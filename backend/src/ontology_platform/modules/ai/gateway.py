@@ -125,6 +125,8 @@ class OpenAIGateway:
         self._retry_delays = tuple(retry_delays)
         self._client: AsyncOpenAI | None = None
         self._probed_ok_at: float | None = None
+        # Attempts in flight, for the whole process: one gateway serves all jobs of a worker.
+        self._slots = asyncio.Semaphore(settings.ai_max_concurrent_calls)
 
     def _get_client(self) -> AsyncOpenAI:
         if not self._settings.ai_configured or self._settings.openai_api_key is None:
@@ -179,7 +181,9 @@ class OpenAIGateway:
         call = _Call(purpose, model, instructions, message, schema, document_id, effort)
         for delay in (*self._retry_delays, None):
             try:
-                return await self._attempt(client, call)
+                # Held for the attempt only: a call waiting to retry leaves its place to another.
+                async with self._slots:
+                    return await self._attempt(client, call)
             except AiError as error:
                 if not error.retryable or delay is None:
                     raise

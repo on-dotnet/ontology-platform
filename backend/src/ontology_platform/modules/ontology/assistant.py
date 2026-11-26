@@ -16,7 +16,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.ontology import editing, expert, rules, schemas, service
-from ontology_platform.modules.ontology.models import ChangeSetSource, Element, Kind, Ontology
+from ontology_platform.modules.ontology.models import (
+    BINDING_KINDS,
+    ChangeSetSource,
+    Element,
+    Kind,
+    Ontology,
+)
 
 # Above this many elements the model only sees those the message names and their neighbours.
 CONTEXT_ELEMENTS_MAX = 400
@@ -165,6 +171,10 @@ def _problem(
     iris: set[str],
 ) -> str | None:
     """Why the item fails the checks of a manual save, or None. Axioms are checked apart."""
+    if item.kind in BINDING_KINDS:
+        # Bindings are proposed from a catalog (spec 003, 8) or edited in their form; neither
+        # the assistant nor an MCP client proposes them (9.4).
+        return "bindings cannot be proposed here"
     if item.kind == "constraint" and item.op != "delete":
         # Rules are too intricate to write from a sentence: the form is for them (section 10).
         return "constraints can only be deleted"
@@ -318,6 +328,8 @@ async def propose(
     `title` and the access token they came through."""
     ontology = await service._ontology_or_404(db, ontology_id, lock=True)
     elements = await service._elements(db, ontology_id)
+    # The checks see the semantic kinds; the cascade of a delete takes the bindings along too.
+    everything = await service._elements(db, ontology_id, all_kinds=True)
     by_id = {element.id: element for element in elements}
     revised = [
         item.model_copy(update={"target_revision": by_id[item.target_element_id].revision})
@@ -330,7 +342,7 @@ async def propose(
     while True:
         kept = await _checked(db, ontology, elements, kept, cache)
         try:
-            with_cascade = _with_cascade(ontology, elements, kept)
+            with_cascade = _with_cascade(ontology, everything, kept)
         except editing.CascadeConflictError as error:
             if not 1 <= error.seq <= len(kept):
                 raise

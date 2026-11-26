@@ -96,6 +96,8 @@ function ontologyServer(extra: Record<string, RouteHandler> = {}) {
       ]);
     },
     'GET /api/ontologies/:id/elements/:elementId/impact': ({ params }) => impactFixture(params.elementId ?? ''),
+    // The type panel's data binding block: nothing bound.
+    'GET /api/ontologies/:id/bindings': ({ query }) => [{ typeId: query.get('typeId') ?? '', table: null, properties: [], relations: [], openChangeSetIds: [] }],
     'GET /api/ontologies/:id/graph': () => ({
       nodes: [
         { id: 'el-molten-steel', label: '钢水', localName: 'MoltenSteel', parentId: null, propertyCount: 1 },

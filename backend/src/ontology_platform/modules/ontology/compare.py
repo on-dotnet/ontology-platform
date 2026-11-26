@@ -14,8 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import defer
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.ontology import schemas, service
-from ontology_platform.modules.ontology.models import KINDS, Release
+from ontology_platform.modules.ontology import bindings, schemas, service
+from ontology_platform.modules.ontology.models import BINDING_KINDS, KINDS, Release
 
 type _Rows = dict[str, dict[str, Any]]
 
@@ -36,6 +36,7 @@ _FIELDS = (
     "autoShape",
     "rules",
     "turtle",
+    "binding",
 )
 _REFERENCES = {"parentId", "domainId", "rangeId", "inverseId"}
 _LEVELS: tuple[schemas.ChangeLevel, ...] = ("breaking", "review", "compatible")
@@ -57,7 +58,9 @@ async def _release(db: AsyncSession, ontology_id: UUID, release_id: UUID) -> Rel
     return release
 
 
-def _label(row: dict[str, Any]) -> str:
+def _label(row: dict[str, Any], rows: _Rows) -> str:
+    if row["kind"] in BINDING_KINDS:
+        return bindings.row_label(row, rows)
     if row["kind"] == "axiom":
         lines = (row.get("turtle") or "").splitlines()
         return str(lines[0][:120]) if lines else ""
@@ -68,7 +71,7 @@ def _reference(value: str | None, rows: _Rows) -> dict[str, Any] | None:
     if value is None:
         return None
     target = rows.get(value)
-    return {"id": value, "label": _label(target) if target is not None else None}
+    return {"id": value, "label": _label(target, rows) if target is not None else None}
 
 
 def _field_changes(element_id: str, left: _Rows, right: _Rows) -> list[schemas.FieldChange]:
@@ -95,7 +98,8 @@ def _field_level(change: schemas.FieldChange) -> schemas.ChangeLevel:
         return "breaking"
     if (field == "required" and change.after) or (field == "multiple" and not change.after):
         return "breaking"
-    if field in {"autoShape", "rules", "turtle"}:
+    if field in {"autoShape", "rules", "turtle", "binding"}:
+        # Another key or column of a binding: queries keep working, maybe on other data.
         return "review"
     return "compatible"
 
@@ -106,18 +110,20 @@ def _element_change(
     change: Literal["added", "removed", "changed", "restored"]
     level: schemas.ChangeLevel
     fields: list[schemas.FieldChange] = []
+    rows = left
     if element_id not in right:
         row = left[element_id]
         change = "removed"
+        # A removed binding breaks the queries that use it (spec 003, 6.5).
         level = "review" if row["kind"] in {"constraint", "axiom"} else "breaking"
     elif element_id not in left:
-        row = right[element_id]
+        row, rows = right[element_id], right
         restored = datetime.fromisoformat(row["createdAt"]) < published
         change = "restored" if restored else "added"
         # Bringing a constraint or an axiom back adds its rules again, like a new one.
         level = "review" if row["kind"] in {"constraint", "axiom"} else "compatible"
     else:
-        row = right[element_id]
+        row, rows = right[element_id], right
         fields = _field_changes(element_id, left, right)
         if not fields:
             return None
@@ -125,12 +131,13 @@ def _element_change(
         level = min(map(_field_level, fields), key=_LEVELS.index)
 
     iri = None
-    if row["kind"] != "axiom":
+    # Axioms and bindings have no IRI of their own.
+    if row["kind"] != "axiom" and row["kind"] not in BINDING_KINDS:
         iri = row.get("iri") or base_iri + row["localName"]
     return schemas.ElementChange(
         element_id=UUID(element_id),
         kind=row["kind"],
-        label=_label(row),
+        label=_label(row, rows),
         iri=iri,
         change=change,
         level=level,

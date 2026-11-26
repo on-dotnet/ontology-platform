@@ -57,3 +57,35 @@ class InvalidValueError(ConnectorError):
     def __init__(self, *, column: str | None = None, sqlstate: str | None = None) -> None:
         super().__init__(sqlstate=sqlstate)
         self.column = column
+
+
+# ---------- raised to the connectors module's own HTTP operations as well ----------
+
+
+class ConnectFailedError(SourceUnavailableError):
+    """Connecting failed; `reason` says why in the terms of `schemas.ConnectionTest.reason`."""
+
+    def __init__(self, reason: str, *, sqlstate: str | None = None) -> None:
+        super().__init__(sqlstate=sqlstate)
+        self.reason = reason
+
+
+class CredentialUnreadableError(SourceDisabledError):
+    """The stored credentials cannot be decrypted with any configured key (lost or wrong
+    OP_SECRET_KEY, or ciphertext moved to another row). HTTP: 409
+    `datasource.credential_unreadable`; for queries the data source counts as disabled."""
+
+    code = "credential_unreadable"
+
+
+class PlatformDatabaseError(SourceDisabledError):
+    """The data source is the platform's own database. HTTP: 422 `datasource.platform_database`;
+    for queries the data source counts as disabled."""
+
+    code = "platform_database"
+
+
+class CatalogTooLargeError(ConnectorError):
+    """The catalog has more tables or columns than `catalog.MAX_TABLES` / `MAX_COLUMNS`."""
+
+    code = "catalog.too_large"

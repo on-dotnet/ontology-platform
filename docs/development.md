@@ -87,6 +87,24 @@
 
 在本机配置文件里写 `OP_REVIEW_MODE=separate`，再运行 `./dev.ps1 up` 生效。设置页会显示当前模式。
 
+## 冶金样例库 `./dev.ps1 seed-steel`
+
+M3 的数据绑定与查询用一套人工合成的冶金 MES 数据作外部数据源（`samples/steel/relational/`，规格 003 第 11 节）。
+
+1. 开发栈运行时执行 `./dev.ps1 seed-steel`。它在开发用的 postgres 实例里建库 `steel_mes` 和只读账号 `steel_reader`（口令 `steel-reader-dev-only`，只在开发环境使用，性质同开发管理员口令），执行两个 SQL 文件，授予该账号对 `mes` 模式的查询权限，并把账号的默认事务设为只读。每次运行都重建 `mes` 模式，可以重复运行；它只动 `steel_mes` 这个库，不碰平台自己的库；`OP_ENV=production` 时拒绝运行。
+2. 在"数据"页新建数据源：主机 `postgres`，端口 5432，库 `steel_mes`，用户 `steel_reader`，口令同上。
+3. 测试镜像里只有 `backend/`，所以 `backend/tests/fixtures/connectors/steel/` 放同样的两个 SQL 文件；改样例时两处一起改，`seed-steel` 装载前会比对，不一致就停下。测试不依赖 `seed-steel`：每个测试进程自己建临时库装入样例（`backend/tests/external_source.py`）。
+
+## 数据源凭据的密钥轮换
+
+数据源的口令用 `OP_SECRET_KEY` 派生的密钥加密存库（规格 003 第 5.4 节），数据库备份里只有密文，密钥要另外保管。更换密钥的步骤：
+
+1. 在本机配置文件里把旧值放进 `OP_SECRET_KEY_PREVIOUS`（可以有多个，逗号分隔），新值放进 `OP_SECRET_KEY`，重启 api 和 worker。这时旧密文仍能解开，新写入一律用新密钥。
+2. 在 api 容器里运行 `python -m ontology_platform.modules.connectors.rekey`，把全部凭据用新密钥重新加密。输出只有条数（重新加密的、解不开的）。
+3. 去掉 `OP_SECRET_KEY_PREVIOUS`，重启。
+
+密钥丢失或填错时，数据源显示"保存的口令无法读取"（`datasource.credential_unreadable`），由管理员重新填写口令即可，其余功能不受影响。
+
 ## 大模型
 
 模型配置只经环境变量提供。Key 不进仓库、不写日志、不在任何接口返回。
@@ -123,7 +141,7 @@
 - 准确率 = 命中任一期望项（含 `core = false`）的预测数 / 预测总数；召回率 = 找到的 `core = true` 项 / `core = true` 项总数。属性与层级没有分母时（没有预测，或没有 `core` 项）记 `null`，屏幕上显示 `-`；类型与关系沿用以前的口径（没有预测记 0）。没有 `properties`、`hierarchy` 段的案例只报预测数量，类型与关系的分数与以前的算法相同。
 - 答案在调用模型之前先检查：缺字段、两端不是某个类型的第一个名字，都会直接失败并指出是哪一条。
 
-结果还包括证据定位率（`groundedShare`：没有 `evidence_not_found` 标记的项的比例）、证据字面核验率（`literalShare`：模型所引的那一句里出现该项名称的比例，关系要两端都出现；按类型、关系、属性分列，规格 004 第 7.2 节），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入、输出、推理 token，汇总在 `usage`；`recorded…` 各项是每次调用录制时的耗时与 token，回放的调用也计入，用来比较两次运行的用量（PR 4 之前的录制没有耗时和推理 token）。录制的键包含推理强度（`OP_AI_EFFORT`、`OP_AI_REASONING_EFFORT`），`models.json` 记下录制时的强度供回放使用。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）；结果顶层是顺序场景，同基线场景用 `sameBaseline.elements` 和 `sameBaseline.parents`。
+结果还包括证据定位率（`groundedShare`：没有 `evidence_not_found` 标记的项的比例）、证据字面核验率（`literalShare`：模型所引的那一句里出现该项名称的比例，关系要两端都出现；按类型、关系、属性分列，规格 004 第 7.2 节），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入、输出、推理 token，汇总在 `usage`；`usage.elapsed` 是每份资料从开始识别到结束的秒数（同一份资料的各批同时调用，所以它小于各次调用的耗时之和；`total` 是各份资料依次识别的秒数之和）；`recorded…` 各项是每次调用录制时的耗时与 token，回放的调用也计入，用来比较两次运行的用量（PR 4 之前的录制没有耗时和推理 token）。录制的键包含推理强度（`OP_AI_EFFORT`、`OP_AI_REASONING_EFFORT`），`models.json` 记下录制时的强度供回放使用。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）；结果顶层是顺序场景，同基线场景用 `sameBaseline.elements` 和 `sameBaseline.parents`。
 
 **不入库的资料**。脱敏后的真实资料不提交进仓库，放在 `.verification/private-docs/<名称>/`（`.verification/` 已被 Git 忽略），结构同案例包：`docs/` 放资料，`eval/expected.toml` 可以没有。把目录路径当作案例参数：
 

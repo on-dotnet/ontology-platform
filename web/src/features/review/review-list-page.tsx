@@ -123,6 +123,7 @@ function ChangeSetTable({ ontology, canUpload }: { ontology: OntologySummary; ca
                             <DocumentName id={changeSet.documentId} />
                           </span>
                         ) : null}
+                        {changeSet.source === 'mcp' ? <SubmitterName name={changeSet.createdByName} /> : null}
                       </div>
                     </TableCell>
                     <TableCell numeric className="font-semibold text-warning-strong">
@@ -160,6 +161,16 @@ const sourceTone: Record<ChangeSetSource, BadgeTone> = {
 export function SourceBadge({ source }: { source: ChangeSetSource }) {
   const { t } = useTranslation();
   return <Badge tone={sourceTone[source]}>{t(`review.source.${source}`)}</Badge>;
+}
+
+/** Who submitted a change set through MCP: the token's owner, named since no document or AI run says where it came from. */
+export function SubmitterName({ name }: { name: string | null }) {
+  const { t } = useTranslation();
+  return (
+    <span className="min-w-0 truncate">
+      {t('review.submittedBy', { name: name ?? t('review.unknownSubmitter') })}
+    </span>
+  );
 }
 
 /** Filename of a change set's source document. */

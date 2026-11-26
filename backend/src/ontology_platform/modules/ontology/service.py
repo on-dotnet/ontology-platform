@@ -24,9 +24,10 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ontology_platform.errors import AppError, not_implemented
+from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import mergeplan, rules, schemas
+from ontology_platform.modules.identity import service as identity
+from ontology_platform.modules.ontology import binding_rules, mergeplan, rules, schemas
 from ontology_platform.modules.ontology.axiom_rules import axiom_problem
 from ontology_platform.modules.ontology.models import (
     BINDING_KINDS,
@@ -70,6 +71,15 @@ class InvalidProposalError(AppError):
 
     def __init__(self, detail: str) -> None:
         super().__init__(422, INVALID_ITEM, detail)
+
+
+class InvalidBindingError(InvalidProposalError):
+    """A binding item fails the binding rules (spec 003, 6.2): its own `binding.*` code."""
+
+    def __init__(self, code: str, detail: str) -> None:
+        super().__init__(detail)
+        self.status = binding_rules.STATUS[code]
+        self.code = code
 
 
 class ReleaseInvalidError(AppError):
@@ -171,15 +181,6 @@ async def _active_elements(db: AsyncSession, ontology_id: UUID) -> list[Element]
 
 
 # ---------- interface for other modules ----------
-
-
-def ensure_no_binding_items(items: Sequence[schemas.ProposedItem | schemas.EditItem]) -> None:
-    """Binding items are accepted by the API models from M3 batch 1 on, but merging them arrives
-    with batch 4a (spec 003, 6.6). Until then they stop here, before any rule table that does
-    not know their kinds; every way to a change set (edits, imports, assistant, cascades) passes
-    through `create_change_set`, and manual edits check first."""
-    if any(item.kind in BINDING_KINDS for item in items):
-        raise not_implemented("Data bindings")
 
 
 async def count_mcp_change_sets(db: AsyncSession, token_id: UUID, *, since: datetime) -> int:
@@ -339,9 +340,10 @@ async def create_change_set(
 
     Raises `InvalidProposalError` when a temp_ref is repeated, a reference is neither an object
     type of the ontology nor the temp_ref of an object type created in this change set, or an
-    update does not target an element of the ontology. Nothing is committed.
+    update does not target an element of the ontology; for a binding item these and the binding
+    rules (including the cached catalog) raise `InvalidBindingError`, a subclass with the
+    `binding.*` codes. Nothing is committed.
     """
-    ensure_no_binding_items(items)
     ontology = await db.get(Ontology, ontology_id)
     if ontology is None:
         raise _ontology_not_found()
@@ -358,9 +360,19 @@ async def create_change_set(
         created_kinds[item.temp_ref] = item.kind
     for position, item in enumerate(items, start=1):
         problem = _proposal_problem(item, elements, created_kinds)
+        if problem and item.kind in BINDING_KINDS:
+            # The binding error codes cover bad references too (spec 003 appendix).
+            raise InvalidBindingError(binding_rules.INVALID, f"Item {position}: {problem}.")
         if problem:
             raise InvalidProposalError(f"Item {position}: {problem}.")
     await _check_matches(db, ontology_id, items, elements, created_kinds)
+    if any(item.kind in BINDING_KINDS for item in items):
+        found = await binding_rules.proposal_problems(
+            db, elements.values(), [_proposed(item) for item in items]
+        )
+        if found:
+            index, broken = found[0]
+            raise InvalidBindingError(broken.code, f"Item {index + 1}: {broken.message}.")
 
     change_set = ChangeSet(
         id=uuid4(),
@@ -486,6 +498,16 @@ async def _check_matches(
         raise InvalidProposalError(f"Item {position}: {problem}.")
 
 
+def _proposed(item: schemas.ProposedItem) -> binding_rules.Proposed:
+    return binding_rules.Proposed(
+        op=item.op,
+        kind=item.kind,
+        target_id=item.target_element_id,
+        temp_ref=item.temp_ref,
+        fields=item.proposed,
+    )
+
+
 def item_references(
     kind: str, fields: schemas.ElementFields
 ) -> list[tuple[str, str, tuple[str, ...]]]:
@@ -494,7 +516,7 @@ def item_references(
     for name in rules.KIND_REFS[kind]:
         value = getattr(fields, name)
         if value is not None:
-            found.append((rules.wire_name(name), value, rules.REF_TARGETS[name]))
+            found.append((rules.wire_name(name), value, rules.ref_targets(kind, name)))
     for index, rule in enumerate(fields.rules or []):
         found.append((f"rules[{index}].pathRef", rule.path_ref, rules.RULE_PATH_KINDS))
         if rule.class_ref is not None:
@@ -527,6 +549,16 @@ def _proposal_problem(
             return "evidence needs both charStart and charEnd, or neither"
         if start is not None and end is not None and end < start:
             return "evidence charEnd is before charStart"
+    if item.kind in BINDING_KINDS:
+        target = elements.get(item.target_element_id) if item.target_element_id else None
+        shape = rules.field_problems(
+            item.kind,
+            item.op,
+            item.proposed,
+            target_binding=target.binding if target else None,
+        )
+        if shape:
+            return ", ".join(shape)
     own_id = item.target_element_id if item.op != "create" else None
     for name, value, kinds in item_references(item.kind, item.proposed):
         problem = _reference_problem(
@@ -547,6 +579,8 @@ _KIND_NAMES = {
     ("entity_type",): "an object type",
     ("relation_type",): "a relation",
     ("relation_type", "property"): "a relation or property",
+    ("property",): "a property",
+    ("type_binding",): "a type binding",
 }
 
 
@@ -1000,6 +1034,15 @@ def _before(element: Element) -> schemas.ElementFields:
     """The element's current values as item fields, with only the keys its kind uses."""
     if element.kind == "axiom":
         return schemas.ElementFields.model_validate({"turtle": element.turtle})
+    if element.kind in BINDING_KINDS:
+        references = {
+            "subject_ref": _ref(element.subject_id),
+            "parent_ref": _ref(element.parent_id),
+            "domain_ref": _ref(element.domain_id),
+            "range_ref": _ref(element.range_id),
+        }
+        values = {name: references[name] for name in rules.KIND_REFS[element.kind]}
+        return schemas.ElementFields.model_validate({**values, "binding": element.binding})
     data: dict[str, Any] = {
         "local_name": element.local_name,
         "label_zh": element.label_zh,
@@ -1401,7 +1444,9 @@ def _counts(decisions: Counter[str]) -> schemas.DecisionCounts:
     )
 
 
-def _summary_data(change_set: ChangeSet, counts: schemas.DecisionCounts) -> dict[str, Any]:
+def _summary_data(
+    change_set: ChangeSet, counts: schemas.DecisionCounts, names: Mapping[UUID, str]
+) -> dict[str, Any]:
     return {
         "id": change_set.id,
         "ontology_id": change_set.ontology_id,
@@ -1411,9 +1456,17 @@ def _summary_data(change_set: ChangeSet, counts: schemas.DecisionCounts) -> dict
         "status": change_set.status,
         "counts": counts,
         "created_by": change_set.created_by,
+        "created_by_name": names.get(change_set.created_by) if change_set.created_by else None,
         "created_at": change_set.created_at,
         "merged_at": change_set.merged_at,
     }
+
+
+async def _names(db: AsyncSession, change_sets: Sequence[ChangeSet]) -> dict[UUID, str]:
+    """Display names of the change sets' submitters, read in one go from identity."""
+    return await identity.display_names(
+        db, {change_set.created_by for change_set in change_sets if change_set.created_by}
+    )
 
 
 async def _decision_counts(
@@ -1435,7 +1488,8 @@ async def _decision_counts(
 
 async def _summary(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetSummary:
     tallies = await _decision_counts(db, [change_set.id])
-    data = _summary_data(change_set, _counts(tallies[change_set.id]))
+    names = await _names(db, [change_set])
+    data = _summary_data(change_set, _counts(tallies[change_set.id]), names)
     return schemas.ChangeSetSummary.model_validate(data)
 
 
@@ -1453,9 +1507,10 @@ async def list_change_sets(
         statement = statement.where(ChangeSet.status == status)
     change_sets = (await db.scalars(statement)).all()
     tallies = await _decision_counts(db, [change_set.id for change_set in change_sets])
+    names = await _names(db, change_sets)
     return [
         schemas.ChangeSetSummary.model_validate(
-            _summary_data(change_set, _counts(tallies[change_set.id])),
+            _summary_data(change_set, _counts(tallies[change_set.id]), names),
         )
         for change_set in change_sets
     ]
@@ -1469,7 +1524,7 @@ async def _items(db: AsyncSession, change_set: ChangeSet) -> Sequence[ChangeItem
 async def _detail(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetDetail:
     items = await _items(db, change_set)
     counts = _counts(Counter(item.decision for item in items))
-    data = _summary_data(change_set, counts)
+    data = _summary_data(change_set, counts, await _names(db, [change_set]))
     resolutions, token, links = await _resolutions(db, change_set, items)
     return schemas.ChangeSetDetail.model_validate(
         {
@@ -1545,6 +1600,7 @@ async def _edit_problems(
         fields,
         target_local_name=target.local_name if target else None,
         target_imported=target is not None and target.iri is not None,
+        target_binding=target.binding if target else None,
     )
     siblings = await _items(db, change_set)
     creates = {
@@ -1581,6 +1637,28 @@ async def _edit_problems(
             own_key = f"ref:{item.temp_ref}"
         if _closes_parent_loop(fields.parent_ref, own_key, elements, creates):
             problems.append("parentRef would make the type hierarchy circular")
+    if kind in BINDING_KINDS and not problems and item.op != "delete":
+        found = await binding_rules.edit_problems(
+            db,
+            elements.values(),
+            [
+                binding_rules.Sibling(
+                    id=sibling.id,
+                    rejected=sibling.decision == "rejected",
+                    item=binding_rules.Proposed(
+                        op=sibling.op,
+                        kind=sibling.kind,
+                        target_id=sibling.target_element_id,
+                        temp_ref=sibling.temp_ref,
+                        fields=rules.effective_fields(sibling.proposed, sibling.edited),
+                    ),
+                )
+                for sibling in siblings
+            ],
+            item.id,
+            fields,
+        )
+        problems.extend(problem.message for problem in found)
     return problems
 
 

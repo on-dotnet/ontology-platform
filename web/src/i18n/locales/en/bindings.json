@@ -1,3 +1,99 @@
 {
-  "title": "Data binding"
+  "title": "Data binding",
+  "info": "Changes to bindings are used by Explore once they are reviewed and published.",
+  "empty": "No data bound yet",
+  "bind": "Bind data",
+  "edit": "Edit binding",
+  "loadFailed": "Could not load the bindings",
+  "pending": {
+    "title": "Binding changes are waiting for review",
+    "link": "Go to review"
+  },
+  "table": {
+    "dataSource": "Data source",
+    "table": "Table",
+    "keyColumns": "Key columns",
+    "archived": "Archived"
+  },
+  "properties": {
+    "title": "Properties and columns",
+    "property": "Property",
+    "column": "Column",
+    "inherited": "Inherited",
+    "unbound": "Not bound"
+  },
+  "relations": {
+    "title": "Relations",
+    "out": "{{relation}} → {{type}}",
+    "in": "{{type}} → {{relation}}",
+    "unbound": "Not bound",
+    "foreignKey": "Foreign key {{columns}} → {{references}}",
+    "linkTable": "Link table {{table}}"
+  },
+  "check": {
+    "missing_table": "This table is not in the catalog; it may have been renamed or dropped",
+    "missing_column": "This column is not in the catalog; it may have been renamed",
+    "type_mismatch": "The column's type does not fit the property's datatype",
+    "catalog_unavailable": "The data source's catalog has not been read, so this cannot be checked"
+  },
+  "form": {
+    "createTitle": "Bind data: {{type}}",
+    "editTitle": "Edit binding: {{type}}",
+    "visibility": {
+      "title": "Data visible to every signed-in user",
+      "description": "Once bound and published, the data in these columns is visible to every signed-in user of the platform."
+    },
+    "dataSource": "Data source",
+    "dataSourcePlaceholder": "Choose a data source",
+    "noDataSources": "No data source is available yet. Ask an administrator to add one on the Data page.",
+    "catalogNotReady": "This data source's catalog has not been read yet. Read it on the Data page first.",
+    "table": "Table",
+    "tableSearch": "Search tables",
+    "noTables": "No tables found",
+    "view": "View",
+    "keyColumns": "Key columns",
+    "keyColumnsHint": "Defaults to the table's primary key. A view has none: choose columns that identify one row.",
+    "propertiesTitle": "Columns of the properties",
+    "propertiesHint": "Only columns that fit the property's datatype are listed.",
+    "noColumn": "Not bound",
+    "noCompatibleColumn": "No column of a fitting type",
+    "staleColumn": "The bound column {{column}} is missing or has an incompatible type.",
+    "unavailableKey": "{{column}} can no longer be used as a key.",
+    "removeKey": "Remove key column",
+    "relationsTitle": "Relations",
+    "relationsHint": "A relation can be bound once the type at its other end is bound.",
+    "otherTypeUnbound": "{{type}} has no data bound yet",
+    "joinKind": "Join",
+    "joinKinds": {
+      "none": "Not bound",
+      "foreign_key": "Foreign key",
+      "link_table": "Link table"
+    },
+    "side": "Table holding the foreign key",
+    "sides": {
+      "source": "Source table ({{table}})",
+      "target": "Target table ({{table}})"
+    },
+    "columns": "Foreign key columns",
+    "references": "Referenced columns",
+    "linkTable": "Link table",
+    "sourceColumns": "Columns for the source",
+    "endpointKeys": "Key order: {{keys}}",
+    "targetColumns": "Columns for the target",
+    "appliesAtOnce": "Takes effect on saving.",
+    "submitsForReview": "Goes to review on saving and takes effect once accepted.",
+    "save": "Save",
+    "saved": "Binding saved",
+    "dependenciesChanged": "A binding used by this change has been updated. Reopen the editor to review the bindings before switching tables.",
+    "errors": {
+      "dataSourceRequired": "Choose a data source",
+      "tableRequired": "Choose a table",
+      "keyRequired": "Choose at least one key column",
+      "keyTooMany": "At most 8 key columns",
+      "joinColumnsRequired": "Choose the columns to join on",
+      "joinTooMany": "Choose at most 8 join columns on each side",
+      "linkColumnsMismatch": "Match the endpoint keys by choosing {{sourceKeys}} source columns and {{targetKeys}} target columns.",
+      "columnsMismatch": "Both sides need the same number of columns"
+    }
+  }
 }

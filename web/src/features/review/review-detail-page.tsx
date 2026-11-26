@@ -46,10 +46,11 @@ import {
   type ItemPatch,
   type MergeResult,
 } from './api';
+import { BINDING_KINDS, bindingSentence, CatalogEvidenceList, isBindingKind } from './binding-item';
 import { ChangeItemCard } from './change-item-card';
 import { ChangeItemEditDialog } from './change-item-edit-dialog';
 import { buildRefContext, itemLabel, type RefContext } from './item-fields';
-import { DocumentName, SourceBadge } from './review-list-page';
+import { DocumentName, SourceBadge, SubmitterName } from './review-list-page';
 
 function BackToList({ ontologyId }: { ontologyId?: string }) {
   const { t } = useTranslation();
@@ -146,7 +147,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const evidencePanelId = useId();
 
   const context = useMemo(() => buildRefContext(changeSet.items, elements, language), [changeSet.items, elements, language]);
-  const groups = ELEMENT_KINDS.map((kind) => ({
+  const groups = [...ELEMENT_KINDS, ...BINDING_KINDS].map((kind) => ({
     kind,
     items: changeSet.items.filter((item) => item.kind === kind).sort((a, b) => a.seq - b.seq),
   })).filter((group) => group.items.length > 0);
@@ -297,6 +298,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
             </span>
           ) : null}
         </span>
+        {changeSet.source === 'mcp' ? <SubmitterName name={changeSet.createdByName} /> : null}
         <span className="tabular-nums">{t('review.countsSummary', { ...changeSet.counts })}</span>
       </div>
 
@@ -534,11 +536,16 @@ function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps
           <Quote className="size-4 text-info-strong" aria-hidden />
           {t('review.evidenceTitle')}
         </CardTitle>
-        <p className="truncate text-sm text-muted-foreground">{itemLabel(item, context)}</p>
+        <p className="truncate text-sm text-muted-foreground">
+          {isBindingKind(item.kind) ? bindingSentence(t, item, context) : itemLabel(item, context)}
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {item.evidence.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('review.noEvidence')}</p>
+        ) : item.evidence.every((evidence) => evidence.kind === 'catalog') ? (
+          // Catalog facts are short and read together: a list, not one excerpt at a time.
+          <CatalogEvidenceList evidence={item.evidence} />
         ) : (
           <>
             {item.evidence.length > 1 ? (
@@ -557,7 +564,8 @@ function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps
                 ))}
               </div>
             ) : null}
-            {current ? <EvidenceExcerpt key={current.id} evidence={current} /> : null}
+            {current?.kind === 'catalog' ? <CatalogEvidenceList evidence={[current]} /> : null}
+            {current && current.kind !== 'catalog' ? <EvidenceExcerpt key={current.id} evidence={current} /> : null}
           </>
         )}
       </CardContent>

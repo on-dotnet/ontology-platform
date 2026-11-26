@@ -479,6 +479,10 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
     # The by-flags review of the sequential scenario repeats the same inputs: all replayed.
     assert model.calls == 10
     assert recorded["usage"]["documents"]["docs/b.md"]["extract.types"]["calls"] == 1
+    # Seconds from start to finish per document, apart from the calls' seconds.
+    elapsed = recorded["sameBaseline"]["usage"]["elapsed"]
+    assert set(elapsed["documents"]) == {"docs/a.md (same baseline)", "docs/b.md (same baseline)"}
+    assert elapsed["total"] == round(sum(elapsed["documents"].values()), 1)
     assert recorded["sameBaseline"]["usage"]["total"] == {
         "calls": 3,
         "replayed": 4,

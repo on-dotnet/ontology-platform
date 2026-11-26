@@ -49,7 +49,12 @@ async def run() -> None:
         )
         register_connector_jobs(session_factory, settings)
         register_usage_provider(ontology_bindings.table_usage)
-        await run_worker(session_factory, f"{socket.gethostname()}-{uuid4()}", stop_event=stop)
+        await run_worker(
+            session_factory,
+            f"{socket.gethostname()}-{uuid4()}",
+            stop_event=stop,
+            concurrency=settings.worker_concurrency,
+        )
     finally:
         loop.remove_signal_handler(signal.SIGTERM)
         await engine.dispose()

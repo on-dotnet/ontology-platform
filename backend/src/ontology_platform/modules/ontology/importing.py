@@ -23,7 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import rules, schemas, service
+from ontology_platform.modules.ontology import bindings, rules, schemas, service
 from ontology_platform.modules.ontology.models import (
     KINDS,
     ChangeSetSource,
@@ -263,7 +263,10 @@ async def _propose(
     title: str,
     source: ChangeSetSource,
     actor: UUID,
+    bound: Sequence[Element] = (),
 ) -> _Proposed:
+    """The differences as an open change set. `elements` are the semantic ones the file is
+    compared with; `bound` are all of them, for the bindings of the elements the file drops."""
     header = service.header_of(ontology)
     existing: dict[str, Element] = {}
     for element in elements:
@@ -280,6 +283,9 @@ async def _propose(
         result,
     )
     items = sorted((proposals.item(change) for change in result.changes), key=_sort_key)
+    # A file has no bindings: they never go for not being in it, only with what they bind.
+    deleted = [item.target_element_id for item in items if item.op == "delete"]
+    items += bindings.cascade_deletes(bound, [i for i in deleted if i is not None])
     if not items:
         return _Proposed(None, items, len(result.kind_changed))
     change_set_id = await service.create_change_set(
@@ -458,6 +464,7 @@ async def compare_into(
         title=title,
         source=source,
         actor=actor,
+        bound=await service._elements(db, ontology.id, all_kinds=True),
     )
     audit.record(
         db,

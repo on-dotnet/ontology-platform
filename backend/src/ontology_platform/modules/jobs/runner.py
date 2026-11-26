@@ -116,29 +116,70 @@ async def _execute(kind: str, context: JobContext, worker_id: str) -> None:
             await service.fail(db, context.id, code, str(error), retryable=False)
 
 
+async def _run(kind: str, context: JobContext, worker_id: str) -> None:
+    try:
+        await _execute(kind, context, worker_id)
+    except* JobLeaseLostError:
+        logger.warning("Job %s was reclaimed", context.id)
+
+
 async def run_worker(
     session_factory: async_sessionmaker[AsyncSession],
     worker_id: str,
     *,
     poll_interval: float = 2.0,
     stop_event: asyncio.Event | None = None,
+    concurrency: int = 1,
 ) -> None:
+    """Runs up to `concurrency` jobs at once (spec 004, 7.3), each with its own claim, heartbeat
+    and lease check. On stop no job is claimed any more; the jobs in progress finish first.
+
+    An error outside a job's handler (recording its outcome failed) stops the worker as it did
+    with one job at a time, once the other jobs in progress have finished.
+    """
     stop = stop_event if stop_event is not None else asyncio.Event()
-    while not stop.is_set():
-        work: tuple[str, JobContext] | None = None
-        async with session_factory.begin() as db:
-            await service.requeue_stale(db)
-            job = await service.claim(db, worker_id)
-            if job is not None:
-                context = JobContext(
-                    job.id, job.payload, session_factory, job.attempts, job.max_attempts, worker_id
-                )
-                work = job.kind, context
-        if work is None:
-            await _wait(stop, poll_interval)
-            continue
-        kind, context = work
-        try:
-            await _execute(kind, context, worker_id)
-        except* JobLeaseLostError:
-            logger.warning("Job %s was reclaimed", context.id)
+    running: set[asyncio.Task[None]] = set()
+    failed: list[BaseException] = []
+
+    def finished(task: asyncio.Task[None]) -> None:
+        running.discard(task)
+        error = None if task.cancelled() else task.exception()
+        if error is not None:
+            # Taking the exception silences asyncio's warning: log every one, raise the first.
+            logger.error("Worker %s stops after an error", worker_id, exc_info=error)
+            failed.append(error)
+
+    try:
+        while not stop.is_set() and not failed:
+            if len(running) >= concurrency:
+                await asyncio.wait(running, return_when=asyncio.FIRST_COMPLETED)
+                continue
+            work: tuple[str, JobContext] | None = None
+            async with session_factory.begin() as db:
+                await service.requeue_stale(db)
+                job = await service.claim(db, worker_id)
+                if job is not None:
+                    context = JobContext(
+                        job.id,
+                        job.payload,
+                        session_factory,
+                        job.attempts,
+                        job.max_attempts,
+                        worker_id,
+                    )
+                    work = job.kind, context
+            if work is None:
+                await _wait(stop, poll_interval)
+                continue
+            task = asyncio.create_task(_run(*work, worker_id))
+            running.add(task)
+            task.add_done_callback(finished)
+    except asyncio.CancelledError:
+        for task in running:
+            task.cancel()
+        raise
+    finally:
+        if running:
+            await asyncio.gather(*running, return_exceptions=True)
+    if failed:
+        raise failed[0]

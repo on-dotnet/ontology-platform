@@ -18,9 +18,17 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.ontology import axiom_rules, expert, rules, schemas, service
+from ontology_platform.modules.ontology import (
+    axiom_rules,
+    binding_rules,
+    bindings,
+    expert,
+    rules,
+    schemas,
+    service,
+)
 from ontology_platform.modules.ontology import merge as merging
-from ontology_platform.modules.ontology.models import Element, Kind, Ontology
+from ontology_platform.modules.ontology.models import BINDING_KINDS, Element, Kind, Ontology
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
 
 # Reference keys of item fields and the columns they set.
@@ -29,6 +37,7 @@ _REF_COLUMNS = {
     "domain_ref": "domain_id",
     "range_ref": "range_id",
     "inverse_ref": "inverse_id",
+    "subject_ref": "subject_id",
 }
 
 
@@ -84,20 +93,23 @@ def _rule_ids(rule: Mapping[str, Any]) -> set[UUID]:
     return found
 
 
-def _label(element: Element) -> str:
+def _label(element: Element, by_id: Mapping[UUID, Element]) -> str:
     if element.kind == "axiom":
         return (element.turtle or "").strip().partition("\n")[0][:120]
+    if element.kind in BINDING_KINDS:
+        return bindings.element_label(element, by_id)
     return rules.display_label(element.label_zh, element.label_en, element.local_name)
 
 
 def _views(ontology: Ontology, elements: Iterable[Element]) -> dict[UUID, _View]:
+    by_id = {e.id: e for e in elements}
     return {
         e.id: _View(
             id=e.id,
             kind=e.kind,
             status=e.status,
             revision=e.revision,
-            label=_label(e),
+            label=_label(e, by_id),
             iri=service.iri_of(e, ontology.base_iri),
             turtle=e.turtle,
             subject_id=e.subject_id,
@@ -107,7 +119,7 @@ def _views(ontology: Ontology, elements: Iterable[Element]) -> dict[UUID, _View]
             inverse_id=e.inverse_id,
             rules=list(e.rules or []),
         )
-        for e in elements
+        for e in by_id.values()
     }
 
 
@@ -302,6 +314,7 @@ async def impact(db: AsyncSession, ontology_id: UUID, element_id: UUID) -> schem
         properties=groups["property"],
         constraints=groups["constraint"],
         axioms=groups["axiom"],
+        bindings=[ref for kind in BINDING_KINDS for ref in groups[kind]],
         inverse=_ref(inverse) if inverse is not None else None,
         cascade=cascade,
     )
@@ -351,7 +364,10 @@ async def _check_items(
             fields,
             target_local_name=target.local_name if target else None,
             target_imported=target is not None and target.iri is not None,
+            target_binding=target.binding if target else None,
         )
+        if problems and edit.kind in BINDING_KINDS:
+            raise AppError(422, binding_rules.INVALID, f"Item {seq}: {', '.join(problems)}.")
         if problems:
             raise _invalid(seq, ", ".join(problems))
         if edit.op == "create" and fields.local_name is not None:
@@ -429,8 +445,12 @@ def _add_cascade(ontology: Ontology, elements: Sequence[Element], checked: _Chec
 def _title(elements: Mapping[UUID, Element], checked: _Checked, count: int) -> str:
     first = checked.items[0]
     target = elements.get(first.target_element_id) if first.target_element_id else None
+    subject = rules.parse_id(first.proposed.subject_ref) if first.proposed.subject_ref else None
     if target is not None:
-        name = _label(target)
+        name = _label(target, elements)
+    elif first.kind in BINDING_KINDS:
+        bound = elements.get(subject) if subject is not None else None
+        name = _label(bound, elements) if bound is not None else ""
     elif first.kind == "axiom":
         name = (first.proposed.turtle or "").strip().partition("\n")[0]
     else:
@@ -450,7 +470,6 @@ async def save_edits(
     ip: str | None,
 ) -> schemas.EditResult:
     """Save `body.items` as a manual change set; merge it when `body.apply` and `may_apply`."""
-    service.ensure_no_binding_items(body.items)
     ontology = await service._ontology_or_404(db, ontology_id, lock=True)
     elements = await service._elements(db, ontology_id, all_kinds=True)
     checked = await _check_items(db, ontology, elements, body)

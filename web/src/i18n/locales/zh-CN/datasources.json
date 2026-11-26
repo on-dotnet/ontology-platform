@@ -1,6 +1,121 @@
 {
   "title": "数据源",
-  "detailInfo": "查看数据源的连接状态和表目录，并让 AI 建议数据绑定。平台对数据源只读。",
-  "detailEmptyTitle": "数据源详情即将推出",
-  "detailEmptyDescription": "你可以在这里测试连接、浏览表目录，并让 AI 建议对象类型与表的绑定。"
+  "create": "新建数据源",
+  "edit": "编辑",
+  "more": "更多操作",
+  "saved": "数据源已保存",
+  "close": "关闭",
+  "cancel": "取消",
+  "unknown": "未知",
+  "unavailable": "—",
+  "fields": {
+    "name": "名称",
+    "kind": "类型",
+    "host": "主机",
+    "port": "端口",
+    "database": "数据库",
+    "username": "用户名",
+    "ssl": "SSL 模式",
+    "schemas": "模式范围",
+    "password": "口令",
+    "credentialAt": "口令更新时间"
+  },
+  "kind": {
+    "postgresql": "PostgreSQL"
+  },
+  "ssl": {
+    "disable": "disable",
+    "prefer": "prefer",
+    "require": "require",
+    "verify-full": "verify-full"
+  },
+  "status": {
+    "ok": "正常",
+    "failed": "失败",
+    "untested": "未测试",
+    "archived": "已归档"
+  },
+  "list": {
+    "empty": "还没有数据源",
+    "askAdmin": "还没有数据源，请管理员添加",
+    "status": "连接状态",
+    "catalogAt": "目录读取时间",
+    "count": "已绑定的对象类型数"
+  },
+  "connection": {
+    "title": "连接信息",
+    "allSchemas": "全部可用模式",
+    "stored": "已保存",
+    "missing": "未保存",
+    "reenter": "重新填写口令",
+    "lastTest": "最近一次测试"
+  },
+  "test": {
+    "current": "本次连接测试",
+    "action": "测试连接",
+    "ok": "连接成功",
+    "version": "服务器版本 {{version}}",
+    "writeWarning": "该账号有写权限，建议换用只读账号",
+    "reason": {
+      "unreachable": "无法连接到主机，请检查主机、端口和网络连接。",
+      "auth_failed": "认证失败，请检查用户名和口令。",
+      "database_missing": "数据库不存在，请检查数据库名称。",
+      "ssl": "SSL 连接失败，请检查 SSL 模式和服务器证书。",
+      "timeout": "连接超时，请检查网络和数据库是否可用后重试。"
+    }
+  },
+  "archive": {
+    "action": "归档",
+    "confirm": "归档数据源",
+    "title": "归档“{{name}}”？",
+    "consequences": "归档会清除已保存的口令，此数据源将无法再使用。已有绑定的旧版本仍会显示数据源名称。",
+    "count": "工作版本中有 {{count}} 个对象类型引用此数据源。",
+    "done": "数据源已归档"
+  },
+  "form": {
+    "editTitle": "编辑数据源",
+    "description": "平台对数据源只读；绑定并发布后，绑定列的数据对平台的所有登录用户可见",
+    "savedPassword": "已保存，留空表示不修改",
+    "allowSamples": "允许把样本值发给模型",
+    "samplesHelp": "AI 建议绑定时可参考列中的实际取值。",
+    "samplesWarning": "打开后，AI 建议绑定时会读取每列最多 5 个值并发送给模型服务；这些值会作为证据显示在审核页，所有登录用户都能看到",
+    "save": "保存数据源",
+    "required": "请填写{{field}}。",
+    "invalidPort": "请输入 1 到 65535 之间的整数。",
+    "validationSummary": "请检查标出的字段后重试。",
+    "addSchema": "添加模式",
+    "removeSchema": "移除模式 {{index}}",
+    "schemaName": "模式名 {{index}}"
+  },
+  "catalog": {
+    "title": "目录",
+    "lastRead": "上次读取",
+    "loading": "正在读取目录",
+    "retry": "重试",
+    "stillReading": "仍在读取",
+    "refresh": "读取目录",
+    "forbidden": "浏览数据源的目录需要编辑者以上角色",
+    "edit": "编辑数据源",
+    "never": "还没有读取目录",
+    "boundType": "绑定的对象类型：{{label}}",
+    "columns": "列",
+    "name": "列名",
+    "type": "类型",
+    "nullable": "可空",
+    "comment": "注释",
+    "primaryKey": "主键",
+    "foreignKey": "外键",
+    "yes": "是",
+    "no": "否",
+    "noColumns": "这张表没有列",
+    "foreignKeys": "外键",
+    "noForeignKeys": "这张表没有外键",
+    "tree": "模式与表",
+    "loadMore": "加载更多表",
+    "noMatches": "没有匹配的表",
+    "emptyTables": "这个模式下没有表",
+    "selectTable": "选择一张表查看列和外键。",
+    "search": "搜索表名",
+    "emptySchemas": "目录中没有可浏览的模式"
+  }
 }

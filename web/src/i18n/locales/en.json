@@ -444,6 +444,34 @@
       "rejected": "Rejected"
     },
     "noSource": "Submitted manually",
+    "submittedBy": "Submitted by {{name}}",
+    "unknownSubmitter": "a user who no longer exists",
+    "binding": {
+      "type": "{{subject}} → {{target}}",
+      "property": "Property {{subject}} → {{target}}",
+      "relation": "Relation {{subject}} → {{target}}",
+      "table": "table {{table}} (key {{keys}})",
+      "column": "column {{column}}",
+      "foreignKeySource": "foreign key on the source table {{columns}} → {{references}}",
+      "foreignKeyTarget": "foreign key on the target table {{columns}} → {{references}}",
+      "linkTable": "link table {{table}} (source {{source}}; target {{target}})",
+      "field": "Binding",
+      "keyUnverified": {
+        "title": "Confirm the key columns",
+        "description": "This table has no primary key constraint. Make sure the chosen columns identify one row: a wrong key makes query results wrong."
+      },
+      "dependencyRejected": "The table binding this item belongs to was not accepted, so it will not take effect"
+    },
+    "catalogEvidence": {
+      "label": "Catalog facts",
+      "facts": {
+        "table": "Table",
+        "column": "Column",
+        "primary_key": "Primary key",
+        "foreign_key": "Foreign key",
+        "sample": "Sample values"
+      }
+    },
     "backToList": "Back to change sets",
     "detailTitle": "Change set",
     "detailInfo": "Accept, edit or reject each change in the change set. Once everything is decided, merge the accepted items into the working ontology.",
@@ -522,6 +550,10 @@
     "confidencePercent": "AI confidence: {{percent}}",
     "confidencePercentShort": " ({{percent}})",
     "flags": {
+      "key_unverified": {
+        "label": "Key not backed by a constraint",
+        "description": "This table has no primary key constraint. Make sure the chosen columns identify one row."
+      },
       "evidence_not_found": {
         "label": "Quote not found",
         "description": "The quote AI cited was not found in the source, so its confidence was lowered. Check the source before deciding."
@@ -852,6 +884,7 @@
         "properties": "Properties ({{count}})",
         "constraints": "Constraints ({{count}})",
         "axioms": "Axioms ({{count}})",
+        "bindings": "Data bindings ({{count}})",
         "inverse": "Inverse relation"
       }
     },
@@ -924,6 +957,7 @@
       "version": "Version",
       "title": "Title",
       "elements": "Elements",
+      "bindings": "Bindings",
       "publishedAt": "Published",
       "current": "Current",
       "actions": "Actions"
@@ -965,7 +999,8 @@
         "invalid_range": "The target object type (range) does not exist or is deprecated",
         "invalid_datatype": "The data type is not one the platform supports",
         "invalid_local_name": "The local name does not follow the naming rules",
-        "missing_label": "The Chinese name is missing"
+        "missing_label": "The Chinese name is missing",
+        "invalid_binding": "A binding refers to an element that no longer exists, or no longer fits its type, column count or uniqueness"
       }
     },
     "activate": {
@@ -998,7 +1033,7 @@
       "levelInfoLabel": "About “{{level}}”",
       "levelInfo": {
         "breaking": "Elements deleted, or their data type, unit, domain, range, parent type or inverse changed. Data and queries that rely on them may break.",
-        "review": "Changes to constraints and advanced axioms. Check that they are what you expect.",
+        "review": "Changes to constraints, advanced axioms and binding contents. Check that they are what you expect.",
         "compatible": "Additions, restores, or changes to names, definitions and synonyms. Existing data and queries are not affected."
       },
       "change": {
@@ -1010,6 +1045,7 @@
       "fields": {
         "rules": "Constraint rules",
         "turtle": "Turtle fragment",
+        "binding": "Binding",
         "other": "Other field"
       },
       "rulesChanged": "Rules changed",
