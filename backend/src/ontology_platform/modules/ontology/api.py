@@ -22,6 +22,7 @@ from ontology_platform.modules.identity.api import (
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
 from ontology_platform.modules.ontology import (
+    bindings,
     compare,
     editing,
     expert,
@@ -276,6 +277,19 @@ async def get_element(
 ) -> schemas.ElementDetail:
     """One element and where it came from: merged change items and their evidence."""
     return await service.get_element(db, id, elementId)
+
+
+@router.get("/ontologies/{id}/bindings", responses=problem_responses(401, 403, 404, 422))
+async def list_bindings(
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+    type_id: Annotated[UUID | None, Query(alias="typeId")] = None,
+) -> list[schemas.TypeBindingView]:
+    """The data bindings of the working version by object type (spec 003, 6.5): of one type
+    (`typeId`, bound or not), or of every bound type, checked against the cached catalogs.
+    404 `element.not_found` when `typeId` is not an active object type."""
+    return await bindings.binding_views(db, id, type_id)
 
 
 @router.get("/ontologies/{id}/graph", responses=problem_responses(401, 404, 422))

@@ -67,6 +67,7 @@ M3_PATHS = {
     "/api/data-sources/{id}/catalog/tables/{schema}/{table}",
     "/api/ontologies/{id}/binding-suggestions",
     "/api/binding-suggestions/{id}",
+    "/api/ontologies/{id}/bindings",
     "/api/ontologies/{id}/objects/types",
     "/api/ontologies/{id}/objects/search",
     "/api/ontologies/{id}/objects/{typeId}/{key}",
