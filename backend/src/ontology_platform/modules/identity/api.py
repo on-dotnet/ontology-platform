@@ -3,6 +3,12 @@
 Write endpoints should depend on `CurrentUser`, `CurrentSession` or `require_role(...)`:
 all of them reject unauthenticated requests (401) and, for POST/PUT/PATCH/DELETE,
 requests whose X-CSRF-Token header does not match the session (403).
+
+Access tokens (spec 003, section 4): a request with `Authorization: Bearer ...` is
+authenticated by the token alone, never by its cookies, and an invalid token is 401
+`auth.invalid_token`. Tokens are refused by default: `CurrentUser`, `CurrentSession` and
+`require_role(...)` answer a valid token with 403 `auth.token_not_allowed`. Only routes that
+depend on `require_scope(...)` (or `AnyPrincipal`) accept one, and token requests skip CSRF.
 """
 
 import hmac
@@ -18,12 +24,14 @@ from ontology_platform.modules.identity import schemas, service, tokens
 from ontology_platform.modules.identity.models import Role, TokenScope
 from ontology_platform.modules.identity.schemas import LoginRequest, UserInfo
 from ontology_platform.modules.identity.service import AuthContext, IssuedSession, Principal
+from ontology_platform.modules.identity.tokens import TokenContext
 from ontology_platform.settings import Settings, get_settings
 
 SESSION_COOKIE = "op_session"
 CSRF_COOKIE = "op_csrf"
 CSRF_HEADER = "X-CSRF-Token"
 UNSAFE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
+BEARER_SCHEME = "bearer"
 
 AppSettings = Annotated[Settings, Depends(get_settings)]
 
@@ -32,15 +40,42 @@ def client_ip(request: Request) -> str | None:
     return request.client.host if request.client else None
 
 
+def bearer_token(request: Request) -> str | None:
+    """The credentials of an `Authorization: Bearer` header ("" when empty); None without one.
+    Other schemes are not ours and are ignored."""
+    parts = request.headers.get("authorization", "").split(maxsplit=1)
+    if not parts or parts[0].lower() != BEARER_SCHEME:
+        return None
+    return parts[1].strip() if len(parts) > 1 else ""
+
+
+async def get_token_context(request: Request, db: DbSession) -> TokenContext | None:
+    """The access token the request carries, if any. An invalid one is 401, with no fallback
+    to the session cookie."""
+    token = bearer_token(request)
+    if token is None:
+        return None
+    return await tokens.authenticate(db, token, ip=client_ip(request))
+
+
+OptionalToken = Annotated[TokenContext | None, Depends(get_token_context)]
+
+
 async def get_auth_context(
     request: Request,
     db: DbSession,
     settings: AppSettings,
 ) -> AuthContext | None:
+    # A request that carries a token is authenticated by the token only.
+    if bearer_token(request) is not None:
+        return None
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
     return await service.authenticate(db, settings, token)
+
+
+OptionalSession = Annotated[AuthContext | None, Depends(get_auth_context)]
 
 
 def verify_csrf(request: Request, context: AuthContext) -> None:
@@ -51,9 +86,18 @@ def verify_csrf(request: Request, context: AuthContext) -> None:
         raise AppError(403, "auth.csrf_failed", "Missing or invalid CSRF token.")
 
 
+async def refuse_tokens(token: OptionalToken) -> None:
+    """Routes are closed to access tokens unless they say otherwise (spec 003, section 4)."""
+    if token is not None:
+        raise AppError(
+            403, "auth.token_not_allowed", "This endpoint does not accept access tokens."
+        )
+
+
 async def require_session(
     request: Request,
-    context: Annotated[AuthContext | None, Depends(get_auth_context)],
+    _: Annotated[None, Depends(refuse_tokens)],
+    context: OptionalSession,
 ) -> AuthContext:
     if context is None:
         raise AppError(401, "auth.not_authenticated", "Authentication required.")
@@ -83,23 +127,40 @@ def require_role(*roles: Role) -> Callable[[Principal], Awaitable[Principal]]:
     return check_role
 
 
-def require_scope(scope: TokenScope) -> Callable[[AuthContext], Awaitable[Principal]]:
+def _session_principal(request: Request, context: AuthContext | None) -> Principal:
+    if context is None:
+        raise AppError(401, "auth.not_authenticated", "Authentication required.")
+    verify_csrf(request, context)
+    return context.principal
+
+
+def require_scope(scope: TokenScope) -> Callable[..., Awaitable[Principal]]:
     """Dependency factory for the few routes that also accept an access token holding `scope`
     (spec 003, section 4; the appendix lists them). Every other route refuses tokens.
 
-    Token authentication arrives with batch 2; until then this is the session check.
-    """
+    A cookie session is checked as usual, CSRF included. A token must hold `scope` after it is
+    cut down to what its owner's current role allows."""
 
-    async def check_scope(context: CurrentSession) -> Principal:
-        return context.principal
+    async def check_scope(
+        request: Request, token: OptionalToken, context: OptionalSession
+    ) -> Principal:
+        if token is None:
+            return _session_principal(request, context)
+        if scope not in token.scopes:
+            raise AppError(403, "auth.insufficient_scope", "The access token lacks a scope.")
+        return token.principal
 
     return check_scope
 
 
-async def require_principal(context: CurrentSession) -> Principal:
+async def require_principal(
+    request: Request, token: OptionalToken, context: OptionalSession
+) -> Principal:
     """A cookie session or any valid access token, whatever its scopes: only for the routes the
-    appendix opens to every token (`/api/auth/me`). Token authentication arrives with batch 2."""
-    return context.principal
+    appendix opens to every token (`/api/auth/me`)."""
+    if token is not None:
+        return token.principal
+    return _session_principal(request, context)
 
 
 AnyPrincipal = Annotated[Principal, Depends(require_principal)]
@@ -146,7 +207,11 @@ def _user_info(principal: Principal) -> UserInfo:
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-@router.post("/login", responses=problem_responses(401, 422))
+@router.post(
+    "/login",
+    dependencies=[Depends(refuse_tokens)],
+    responses=problem_responses(401, 422),
+)
 async def login(
     body: LoginRequest,
     request: Request,
