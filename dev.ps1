@@ -20,7 +20,8 @@
   test              同时运行 test-api、test-web，日志在 .verification/test/
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
-  ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
+  ai-check          在容器里对 OP_AI_MODEL、OP_AI_REASONING_MODEL 各发一次最小的结构化调用（带识别时用的推理强度），
+                    只显示可用与否、模型、强度和错误类型，不显示地址与 Key
   eval [案例|目录] [-Replay] [-Recordings <目录>] [-Sequential]
                     识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/。
                     也可给一个结构相同的目录（带 / 或 \，如 .verification/private-docs/<名称>），
