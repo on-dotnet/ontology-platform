@@ -42,8 +42,35 @@ export function patchItem(changeSetId: string, itemId: string, body: ItemPatch):
   return unwrap(api.PATCH('/api/change-sets/{id}/items/{itemId}', { params: { path: { id: changeSetId, itemId } }, body }));
 }
 
+/** The decisions endpoint takes at most this many items per request. */
+export const DECISION_BATCH_SIZE = 5000;
+
+/** Some batches were saved before one failed; the saved ones stay decided, so a retry sends only the rest. */
+export class PartialDecisionError extends Error {
+  readonly saved: number;
+  readonly total: number;
+  readonly reason: unknown;
+
+  constructor(saved: number, total: number, reason: unknown) {
+    super(`Saved ${saved} of ${total} decisions`);
+    this.name = 'PartialDecisionError';
+    this.saved = saved;
+    this.total = total;
+    this.reason = reason;
+  }
+}
+
+/** Sends the decisions in batches, one after another, and stops at the first batch that fails. */
 export async function decideItems(changeSetId: string, itemIds: string[], decision: Decision): Promise<void> {
-  await unwrap(api.POST('/api/change-sets/{id}/decisions', { params: { path: { id: changeSetId } }, body: { itemIds, decision } }));
+  for (let start = 0; start < itemIds.length; start += DECISION_BATCH_SIZE) {
+    const batch = itemIds.slice(start, start + DECISION_BATCH_SIZE);
+    try {
+      await unwrap(api.POST('/api/change-sets/{id}/decisions', { params: { path: { id: changeSetId } }, body: { itemIds: batch, decision } }));
+    } catch (error) {
+      if (start === 0) throw error;
+      throw new PartialDecisionError(start, itemIds.length, error);
+    }
+  }
 }
 
 /**
