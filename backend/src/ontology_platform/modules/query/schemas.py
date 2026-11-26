@@ -3,8 +3,15 @@
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import Field, StringConstraints
+from pydantic import (
+    Field,
+    StringConstraints,
+    ValidationError,
+    ValidatorFunctionWrapHandler,
+    field_validator,
+)
 
+from ontology_platform.errors import AppError
 from ontology_platform.modules.ontology.models import Datatype
 from ontology_platform.schemas import CamelModel
 
@@ -39,6 +46,14 @@ class Filter(CamelModel):
     op: FilterOp
     # One value, the list of `in` (at most 100), or nothing for isNull / notNull.
     value: FilterValue | list[FilterValue] | None = None
+
+    @field_validator("op", "value", mode="wrap")
+    @classmethod
+    def validate_operand(cls, value: object, handler: ValidatorFunctionWrapHandler) -> object:
+        try:
+            return handler(value)
+        except ValidationError:
+            raise AppError(422, "query.invalid_filter", "The filter is invalid.") from None
 
 
 class Sort(CamelModel):
