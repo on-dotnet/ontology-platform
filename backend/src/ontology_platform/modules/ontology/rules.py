@@ -7,12 +7,14 @@ from uuid import UUID
 
 from pydantic.alias_generators import to_camel
 
+from ontology_platform.modules.ontology import binding_rules
+from ontology_platform.modules.ontology.models import BINDING_KINDS
 from ontology_platform.modules.ontology.schemas import ElementFields, Synonym
 
 LOCAL_NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*")
 LOCAL_NAME_MAX_LENGTH = 128
 
-REF_FIELDS = ("parent_ref", "domain_ref", "range_ref", "inverse_ref")
+REF_FIELDS = ("parent_ref", "domain_ref", "range_ref", "inverse_ref", "subject_ref")
 # Reference fields each kind uses.
 KIND_REFS: dict[str, tuple[str, ...]] = {
     "entity_type": ("parent_ref",),
@@ -20,6 +22,7 @@ KIND_REFS: dict[str, tuple[str, ...]] = {
     "property": ("domain_ref",),
     "constraint": ("domain_ref",),
     "axiom": (),
+    **binding_rules.REFS,
 }
 # Mandatory references of elements made in the platform. Imported elements (explicit IRI) may
 # lack them, as OWL allows (spec 002, 3.1); a constraint always needs its target type.
@@ -29,8 +32,9 @@ REQUIRED_REFS: dict[str, tuple[str, ...]] = {
     "property": ("domain_ref",),
     "constraint": ("domain_ref",),
     "axiom": (),
+    **binding_rules.REFS,
 }
-# The kinds each reference may point at.
+# The kinds each reference of a semantic element may point at; see `ref_targets`.
 REF_TARGETS: dict[str, tuple[str, ...]] = {
     "parent_ref": ("entity_type",),
     "domain_ref": ("entity_type",),
@@ -41,6 +45,12 @@ RULE_PATH_KINDS = ("relation_type", "property")
 _PASCAL_KINDS = ("entity_type", "constraint")
 _PROPERTY_FIELDS = ("datatype", "unit")
 _MEMBER_FIELDS = ("required", "multiple")
+
+
+def ref_targets(kind: str, name: str) -> tuple[str, ...]:
+    """The kinds reference `name` of an element of `kind` may point at: a binding's parent,
+    domain and range are type bindings, its subject depends on the kind (spec 003, 6.2)."""
+    return binding_rules.REF_TARGETS.get((kind, name)) or REF_TARGETS[name]
 
 
 def wire_name(field: str) -> str:
@@ -94,11 +104,12 @@ def _kind_problems(kind: str, fields: ElementFields) -> list[str]:
         ("auto_shape", kind in ("entity_type", *RULE_PATH_KINDS)),
         ("rules", kind == "constraint"),
         ("turtle", kind == "axiom"),
+        ("binding", kind in BINDING_KINDS),
     ]
     for name, applies in checks:
         if not applies and getattr(fields, name) is not None:
             problems.append(f"{wire_name(name)} does not apply to {kind}")
-    if kind == "axiom":
+    if kind == "axiom" or kind in BINDING_KINDS:
         for name in (
             "local_name",
             "iri",
@@ -109,7 +120,7 @@ def _kind_problems(kind: str, fields: ElementFields) -> list[str]:
             "synonyms",
         ):
             if getattr(fields, name) is not None:
-                problems.append(f"{wire_name(name)} does not apply to axiom")
+                problems.append(f"{wire_name(name)} does not apply to {kind}")
     return problems
 
 
@@ -120,18 +131,22 @@ def field_problems(
     *,
     target_local_name: str | None = None,
     target_imported: bool = False,
+    target_binding: dict[str, Any] | None = None,
 ) -> list[str]:
     """Problems with the shape of effective item fields that need no database lookups.
 
     For `create` the fields must describe a complete element; an imported element (one with an
     explicit `iri`) may lack the Chinese label, references and datatype OWL does not require.
     For `update` and `restore` only the given keys are checked; the local name and IRI cannot
-    change and mandatory values cannot be cleared. A `delete` carries no fields.
+    change and mandatory values cannot be cleared. A `delete` carries no fields. Bindings
+    follow `binding_rules.shape_problems`; `target_binding` is the binding an update changes.
     """
     given = fields.model_fields_set
     if op == "delete":
         return ["a delete item has no fields"] if given else []
     problems = _kind_problems(kind, fields)
+    if kind in BINDING_KINDS:
+        return problems + binding_rules.shape_problems(kind, op, fields, target_binding)
 
     if op == "create":
         if kind == "axiom":

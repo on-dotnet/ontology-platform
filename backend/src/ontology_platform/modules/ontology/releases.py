@@ -15,8 +15,9 @@ from sqlalchemy.orm import defer
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import rules, schemas
+from ontology_platform.modules.ontology import binding_rules, rules, schemas
 from ontology_platform.modules.ontology.models import (
+    BINDING_KINDS,
     DATATYPES,
     SEMANTIC_KINDS,
     Element,
@@ -59,9 +60,15 @@ def release_problems(elements: Sequence[Element]) -> list[schemas.ReleaseProblem
         if not active(element_id, "entity_type"):
             report(code, element, f"The {what} is missing or inactive")
 
+    nodes = {str(e.id): binding_rules.element_node(e) for e in elements}
     for element in active_elements:
         if element.kind == "axiom":
             continue  # checked when merged; kept as written
+        if element.kind in BINDING_KINDS:
+            # Bindings have no names; the rules they were merged under must still hold.
+            for problem in binding_rules.node_problems(nodes[str(element.id)], nodes):
+                report("release.invalid_binding", element, problem.message)
+            continue
         imported = element.iri is not None
         naming = rules.local_name_problem(element.kind, element.local_name or "", imported=imported)
         if naming:
@@ -256,6 +263,7 @@ async def activate_release(
             "ontologyId": str(ontology.id),
             "version": release.version,
             "previousReleaseId": str(previous) if previous else None,
+            "bindingCount": release.binding_count,
         },
         ip=ip,
     )

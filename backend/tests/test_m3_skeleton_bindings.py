@@ -1,6 +1,6 @@
 """Bindings in the ontology module as the M3 skeleton leaves them (spec 003, 6.1 and section 16,
 batch 1): binding rows (inserted directly, as batch 4a's merge will write them) stay out of the
-semantic views, but the dependency checks see them; binding items wait for batch 4a.
+semantic views, but the dependency checks see them.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -126,34 +126,6 @@ async def test_a_bound_type_is_not_deleted_from_under_its_binding(
     assert impact.status_code == 200
     cascade = {(change["op"], change["element"]["id"]) for change in impact.json()["cascade"]}
     assert ("delete", str(binding.id)) in cascade
-
-
-async def test_binding_items_wait_for_batch_4a(client: AsyncClient, db: AsyncSession) -> None:
-    steel, heat, _, source_id = await _bound_steel(db)
-    await sign_in(client, db, Role.ADMIN)
-    create = {
-        "op": "create",
-        "kind": "type_binding",
-        "tempRef": "b1",
-        "fields": {"subjectRef": str(heat.id), "binding": _table(source_id)},
-    }
-    # Deleting the bound type takes its binding along in the cascade, which stops there too.
-    delete = {
-        "op": "delete",
-        "kind": "entity_type",
-        "targetElementId": str(heat.id),
-        "targetRevision": heat.revision,
-        "fields": {},
-    }
-
-    for item in (create, delete):
-        response = await client.post(
-            f"/api/ontologies/{steel.id}/edits",
-            json={"items": [item], "apply": True},
-            headers=csrf_headers(client),
-        )
-        assert response.status_code == 501, item
-        assert response.json()["code"] == "http.not_implemented"
 
 
 async def test_connectors_learn_which_tables_are_bound(db: AsyncSession) -> None:

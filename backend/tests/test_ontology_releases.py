@@ -233,6 +233,7 @@ async def test_activate_rolls_back_to_an_older_release(
         "ontologyId": str(steel.id),
         "version": 1,
         "previousReleaseId": v2["id"],
+        "bindingCount": 0,
     }
     assert missing.status_code == 404
     assert missing.json()["code"] == "release.not_found"

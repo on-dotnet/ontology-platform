@@ -14,9 +14,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import mergeplan, rules, schemas
+from ontology_platform.modules.ontology import binding_rules, mergeplan, rules, schemas
 from ontology_platform.modules.ontology.axiom_rules import NormalizedAxiom, normalize_axiom
-from ontology_platform.modules.ontology.models import ChangeItem, ChangeSet, Element, Ontology
+from ontology_platform.modules.ontology.models import (
+    BINDING_KINDS,
+    ChangeItem,
+    ChangeSet,
+    Element,
+    Ontology,
+)
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
 from ontology_platform.modules.ontology.schemas import ReviewMode
 from ontology_platform.modules.ontology.service import (
@@ -142,6 +148,7 @@ class _Merge:
             fields,
             target_local_name=target.local_name if target else None,
             target_imported=target is not None and target.iri is not None,
+            target_binding=target.binding if target else None,
         ):
             return INVALID_ITEM
         resolved: dict[str, UUID | None] = {}
@@ -154,13 +161,15 @@ class _Merge:
                 continue
             outcome, element_id = await self._resolve(
                 value,
-                rules.REF_TARGETS[name],
+                rules.ref_targets(kind, name),
                 target,
                 defer=item if name == "inverse_ref" else None,
             )
             if outcome is not None:
                 return outcome
             resolved[name] = element_id
+        if kind in BINDING_KINDS:
+            return await self._bind(item, target, fields, resolved)
         stored_rules: list[dict[str, Any]] | None = None
         if fields.rules is not None:
             outcome, stored_rules = await self._rules(fields.rules, target)
@@ -254,6 +263,69 @@ class _Merge:
                 data.pop("message", None)
             stored.append(data)
         return None, stored
+
+    async def _bind(
+        self,
+        item: ChangeItem,
+        target: Element | None,
+        fields: schemas.ElementFields,
+        resolved: dict[str, UUID | None],
+    ) -> str | None:
+        """Create, change or restore a binding (spec 003, 6.3), checked by the binding rules
+        among the elements as the merge has left them so far. The cached catalog is not
+        consulted: it may be out of date by now."""
+        update = {name: str(value) for name, value in resolved.items() if value is not None}
+        node = binding_rules.applied(
+            binding_rules.element_node(target) if target is not None else None,
+            op=item.op,
+            kind=item.kind,
+            key=str(target.id) if target is not None else f"item:{item.id}",
+            fields=fields.model_copy(update=update),
+        )
+        nodes = {str(e.id): binding_rules.element_node(e) for e in self._elements.values()}
+        if binding_rules.node_problems(node, nodes) or node.binding is None:
+            return INVALID_ITEM
+        if item.kind == "type_binding" and await binding_rules.data_source_problem(
+            self._db, node.binding.get("dataSourceId")
+        ):
+            return INVALID_ITEM
+        if target is not None:
+            target.binding = dict(node.binding)
+            if item.op == "restore":
+                target.status = "active"
+            target.revision += 1
+            target.updated_at = self._now
+            item.applied_element_id = target.id
+            return None
+        origin = {"manual": "manual", "import": "import"}.get(self._change_set.source, "ai")
+        element = Element(
+            id=uuid4(),
+            ontology_id=self._change_set.ontology_id,
+            kind=item.kind,
+            local_name=None,
+            iri=None,
+            label_zh=None,
+            synonyms=[],
+            subject_id=resolved.get("subject_ref"),
+            parent_id=resolved.get("parent_ref"),
+            domain_id=resolved.get("domain_ref"),
+            range_id=resolved.get("range_ref"),
+            binding=dict(node.binding),
+            flags=[],
+            required=False,
+            multiple=False,
+            auto_shape=False,
+            status="active",
+            origin=origin,
+            revision=1,
+            created_at=self._now,
+            updated_at=self._now,
+        )
+        self._db.add(element)
+        await self._db.flush()
+        self._elements[element.id] = element
+        item.applied_element_id = element.id
+        return None
 
     def _subject_id(self, axiom: NormalizedAxiom) -> UUID | None:
         if axiom.subject is None:
@@ -589,12 +661,14 @@ async def merge_change_set(
     additions. `resolution_token` is the token of the plan the reviewer saw; if the plan is
     another one by now, nothing is applied (409 `changeset.resolution_changed`).
 
-    Creates, updates and restores come first (axioms after elements, so that an axiom finds the
-    element it is about), deletes last. Skipped items: `changeset.stale_target` when the target
-    changed after the item was proposed, `changeset.dependency_skipped` when a reference
-    resolves to a rejected or skipped item (also transitively), `changeset.has_dependents` when
-    a deleted element is still in use, `changeset.invalid_item` when the fields do not form a
-    valid element, a reference is unusable, or the type hierarchy would become circular.
+    The order (spec 003, 6.3): creates, updates and restores of semantic elements (axioms after
+    the others, so that an axiom finds the element it is about); binding deletes; binding
+    creates, updates and restores, type bindings first; semantic deletes last. Skipped items:
+    `changeset.stale_target` when the target changed after the item was proposed,
+    `changeset.dependency_skipped` when a reference resolves to a rejected or skipped item (also
+    transitively), `changeset.has_dependents` when a deleted element is still in use,
+    `changeset.invalid_item` when the fields do not form a valid element, a reference is
+    unusable, or the type hierarchy would become circular.
     """
     change_set = await _change_set_or_404(db, change_set_id)
     ontology = await _ontology_or_404(db, change_set.ontology_id, lock=True)
@@ -635,13 +709,25 @@ async def _apply_change_set(
         )
     merge = _Merge(db, change_set, ontology, elements, items, now, plan.resolutions)
     accepted = [item for item in items if item.decision == "accepted"]
+    semantic = [item for item in accepted if item.kind not in BINDING_KINDS]
+    bound = [item for item in accepted if item.kind in BINDING_KINDS]
     ordered = [
-        *(item for item in accepted if item.op != "delete" and item.kind != "axiom"),
-        *(item for item in accepted if item.op != "delete" and item.kind == "axiom"),
+        *(item for item in semantic if item.op != "delete" and item.kind != "axiom"),
+        *(item for item in semantic if item.op != "delete" and item.kind == "axiom"),
     ]
     for item in ordered:
         await merge.apply(item)
-    merge.apply_deletes([item for item in accepted if item.op == "delete"])
+    # Bindings leave before new ones come (spec 003, 6.3): a change set that replaces a type
+    # binding would otherwise create the new one next to the old and skip it as a duplicate.
+    merge.apply_deletes([item for item in bound if item.op == "delete"])
+    await db.flush()
+    # Type bindings first: a column or relation binding is checked against the key columns of
+    # its type bindings as this change set leaves them, also when it names them by id.
+    changing = [item for item in bound if item.op != "delete"]
+    for item in sorted(changing, key=lambda item: BINDING_KINDS.index(item.kind)):
+        await merge.apply(item)
+    # Semantic elements leave last, after the bindings that referred to them.
+    merge.apply_deletes([item for item in semantic if item.op == "delete"])
     skipped = [
         schemas.MergeSkip.model_validate({"item_id": item.id, "code": merge.outcomes[item.id]})
         for item in accepted
