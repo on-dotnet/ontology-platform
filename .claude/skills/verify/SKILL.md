@@ -43,7 +43,7 @@ git status --short
 ./dev.ps1 ci -Report
 ```
 
-门禁要求工作区干净、提交已推送；test-api（全量）、test-web、构建运行镜像三项同时跑，日志在 `.verification/ci/`，失败的一项会打出失败用例和日志末尾。成功后提交状态 `local-ci` 为 success。门禁之后 HEAD 又变了就重新运行。长命令放到后台运行，等完成通知，不轮询。
+门禁要求工作区干净、提交已推送。先校验 Compose 配置，再并行运行 `test-api`（全量）、`test-web` 和 `build`（构建运行镜像）。`build` 结束后启动 `schema-check`，核对前端接口类型与后端 OpenAPI 是否一致。日志在 `.verification/ci/`，失败的一项会打出失败用例和日志末尾。成功后提交状态 `local-ci` 为 success。门禁之后 HEAD 又变了就重新运行。长命令放到后台运行，等完成通知，不轮询。
 
 ## 4 汇报
 
