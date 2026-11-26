@@ -14,6 +14,7 @@ import hashlib
 import json
 import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
+from contextvars import ContextVar
 from typing import Any
 
 from pydantic import BaseModel
@@ -22,6 +23,10 @@ from ontology_platform.modules.ai.gateway import InputFile, ModelGateway, OpenAI
 
 # Changes when the key or the record format changes, so old recordings are not misread.
 FORMAT = 1
+
+# Attempts, input, output and reasoning tokens of the call in progress. A context variable, so
+# that calls made at the same time (the batches of a document) each count their own attempts.
+_CALL_USAGE: ContextVar[list[int] | None] = ContextVar("call_usage", default=None)
 
 
 class ReplayMissError(Exception):
@@ -170,19 +175,22 @@ class ReplayGateway:
                 f"No recording for {document or 'an unknown document'}, stage {purpose} "
                 f"(call {done + 1} of the document, model {model})."
             )
-        result = await self._inner.structured(
-            purpose=purpose,
-            model=model,
-            instructions=instructions,
-            text=text,
-            schema=schema,
-            files=files,
-            document_id=document_id,
-            effort=effort,
-        )
-        # Usage since the last take is this call's: extraction makes its calls one at a time.
-        # Concurrent calls through one gateway would need usage handed back per call instead.
-        attempts, input_tokens, output_tokens, reasoning_tokens = _take_usage(self._inner)
+        usage = [0, 0, 0, 0]
+        token = _CALL_USAGE.set(usage)
+        try:
+            result = await self._inner.structured(
+                purpose=purpose,
+                model=model,
+                instructions=instructions,
+                text=text,
+                schema=schema,
+                files=files,
+                document_id=document_id,
+                effort=effort,
+            )
+        finally:
+            _CALL_USAGE.reset(token)
+        attempts, input_tokens, output_tokens, reasoning_tokens = _usage_of(self._inner, usage)
         seconds = time.monotonic() - started
         stage["calls"] += attempts
         stage["inputTokens"] += input_tokens
@@ -233,7 +241,12 @@ class ReplayGateway:
         }
 
 
-def _take_usage(gateway: ModelGateway) -> tuple[int, int, int, int]:
+def _usage_of(gateway: ModelGateway, usage: Sequence[int]) -> tuple[int, int, int, int]:
+    """One call's usage: counted for it by a `MeteredGateway`; else what a stand-in's
+    `take_usage` reports; else one attempt."""
+    if isinstance(gateway, MeteredGateway):
+        attempts, input_tokens, output_tokens, reasoning_tokens = usage
+        return attempts, input_tokens, output_tokens, reasoning_tokens
     take = getattr(gateway, "take_usage", None)
     if take is None:
         return 1, 0, 0, 0
@@ -242,7 +255,11 @@ def _take_usage(gateway: ModelGateway) -> tuple[int, int, int, int]:
 
 
 class MeteredGateway(OpenAIGateway):
-    """The real gateway, keeping the usage of its attempts in memory instead of the database."""
+    """The real gateway, keeping the usage of its attempts in memory instead of the database.
+
+    Through a `ReplayGateway` each call counts its own attempts; called directly, they add up
+    until `take_usage`.
+    """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -251,11 +268,14 @@ class MeteredGateway(OpenAIGateway):
     async def _record(
         self, call: "_Call[Any]", started: float, usage: Any, error_code: str | None
     ) -> None:
-        self._usage[0] += 1
-        self._usage[1] += getattr(usage, "input_tokens", None) or 0
-        self._usage[2] += getattr(usage, "output_tokens", None) or 0
+        counts = _CALL_USAGE.get()
+        if counts is None:
+            counts = self._usage
+        counts[0] += 1
+        counts[1] += getattr(usage, "input_tokens", None) or 0
+        counts[2] += getattr(usage, "output_tokens", None) or 0
         details = getattr(usage, "output_tokens_details", None)
-        self._usage[3] += getattr(details, "reasoning_tokens", None) or 0
+        counts[3] += getattr(details, "reasoning_tokens", None) or 0
 
     def take_usage(self) -> tuple[int, int, int, int]:
         """Attempts, input, output and reasoning tokens since the last call of this method."""
