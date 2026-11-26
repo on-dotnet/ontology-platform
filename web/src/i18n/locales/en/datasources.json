@@ -1,6 +1,120 @@
 {
-  "title": "Data source",
-  "detailInfo": "See the connection status and table catalog of a data source and let AI suggest data bindings. The platform only reads from data sources.",
-  "detailEmptyTitle": "Data source details are coming soon",
-  "detailEmptyDescription": "Here you will test the connection, browse the table catalog and let AI suggest bindings of object types to tables."
+  "title": "Data sources",
+  "create": "Create data source",
+  "edit": "Edit",
+  "more": "More actions",
+  "saved": "Data source saved",
+  "close": "Close",
+  "cancel": "Cancel",
+  "unknown": "Unknown",
+  "unavailable": "—",
+  "fields": {
+    "name": "Name",
+    "kind": "Type",
+    "host": "Host",
+    "port": "Port",
+    "database": "Database",
+    "username": "Username",
+    "ssl": "SSL mode",
+    "schemas": "Schema scope",
+    "password": "Password",
+    "credentialAt": "Password updated"
+  },
+  "kind": {
+    "postgresql": "PostgreSQL"
+  },
+  "ssl": {
+    "disable": "disable",
+    "prefer": "prefer",
+    "require": "require",
+    "verify-full": "verify-full"
+  },
+  "status": {
+    "ok": "Healthy",
+    "failed": "Failed",
+    "untested": "Untested",
+    "archived": "Archived"
+  },
+  "list": {
+    "empty": "No data sources yet",
+    "askAdmin": "No data sources yet. Ask an administrator to add one.",
+    "status": "Connection status",
+    "catalogAt": "Catalog last read",
+    "count": "Bound object types"
+  },
+  "connection": {
+    "title": "Connection details",
+    "allSchemas": "All available schemas",
+    "stored": "Saved",
+    "missing": "Not saved",
+    "reenter": "Re-enter password",
+    "lastTest": "Last connection test"
+  },
+  "test": {
+    "current": "This connection test",
+    "action": "Test connection",
+    "ok": "Connection successful",
+    "version": "Server version {{version}}",
+    "writeWarning": "This account has write access. Use a read-only account.",
+    "reason": {
+      "unreachable": "Cannot reach the host. Check the host, port, and network connection.",
+      "auth_failed": "Authentication failed. Check the username and password.",
+      "database_missing": "The database does not exist. Check the database name.",
+      "ssl": "The SSL connection failed. Check the SSL mode and server certificate.",
+      "timeout": "The connection timed out. Check that the network and database are available, then try again."
+    }
+  },
+  "archive": {
+    "action": "Archive",
+    "confirm": "Archive data source",
+    "title": "Archive “{{name}}”?",
+    "consequences": "Archiving clears the saved password and prevents further use of this data source. Existing bindings in older versions will still show its name.",
+    "count": "Object types in the working version that reference this data source: {{count}}.",
+    "done": "Data source archived"
+  },
+  "form": {
+    "editTitle": "Edit data source",
+    "description": "The platform has read-only access. Once a binding is published, all signed-in users can see the data in its bound columns.",
+    "savedPassword": "Password saved. Leave blank to keep it.",
+    "allowSamples": "Allow sending sample values to the model",
+    "samplesHelp": "Sample values help the AI suggest how to bind a column.",
+    "samplesWarning": "When suggesting bindings, the AI will read up to five values per column and send them to the model service. The review page will show these values as evidence to all signed-in users.",
+    "save": "Save data source",
+    "required": "Enter {{field}}.",
+    "invalidPort": "Enter a whole number between 1 and 65535.",
+    "validationSummary": "Check the highlighted fields and try again.",
+    "addSchema": "Add schema",
+    "removeSchema": "Remove schema {{index}}",
+    "schemaName": "Schema name {{index}}"
+  },
+  "catalog": {
+    "title": "Catalog",
+    "loading": "Reading the catalog",
+    "retry": "Retry",
+    "stillReading": "Still reading the catalog",
+    "refresh": "Read catalog",
+    "forbidden": "You need the editor role or higher to browse this catalog.",
+    "edit": "Edit data source",
+    "never": "The catalog has not been read yet",
+    "boundType": "Bound object type: {{label}}",
+    "columns": "Columns",
+    "name": "Column name",
+    "type": "Type",
+    "nullable": "Nullable",
+    "comment": "Comment",
+    "primaryKey": "Primary key",
+    "foreignKey": "Foreign key",
+    "yes": "Yes",
+    "no": "No",
+    "noColumns": "This table has no columns.",
+    "foreignKeys": "Foreign keys",
+    "noForeignKeys": "This table has no foreign keys.",
+    "tree": "Schemas and tables",
+    "loadMore": "Load more tables",
+    "noMatches": "No matching tables",
+    "emptyTables": "This schema has no tables.",
+    "selectTable": "Select a table to see its columns and foreign keys.",
+    "search": "Search table names",
+    "emptySchemas": "There are no schemas to browse in this catalog."
+  }
 }

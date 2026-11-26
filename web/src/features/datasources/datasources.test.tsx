@@ -1,19 +1,26 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import { permissionsFor } from '@/features/auth/permissions';
 import { mockApi, renderApp } from '@/test/utils';
 
+import { makeSource } from './test-fixtures';
+
 // The M3 skeleton (spec 003, section 16): the pages exist and say they are coming; batches 2, 3,
 // 5 and 6a replace these placeholders and their tests.
 describe('M3 skeleton pages', () => {
   it('opens the data source list and one data source', async () => {
-    mockApi({});
-    const { router } = renderApp('/data');
-    expect(await screen.findByRole('heading', { name: '数据连接即将推出' })).toBeInTheDocument();
-
-    await router.navigate({ to: '/data/$dataSourceId', params: { dataSourceId: '00000000-0000-4000-8000-000000000009' } });
-    expect(await screen.findByRole('heading', { name: '数据源详情即将推出' })).toBeInTheDocument();
+    const user = userEvent.setup();
+    const source = makeSource();
+    mockApi({ 'GET /api/data-sources': () => [source], 'GET /api/data-sources/:id': () => source });
+    renderApp('/data');
+    const link = await screen.findByRole('link', { name: source.name });
+    expect(link).toHaveAttribute('href', `/data/${source.id}`);
+    expect(screen.getByRole('button', { name: '新建数据源' })).toBeInTheDocument();
+    await user.click(screen.getByRole('cell', { name: 'db.example.test' }));
+    expect(await screen.findByRole('heading', { level: 1, name: source.name })).toBeInTheDocument();
+    expect(screen.getByText('reader')).toBeInTheDocument();
   });
 
   it('opens the explore page', async () => {
