@@ -192,7 +192,12 @@ async def _platform_identity(db: AsyncSession) -> _ServerIdentity:
     key = db.get_bind().engine.url.render_as_string()
     identity = _platform_identities.get(key)
     if identity is None:
+        # A session that was idle is left idle: a long read of the source must not keep a
+        # transaction open on the platform's database.
+        idle = not db.in_transaction() and not (db.new or db.dirty or db.deleted)
         identity = await _identity_of(db.execute)
+        if idle:
+            await db.rollback()
         # Only a system identifier is stable: the start time changes when the platform's server
         # restarts, so without one the identity is read again every time.
         if identity.system_identifier is not None:

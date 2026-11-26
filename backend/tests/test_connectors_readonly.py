@@ -355,16 +355,29 @@ async def test_cancelling_the_call_cancels_the_statement(
     assert await _active(external_source) == []
 
 
-SLEEP = "SELECT pg_sleep(5)::text, 'op_deadline'"
+# Longer than the deadline and than the polling below, so only a cancel can end it early.
+SLEEP = "SELECT pg_sleep(30)::text, 'op_deadline'"
+DEADLINE = 3.0
 
 
 async def _sleeping(source: ExternalSource) -> list[tuple[Any, ...]]:
     return admin_rows(
         source,
         "SELECT pid FROM pg_stat_activity WHERE application_name = %s AND state = 'active' "
-        "AND query LIKE '%%op_deadline%%'",
+        "AND datname = current_database() AND query LIKE '%%op_deadline%%'",
         APPLICATION_NAME,
     )
+
+
+async def _started(source: ExternalSource, task: asyncio.Task[Any]) -> None:
+    for _ in range(int(DEADLINE * 10)):
+        if await _sleeping(source):
+            return
+        if task.done():
+            break
+        await asyncio.sleep(0.1)
+    task.cancel()
+    pytest.fail("the statement never started")
 
 
 async def _gone(source: ExternalSource) -> bool:
@@ -378,7 +391,7 @@ async def _gone(source: ExternalSource) -> bool:
 def _short_deadline(monkeypatch: pytest.MonkeyPatch) -> None:
     # The statement timeout alone would let the statement finish; only the deadline stops it.
     configure(monkeypatch, query_timeout_seconds=60)
-    monkeypatch.setattr(connection, "_deadline", lambda *, statements: 1.0)
+    monkeypatch.setattr(connection, "_deadline", lambda *, statements: DEADLINE)
 
 
 async def test_a_catalog_read_past_its_deadline_is_cancelled(
@@ -392,11 +405,15 @@ async def test_a_catalog_read_past_its_deadline_is_cancelled(
 
     monkeypatch.setattr(connection.catalog, "inspect_catalog", slow_catalog)
     started = time.monotonic()
+    task = asyncio.create_task(
+        connection.read_catalog(db, reader_params(external_source), ("mes",))
+    )
+    await _started(external_source, task)
 
     with pytest.raises(QueryTimeoutError):
-        await connection.read_catalog(db, reader_params(external_source), ("mes",))
+        await task
 
-    assert time.monotonic() - started < 4
+    assert time.monotonic() - started < DEADLINE + 5
     assert await _gone(external_source)
 
 
@@ -406,12 +423,34 @@ async def test_a_connection_test_past_its_deadline_is_a_timeout(
     _short_deadline(monkeypatch)
     monkeypatch.setattr(connection, "_SERVER_VERSION", text(SLEEP))
     started = time.monotonic()
+    task = asyncio.create_task(connection.test_connection(db, reader_params(external_source)))
+    await _started(external_source, task)
 
-    result = await connection.test_connection(db, reader_params(external_source))
+    result = await task
 
     assert (result.ok, result.reason) == (False, "timeout")
-    assert time.monotonic() - started < 4
+    assert time.monotonic() - started < DEADLINE + 5
     assert await _gone(external_source)
+
+
+async def test_reading_a_source_leaves_an_idle_platform_session_idle(
+    app: Any, external_source: ExternalSource, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Not cached, so that the identity of the platform's database is read on this session.
+    monkeypatch.setattr(connection, "_platform_identities", {})
+    inspect_catalog = connection.catalog.inspect_catalog
+    seen: list[bool] = []
+
+    async with app.state.session_factory() as db:
+
+        def watch(conn: Any, schema_names: tuple[str, ...]) -> list[Any]:
+            seen.append(db.in_transaction())
+            return inspect_catalog(conn, schema_names)
+
+        monkeypatch.setattr(connection.catalog, "inspect_catalog", watch)
+        await connection.read_catalog(db, reader_params(external_source), ("mes",))
+
+    assert seen == [False]
 
 
 async def test_more_than_four_statements_per_source_wait_then_get_busy(
@@ -522,14 +561,13 @@ async def test_driver_errors_while_setting_up_the_connection_do_not_leave_the_co
     assert marker not in caplog.text
 
 
-
 @pytest.mark.parametrize(
     ("database", "message", "reason"),
     [
-        ("data", "FATAL:  database \"data\" does not exist", "database_missing"),
+        ("data", 'FATAL:  database "data" does not exist', "database_missing"),
         (
             "authentication",
-            "FATAL:  password authentication failed for user \"a\"",
+            'FATAL:  password authentication failed for user "a"',
             "auth_failed",
         ),
     ],

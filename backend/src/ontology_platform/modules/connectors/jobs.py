@@ -118,7 +118,8 @@ def register_handlers(
             unexpected: Exception | None = None
             try:
                 params = connection.params_of(row)
-                # Not idle in a transaction on the platform database while the source is read.
+                # Not idle in a transaction on the platform database while the source is read;
+                # `connect` leaves the session idle after checking the platform's identity.
                 await db.commit()
                 tables = await connection.read_catalog(db, params, schema_names)
             except ConnectorError as error:
