@@ -25,6 +25,7 @@
 ./dev.ps1 test-api     # 后端全量（ruff、mypy、pytest），一般交给门禁
 ./dev.ps1 fmt <文件…>  # 在容器里用 ruff 修正并格式化指定的后端文件
 ./dev.ps1 test-web     # 前端检查（eslint、tsc、vitest 同时跑）
+./dev.ps1 e2e          # 端到端冒烟（Playwright + Chromium）：自起一套 op-tmp-e2e-* 临时 postgres/api/web，用 web/e2e/e2e.env 的测试账号，跑完全部删除；不在门禁里
 ./dev.ps1 lock api     # 改了 backend/pyproject.toml 之后
 ./dev.ps1 lock web     # 改了 web/package.json 之后
 ./dev.ps1 gen-api      # 改了后端接口之后，同步前端类型
@@ -51,7 +52,8 @@
    - 每次 `test-api` 都会 `up -d postgres`。哪个工作区的 postgres 配置（`compose.yaml` 里的 postgres 服务，或 `OP_POSTGRES_PASSWORD` 等设置）和正在运行的不同，就会重建共用的 postgres 容器（数据卷保留），同样会打断别人。改 postgres 服务定义的分支，测试时先确认没有别的会话在跑。
 4. 本机私有配置 `.env.local` 不在 Git 里，新 worktree 里没有。主检出目录的这份没有改 `OP_POSTGRES_PASSWORD`、`OP_DOCKER_CONTEXT`、`OP_MIRROR` 时，跑测试和门禁不需要它；改了的话，由用户本人把它复制到 worktree，否则 worktree 会用默认值，触发上一条的重建或连错主机。要在 worktree 里 `up`、`ai-check`、`eval` 也需要复制，否则开发栈会以"AI 未配置"启动。
 5. worktree 删掉以后，它的镜像标签会留下。`./dev.ps1 images` 列出本项目的镜像（`ontology/*`）及所属工作区，`./dev.ps1 clean-images` 删除已不存在的工作区的标签。它只删符合"目录名-8 位哈希"格式、且不属于任何现存工作区的 `ontology/*` 标签；不符合这个格式的标签（如 `local`、用 `OP_IMAGE_TAG` 指定的 `my-custom`、`<none>`）一律不动；`git worktree list` 失败时什么也不删；不 prune、不强制删除，仍有容器在用的镜像会保留。
-6. `ci`、`test` 被 Ctrl+C 中断时，在控制台里子进程会收到同一个中断并清理自己的临时容器；在别的环境里子进程可能还在跑，重跑前用 `docker ps --filter name=op-tmp-` 确认。
+6. 仓库的 Claude Code 钩子 `.claude/hooks/guard-dev-commands.mjs` 会在 Bash 和 PowerShell 命令执行前检查命令文本：含 `dev.ps1 reset` 的命令在任何目录都会被拦下，只能由用户本人运行；含 `dev.ps1 down` 的命令在 worktree 里会被拦下，需要停开发栈时请主会话或用户在主检出目录运行。`up` 和其他子命令不受影响。钩子只按文本匹配，宁可多拦：命令里只是提到这几个词也会被拦。钩子自身出错时一律放行，已有的 deny 规则仍是底线。测试：`node --test .claude/hooks/`。
+7. `ci`、`test` 被 Ctrl+C 中断时，在控制台里子进程会收到同一个中断并清理自己的临时容器；在别的环境里子进程可能还在跑，重跑前用 `docker ps --filter name=op-tmp-` 确认。
 
 ## Protégé 往返检查 `./dev.ps1 owl-check`
 

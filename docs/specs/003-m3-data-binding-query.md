@@ -317,6 +317,7 @@
 
 **校验与证据**：
 - 模型给的 id、表、列必须在本体和目录缓存里真实存在，否则丢弃；同一元素只取第一个通过校验的建议；丢弃的条数记在请求上，界面提示"有 N 项无法采用，已忽略"。
+- 说明（经主会话同意补充）：同一位置（同一元素的同种绑定，属性在同一类型绑定下，关系在同一对两端之间）的建议按模型给出的顺序作为候选，每个位置最多试 3 个，取第一个通过绑定规则的，其余记 `binding.duplicate`；类型的表在匹配属性与关系之前先这样定下。ai 一侧丢弃时的原因码有三个：`suggestion.unknown_element`（id 不在给模型看的候选里）、`suggestion.not_in_catalog`（表、列或连接在目录缓存里没有）、`suggestion.repeated`（同一位置超过 3 个候选）。绑定规则丢弃的用 `binding.*`，因依赖项被丢弃而丢弃的用 `binding.dependency_dropped`。各原因的条数记在审计 `binding.suggestion_finished` 里。
 - 主键：表有主键时直接用表的主键，不采用模型另选的列；没有主键时（如视图）采用模型的建议并打上 `key_unverified`。
 - 类型族与属性的数据类型不相容的建议丢弃。
 - 证据由确定性代码从目录缓存生成，不取模型的转述：列名、类型、注释、主键、外键，以及开关打开时的样本值。所以每条建议的证据都能在目录里对上。
@@ -532,6 +533,7 @@
 | `datasource.catalog_refreshed` | 读取目录 | 表数或错误码 |
 | `datasource.sampled` | 读取样本值 | 表数、列数 |
 | `binding.suggested` | 发起 AI 绑定建议 | 数据源、范围大小、是否发送了样本 |
+| `binding.suggestion_finished` | AI 绑定建议的任务结束（失败的不记） | 变更集 id（没有生成时为空）、采用与丢弃的条数、各丢弃原因码的条数 |
 | `changeset.created` / `merged` / `rejected` | 已有；绑定和 MCP 的变更集同样记 | MCP 的另记令牌 id |
 | `release.published` / `activated` | 已有 | 增加绑定数 |
 | `token.created` / `revoked` / `rejected` | 第 4 节 | 令牌 id、前缀、作用域 |

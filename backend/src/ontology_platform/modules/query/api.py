@@ -43,7 +43,7 @@ async def search_objects(
     db: DbSession,
 ) -> schemas.ObjectPage:
     """List the objects of a type: filter, sort and page. A read, although it is a POST."""
-    return await service.search(db, id, body)
+    return await service.until_disconnected(request, service.search(db, id, body))
 
 
 @router.get("/ontologies/{id}/objects/{typeId}/{key}", responses=_ERRORS)
@@ -56,7 +56,7 @@ async def get_object(
     db: DbSession,
 ) -> schemas.ObjectDetail:
     """One object by type and primary key, with the relations it can be followed along."""
-    return await service.get_object(db, id, typeId, key)
+    return await service.until_disconnected(request, service.get_object(db, id, typeId, key))
 
 
 @router.get("/ontologies/{id}/objects/{typeId}/{key}/related", responses=_ERRORS)
@@ -73,13 +73,16 @@ async def list_related_objects(
     cursor: Annotated[str | None, Query(max_length=schemas.CURSOR_MAX_LENGTH)] = None,
 ) -> schemas.ObjectPage:
     """One hop along a relation; `typeId` of the page is the type of the related objects."""
-    return await service.related(
-        db,
-        id,
-        typeId,
-        key,
-        relation_id=relation_id,
-        direction=direction,
-        limit=limit,
-        cursor=cursor,
+    return await service.until_disconnected(
+        request,
+        service.related(
+            db,
+            id,
+            typeId,
+            key,
+            relation_id=relation_id,
+            direction=direction,
+            limit=limit,
+            cursor=cursor,
+        ),
     )

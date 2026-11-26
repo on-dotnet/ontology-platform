@@ -27,7 +27,7 @@ describe('M3 pages', () => {
   it('opens the explore page', async () => {
     mockApi({});
     renderApp('/explore');
-    expect(await screen.findByRole('heading', { name: '探索即将推出' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: '探索' })).toBeInTheDocument();
   });
 
   it('shows the access token and MCP cards in the settings', async () => {
