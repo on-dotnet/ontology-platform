@@ -1,0 +1,2019 @@
+# Bibliographic records of public standards cited by the steel ontology (spec 006 §8).
+# Only identifier, titles, edition year, status, catalogue link and replacement relations; no normative text.
+# Every record was checked against the official catalogue on 2026-11-26; status reflects that snapshot.
+# English titles are copied verbatim from official catalogues, original typos included.
+# For non-Chinese standards the @zh title is a working translation; the @en title is authoritative.
+# issued is the year at the end of the identifier; for ASTM that is the latest revision or reapproval year.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/standards> a owl:Ontology ;
+    owl:versionIRI <ontology/core/standards/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁本体：标准书目"@zh, "Steel ontology: standards bibliography"@en ;
+    rdfs:comment "钢铁本体引用的公开标准书目，每个版次一条，只记编号、名称、版次、状态、官方目录链接和代替关系。"@zh,
+        "Public standards cited by the steel ontology, one record per edition, holding only identifier, titles, edition, status, catalogue link and replacement relations."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<source/industry-practice> a dcterms:BibliographicResource ;
+    rdfs:label "行业通用"@zh, "Industry practice"@en ;
+    skos:definition "没有可引用的公开标准、按钢铁行业通行做法定义的来源。"@zh,
+        "Source for terms defined from common steel industry practice where no public standard can be cited."@en ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20566-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20566-2006" ;
+    dcterms:title "钢及合金术语"@zh ;
+    dcterms:title "Terminology of steel and alloy"@en ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7C1E0D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-13304-1-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 13304.1-2008" ;
+    dcterms:title "钢分类 第1部分：按化学成分分类"@zh ;
+    dcterms:title "Steels classification - Part 1: Classification of according to chemical composition"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75BDED3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-13304-2-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 13304.2-2008" ;
+    dcterms:title "钢分类 第2部分：按主要质量等级和主要性能或使用特性的分类"@zh ;
+    dcterms:title "Steels classification - Part 2: Classification of according to main quality classes and main property or application characteristics"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=mgadeH4fzxI%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-15574-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 15574-2016" ;
+    dcterms:title "钢产品分类"@zh ;
+    dcterms:title "Steel products classification"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=A%2ByDVqPCFTs%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-221-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 221-2008" ;
+    dcterms:title "钢铁产品牌号表示方法"@zh ;
+    dcterms:title "Notations for designation of iron and steel"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75B53D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-700-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 700-2006" ;
+    dcterms:title "碳素结构钢"@zh ;
+    dcterms:title "Carbon structural steels"@en ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7C7C2D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3274-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3274-2017" ;
+    dcterms:title "碳素结构钢和低合金结构钢热轧钢板和钢带"@zh ;
+    dcterms:title "Hot-rolled plates、sheets and strips of carbon structural steels and high strength low alloy structural steels"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Kp06oCXybAo%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-709-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 709-2019" ;
+    dcterms:title "热轧钢板和钢带的尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimension,shape,weight and tolerance for hot-rolled steel strip,plate and sheet"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=8531C702DB296551E05397BE0A0ACD16> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-708-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 708-2026" ;
+    dcterms:title "冷轧钢板及钢带的尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimension, shape, weight and tolerance for cold-rolled steel sheet and strip"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=52AF72FB02B3403AE06397BE0A0AD6A8> ;
+    dcterms:replaces <std/gbt-708-2019> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-708-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 708-2019" ;
+    dcterms:title "冷轧钢板和钢带的尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimension,shape,weight and tolerance for cold-rolled steel strip and sheet"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=8531C702DB326551E05397BE0A0ACD16> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2518-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2518-2019" ;
+    dcterms:title "连续热镀锌和锌合金镀层钢板及钢带"@zh ;
+    dcterms:title "Continuously hot-dip zinc and zinc alloy coated steel sheet and strip"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=996A838ABFD28372E05397BE0A0AD949> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-5213-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 5213-2019" ;
+    dcterms:title "冷轧低碳钢板及钢带"@zh ;
+    dcterms:title "Cold rolled low carbon steel sheet and strip"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Lb63thr9SCE%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20564-2-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20564.2-2017" ;
+    dcterms:title "汽车用高强度冷连轧钢板及钢带 第2部分：双相钢"@zh ;
+    dcterms:title "Continuously cold rolled high strength steel sheet and strip for automobile—Part 2: Dual phase steel"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81D60D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2975-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2975-2018" ;
+    dcterms:title "钢及钢产品 力学性能试验取样位置及试样制备"@zh ;
+    dcterms:title "Steel and steel products—Location and preparation of samples and test pieces for mechanical testing"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82B74D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-222-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 222-2025" ;
+    dcterms:title "钢及合金 成品化学成分允许偏差"@zh ;
+    dcterms:title "Steels and alloys—Permissible deviations of product analyzed chemical composition"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213285530D16E06397BE0A0A8119> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-4336-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4336-2016" ;
+    dcterms:title "碳素钢和中低合金钢 多元素含量的测定 火花放电原子发射光谱法（常规法）"@zh ;
+    dcterms:title "Carbon and low-alloy steel—Determination of multi-element contents—Spark discharge atomic emission spectrometric method (routine method)"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=QStH8NELbmA%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20066-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20066-2006" ;
+    dcterms:title "钢和铁 化学成分测定用试样的取样和制样方法"@zh ;
+    dcterms:title "Steel and iron -- Sampling and preparation of samples for the determination of chemical composition"@en ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=6jxSfPicV3E%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-228-1-2021> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 228.1-2021" ;
+    dcterms:title "金属材料 拉伸试验 第1部分:室温试验方法"@zh ;
+    dcterms:title "Metallic materials—Tensile testing—Part 1: Method of test at room temperature"@en ;
+    dcterms:issued "2021"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=D4BEFFF4EB12B241E05397BE0A0AF581> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-229-2020> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 229-2020" ;
+    dcterms:title "金属材料 夏比摆锤冲击试验方法"@zh ;
+    dcterms:title "Metallic materials—Charpy pendulum impact test method"@en ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=B13990C15C6C5DDAE05397BE0A0A0D35> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-232-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 232-2024" ;
+    dcterms:title "金属材料 弯曲试验方法"@zh ;
+    dcterms:title "Metallic materials—Bend testing method"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Mt3SaeLiHXk%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-10561-2023> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 10561-2023" ;
+    dcterms:title "钢中非金属夹杂物含量的测定 标准评级图显微检验法"@zh ;
+    dcterms:title "Determination of content of nonmetallic inclusions in steel—Micrographic method using standard diagrams"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=FC816D05008B62EBE05397BE0A0AD5FA> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-247-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 247-2025" ;
+    dcterms:title "钢板和钢带包装、标志及质量证明书的一般要求"@zh ;
+    dcterms:title "General rule of package, mark and certification for steel plate, sheet and strip"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=3B46A026CCD6469CE06397BE0A0AEEB8> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-10623-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 10623-2008" ;
+    dcterms:title "金属材料 力学性能试验术语"@zh ;
+    dcterms:title "Metallic material - Mechanical testing - Vocabulary"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D76CF8D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbz-231-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/Z 231-2026" ;
+    dcterms:title "人工智能 钢铁大模型数据集技术要求"@zh ;
+    dcterms:title "Artificial intelligence—Technical requirements of dataset for steel industry large model"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/search/stdPage?q=25206> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbz-224-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/Z 224-2026" ;
+    dcterms:title "人工智能 钢铁行业应用场景分类指南"@zh ;
+    dcterms:title "Artificial intelligence—Classification guideline for application scenarios of steel industry"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=0F717EE0F9BC34535D3CAC9870C99FF4> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbz-241-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/Z 241-2026" ;
+    dcterms:title "人工智能 钢铁大模型服务能力成熟度评估"@zh ;
+    dcterms:title "Artificial intelligence—Maturity assessment for service capabilities of large-scale steel model"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=5A138523DF9B79B5E06397BE0A0AD5FD> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-2011-2014> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 2011-2014" ;
+    dcterms:title "连续铸钢方坯和矩形坯"@zh ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F2185BBB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-2012-2014> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 2012-2014" ;
+    dcterms:title "连续铸钢板坯"@zh ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=8B1827F21AAABB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-4003-2016> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 4003-2016" ;
+    dcterms:title "连铸钢板坯低倍组织缺陷评级图"@zh ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=8B1827F2449EBB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-4002-2013> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 4002-2013" ;
+    dcterms:title "连铸钢方坯低倍组织缺陷评级图"@zh ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F1CAE1BB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-226-2015> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 226-2015" ;
+    dcterms:title "钢的低倍组织及缺陷酸蚀检验法"@zh ;
+    dcterms:title "Test method for macrostructure and defect of steel by etching"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D809E7D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-18253-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 18253-2018" ;
+    dcterms:title "钢及钢产品 检验文件的类型"@zh ;
+    dcterms:title "Steel and steel products—Types of inspection documents"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=75BDFF36F3E78F0AD38F6D9AD55D0240> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-17505-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 17505-2016" ;
+    dcterms:title "钢及钢产品 交货一般技术要求"@zh ;
+    dcterms:title "Steel and steel products—General technical delivery requirements"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81302D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-25052-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 25052-2024" ;
+    dcterms:title "连续热浸镀层钢板和钢带尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimension,shape,weight and tolerance for continuously hot-dip coated steel sheet and strip"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=208E903AB62179F3E06397BE0A0AB2B9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1839-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1839-2025" ;
+    dcterms:title "钢产品镀锌层质量试验方法"@zh ;
+    dcterms:title "Test method for gravimetric determination of the mass per unit area of galvanized coatings on steel products"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213286420D16E06397BE0A0A8119> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/jbt-14606-2023> a stl:StandardEdition ;
+    dcterms:identifier "JB/T 14606-2023" ;
+    dcterms:title "RH精炼炉多功能顶枪"@zh ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=11B7CF2E83CAF485E06397BE0A0A08E9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6393-2025> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6393-2025" ;
+    dcterms:title "转炉生产智能控制系统技术要求"@zh ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181471D0E06397BE0A0A1FF9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6394-2025> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6394-2025" ;
+    dcterms:title "钢包精炼（LF）智能控制系统技术要求"@zh ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181571D0E06397BE0A0A1FF9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-38813-2020> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 38813-2020" ;
+    dcterms:title "热轧酸洗钢板及钢带的一般要求"@zh ;
+    dcterms:title "General requirements for hot-rolled pickled steel sheet and strip"@en ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LGpcOWMQiF0%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-37752-5-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 37752.5-2024" ;
+    dcterms:title "工业炉及相关工艺设备 安全 第5部分：钢带连续退火炉"@zh ;
+    dcterms:title "Industrial furnaces and associated processing equipment—Safety—Part 5：Steel strip continuous annealing furnace"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=25940C3CEEE78A9AE06397BE0A0A525A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/jbt-6995-2016> a stl:StandardEdition ;
+    dcterms:identifier "JB/T 6995-2016" ;
+    dcterms:title "冷轧带材精整与处理生产线 开卷机、卷取机"@zh ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F214EDBB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-42230-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 42230-2022" ;
+    dcterms:title "钢板卷道路运输捆绑固定要求"@zh ;
+    dcterms:title "Binding and fixing requirements for steel coils in road transport"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=aX%2FtBa9GxdI%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-6929-2013> a stl:StandardEdition ;
+    dcterms:identifier "ISO 6929:2013" ;
+    dcterms:title "钢产品 词汇"@zh ;
+    dcterms:title "Steel products — Vocabulary"@en ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/52949.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-4948-1-2026> a stl:StandardEdition ;
+    dcterms:identifier "ISO 4948-1:2026" ;
+    dcterms:title "钢分类 第1部分：按化学成分分类"@zh ;
+    dcterms:title "Steels — Classification — Part 1: Classification of steels based on chemical composition"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/91226.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-4529-2023> a stl:StandardEdition ;
+    dcterms:identifier "ISO 4529:2023" ;
+    dcterms:title "工业炉及相关工艺设备 二次炼钢 钢液处理机械与设备"@zh ;
+    dcterms:title "Industrial furnaces and associated processing equipment — Secondary steelmaking — Machinery and equipment for treatment of liquid steel"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/80050.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-404-2013> a stl:StandardEdition ;
+    dcterms:identifier "ISO 404:2013" ;
+    dcterms:title "钢及钢产品 交货一般技术要求"@zh ;
+    dcterms:title "Steel and steel products — General technical delivery requirements"@en ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/56861.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-10474-2013> a stl:StandardEdition ;
+    dcterms:identifier "ISO 10474:2013" ;
+    dcterms:title "钢及钢产品 检验文件"@zh ;
+    dcterms:title "Steel and steel products — Inspection documents"@en ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/53736.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-4967-2026> a stl:StandardEdition ;
+    dcterms:identifier "ISO 4967:2026" ;
+    dcterms:title "钢 非金属夹杂物含量的测定 显微法"@zh ;
+    dcterms:title "Steel — Determination of the non-metallic inclusion content — Micrographic method"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/86687.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-14284-2022> a stl:StandardEdition ;
+    dcterms:identifier "ISO 14284:2022" ;
+    dcterms:title "钢和铁 化学成分测定用试样的取样与制备"@zh ;
+    dcterms:title "Steel and iron — Sampling and preparation of samples for the determination of chemical composition"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/77332.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-3575-2025> a stl:StandardEdition ;
+    dcterms:identifier "ISO 3575:2025" ;
+    dcterms:title "商业级和冲压级连续热浸镀锌及锌铁合金镀层碳素钢薄板"@zh ;
+    dcterms:title "Continuous hot-dip zinc-coated and zinc-iron alloy-coated carbon steel sheet of commercial and drawing qualities"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/86691.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-4998-2023> a stl:StandardEdition ;
+    dcterms:identifier "ISO 4998:2023" ;
+    dcterms:title "连续热浸镀锌及锌铁合金镀层结构级钢板"@zh ;
+    dcterms:title "Steel sheet, zinc-coated and zinc-iron alloy-coated by the continuous hot-dip process, of structural quality"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/84171.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-377-2017> a stl:StandardEdition ;
+    dcterms:identifier "ISO 377:2017" ;
+    dcterms:title "钢及钢产品 力学试验用样品和试样的取样位置与制备"@zh ;
+    dcterms:title "Steel and steel products — Location and preparation of samples and test pieces for mechanical testing"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/72529.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-7438-2020> a stl:StandardEdition ;
+    dcterms:identifier "ISO 7438:2020" ;
+    dcterms:title "金属材料 弯曲试验"@zh ;
+    dcterms:title "Metallic materials — Bend test"@en ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/72187.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-6892-1-2019> a stl:StandardEdition ;
+    dcterms:identifier "ISO 6892-1:2019" ;
+    dcterms:title "金属材料 拉伸试验 第1部分：室温试验方法"@zh ;
+    dcterms:title "Metallic materials — Tensile testing — Part 1: Method of test at room temperature"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/78322.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-148-1-2016> a stl:StandardEdition ;
+    dcterms:identifier "ISO 148-1:2016" ;
+    dcterms:title "金属材料 夏比摆锤冲击试验 第1部分：试验方法"@zh ;
+    dcterms:title "Metallic materials — Charpy pendulum impact test — Part 1: Test method"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/63802.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-23718-2007> a stl:StandardEdition ;
+    dcterms:identifier "ISO 23718:2007" ;
+    dcterms:title "金属材料 力学试验 词汇"@zh ;
+    dcterms:title "Metallic materials — Mechanical testing — Vocabulary"@en ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/36948.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/isots-6084-2022> a stl:StandardEdition ;
+    dcterms:identifier "ISO/TS 6084:2022" ;
+    dcterms:title "钢及钢产品 化学分析词汇"@zh ;
+    dcterms:title "Steel and steel products — Vocabulary relating to chemical analysis"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/82035.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-780-2015> a stl:StandardEdition ;
+    dcterms:identifier "ISO 780:2015" ;
+    dcterms:title "包装 运输包装 包件搬运和储存的图形符号"@zh ;
+    dcterms:title "Packaging — Distribution packaging — Graphical symbols for handling and storage of packages"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/59933.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-15394-2017> a stl:StandardEdition ;
+    dcterms:identifier "ISO 15394:2017" ;
+    dcterms:title "包装 发运、运输和收货标签用条码与二维符号"@zh ;
+    dcterms:title "Packaging — Bar code and two-dimensional symbols for shipping, transport and receiving labels"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/65013.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-22742-2026> a stl:StandardEdition ;
+    dcterms:identifier "ISO 22742:2026" ;
+    dcterms:title "包装 产品包装用一维条码和二维符号"@zh ;
+    dcterms:title "Packaging — Linear bar code and two-dimensional symbols for product packaging"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/87746.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/isoiec-11179-3-2023> a stl:StandardEdition ;
+    dcterms:identifier "ISO/IEC 11179-3:2023" ;
+    dcterms:title "信息技术 元数据注册系统 第3部分：注册系统通用设施元模型"@zh ;
+    dcterms:title "Information technology — Metadata registries (MDR) — Part 3: Metamodel for registry common facilities"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/78915.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-80000-1-2022> a stl:StandardEdition ;
+    dcterms:identifier "ISO 80000-1:2022" ;
+    dcterms:title "量和单位 第1部分：总则"@zh ;
+    dcterms:title "Quantities and units — Part 1: General"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/76921.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-704-2022> a stl:StandardEdition ;
+    dcterms:identifier "ISO 704:2022" ;
+    dcterms:title "术语工作 原则与方法"@zh ;
+    dcterms:title "Terminology work — Principles and methods"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/79077.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-1087-2019> a stl:StandardEdition ;
+    dcterms:identifier "ISO 1087:2019" ;
+    dcterms:title "术语工作与术语学 词汇"@zh ;
+    dcterms:title "Terminology work and terminology science — Vocabulary"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/62330.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-a941-26a> a stl:StandardEdition ;
+    dcterms:identifier "ASTM A941-26a" ;
+    dcterms:title "钢、不锈钢、相关合金及铁合金术语"@zh ;
+    dcterms:title "Standard Terminology Relating to Steel, Stainless Steel, Related Alloys, and Ferroalloys"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/a0941-26a.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-a1008-a1008m-26> a stl:StandardEdition ;
+    dcterms:identifier "ASTM A1008/A1008M-26" ;
+    dcterms:title "冷轧碳素、结构、高强度低合金、改善成形性的高强度低合金、规定硬度、固溶强化及烘烤硬化薄钢板规范"@zh ;
+    dcterms:title "Standard Specification for Steel, Sheet, Cold-Rolled, Carbon, Structural, High-Strength Low-Alloy, High-Strength Low-Alloy with Improved Formability, Required Hardness, Solution Hardened, and Bake Hardenable"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/a1008_a1008m-26.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-a653-a653m-25a> a stl:StandardEdition ;
+    dcterms:identifier "ASTM A653/A653M-25a" ;
+    dcterms:title "热浸镀锌或锌铁合金镀层钢板规范"@zh ;
+    dcterms:title "Standard Specification for Steel Sheet, Zinc-Coated (Galvanized) or Zinc-Iron Alloy-Coated (Galvannealed) by the Hot-Dip Process"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/a0653_a0653m-25a.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10027-1-2016> a stl:StandardEdition ;
+    dcterms:identifier "EN 10027-1:2016" ;
+    dcterms:title "钢的牌号体系 第1部分：钢名"@zh ;
+    dcterms:title "Designation systems for steels - Part 1: Steel names"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10027-1/262540217> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10027-2-2015> a stl:StandardEdition ;
+    dcterms:identifier "EN 10027-2:2015" ;
+    dcterms:title "钢的牌号体系 第2部分：数字体系"@zh ;
+    dcterms:title "Designation systems for steels - Part 2: Numerical system"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10027-2/223407681> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10204-2004> a stl:StandardEdition ;
+    dcterms:identifier "EN 10204:2004" ;
+    dcterms:title "金属产品 检验文件的类型"@zh ;
+    dcterms:title "Metallic products - Types of inspection documents"@en ;
+    dcterms:issued "2004"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10204/59682782> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10346-2026> a stl:StandardEdition ;
+    dcterms:identifier "EN 10346:2026" ;
+    dcterms:title "冷成形用连续热浸镀层扁平钢产品 交货技术条件"@zh ;
+    dcterms:title "Continuously hot-dip coated steel flat products for cold forming — Technical delivery conditions"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.boutique.afnor.org/en-gb/standard/nf-en-10346/continuously-hotdip-coated-steel-flat-products-for-cold-forming-technical-d/fa202499/607164> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iec-62264-1-2013> a stl:StandardEdition ;
+    dcterms:identifier "IEC 62264-1:2013" ;
+    dcterms:title "企业控制系统集成 第1部分：模型与术语"@zh ;
+    dcterms:title "Enterprise-control system integration - Part 1: Models and terminology"@en ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/6675> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iec-62264-2-2026> a stl:StandardEdition ;
+    dcterms:identifier "IEC 62264-2:2026" ;
+    dcterms:title "企业控制系统集成 第2部分：制造运营与业务功能接口的对象模型和关系"@zh ;
+    dcterms:title "Enterprise-Control System Integration - Part 2: Object models and relationships for interfaces between manufacturing operations and business functions"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/75127> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iec-61360-1-2017> a stl:StandardEdition ;
+    dcterms:identifier "IEC 61360-1:2017" ;
+    dcterms:title "标准数据元素类型及相关分类体系 第1部分：定义、原则与方法"@zh ;
+    dcterms:title "Standard data element types with associated classification scheme - Part 1: Definitions - Principles and methods"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/28560> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/wbt-1091-2018> a stl:StandardEdition ;
+    dcterms:identifier "WB/T 1091-2018" ;
+    dcterms:title "钢铁物流作业规范"@zh ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F24A2EBB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/wbt-1092-2018> a stl:StandardEdition ;
+    dcterms:identifier "WB/T 1092-2018" ;
+    dcterms:title "钢铁物流包装、标识规范"@zh ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F24A2FBB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-4878-2020> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 4878-2020" ;
+    dcterms:title "钢铁物流数字化仓储建设基本要求"@zh ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=B783196B1952A04CE05397BE0A0A5803> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6395-2025> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6395-2025" ;
+    dcterms:title "热轧生产智能管控技术要求"@zh ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181671D0E06397BE0A0A1FF9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6527-2026> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6527-2026" ;
+    dcterms:title "钢铁行业冷轧生产智能管控系统技术要求"@zh ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://hbba.sacinfo.org.cn/stdDetail/27d59e1c62a3553721aa76a3177f93595765f72b812f670f1571443ff09c12d2> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-17616-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 17616-2025" ;
+    dcterms:title "钢铁及合金牌号统一数字代号体系"@zh ;
+    dcterms:title "Iron and steel coding system for irons, steels and alloys"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213286990D16E06397BE0A0A8119> ;
+    dcterms:replaces <std/gbt-17616-2013> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-7232-2023> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 7232-2023" ;
+    dcterms:title "金属热处理 术语"@zh ;
+    dcterms:title "Metal heat treatment—Terminology"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=027A6096AEE6643EE06397BE0A0A0867> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-12603-2005> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 12603-2005" ;
+    dcterms:title "金属热处理工艺分类及代号"@zh ;
+    dcterms:title "Classifications and designations for metal heat treatment"@en ;
+    dcterms:issued "2005"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D779D6D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-8541-2012> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 8541-2012" ;
+    dcterms:title "锻压术语"@zh ;
+    dcterms:title "Terminology of forging and stamping"@en ;
+    dcterms:issued "2012"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=enPXniyMfX0%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-5611-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 5611-2017" ;
+    dcterms:title "铸造术语"@zh ;
+    dcterms:title "Foundry terminology"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8285FD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1996-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1996-2017" ;
+    dcterms:title "冶金焦炭"@zh ;
+    dcterms:title "Coke for metallurgy"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81F6CD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2006-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2006-2008" ;
+    dcterms:title "焦炭机械强度的测定方法"@zh ;
+    dcterms:title "Coke for metallurgy - Determination of mechanical strength"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75CFAD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-4000-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4000-2017" ;
+    dcterms:title "焦炭反应性及反应后强度试验方法"@zh ;
+    dcterms:title "Determination of coke reactivity index (CRI) and coke strength after reaction (CSR)"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81FE3D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-212-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 212-2008" ;
+    dcterms:title "煤的工业分析方法"@zh ;
+    dcterms:title "Proximate analysis of coal"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D77AA5D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-6730-1-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 6730.1-2016" ;
+    dcterms:title "铁矿石 分析用预干燥试样的制备"@zh ;
+    dcterms:title "Iron ores—Preparation of predried test samples for chemical analysis"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=4MMzJk7b2zk%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-10322-1-2023> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 10322.1-2023" ;
+    dcterms:title "铁矿石 取样和制样方法"@zh ;
+    dcterms:title "Iron ores—Sampling and sample preparation procedures"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=027A6096AF72643EE06397BE0A0A0867> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-24531-2009> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 24531-2009" ;
+    dcterms:title "高炉和直接还原用铁矿石 转鼓和耐磨指数的测定"@zh ;
+    dcterms:title "Iron ores for blast furnace and direct reduction feedstocks - Determination of the tumble and abrasion indices"@en ;
+    dcterms:issued "2009"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7F4EBD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-13241-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 13241-2017" ;
+    dcterms:title "铁矿石 还原性的测定方法"@zh ;
+    dcterms:title "Iron ores—Determination of reducibility"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81C23D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-24189-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 24189-2024" ;
+    dcterms:title "高炉用铁矿石 用最终还原度指数表示的还原性的测定"@zh ;
+    dcterms:title "Iron ores for blast furnace feedstocks—Determination of the reducibility by the final degree of reduction index"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=19B8508AED724286E06397BE0A0A616D> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-717-1998> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 717-1998" ;
+    dcterms:title "炼钢用生铁"@zh ;
+    dcterms:title "Pig iron for steelmaking"@en ;
+    dcterms:issued "1998"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75FAFD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-718-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 718-2024" ;
+    dcterms:title "铸造用生铁"@zh ;
+    dcterms:title "Pig iron for casting"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=ED53B6E5E8BCA4511B9BD115ACE42BA5> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-4223-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4223-2017" ;
+    dcterms:title "废钢铁"@zh ;
+    dcterms:title "Iron and steel scraps"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LCsCZ0c8eO0%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2272-2020> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2272-2020" ;
+    dcterms:title "硅铁"@zh ;
+    dcterms:title "Ferrosillicon"@en ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=A73D6262FE0572E3E05397BE0A0A6CEB> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3795-2014> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3795-2014" ;
+    dcterms:title "锰铁"@zh ;
+    dcterms:title "Ferromanganese"@en ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7F3E8D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gb-1499-1-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB 1499.1-2024" ;
+    dcterms:title "钢筋混凝土用钢 第1部分：热轧光圆钢筋"@zh ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 1:Hot rolled plain bars"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=GJ733S1WRs0%3D&mode=p> ;
+    dcterms:replaces <std/gbt-1499-1-2017> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gb-1499-2-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB 1499.2-2024" ;
+    dcterms:title "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=1BD5B9878E5A2FCEE06397BE0A0A10CC> ;
+    dcterms:replaces <std/gbt-1499-2-2018> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-701-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 701-2008" ;
+    dcterms:title "低碳钢热轧圆盘条"@zh ;
+    dcterms:title "Hot rolled low carbon steel wire rods"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75D46D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-702-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 702-2026" ;
+    dcterms:title "钢棒尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimensions, shape, weight and tolerances of steel bars"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OmF02s7kDno%3D&mode=p> ;
+    dcterms:replaces <std/gbt-702-2017>, <std/gbt-905-1994>, <std/gbt-908-2019> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-706-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 706-2026" ;
+    dcterms:title "热轧型钢"@zh ;
+    dcterms:title "Hot rolled section steel"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/search/stdPage?pageNo=1&q=GB%2FT706-2026> ;
+    dcterms:replaces <std/gbt-706-2016> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-11263-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 11263-2024" ;
+    dcterms:title "热轧H型钢和剖分T型钢"@zh ;
+    dcterms:title "Hot rolled H and cut T section steel"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=25940C3CEEF98A9AE06397BE0A0A525A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-8162-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 8162-2018" ;
+    dcterms:title "结构用无缝钢管"@zh ;
+    dcterms:title "Seamless steel tubes for structural purposes"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=C2spWs1c1MI%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-8163-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 8163-2018" ;
+    dcterms:title "输送流体用无缝钢管"@zh ;
+    dcterms:title "Seamless steel pipes for liquid service"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D82D1DD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3091-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3091-2025" ;
+    dcterms:title "低压流体输送用焊接钢管"@zh ;
+    dcterms:title "Welded steel pipes for low pressure fluid delivery"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=31DA5F377C658F08E06397BE0A0A4CFB> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-9711-2023> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 9711-2023" ;
+    dcterms:title "石油天然气工业 管线输送系统用钢管"@zh ;
+    dcterms:title "Petroleum and natural gas industries—Steel pipe for pipeline transportation systems"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=0B4529DE10D1FCAFE06397BE0A0A46CC> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-17395-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 17395-2024" ;
+    dcterms:title "钢管尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimensions, shapes, masses and tolerances of steel tubes"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=D0312C0534BD7B987D945321BAB7B778> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2102-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2102-2022" ;
+    dcterms:title "钢管的验收、包装、标志和质量证明书"@zh ;
+    dcterms:title "Acceptance, packaging, marking and quality certification for steel tubular products"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=EB58F4DA9200B2A2E05397BE0A0A7D33> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2101-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2101-2017" ;
+    dcterms:title "型钢验收、包装、标志及质量证明书的一般规定"@zh ;
+    dcterms:title "General requirment of acceptance, packaging, marking and certification for section steel"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8141DD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-699-2015> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 699-2015" ;
+    dcterms:title "优质碳素结构钢"@zh ;
+    dcterms:title "Quality carbon structure steels"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=l39338zzV54%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1591-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1591-2018" ;
+    dcterms:title "低合金高强度结构钢"@zh ;
+    dcterms:title "High strength low alloy structural steels"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/search/stdPage?q=%E4%BD%8E%E5%90%88%E9%87%91%E9%AB%98%E5%BC%BA%E5%BA%A6%E7%BB%93%E6%9E%84%E9%92%A2> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3077-2015> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3077-2015" ;
+    dcterms:title "合金结构钢"@zh ;
+    dcterms:title "Alloy structure steels"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LWoKmnMVfLA%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20878-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20878-2024" ;
+    dcterms:title "不锈钢 牌号及化学成分"@zh ;
+    dcterms:title "Stainless steels—Designation and chemical composition"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=1E5A13A77F7ABC8DE06397BE0A0A87E8> ;
+    dcterms:replaces <std/gbt-20878-2007> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1220-2007> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1220-2007" ;
+    dcterms:title "不锈钢棒"@zh ;
+    dcterms:title "Stainless steel bars"@en ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7F4DBD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1221-2007> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1221-2007" ;
+    dcterms:title "耐热钢棒"@zh ;
+    dcterms:title "Heat-resistant steel bars"@en ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D767B5D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1299-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1299-2025" ;
+    dcterms:title "工模具钢"@zh ;
+    dcterms:title "Tool and mould steels"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=TyyZXROMMjw%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-18254-2002> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 18254-2002" ;
+    dcterms:title "高碳铬轴承钢"@zh ;
+    dcterms:title "High-carbon chromium bearing steel"@en ;
+    dcterms:issued "2002"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7F768D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1222-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1222-2025" ;
+    dcterms:title "弹簧钢"@zh ;
+    dcterms:title "Spring steels"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=42BA7D06A4F0E936E06397BE0A0ACDC9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-5216-2014> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 5216-2014" ;
+    dcterms:title "保证淬透性结构钢"@zh ;
+    dcterms:title "Structural steel with specified hardenability bands"@en ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7ED65D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-14992-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 14992-2025" ;
+    dcterms:title "高温合金和金属间化合物 牌号及化学成分"@zh ;
+    dcterms:title "Superalloys and intermetallic compounds—Designation and chemical composition"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213286400D16E06397BE0A0A8119> ;
+    dcterms:replaces <std/gbt-14992-2005> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-908-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 908-2019" ;
+    dcterms:title "锻制钢棒尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Forged bars for dimensions,shape,weight and tolerances"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=8AA1F5D36ED7A8DBE05397BE0A0AB19B> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-228-2-2015> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 228.2-2015" ;
+    dcterms:title "金属材料 拉伸试验 第2部分：高温试验方法"@zh ;
+    dcterms:title "Metallic materials—Tensile testing—Part 2: Method of test at elevated temperature"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D80910D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-230-1-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 230.1-2018" ;
+    dcterms:title "金属材料 洛氏硬度试验 第1部分: 试验方法"@zh ;
+    dcterms:title "Metallic materials—Rockwell hardness test—Part 1：Test method"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3SDoo8yHFRo%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-231-1-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 231.1-2018" ;
+    dcterms:title "金属材料 布氏硬度试验 第1部分: 试验方法"@zh ;
+    dcterms:title "Metallic materials—Brinell hardness test—Part 1: Test method"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=7DAB268C1B1B5265C36A2F1D1330E87D> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-4340-1-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4340.1-2024" ;
+    dcterms:title "金属材料 维氏硬度试验 第1部分: 试验方法"@zh ;
+    dcterms:title "Metallic materials—Vickers hardness test—Part 1: Test method"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=19B8508AED824286E06397BE0A0A616D> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-225-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 225-2006" ;
+    dcterms:title "钢 淬透性的末端淬火试验方法（Jominy 试验）"@zh ;
+    dcterms:title "Steel - Hardenability test by end quenching（Jominy test）"@en ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=hUuK8utaag0%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-6394-2002> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 6394-2002" ;
+    dcterms:title "金属平均晶粒度测定法"@zh ;
+    dcterms:title "Metal-methids for estimating the average grain size"@en ;
+    dcterms:issued "2002"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=58F9D9AF0F098076E61DCFD27B40C72A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-13298-2015> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 13298-2015" ;
+    dcterms:title "金属显微组织检验方法"@zh ;
+    dcterms:title "Inspection methods of microstructure for metals"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D80A02D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-224-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 224-2019" ;
+    dcterms:title "钢的脱碳层深度测定法"@zh ;
+    dcterms:title "Determination of the depth of decarburization of steels"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=8AA1F5D36E86A8DBE05397BE0A0AB19B> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-13299-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 13299-2022" ;
+    dcterms:title "钢的游离渗碳体、珠光体和魏氏组织的评定方法"@zh ;
+    dcterms:title "Determination of free cementite, pearlite and Widmanstaten structure in steel"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=NSjNeRFI%2FKA%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1979-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1979-2025" ;
+    dcterms:title "结构钢低倍组织缺陷评定 酸浸法和超声检测法"@zh ;
+    dcterms:title "Evaluation of macrostructural defects in structural steels—Acid etching method and ultrasonic testing method"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA2132868B0D16E06397BE0A0A8119> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-4236-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4236-2025" ;
+    dcterms:title "钢的硫印检验方法"@zh ;
+    dcterms:title "Steel-examination by sulphur print"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213285560D16E06397BE0A0A8119> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-15711-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 15711-2018" ;
+    dcterms:title "钢中非金属夹杂物的检验 塔形发纹酸浸法"@zh ;
+    dcterms:title "Inspection of non-metallic inclusions of steel—Etching test method of tower samples"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D82AECD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-4162-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4162-2022" ;
+    dcterms:title "锻轧钢棒超声检测方法"@zh ;
+    dcterms:title "Method for ultrasonic testing of forged and rolled steel bars"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=DD3D95E5C0BA71EBE05397BE0A0AF33F> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-6402-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 6402-2008" ;
+    dcterms:title "钢锻件超声检测方法"@zh ;
+    dcterms:title "Steel forgings - Method for ultrasonic testing"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D76CE9D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2970-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2970-2026" ;
+    dcterms:title "厚钢板超声检测方法"@zh ;
+    dcterms:title "Method for ultrasonic testing of thick steel plates"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=BmnpzqdA4e0%3D&mode=p> ;
+    dcterms:replaces <std/gbt-2970-2016> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-5777-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 5777-2019" ;
+    dcterms:title "无缝和焊接（埋弧焊除外）钢管纵向和/或横向缺欠的全圆周自动超声检测"@zh ;
+    dcterms:title "Automated full peripheral ultrasonic testing of seamless and welded (except submerged arc-welded) steel tubes for the detection of longitudinal and/or transverse imperfections"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=9CC92E7DD0FD99B88CEA538409159048> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-15822-1-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 15822.1-2024" ;
+    dcterms:title "无损检测 磁粉检测 第1部分：总则"@zh ;
+    dcterms:title "Non-destructive testing—Magnetic particle testing—Part 1：General principles"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=234D7936AB23E194E06397BE0A0AA0A9> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-18851-1-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 18851.1-2024" ;
+    dcterms:title "无损检测 渗透检测 第1部分：总则"@zh ;
+    dcterms:title "Non-destructive testing—Penetrant testing—Part 1: General principles"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=28045D84DA459055E06397BE0A0A7C5C> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-7735-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 7735-2016" ;
+    dcterms:title "无缝和焊接（埋弧焊除外）钢管缺欠的自动涡流检测"@zh ;
+    dcterms:title "Automated eddy current testing of seamless and welded (except submerged arc-welded) steel tubes for detection of imperfections"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=g%2BCGzdhWmnc%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-223-86-2009> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 223.86-2009" ;
+    dcterms:title "钢铁及合金 总碳含量的测定 感应炉燃烧后红外吸收法"@zh ;
+    dcterms:title "Steel and iron - Determination of total carbon content - Infrared absorption method after combustion in an induction furnace"@en ;
+    dcterms:issued "2009"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7D6E6D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-223-85-2009> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 223.85-2009" ;
+    dcterms:title "钢铁及合金 硫含量的测定 感应炉燃烧后红外吸收法"@zh ;
+    dcterms:title "Steel and iron - Determination of sulfur content - Infrared absorption method after combustion in an induction furnace"@en ;
+    dcterms:issued "2009"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7D6E5D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-11261-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 11261-2006" ;
+    dcterms:title "钢铁 氧含量的测定 脉冲加热惰气熔融-红外线吸收法"@zh ;
+    dcterms:title "Steel and iron Determination of oxygen content The pulse heating inert gas fusion-infra-red absorption method"@en ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OzPD%2B7jzD2U%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20124-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20124-2006" ;
+    dcterms:title "钢铁 氮含量的测定 惰性气体熔融热导法（常规方法）"@zh ;
+    dcterms:title "Steel and iron -- Determination of nitrogen content -- Thermal conductimetric method after fusion in a current of inert gas (Routine method)"@en ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7FEADD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-223-82-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 223.82-2018" ;
+    dcterms:title "钢铁 氢含量的测定 惰性气体熔融-热导或红外法"@zh ;
+    dcterms:title "Steel and iron—Determination of hydrogen content—Thermal conductivity/infrared method after fusion under inert gas"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82B6FD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-223-69-2008> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 223.69-2008" ;
+    dcterms:title "钢铁及合金 碳含量的测定 管式炉内燃烧后气体容量法"@zh ;
+    dcterms:title "Iron, steel and alloy - Determination of carbon contents - Gas-volumetric method after combustion in the pipe furnace"@en ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7F851D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20720-1-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20720.1-2019" ;
+    dcterms:title "企业控制系统集成 第1部分：模型和术语"@zh ;
+    dcterms:title "Enterprise-control system integration—Part 1: Models and terminology"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=4GhCJf5rjrU%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20720-2-2020> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20720.2-2020" ;
+    dcterms:title "企业控制系统集成 第2部分：企业控制系统集成的对象和属性"@zh ;
+    dcterms:title "Enterprise-control system integration—Part 2: Objects and attributes for enterprise-control system integration"@en ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=B691BB778754D126E05397BE0A0AF3B3> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20720-3-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20720.3-2022" ;
+    dcterms:title "企业控制系统集成 第3部分：制造运行管理的活动模型"@zh ;
+    dcterms:title "Enterprise-control system integration—Part 3: Activity models of manufacturing operations management"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=DAB8B40045E9896BE05397BE0A0A0B32> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20720-4-2021> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20720.4-2021" ;
+    dcterms:title "企业控制系统集成 第4部分：制造运行管理集成的对象模型属性"@zh ;
+    dcterms:title "Enterprise-control system integration—Part 4: Object model attributes for manufacturing operations management integration"@en ;
+    dcterms:issued "2021"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=C3386C490CC38B79E05397BE0A0AC288> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gb-3100-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB 3100-1993" ;
+    dcterms:title "国际单位制及其应用"@zh ;
+    dcterms:title "SI units and recommendations for the use of theirmultiples and of certain other units"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7AA78D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3101-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3101-1993" ;
+    dcterms:title "有关量、单位和符号的一般原则"@zh ;
+    dcterms:title "General principles concerning quantities，units and symbols"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D797FAD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-1-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.1-1993" ;
+    dcterms:title "空间和时间的量和单位"@zh ;
+    dcterms:title "Quantities and units of space and time"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D79176D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-27692-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 27692-2024" ;
+    dcterms:title "高炉用铁球团矿"@zh ;
+    dcterms:title "Iron pellets for blast furnaces"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=173829859DCB1AA5E06397BE0A0AA311> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-42091-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 42091-2022" ;
+    dcterms:title "大型锻钢件用真空钢锭的冶炼与铸锭规范"@zh ;
+    dcterms:title "Specification of smelting and casting of vacuum ingot for heavy steel forgings"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=F159DFC2A79947EFE05397BE0A0AF334> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6533-2026> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6533-2026" ;
+    dcterms:title "电渣重熔钢坯"@zh ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=581CB09482B69BCDE06397BE0A0A2B6E> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-24444-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 24444-2026" ;
+    dcterms:title "电渣重熔结晶器"@zh ;
+    dcterms:title "Electroslag remelting mould"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=511EBC59677F9318E06397BE0A0AFBD5> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-10067-35-2015> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 10067.35-2015" ;
+    dcterms:title "电热装置基本技术条件 第35部分：中频真空感应熔炼炉"@zh ;
+    dcterms:title "Basic specifications for electroheat installations—Part 35: Medium frequency vacuum induction melting furnace"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D80F99D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-4782-2019> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 4782-2019" ;
+    dcterms:title "真空自耗炉结晶器"@zh ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=9F00800245E11BB1E05397BE0A0A3358> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-26639-2011> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 26639-2011" ;
+    dcterms:title "液压机上钢质自由锻件 通用技术条件"@zh ;
+    dcterms:title "General specifications for open die forgings on hydraulic press"@en ;
+    dcterms:issued "2011"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7DE74D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-33212-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 33212-2016" ;
+    dcterms:title "锤上钢质自由锻件 通用技术条件"@zh ;
+    dcterms:title "Steel open die forgings on hammer—General specifications"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81464D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-34474-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 34474-2025" ;
+    dcterms:title "钢中带状组织的评定方法"@zh ;
+    dcterms:title "Methods for determination of banded structure of steels"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=3DBA213286870D16E06397BE0A0A8119> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-3-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.3-1993" ;
+    dcterms:title "力学的量和单位"@zh ;
+    dcterms:title "Quantities and units of mechanics"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D79A69D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6339-2025> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6339-2025" ;
+    dcterms:title "电弧炉短流程炼钢生产通用要求"@zh ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=40C8E02241A14CBBE06397BE0A0A2F5A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-4378-2014> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 4378-2014" ;
+    dcterms:title "铁水脱硫用钝化镁"@zh ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F21379BB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-421-2014> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 421-2014" ;
+    dcterms:title "铁烧结矿"@zh ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F21029BB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-153-2015> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 153-2015" ;
+    dcterms:title "优质结构钢连铸坯低倍组织缺陷评级图"@zh ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F21AA7BB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-24515-2009> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 24515-2009" ;
+    dcterms:title "高炉用铁矿石 用还原速率表示的还原性的测定"@zh ;
+    dcterms:title "Iron ores for blast furnace feedstocks - Determination of the reducibility by the rate of reduction index"@en ;
+    dcterms:issued "2009"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7D420D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20565-2022> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20565-2022" ;
+    dcterms:title "铁矿石和直接还原铁 术语"@zh ;
+    dcterms:title "Iron ores and direct reduced iron—Vocabulary"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=ERTJ0NLXoBg%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-6534-2026> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 6534-2026" ;
+    dcterms:title "炼钢用氢基竖炉直接还原铁"@zh ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=581CB09482C39BCDE06397BE0A0A2B6E> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-5296-2011> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 5296-2011" ;
+    dcterms:title "炼钢用生铁"@zh ;
+    dcterms:issued "2011"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F22467BB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-47019-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 47019-2026" ;
+    dcterms:title "工业互联网平台 工业设备接入数据字典"@zh ;
+    dcterms:title "Industrial internet platform—Data dictionary for connecting industrial equipment"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=49FD1852CB35C31FE06397BE0A0A1304> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-6730-85-2023> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 6730.85-2023" ;
+    dcterms:title "铁矿石 化学分析用有证标准样品的制备和定值"@zh ;
+    dcterms:title "Iron ores—Preparation and certification of certified reference materials for use in chemical analysis"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=027A6096AF8E643EE06397BE0A0A0867> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-6394-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 6394-2017" ;
+    dcterms:title "金属平均晶粒度测定方法"@zh ;
+    dcterms:title "Determination of estimating the average grain size of metal"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D815A3D3A7E05397BE0A0AB82A> ;
+    dcterms:replaces <std/gbt-6394-2002> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1361-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1361-2024" ;
+    dcterms:title "铁矿石分析方法总则及一般规定"@zh ;
+    dcterms:title "General rules and regulations for analysis of iron ores"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=71691F8D50759C4335EDC75BBC0347EB> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-37775-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 37775-2019" ;
+    dcterms:title "大型钢质自由锻件 通用技术规范"@zh ;
+    dcterms:title "Heavy steel open die forgings—General technical specification"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=4WsVZ1sMx6k%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/ybt-4170-2008> a stl:StandardEdition ;
+    dcterms:identifier "YB/T 4170-2008" ;
+    dcterms:title "炼钢用直接还原铁"@zh ;
+    dcterms:issued "2008"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F199C8BB19E05397BE0A0AB44A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-4-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.4-1993" ;
+    dcterms:title "热学的量和单位"@zh ;
+    dcterms:title "Quantities and units of heat"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7C091D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-5-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.5-2026" ;
+    dcterms:title "量和单位 第5部分：热力学"@zh ;
+    dcterms:title "Quantities and units—Part 5: Thermodynamics"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=5F6AFB193EF57748E06397BE0A0A0B47> ;
+    dcterms:replaces <std/gbt-3102-4-1993> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-42602-2023> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 42602-2023" ;
+    dcterms:title "大型锻钢件的锻造规范"@zh ;
+    dcterms:title "Specification of forging of heavy steel forgings"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=FC816D04FED462EBE05397BE0A0AD5FA> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-10067-8-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 10067.8-2016" ;
+    dcterms:title "电热装置基本技术条件 第8部分：电渣重熔炉"@zh ;
+    dcterms:title "Basic specifications for electroheat installations—Part 8: Electroslag remelting furnaces"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81301D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-706-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 706-2016" ;
+    dcterms:title "热轧型钢"@zh ;
+    dcterms:title "Hot rolled section steel"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81430D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-2970-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2970-2016" ;
+    dcterms:title "厚钢板超声检测方法"@zh ;
+    dcterms:title "Method for ultrasonic testing of thicker steel plates"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81236D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1499-2-2018> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1499.2-2018" ;
+    dcterms:title "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82C58D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-3-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.3-2026" ;
+    dcterms:title "量和单位 第3部分：空间和时间"@zh ;
+    dcterms:title "Quantities and units—Part 3: Space and time"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=5F6AFB193EF87748E06397BE0A0A0B47> ;
+    dcterms:replaces <std/gbt-3102-1-1993>, <std/gbt-3102-2-1993> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-4-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.4-2026" ;
+    dcterms:title "量和单位 第4部分：力学"@zh ;
+    dcterms:title "Quantities and units—Part 4: Mechanics"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=5F6AFB193EAC7748E06397BE0A0A0B47> ;
+    dcterms:replaces <std/gbt-3102-3-1993> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-40882-2021> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 40882-2021" ;
+    dcterms:title "第三代核电站主管道锻件 工艺规范"@zh ;
+    dcterms:title "Forgings of main pipes for nuclear power plant of generation Ⅲ—Technological specification"@en ;
+    dcterms:issued "2021"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=D1E86BE73A2A430EE05397BE0A0A206B> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-9-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.9-2026" ;
+    dcterms:title "量和单位 第9部分：物理化学和分子物理学"@zh ;
+    dcterms:title "Quantities and units—Part 9: Physical chemistry and molecular physics"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=5F6AFB193EF77748E06397BE0A0A0B47> ;
+    dcterms:replaces <std/gbt-3102-8-1993> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-18254-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 18254-2016" ;
+    dcterms:title "高碳铬轴承钢"@zh ;
+    dcterms:title "High-carbon chromium bearing steel"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8111ED3A7E05397BE0A0AB82A> ;
+    dcterms:replaces <std/gbt-18254-2002> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-6402-2024> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 6402-2024" ;
+    dcterms:title "钢锻件超声检测方法"@zh ;
+    dcterms:title "Method for ultrasonic testing of steel forgings"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=234D7936AAEDE194E06397BE0A0AA0A9> ;
+    dcterms:replaces <std/gbt-6402-2008> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-8-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.8-1993" ;
+    dcterms:title "物理化学和分子物理学的量和单位"@zh ;
+    dcterms:title "Quantities and units of physical chemistry and molecular physics"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D799E3D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-1499-1-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1499.1-2017" ;
+    dcterms:title "钢筋混凝土用钢 第1部分：热轧光圆钢筋"@zh ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 1:Hot rolled plain bars"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D828B7D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-20878-2007> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20878-2007" ;
+    dcterms:title "不锈钢和耐热钢 牌号及化学成分"@zh ;
+    dcterms:title "Stainless and heat-resisting steels - Designation and chemical composition"@en ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D78923D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-14992-2005> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 14992-2005" ;
+    dcterms:title "高温合金和金属间化合物高温材料的分类和牌号"@zh ;
+    dcterms:title "Classification and designation for superalloys and high temperature intermetallic materials"@en ;
+    dcterms:issued "2005"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=ofmER4fK6Kw%3D&mode=p> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-17616-2013> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 17616-2013" ;
+    dcterms:title "钢铁及合金牌号统一数字代号体系"@zh ;
+    dcterms:title "Unified numbering system for designation of iron,steel and alloy"@en ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7EEB9D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-3102-2-1993> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 3102.2-1993" ;
+    dcterms:title "周期及其有关现象的量和单位"@zh ;
+    dcterms:title "Quantities and units of periodic and related pheno-mena"@en ;
+    dcterms:issued "1993"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D79A37D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-702-2017> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 702-2017" ;
+    dcterms:title "热轧钢棒尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Hot-rolled steel bars—Dimensions,shape,weight and tolerances"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81C41D3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/gbt-905-1994> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 905-1994" ;
+    dcterms:title "冷拉圆钢、方钢、六角钢尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:title "Dimension，shape，weight and tolerance for cold-drawn round，square and hexagonal steels"@en ;
+    dcterms:issued "1994"^^xsd:gYear ;
+    dcterms:description "废止"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D79CBBD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-3082-2017> a stl:StandardEdition ;
+    dcterms:identifier "ISO 3082:2017" ;
+    dcterms:title "铁矿石 取样和制样程序"@zh ;
+    dcterms:title "Iron ores — Sampling and sample preparation procedures"@en ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/66457.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-3271-2015> a stl:StandardEdition ;
+    dcterms:identifier "ISO 3271:2015" ;
+    dcterms:title "高炉及直接还原用铁矿石 转鼓和耐磨指数的测定"@zh ;
+    dcterms:title "Iron ores for blast furnace and direct reduction feedstocks — Determination of the tumble and abrasion indices"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/62135.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-4695-2021> a stl:StandardEdition ;
+    dcterms:identifier "ISO 4695:2021" ;
+    dcterms:title "高炉用铁矿石 用还原速率指数表示的还原性测定"@zh ;
+    dcterms:title "Iron ores for blast furnace feedstocks — Determination of the reducibility by the rate of reduction index"@en ;
+    dcterms:issued "2021"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/82818.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-7215-2015> a stl:StandardEdition ;
+    dcterms:identifier "ISO 7215:2015" ;
+    dcterms:title "高炉用铁矿石 用最终还原度指数表示的还原性测定"@zh ;
+    dcterms:title "Iron ores for blast furnace feedstocks — Determination of the reducibility by the final degree of reduction index"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/62142.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-3183-2019> a stl:StandardEdition ;
+    dcterms:identifier "ISO 3183:2019" ;
+    dcterms:title "石油天然气工业 管线输送系统用钢管"@zh ;
+    dcterms:title "Petroleum and natural gas industries — Steel pipe for pipeline transportation systems"@en ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/76676.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-683-1-2016> a stl:StandardEdition ;
+    dcterms:identifier "ISO 683-1:2016" ;
+    dcterms:title "热处理钢、合金钢和易切削钢 第1部分：调质用非合金钢"@zh ;
+    dcterms:title "Heat-treatable steels, alloy steels and free-cutting steels — Part 1: Non-alloy steels for quenching and tempering"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/70642.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-6506-1-2014> a stl:StandardEdition ;
+    dcterms:identifier "ISO 6506-1:2014" ;
+    dcterms:title "金属材料 布氏硬度试验 第1部分：试验方法"@zh ;
+    dcterms:title "Metallic materials — Brinell hardness test — Part 1: Test method"@en ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/59671.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-6507-1-2023> a stl:StandardEdition ;
+    dcterms:identifier "ISO 6507-1:2023" ;
+    dcterms:title "金属材料 维氏硬度试验 第1部分：试验方法"@zh ;
+    dcterms:title "Metallic materials — Vickers hardness test — Part 1: Test method"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/83898.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-6508-1-2023> a stl:StandardEdition ;
+    dcterms:identifier "ISO 6508-1:2023" ;
+    dcterms:title "金属材料 洛氏硬度试验 第1部分：试验方法"@zh ;
+    dcterms:title "Metallic materials — Rockwell hardness test — Part 1: Test method"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/84343.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-642-2024> a stl:StandardEdition ;
+    dcterms:identifier "ISO 642:2024" ;
+    dcterms:title "钢 末端淬火淬透性试验（乔米尼试验）"@zh ;
+    dcterms:title "Steel — Hardenability test by end quenching (Jominy test)"@en ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/85868.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iso-4948-2-1981> a stl:StandardEdition ;
+    dcterms:identifier "ISO 4948-2:1981" ;
+    dcterms:title "钢分类 第2部分：按主要质量等级和主要性能或使用特性对非合金钢和合金钢分类"@zh ;
+    dcterms:title "Steels — Classification — Part 2: Classification of unalloyed and alloy steels according to main quality classes and main property or application characteristics"@en ;
+    dcterms:issued "1981"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.iso.org/standard/10964.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-a276-a276m-25> a stl:StandardEdition ;
+    dcterms:identifier "ASTM A276/A276M-25" ;
+    dcterms:title "不锈钢棒材和型材规范"@zh ;
+    dcterms:title "Standard Specification for Stainless Steel Bars and Shapes"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/a0276_a0276m-25.html?eid=37969> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-a604-a604m-07-2022> a stl:StandardEdition ;
+    dcterms:identifier "ASTM A604/A604M-07(2022)" ;
+    dcterms:title "自耗电极重熔钢棒和钢坯的宏观酸蚀检验规程"@zh ;
+    dcterms:title "Standard Practice for Macroetch Testing of Consumable Electrode Remelted Steel Bars and Billets"@en ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/a0604_a0604m-07r22.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-e45-25> a stl:StandardEdition ;
+    dcterms:identifier "ASTM E45-25" ;
+    dcterms:title "钢中夹杂物含量的测定方法"@zh ;
+    dcterms:title "Standard Test Methods for Determining the Inclusion Content of Steel"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/e0045-25.html> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-e1245-03-2023> a stl:StandardEdition ;
+    dcterms:identifier "ASTM E1245-03(2023)" ;
+    dcterms:title "自动图像分析测定金属中夹杂物或第二相含量的规程"@zh ;
+    dcterms:title "Standard Practice for Determining the Inclusion or Second-Phase Constituent Content of Metals by Automatic Image Analysis"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/standards/e1245> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/astm-e112-25e1> a stl:StandardEdition ;
+    dcterms:identifier "ASTM E112-25e1" ;
+    dcterms:title "平均晶粒度测定方法"@zh ;
+    dcterms:title "Standard Test Methods for Determining Average Grain Size"@en ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://store.astm.org/standards/e112> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10079-2007> a stl:StandardEdition ;
+    dcterms:identifier "EN 10079:2007" ;
+    dcterms:title "钢产品的定义"@zh ;
+    dcterms:title "Definition of steel products"@en ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/de/norm/din-en-10079/93163915> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10020-2000> a stl:StandardEdition ;
+    dcterms:identifier "EN 10020:2000" ;
+    dcterms:title "钢种的定义和分类"@zh ;
+    dcterms:title "Definition and classification of grades of steel"@en ;
+    dcterms:issued "2000"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10020/27404233> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/en-10088-1-2023> a stl:StandardEdition ;
+    dcterms:identifier "EN 10088-1:2023" ;
+    dcterms:title "不锈钢 第1部分：不锈钢一览表"@zh ;
+    dcterms:title "Stainless steels - Part 1: List of stainless steels"@en ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10088-1/368571045> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iec-62264-3-2016> a stl:StandardEdition ;
+    dcterms:identifier "IEC 62264-3:2016" ;
+    dcterms:title "企业控制系统集成 第3部分：制造运营管理的活动模型"@zh ;
+    dcterms:title "Enterprise-control system integration - Part 3: Activity models of manufacturing operations management"@en ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/33511> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/iec-62264-4-2015> a stl:StandardEdition ;
+    dcterms:identifier "IEC 62264-4:2015" ;
+    dcterms:title "企业控制系统集成 第4部分：制造运营管理集成的对象模型属性"@zh ;
+    dcterms:title "Enterprise-control system integration - Part 4: Objects models attributes for manufacturing operations management integration"@en ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/23943> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
+
+<std/jis-g-0701-1957> a stl:StandardEdition ;
+    dcterms:identifier "JIS G 0701:1957" ;
+    dcterms:title "钢材锻造作业中锻造比的表示方法"@zh ;
+    dcterms:title "Symbols of forming ratio for steel forging"@en ;
+    dcterms:issued "1957"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+G+0701%3A1957> ;
+    rdfs:isDefinedBy <ontology/core/standards> .
