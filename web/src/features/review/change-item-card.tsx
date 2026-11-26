@@ -2,6 +2,7 @@ import { ArrowRight, Check, Pencil, Quote, Waypoints, X } from 'lucide-react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { InlineNotice } from '@/components/feedback/inline-notice';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -9,11 +10,12 @@ import { DATATYPES, turtleSummary } from '@/features/ontologies/api';
 import { ConstraintRules, TurtleBlock } from '@/features/ontology/element-content';
 import { cn } from '@/lib/cn';
 
-import type { ChangeItem, Decision, ElementFields, MatchDecision } from './api';
+import { isAiSource, type ChangeItem, type ChangeSetSource, type Decision, type ElementFields, type MatchDecision } from './api';
 import { BindingComparison, BindingNotices, bindingSentence, isBindingKind } from './binding-item';
 import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge } from './item-badges';
 import { ItemImpact } from './item-impact';
 import { MatchNotice } from './match-notice';
+import { MetricItem } from './metric-item';
 import { ResolutionNotice } from './resolution-notice';
 import {
   COMPARED_FIELDS,
@@ -32,9 +34,9 @@ interface ChangeItemCardProps {
   item: ChangeItem;
   /** The change set the item belongs to. */
   changeSetId: string;
+  merged: boolean;
   context: RefContext;
-  /** The change set was proposed by AI: items carry the AI label and confidence. */
-  isAi: boolean;
+  source: ChangeSetSource;
   selected: boolean;
   onSelect: () => void;
   /** Id of the evidence panel the button opens under the card (stacked layout); unset when it selects. */
@@ -54,8 +56,9 @@ interface ChangeItemCardProps {
 export function ChangeItemCard({
   item,
   changeSetId,
+  merged,
   context,
-  isAi,
+  source,
   selected,
   onSelect,
   evidencePanelId,
@@ -71,10 +74,15 @@ export function ChangeItemCard({
   const impactId = useId();
   const [showImpact, setShowImpact] = useState(false);
   const { targetElementId } = item;
-  const hasImpact = impactOntologyId !== undefined && targetElementId !== null && (item.op === 'update' || item.op === 'delete');
-  const fields = shownFields(item);
+  const isAi = isAiSource(source);
+  const patch = effectiveFields(item);
+  const skipMetric = item.kind === 'metric' && (source !== 'manual' || patch.metric === null);
+  const hasImpact = !skipMetric && impactOntologyId !== undefined && targetElementId !== null && (item.op === 'update' || item.op === 'delete');
+  // After merge, the server reads "before" from the live target, which may already have changed again.
+  const mergedMetric = merged && item.kind === 'metric';
+  const fields = mergedMetric ? patch : shownFields(item);
   const isBinding = isBindingKind(item.kind);
-  const label = isBinding ? bindingSentence(t, item, context) : itemLabel(item, context);
+  const label = isBinding ? bindingSentence(t, item, context) : itemLabel(mergedMetric ? { ...item, before: null } : item, context);
   const isAxiom = item.kind === 'axiom';
   const localName = isAxiom || isBinding ? null : fields.localName;
   // Delete and restore show what the target holds now, so the reviewer sees what goes away or comes back.
@@ -119,16 +127,26 @@ export function ChangeItemCard({
         {localName ? <span className="font-mono text-xs font-normal text-muted-foreground">{localName}</span> : null}
       </h3>
 
-      {showsCurrent ? <p className="mt-1.5 text-xs font-medium text-muted-foreground">{t(`review.currentValue.${item.op}`)}</p> : null}
-      {item.match ? (
-        <MatchNotice item={item} match={item.match} changeSetId={changeSetId} canDecide={canDecide} busy={busy} onDecide={onDecideMatch} />
-      ) : null}
-      {item.resolution ? <ResolutionNotice item={item} resolution={item.resolution} /> : null}
-      {isBinding ? <BindingNotices item={item} context={context} /> : <ItemFacts item={item} fields={fields} context={context} />}
-      {isBinding && item.op === 'update' ? <BindingComparison item={item} /> : null}
-      {!isBinding && (item.op === 'update' || item.op === 'restore') ? (
-        <UpdateComparison kind={item.kind} before={item.before} after={effectiveFields(item)} context={context} />
-      ) : null}
+      {skipMetric ? (
+        <InlineNotice tone="warning" announce={false} className="mt-2" title={t(merged ? 'reviewMetric.skipped' : 'reviewMetric.willSkip')}>
+          {t(source !== 'manual' ? 'reviewMetric.manualOnly' : 'reviewMetric.nullDefinition')}
+        </InlineNotice>
+      ) : (
+        <>
+          {showsCurrent && !mergedMetric ? <p className="mt-1.5 text-xs font-medium text-muted-foreground">{t(`review.currentValue.${item.op}`)}</p> : null}
+          {item.match ? (
+            <MatchNotice item={item} match={item.match} changeSetId={changeSetId} canDecide={canDecide} busy={busy} onDecide={onDecideMatch} />
+          ) : null}
+          {item.resolution ? <ResolutionNotice item={item} resolution={item.resolution} /> : null}
+          {isBinding ? <BindingNotices item={item} context={context} />
+            : item.kind === 'metric' ? <MetricItem item={item} context={context} merged={merged} />
+            : <ItemFacts item={item} fields={fields} context={context} />}
+          {isBinding && item.op === 'update' ? <BindingComparison item={item} /> : null}
+          {!isBinding && !mergedMetric && (item.op === 'update' || item.op === 'restore') ? (
+            <UpdateComparison kind={item.kind} before={item.before} after={patch} context={context} />
+          ) : null}
+        </>
+      )}
       {/* The rules above are the new ones; an update that changes them shows what they replace. */}
       {item.op === 'update' && item.kind === 'constraint' && item.before && effectiveFields(item).rules !== undefined ? (
         <section className="mt-2 space-y-1.5" aria-label={t('review.rulesBefore')}>
@@ -308,7 +326,8 @@ function UpdateComparison({ kind, before, after, context }: UpdateComparisonProp
     datatype: (datatype) => ((DATATYPES as readonly string[]).includes(datatype) ? t(`datatypes.${datatype}`) : datatype),
     flag: (value) => (value ? t('review.yes') : t('review.no')),
   };
-  const rows = COMPARED_FIELDS.filter((field) => field in after && fieldText(before, field, format) !== fieldText(after, field, format));
+  const rows = COMPARED_FIELDS.filter((field) => !(kind === 'metric' && field === 'unit') &&
+    field in after && fieldText(before, field, format) !== fieldText(after, field, format));
   if (rows.length === 0) return null;
   return (
     <dl className="mt-2 space-y-1.5 rounded-lg border border-border bg-background p-3 text-sm">

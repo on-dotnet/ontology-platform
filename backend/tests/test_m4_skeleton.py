@@ -98,7 +98,10 @@ async def test_metric_release_and_comparison(
     token, _ = await new_token(client, db, Role.VIEWER, ["ontology:read"])
     client.cookies.clear()
     result = await call_tool(client, token, "search_elements", {"ontology": ontology.key})
-    assert [item["id"] for item in result["structuredContent"]["items"]] == [str(heat.id)]
+    assert [item["id"] for item in result["structuredContent"]["items"]] == [
+        str(heat.id),
+        str(metric.id),
+    ]
 
 
 async def test_metric_working_views_and_proposals(
@@ -157,7 +160,16 @@ async def test_metric_write_gate_and_legacy_merge(
     item = create(
         "metric", "otherCount", "计数", subjectRef=str(heat.id), metric={"aggregate": "count"}
     )
-    assert_problem(await save(client, ontology, item), 422, "changeset.invalid_item")
+    saved = await save(client, ontology, item, apply=False)
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["merged"] is False
+    pending_id = UUID(saved.json()["changeSetId"])
+    pending = await db.get(ChangeSet, pending_id)
+    assert pending is not None
+    assert pending.source == "manual"
+    [draft] = await change_set_items(client, pending_id)
+    assert (draft["kind"], draft["decision"]) == ("metric", "pending")
+    assert await db.scalar(select(Element.id).where(Element.local_name == "otherCount")) is None
     with pytest.raises(ontology_service.InvalidProposalError) as caught:
         await open_change_set(db, ontology, [proposal("delete", "metric", target=metric.id)])
     assert caught.value.code == "changeset.invalid_item"
@@ -186,17 +198,16 @@ async def test_metric_write_gate_and_legacy_merge(
     db.add_all([create_item, delete_item])
     await db.commit()
     result = await merge(client, change_set.id)
-    assert result.json() == {
-        "applied": 0,
-        "skipped": [
-            {"itemId": str(i.id), "code": "changeset.invalid_item"}
-            for i in (create_item, delete_item)
-        ],
-    }
+    assert result.json() == {"applied": 2, "skipped": []}
     rows = await db.scalars(
         select(Element).where(Element.kind == "metric", Element.status == "active")
     )
-    assert [row.id for row in rows] == [metric.id]
+    [created] = rows
+    await db.refresh(create_item)
+    await db.refresh(metric)
+    assert created.id == create_item.applied_element_id
+    assert (created.local_name, created.subject_id) == ("otherCount", heat.id)
+    assert metric.status == "deprecated"
 
 
 @pytest.mark.parametrize("wrong_kind", [False, True])
@@ -238,7 +249,6 @@ async def test_batch_2_zero_hops(
     assert result.json()["truncated"]
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 3: metrics are available from the active release")
 async def test_batch_3_released_metric(
     client: AsyncClient, db: AsyncSession, metric_rows: tuple[Ontology, Element, Element]
 ) -> None:

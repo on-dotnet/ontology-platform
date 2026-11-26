@@ -23,6 +23,7 @@ from ontology_platform.modules.ontology import (
     binding_rules,
     bindings,
     expert,
+    metric_rules,
     rules,
     schemas,
     service,
@@ -80,13 +81,14 @@ class _View:
     range_id: UUID | None = None
     inverse_id: UUID | None = None
     rules: list[dict[str, Any]] = field(default_factory=list)
+    metric_properties: set[UUID] = field(default_factory=set)
 
     def refs(self) -> set[UUID]:
         columns = (self.parent_id, self.domain_id, self.range_id, self.inverse_id)
         found = {ref for ref in columns if ref is not None}
         for rule in self.rules:
             found |= _rule_ids(rule)
-        return found
+        return found | self.metric_properties
 
 
 def _rule_ids(rule: Mapping[str, Any]) -> set[UUID]:
@@ -124,6 +126,7 @@ def _views(ontology: Ontology, elements: Iterable[Element]) -> dict[UUID, _View]
             range_id=e.range_id,
             inverse_id=e.inverse_id,
             rules=list(e.rules or []),
+            metric_properties=metric_rules.stored_ids(e.metric),
         )
         for e in by_id.values()
     }
@@ -157,6 +160,8 @@ def _with_fields(
             changes[column] = _ref_id(getattr(fields, key))
     if "rules" in given and fields.rules is not None:
         changes["rules"] = [_stored_rule(rule) for rule in fields.rules]
+    if fields.metric is not None:
+        changes["metric_properties"] = _metric_ids(fields.metric)
     if view.kind == "axiom" and fields.turtle is not None:
         changes["turtle"] = fields.turtle
         # The old subject must stop pulling the axiom into the cascade. The new one needs no
@@ -171,6 +176,10 @@ def _with_fields(
     return replace(view, **changes)
 
 
+def _metric_ids(definition: schemas.MetricDefinitionFields) -> set[UUID]:
+    return {id_ for ref in metric_rules.property_refs(definition) if (id_ := _ref_id(ref))}
+
+
 def _field_refs(fields: schemas.ElementFields) -> set[UUID]:
     """Existing elements the fields refer to."""
     found = {
@@ -183,6 +192,8 @@ def _field_refs(fields: schemas.ElementFields) -> set[UUID]:
             ref = _ref_id(value)
             if ref is not None:
                 found.add(ref)
+    if fields.metric is not None:
+        found.update(_metric_ids(fields.metric))
     return found
 
 
@@ -376,6 +387,8 @@ async def _check_items(
         )
         if problems and edit.kind in BINDING_KINDS:
             raise AppError(422, binding_rules.INVALID, f"Item {seq}: {', '.join(problems)}.")
+        if problems and edit.kind == "metric":
+            raise AppError(422, metric_rules.INVALID, f"Item {seq}: {', '.join(problems)}.")
         if problems:
             raise _invalid(seq, ", ".join(problems))
         if edit.op == "create" and fields.local_name is not None:

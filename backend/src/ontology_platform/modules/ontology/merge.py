@@ -10,11 +10,18 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import binding_rules, mergeplan, rules, schemas
+from ontology_platform.modules.ontology import (
+    binding_rules,
+    mergeplan,
+    metric_rules,
+    rules,
+    schemas,
+)
 from ontology_platform.modules.ontology.axiom_rules import NormalizedAxiom, normalize_axiom
 from ontology_platform.modules.ontology.models import (
     BINDING_KINDS,
@@ -53,7 +60,23 @@ def _rule_references(element: Element) -> set[UUID]:
             value = rule.get(key)
             if value:
                 found.add(UUID(str(value)))
-    return found
+    return found | metric_rules.stored_ids(element.metric)
+
+
+def _valid_metric_fields(proposed: object, edited: object, *, delete: bool) -> bool:
+    if not isinstance(proposed, dict) or (edited is not None and not isinstance(edited, dict)):
+        return False
+    if delete:
+        return not proposed and not edited
+    try:
+        rules.effective_fields(proposed, edited)
+    except ValidationError:
+        return False
+    except AppError as exc:
+        if exc.code != metric_rules.INVALID:
+            raise
+        return False
+    return True
 
 
 class _Merge:
@@ -171,6 +194,12 @@ class _Merge:
             resolved[name] = element_id
         if kind in BINDING_KINDS:
             return await self._bind(item, target, fields, resolved)
+        metric = None
+        if kind == "metric":
+            subject = resolved.get("subject_ref", target.subject_id if target is not None else None)
+            outcome, metric = await self._metric(fields.metric, subject, target)
+            if outcome is not None:
+                return outcome
         stored_rules: list[dict[str, Any]] | None = None
         if fields.rules is not None:
             outcome, stored_rules = await self._rules(fields.rules, target)
@@ -183,8 +212,8 @@ class _Merge:
             except RdfInputError:
                 return INVALID_ITEM
         if target is None:
-            return await self._create(item, fields, resolved, stored_rules, axiom)
-        return self._update(item, target, fields, resolved, stored_rules, axiom)
+            return await self._create(item, fields, resolved, stored_rules, axiom, metric)
+        return self._update(item, target, fields, resolved, stored_rules, axiom, metric)
 
     async def _resolve(
         self,
@@ -265,6 +294,25 @@ class _Merge:
             stored.append(data)
         return None, stored
 
+    async def _metric(
+        self,
+        definition: schemas.MetricDefinitionFields | None,
+        subject: UUID | None,
+        target: Element | None,
+    ) -> tuple[str | None, dict[str, Any] | None]:
+        metric = target.metric if target is not None else None
+        if definition is not None:
+            ids: dict[str, UUID] = {}
+            for ref in metric_rules.property_refs(definition):
+                problem, property_id = await self._resolve(ref, ("property",), target)
+                if problem is not None or property_id is None:
+                    return problem or INVALID_ITEM, None
+                ids[ref] = property_id
+            metric = metric_rules.stored(definition, ids)
+        if not metric_rules.valid_stored(metric, subject, self._elements):
+            return INVALID_ITEM, None
+        return None, metric
+
     async def _bind(
         self,
         item: ChangeItem,
@@ -343,6 +391,7 @@ class _Merge:
         resolved: dict[str, UUID | None],
         stored_rules: list[dict[str, Any]] | None,
         axiom: NormalizedAxiom | None,
+        metric: dict[str, Any] | None,
     ) -> str | None:
         kind = item.kind
         origin = {"manual": "manual", "import": "import"}.get(self._change_set.source, "ai")
@@ -408,12 +457,14 @@ class _Merge:
             domain_id=resolved.get("domain_ref"),
             range_id=resolved.get("range_ref"),
             inverse_id=resolved.get("inverse_ref"),
+            subject_id=resolved.get("subject_ref"),
             datatype=fields.datatype if kind == "property" else None,
-            unit=rules.clean_text(fields.unit) if kind == "property" else None,
+            unit=rules.clean_text(fields.unit) if kind in ("property", "metric") else None,
             required=bool(fields.required) and member,
             multiple=bool(fields.multiple) and member,
-            auto_shape=bool(auto_shape) and kind != "constraint",
+            auto_shape=bool(auto_shape) and kind not in ("constraint", "metric"),
             rules=stored_rules if kind == "constraint" else None,
+            metric=metric,
             flags=[],
             status="active",
             origin=origin,
@@ -548,6 +599,7 @@ class _Merge:
         resolved: dict[str, UUID | None],
         stored_rules: list[dict[str, Any]] | None,
         axiom: NormalizedAxiom | None,
+        metric: dict[str, Any] | None,
     ) -> str | None:
         given = fields.model_fields_set
         if "parent_ref" in resolved:
@@ -559,6 +611,7 @@ class _Merge:
             ("domain_ref", "domain_id"),
             ("range_ref", "range_id"),
             ("inverse_ref", "inverse_id"),
+            ("subject_ref", "subject_id"),
         ):
             if name in resolved:
                 setattr(target, column, resolved[name])
@@ -575,11 +628,12 @@ class _Merge:
                 target.synonyms = rules.merge_synonyms(fields.synonyms)
             else:
                 target.synonyms = rules.merge_synonyms(target.synonyms, fields.synonyms)
-        if item.kind == "property":
-            if "datatype" in given:
-                target.datatype = fields.datatype
-            if "unit" in given:
-                target.unit = rules.clean_text(fields.unit)
+        if item.kind == "property" and "datatype" in given:
+            target.datatype = fields.datatype
+        if item.kind in ("metric", "property") and "unit" in given:
+            target.unit = rules.clean_text(fields.unit)
+        if metric is not None:
+            target.metric = metric
         if item.kind in rules.RULE_PATH_KINDS:
             if fields.required is not None:
                 target.required = fields.required
@@ -697,6 +751,16 @@ async def _apply_change_set(
     items = await _items(db, change_set)
     if any(item.decision == "pending" for item in items):
         raise AppError(409, "changeset.pending_items", "Every item needs a decision first.")
+    accepted = [item for item in items if item.decision == "accepted"]
+    invalid_metrics = {
+        item.id
+        for item in accepted
+        if item.kind == "metric"
+        and (
+            change_set.source != "manual"
+            or not _valid_metric_fields(item.proposed, item.edited, delete=item.op == "delete")
+        )
+    }
     now = _now()
     elements = await _elements(db, ontology.id, all_kinds=True)
     # Under the ontology lock: the plan made here is the one that is applied.
@@ -709,14 +773,17 @@ async def _apply_change_set(
             "The working version changed since the change set was shown; review it again.",
         )
     merge = _Merge(db, change_set, ontology, elements, items, now, plan.resolutions)
-    accepted = [item for item in items if item.decision == "accepted"]
-    # Unsupported items must also be skipped when reached through another item's reference.
-    merge.outcomes.update((item.id, INVALID_ITEM) for item in accepted if item.kind == "metric")
+    # A reference can reach a skipped create or restore before its turn in the merge.
+    merge.outcomes.update(dict.fromkeys(invalid_metrics, INVALID_ITEM))
+    metrics = [
+        item for item in accepted if item.kind == "metric" and item.id not in invalid_metrics
+    ]
     semantic = [item for item in accepted if item.kind in SEMANTIC_KINDS]
     bound = [item for item in accepted if item.kind in BINDING_KINDS]
     ordered = [
         *(item for item in semantic if item.op != "delete" and item.kind != "axiom"),
         *(item for item in semantic if item.op != "delete" and item.kind == "axiom"),
+        *(item for item in metrics if item.op != "delete"),
     ]
     for item in ordered:
         await merge.apply(item)
@@ -730,7 +797,7 @@ async def _apply_change_set(
     for item in sorted(changing, key=lambda item: BINDING_KINDS.index(item.kind)):
         await merge.apply(item)
     # Semantic elements leave last, after the bindings that referred to them.
-    merge.apply_deletes([item for item in semantic if item.op == "delete"])
+    merge.apply_deletes([item for item in (*semantic, *metrics) if item.op == "delete"])
     skipped = [
         schemas.MergeSkip.model_validate({"item_id": item.id, "code": merge.outcomes[item.id]})
         for item in accepted

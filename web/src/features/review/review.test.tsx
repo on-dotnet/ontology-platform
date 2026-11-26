@@ -2,7 +2,7 @@ import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { changeSetFixture, documentFixture, elementFixture, itemFixture, ontologyFixture } from '@/test/fixtures';
+import { changeSetFixture, documentFixture, elementFixture, elementRefFixture, impactFixture, itemFixture, ontologyFixture } from '@/test/fixtures';
 import type { UserInfo } from '@/features/auth/api';
 import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
@@ -504,6 +504,151 @@ function importServer(extra: Record<string, RouteHandler> = {}) {
     extra: { 'GET /api/ontologies/:id/elements': () => importedElements, ...extra },
   });
 }
+
+it('compares the current and edited metric definitions with names for temporary references', async () => {
+  const metric = itemFixture({
+    id: 'item-mean', op: 'update', kind: 'metric', tempRef: null, targetElementId: 'el-mean',
+    before: {
+      labelZh: '炉次指标', subjectRef: 'el-molten-steel', unit: '℃',
+      metric: { aggregate: 'avg', propertyRef: 'el-temperature', decimals: 1, percent: false,
+        filters: [{ propertyRef: 'el-temperature', op: 'gt', value: 1500 }] },
+    },
+    proposed: { unit: '%', metric: { aggregate: 'count', decimals: 0, percent: false } },
+    edited: { metric: { aggregate: 'ratio', decimals: 3, percent: true, filters: [],
+      numerator: [{ propertyRef: 'new:grade', op: 'in', value: ['Q235B', 'Q345'] }] } },
+    rationale: null,
+  });
+  const grade = itemFixture({ id: 'item-grade', kind: 'property', tempRef: 'new:grade', proposed: { labelZh: '钢种' } });
+  reviewServer({
+    initial: changeSetFixture([metric, grade], { id: 'cs-metric', source: 'manual', documentId: null }),
+    extra: { 'GET /api/ontologies/:id/elements': () => [elementFixture(), elementFixture({ id: 'el-temperature', kind: 'property', labelZh: '温度' })] },
+  });
+  renderApp('/review/cs-metric');
+  const card = within(await screen.findByRole('article', { name: /炉次指标/ }));
+  const previous = card.getByRole('region', { name: '变更前的指标' });
+  const next = card.getByRole('region', { name: '变更后的指标' });
+  expect(previous).toHaveTextContent('平均值');
+  expect(previous).toHaveTextContent('温度 大于 1500');
+  expect(previous).toHaveTextContent('℃');
+  expect(next).toHaveTextContent('占比');
+  expect(next).toHaveTextContent('钢水');
+  expect(next).toHaveTextContent('钢种 属于');
+  expect(next).toHaveTextContent('Q235B');
+  expect(next).toHaveTextContent('Q345');
+  expect(next).toHaveTextContent('%');
+  expect(next).not.toHaveTextContent('计数');
+  expect(next).not.toHaveTextContent('1500');
+  expect(next).not.toHaveTextContent('new:grade');
+});
+
+it('shows two decimal places for an older proposal with omitted defaults and preserves an explicit zero', async () => {
+  const metric = itemFixture({ id: 'item-count', op: 'update', kind: 'metric', targetElementId: 'el-count', tempRef: null,
+    before: { labelZh: '炉次数量', subjectRef: 'el-molten-steel', metric: { aggregate: 'count', decimals: 0, percent: false } },
+  });
+  const changeSet = changeSetFixture([metric], { id: 'cs-sparse', source: 'manual', documentId: null });
+  reviewServer({ initial: changeSet, extra: {
+    // The change-set response omits unset nested fields, including defaults present in OpenAPI.
+    'GET /api/change-sets/:id': () => ({ ...changeSet, items: [{ ...metric, proposed: { metric: { aggregate: 'count' } } }] }),
+  } });
+  renderApp('/review/cs-sparse');
+  const item = within(await screen.findByRole('article', { name: /炉次数量/ }));
+  const before = within(item.getByRole('region', { name: '变更前的指标' }));
+  const after = within(item.getByRole('region', { name: '变更后的指标' }));
+  expect(before.getByText('小数位数').nextElementSibling).toHaveTextContent(/^0$/);
+  expect(after.getByText('小数位数').nextElementSibling).toHaveTextContent(/^2$/);
+});
+
+it.each(['property', 'entity_type'] as const)('shows only active direct metric references in the impact of a %s update', async (kind) => {
+  const user = userEvent.setup();
+  const heat = elementFixture({ id: 'heat', labelZh: '炉次' });
+  const weight = elementFixture({ id: 'weight', kind: 'property', labelZh: '重量', datatype: 'decimal', domainId: heat.id });
+  const target = kind === 'property' ? weight : heat;
+  const total = elementFixture({ id: 'total', kind: 'metric', labelZh: '总重量', subjectId: heat.id,
+    metric: { aggregate: 'sum', propertyId: weight.id, filters: [], numerator: [], decimals: 0, percent: false } });
+  const indirect = elementFixture({ ...total, id: 'indirect', labelZh: '间接指标', subjectId: 'other-type',
+    metric: { aggregate: 'count', propertyId: null, filters: [], numerator: [], decimals: 0, percent: false } });
+  const retired = elementFixture({ ...total, id: 'retired', labelZh: '停用指标', status: 'deprecated' });
+  const outside = elementFixture({ ...total, id: 'outside', labelZh: '不在影响清单内' });
+  const item = itemFixture({ id: 'item-update', kind, op: 'update', targetElementId: target.id, tempRef: null,
+    proposed: { definitionZh: '更新说明' }, before: { labelZh: target.labelZh } });
+  reviewServer({
+    initial: changeSetFixture([item], { id: 'cs-impact', source: 'manual', documentId: null }),
+    extra: {
+      'GET /api/ontologies/:id/elements': () => [heat, weight, total, retired, indirect, outside],
+      'GET /api/ontologies/:id/elements/:elementId/impact': () => impactFixture(target.id, {
+        cascade: [indirect, retired, total].map((metric) => ({ op: 'delete', element: elementRefFixture(metric) })),
+      }),
+    },
+  });
+  renderApp('/review/cs-impact');
+  const card = within(await screen.findByRole('article', { name: target.labelZh ?? '' }));
+  await user.click(card.getByRole('button', { name: '查看影响' }));
+  const list = await card.findByRole('list', { name: '被 1 个元素引用' });
+  expect(within(list).getAllByRole('listitem').map((entry) => entry.textContent)).toEqual(['指标总重量']);
+  expect(card.queryByText('没有其他元素引用它。')).not.toBeInTheDocument();
+});
+
+it('shows only the recorded metric proposal after merge, even if the target has changed again', async () => {
+  const metric = itemFixture({ kind: 'metric', op: 'update', tempRef: null, targetElementId: 'metric-count', decision: 'accepted',
+    appliedElementId: 'metric-count', proposed: { labelZh: '炉次统计', unit: '批',
+      metric: { aggregate: 'count', decimals: 0, percent: false } }, edited: { unit: '炉' },
+    before: { labelZh: '后续改名', definitionZh: '后续说明', subjectRef: 'el-molten-steel', unit: '吨',
+      metric: { aggregate: 'sum', decimals: 3, percent: false } },
+  });
+  reviewServer({ initial: changeSetFixture([metric], {
+    id: 'cs-merged-metric', source: 'manual', documentId: null, status: 'merged', mergedAt: '2026-11-21T08:00:00Z',
+  }) });
+  renderApp('/review/cs-merged-metric');
+  const card = within(await screen.findByRole('article', { name: /炉次统计/ }));
+  const proposal = within(card.getByRole('region', { name: '指标提议内容' }));
+  expect(proposal.getByText('计数')).toBeInTheDocument();
+  expect(proposal.getByText('炉')).toBeInTheDocument();
+  expect(proposal.queryByText('主体类型')).not.toBeInTheDocument();
+  for (const text of ['变更前的指标', '变更后的指标', '后续说明', '后续改名', '吨', '批', '求和']) {
+    expect(card.queryByText(text)).not.toBeInTheDocument();
+  }
+});
+
+describe('historical metric proposals', () => {
+  const count = { aggregate: 'count', decimals: 2, percent: false } as const;
+
+  it.each([
+    { source: 'import', status: 'open', proposed: count, edited: null, reason: '指标变更只接受手工编辑。' },
+    { source: 'mcp', status: 'merged', proposed: count, edited: null, reason: '指标变更只接受手工编辑。' },
+    { source: 'manual', status: 'open', proposed: count, edited: { metric: null }, reason: '此项将指标定义设为空。' },
+    { source: 'manual', status: 'merged', proposed: null, edited: { unit: '炉' }, reason: '此项将指标定义设为空。' },
+  ] as const)('explains the skipped $source metric in a $status change set', async ({ source, status, proposed, edited, reason }) => {
+    const item = itemFixture({
+      kind: 'metric', op: 'update', targetElementId: 'el-count', tempRef: null, decision: 'accepted',
+      before: { labelZh: '旧名', subjectRef: 'el-molten-steel', metric: count },
+      proposed: { labelZh: '炉次计数', metric: proposed }, edited,
+    });
+    reviewServer({ initial: changeSetFixture([item], { id: 'cs-legacy', source, status, documentId: null,
+      mergedAt: status === 'merged' ? '2026-11-21T08:00:00Z' : null }) });
+    renderApp('/review/cs-legacy');
+    const card = within(await screen.findByRole('article', { name: '炉次计数' }));
+    expect(card.getByText(reason)).toBeInTheDocument();
+    expect(card.getByText(status === 'merged' ? '合并时已跳过此项' : '合并时会跳过此项')).toBeInTheDocument();
+    for (const text of ['聚合方式', '变更前的指标', '变更后的指标', '指标提议内容', '旧名']) {
+      expect(card.queryByText(text)).not.toBeInTheDocument();
+    }
+  });
+
+  it.each([
+    { scenario: 'omitted definition', proposed: { unit: '炉' }, edited: null },
+    { scenario: 'corrected definition', proposed: { metric: null }, edited: { metric: count } },
+  ])('keeps the normal manual comparison for a $scenario', async ({ proposed, edited }) => {
+    const item = itemFixture({
+      kind: 'metric', op: 'update', targetElementId: 'el-count', tempRef: null,
+      before: { labelZh: '炉次计数', subjectRef: 'el-molten-steel', metric: count }, proposed, edited,
+    });
+    reviewServer({ initial: changeSetFixture([item], { id: 'cs-partial', source: 'manual', documentId: null }) });
+    renderApp('/review/cs-partial');
+    const card = within(await screen.findByRole('article', { name: '炉次计数' }));
+    expect(card.getByRole('region', { name: '变更后的指标' })).toHaveTextContent('计数');
+    expect(card.queryByText(/跳过此项/)).not.toBeInTheDocument();
+  });
+});
 
 describe('import change set review', () => {
   it('shows constraints with their rules, axioms as Turtle, and deletes and restores with the current values', async () => {
