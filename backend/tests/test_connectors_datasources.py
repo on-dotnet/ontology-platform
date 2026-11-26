@@ -654,7 +654,8 @@ async def test_unsaved_tests_use_submitted_settings_and_only_borrow_the_password
     assert [(e.target_id, e.detail) for e in tests] == [
         (None, {"code": "ok"}),
         (source["id"], {"code": "ok"}),
-        (source["id"], {"code": "datasource.connect_failed"}),
+        # With a password of its own the request did not use the data source: no target.
+        (None, {"code": "datasource.connect_failed"}),
     ]
     for event in tests:
         assert (event.action, event.target_type) == ("datasource.tested", "data_source")

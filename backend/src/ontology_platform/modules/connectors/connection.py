@@ -94,10 +94,22 @@ TEXT_LIMIT = 2_000
 SAMPLE_ROWS = 20
 SAMPLES_PER_COLUMN = 5
 SAMPLE_TEXT_LIMIT = 64
+# Statements a catalog read is given time for (identity check, relations, then three per schema
+# in typical scopes); past that the read is cancelled.
+CATALOG_STATEMENTS = 12
 
 # psycopg logs failed connection attempts at DEBUG with host, port and the server's message,
 # which names the user. Those lines must not reach any log, whatever level is configured.
 logging.getLogger("psycopg").setLevel(logging.INFO)
+# SQLAlchemy's engine and pool loggers of connector engines: the pool prints the driver
+# connection's repr, which names host, user and database, also at ERROR. Silenced entirely.
+_LOGGING_NAME = "op_connector"
+_QUIET_LOGGERS = (
+    f"sqlalchemy.engine.Engine.{_LOGGING_NAME}",
+    f"sqlalchemy.pool.impl.NullPool.{_LOGGING_NAME}",
+)
+for _name in _QUIET_LOGGERS:
+    logging.getLogger(_name).setLevel(logging.CRITICAL + 1)
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,7 +184,10 @@ async def _platform_identity(db: AsyncSession) -> _ServerIdentity:
     identity = _platform_identities.get(key)
     if identity is None:
         identity = await _identity_of(db.execute)
-        _platform_identities[key] = identity
+        # Only a system identifier is stable: the start time changes when the platform's server
+        # restarts, so without one the identity is read again every time.
+        if identity.system_identifier is not None:
+            _platform_identities[key] = identity
     return identity
 
 
@@ -202,17 +217,30 @@ async def ensure_not_platform_address(
 # ---------- connecting ----------
 
 
-def _connect_failure(exc: BaseException) -> ConnectFailedError:
-    """Classify a failed connection attempt. The message is only looked at, never kept."""
+_SSL_MESSAGE = re.compile(
+    r"\bssl (error|syscall|connection|negotiation)|does not support ssl|ssl was required|"
+    r"certificate|sslmode",
+)
+
+
+def _connect_failure(exc: BaseException, params: ConnectionParams) -> ConnectFailedError:
+    """Classify a failed connection attempt. The message is only looked at, never kept; the
+    host and user names are taken out first so that they cannot steer the classification.
+
+    Connection errors usually carry no SQLSTATE, so this reads the server's English messages:
+    a server with another lc_messages yields "unreachable" for anything but a timeout."""
     if isinstance(exc, (pg_errors.ConnectionTimeout, TimeoutError)):
         return ConnectFailedError("timeout")
     sqlstate = getattr(exc, "sqlstate", None)
     message = str(exc).lower()
+    for name in (params.host, params.username, params.database):
+        if name:
+            message = message.replace(name.lower(), "")
     if sqlstate in ("28P01", "28000") or "authentication failed" in message:
         reason = "auth_failed"
     elif sqlstate == "3D000" or ("database" in message and "does not exist" in message):
         reason = "database_missing"
-    elif "ssl" in message:
+    elif _SSL_MESSAGE.search(message):
         reason = "ssl"
     elif "timeout expired" in message:
         reason = "timeout"
@@ -246,8 +274,9 @@ async def _open(params: ConnectionParams, settings: Settings) -> psycopg.AsyncCo
                 application_name=APPLICATION_NAME,
                 options=_options(settings),
             )
-    except (psycopg.Error, OSError, TimeoutError) as exc:
-        failure = _connect_failure(exc)
+    # ValueError covers settings libpq cannot take at all, such as lone surrogates in a password.
+    except (psycopg.Error, OSError, TimeoutError, ValueError) as exc:
+        failure = _connect_failure(exc, params)
     if failure is not None:
         raise failure from None
     # Every transaction psycopg opens on this connection is BEGIN READ ONLY.
@@ -255,12 +284,12 @@ async def _open(params: ConnectionParams, settings: Settings) -> psycopg.AsyncCo
     return conn
 
 
-def _statement_failure(exc: DBAPIError) -> ConnectorError:
-    original = exc.orig
+def _statement_failure(original: BaseException | None) -> ConnectorError:
+    """Map a driver exception to a connector error; only its class and SQLSTATE are kept."""
     sqlstate = getattr(original, "sqlstate", None)
     if isinstance(original, pg_errors.QueryCanceled) or sqlstate in ("57014", "55P03"):
         return QueryTimeoutError(sqlstate=sqlstate)
-    if exc.connection_invalidated or (sqlstate or "").startswith("08") or sqlstate is None:
+    if sqlstate is None or sqlstate.startswith("08"):
         return SourceUnavailableError(sqlstate=sqlstate)
     if sqlstate.startswith("22"):
         return InvalidValueError(sqlstate=sqlstate)
@@ -293,15 +322,20 @@ async def connect(db: AsyncSession, params: ConnectionParams) -> AsyncIterator[A
         return await _open(params, settings)
 
     # The URL carries nothing: host, user and password stay with `creator`, out of SQLAlchemy's
-    # reprs and pool logs.
+    # reprs. The pool's own log lines show the driver connection's repr (host, user, database),
+    # so this engine logs under names that are switched off (see _QUIET_LOGGERS).
     engine = create_async_engine(
         "postgresql+psycopg://",
         async_creator=creator,
         poolclass=NullPool,
         hide_parameters=True,
+        logging_name=_LOGGING_NAME,
+        pool_logging_name=_LOGGING_NAME,
     )
     failure: ConnectorError | None = None
     try:
+        # The dialect's first-connect queries and closing the connection can fail too: the
+        # whole block is covered, not only the statements inside it.
         async with engine.connect() as conn:
             try:
                 async with conn.begin():
@@ -312,8 +346,10 @@ async def connect(db: AsyncSession, params: ConnectionParams) -> AsyncIterator[A
             except asyncio.CancelledError:
                 await asyncio.shield(_cancel(conn))
                 raise
-            except DBAPIError as exc:
-                failure = _statement_failure(exc)
+    except DBAPIError as exc:
+        failure = _statement_failure(exc.orig)
+    except psycopg.Error as exc:
+        failure = _statement_failure(exc)
     finally:
         await asyncio.shield(engine.dispose())
     if failure is not None:
@@ -343,6 +379,12 @@ _CAN_WRITE = text(
 _SERVER_VERSION = text("SELECT current_setting('server_version')")
 
 
+def _deadline(*, statements: int) -> float:
+    """A client-side limit for a whole operation: the server's statement timeout bounds each
+    statement, but not a connection whose network went quiet."""
+    return CONNECT_TIMEOUT_SECONDS + 2 + statements * config.current().query_timeout_seconds
+
+
 async def test_connection(db: AsyncSession, params: ConnectionParams) -> schemas.ConnectionTest:
     """Connect, read the server version and whether the account may write.
 
@@ -350,7 +392,7 @@ async def test_connection(db: AsyncSession, params: ConnectionParams) -> schemas
     not an exception. Raises PlatformDatabaseError.
     """
     try:
-        async with connect(db, params) as conn:
+        async with asyncio.timeout(_deadline(statements=3)), connect(db, params) as conn:
             version = (await conn.execute(_SERVER_VERSION)).scalar()
             can_write = bool((await conn.execute(_CAN_WRITE)).scalar())
     except ConnectFailedError as exc:
@@ -361,7 +403,7 @@ async def test_connection(db: AsyncSession, params: ConnectionParams) -> schemas
             warnings=[],
             server_version=None,
         )
-    except QueryTimeoutError:
+    except (QueryTimeoutError, TimeoutError):
         return schemas.ConnectionTest(
             ok=False,
             code="datasource.connect_failed",
@@ -393,15 +435,24 @@ async def read_catalog(
 ) -> list[DiscoveredTable]:
     """Connect and run `catalog.inspect_catalog`. Raises ConnectFailedError,
     PlatformDatabaseError, CatalogTooLargeError, and QueryTimeoutError past the statement
-    timeout."""
-    async with connect(db, params) as conn:
-        return await conn.run_sync(catalog.inspect_catalog, tuple(schema_names))
+    timeout or past the whole operation's deadline."""
+    try:
+        async with asyncio.timeout(_deadline(statements=CATALOG_STATEMENTS)):
+            async with connect(db, params) as conn:
+                return await conn.run_sync(catalog.inspect_catalog, tuple(schema_names))
+    except TimeoutError:
+        raise QueryTimeoutError from None
 
 
 # ---------- SelectQuery ----------
 
-_PLAIN_NAME = r'(?:[a-z_][a-z0-9_$]*|"(?:[^"]|"")+")'
+_PLAIN_NAME = r'(?:[a-z_][a-z0-9_$]*|"(?:[^"%]|"")+")'
+# An enum's name as format_type() writes it. "%" is left out: psycopg would read it as a
+# placeholder in the statement text.
 _TYPE_NAME = re.compile(rf"{_PLAIN_NAME}(?:\.{_PLAIN_NAME})?")
+# Blank-padded character columns compare with a parameter of their own type, not varchar, so
+# that the column is not cast and its index still serves.
+_CHARACTER = re.compile(r"character\(\d{1,5}\)")
 
 
 class _NamedType(UserDefinedType[str]):
@@ -504,6 +555,8 @@ class _Renderer:
         if value is None:
             raise ValueError("comparison with None; use is_null")
         spec = self.columns.spec(ref)
+        if spec.family == "string" and _CHARACTER.fullmatch(spec.type):
+            return cast(bindparam(None, value, type_=String()), _NamedType(spec.type))
         if spec.family == "opaque" and spec.type.lower() != "uuid":
             if not _TYPE_NAME.fullmatch(spec.type):
                 raise SourceMismatchError
@@ -527,9 +580,11 @@ class _Renderer:
             case "contains" | "starts_with":
                 if not isinstance(value, str):
                     raise ValueError(f"`{condition.operator}` takes a string")
-                pattern = _like_escape(value)
-                pattern = f"%{pattern}%" if condition.operator == "contains" else f"{pattern}%"
-                return col.like(bindparam(None, pattern, type_=String()), escape="/")
+                # autoescape: SQLAlchemy escapes %, _ and its escape character "/" in the value
+                # and renders ESCAPE '/'; the value stays a bound parameter.
+                if condition.operator == "contains":
+                    return col.contains(value, autoescape=True)
+                return col.startswith(value, autoescape=True)
         if isinstance(value, tuple):
             raise ValueError("a comparison takes one value")
         param = self.param(condition.column, value)
@@ -589,10 +644,6 @@ class _Renderer:
             col = self.col(key.column)
             order.append(col.desc().nulls_first() if key.descending else col.asc().nulls_last())
         return statement.order_by(*order).limit(limit)
-
-
-def _like_escape(value: str) -> str:
-    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 def _normalize(value: Any) -> tuple[Value, bool]:

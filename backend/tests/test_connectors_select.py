@@ -28,6 +28,7 @@ from test_connectors_support import (
     add_source,
     admin_rows,
     cache_table,
+    external_statements,
     scratch_fixture,  # noqa: F401  (registers the fixture)
 )
 
@@ -261,3 +262,80 @@ async def test_archived_sources_are_disabled(
         await service.select(
             db, SelectQuery(row.id, TableRef("mes", "heat"), (ColumnRef("heat_no"),))
         )
+
+
+BACKSLASHED = "a" + chr(92) + "b"
+WORDS = sorted(["a%b", "a_b", "a/b", BACKSLASHED, "axb"])
+
+
+@pytest.mark.parametrize(
+    ("operator", "value", "expected"),
+    [
+        ("contains", "a%b", ["a%b"]),
+        ("contains", "a_b", ["a_b"]),
+        ("contains", "a/b", ["a/b"]),
+        ("contains", BACKSLASHED, [BACKSLASHED]),
+        ("contains", "x", ["axb"]),
+        ("starts_with", "a%", ["a%b"]),
+        ("starts_with", "a/", ["a/b"]),
+        ("starts_with", "a", WORDS),
+    ],
+)
+async def test_like_wildcards_in_values_match_literally(
+    db: AsyncSession,
+    external_source: ExternalSource,
+    scratch: str,
+    operator: str,
+    value: str,
+    expected: list[str],
+) -> None:
+    admin_rows(
+        external_source,
+        f"CREATE TABLE {scratch}.words (word text PRIMARY KEY);"
+        f'GRANT SELECT ON {scratch}.words TO "{external_source.reader}"',
+    )
+    for word in WORDS:
+        admin_rows(external_source, f"INSERT INTO {scratch}.words VALUES (%s)", word)  # noqa: S608
+    row = await add_source(db, external_source)
+    await cache_table(db, row.id, external_source, scratch, "words")
+
+    result = await service.select(
+        db,
+        SelectQuery(
+            row.id,
+            TableRef(scratch, "words"),
+            (ColumnRef("word"),),
+            where=(Condition(ColumnRef("word"), operator, value),),  # type: ignore[arg-type]
+            order_by=(SortKey(ColumnRef("word")),),
+        ),
+    )
+
+    assert sorted(str(word) for (word,) in result.rows) == sorted(expected)
+
+
+async def test_blank_padded_keys_compare_without_casting_the_column(
+    db: AsyncSession, external_source: ExternalSource, scratch: str
+) -> None:
+    admin_rows(
+        external_source,
+        f"CREATE TABLE {scratch}.codes (code character(8) PRIMARY KEY);"
+        f'GRANT SELECT ON {scratch}.codes TO "{external_source.reader}"',
+    )
+    admin_rows(external_source, f"INSERT INTO {scratch}.codes VALUES ('A1'), ('B2')")  # noqa: S608
+    row = await add_source(db, external_source)
+    await cache_table(db, row.id, external_source, scratch, "codes")
+
+    with external_statements() as seen:
+        result = await service.select(
+            db,
+            SelectQuery(
+                row.id,
+                TableRef(scratch, "codes"),
+                (ColumnRef("code"),),
+                where=(Condition(ColumnRef("code"), "eq", "A1"),),
+            ),
+        )
+
+    assert result.rows == (("A1      ",),)
+    [statement] = [text for text, _ in seen if "codes" in text]
+    assert "AS character(8))" in statement

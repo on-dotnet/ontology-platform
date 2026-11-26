@@ -8,12 +8,14 @@ timeouts, a row limit and cancellation.
 import asyncio
 import dataclasses
 import inspect
+import logging
 import time
 from typing import Any, get_type_hints
 
 import psycopg
 import pytest
 from sqlalchemy import text
+from sqlalchemy.dialects.postgresql.psycopg import PGDialectAsync_psycopg
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
@@ -431,3 +433,30 @@ async def test_long_text_is_cut_and_marked(
         (2, "short"),
     )
     assert result.truncated == frozenset({(0, 1)})
+
+
+async def test_driver_errors_while_setting_up_the_connection_do_not_leave_the_connector(
+    db: AsyncSession,
+    external_source: ExternalSource,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG)
+    caplog.set_level(logging.DEBUG, logger="sqlalchemy.pool")
+    marker = f"op-secret-{external_source.reader}"
+
+    def fail(self: Any, connection: Any) -> None:
+        raise psycopg.OperationalError(f"server closed the connection for {marker}")
+
+    monkeypatch.setattr(PGDialectAsync_psycopg, "initialize", fail)
+
+    with pytest.raises(ConnectorError) as raised:
+        async with connect(db, reader_params(external_source)):
+            pass
+
+    error = raised.value
+    assert error.__cause__ is None
+    assert error.__suppress_context__
+    assert marker not in str(error)
+    assert marker not in repr(error)
+    assert marker not in caplog.text

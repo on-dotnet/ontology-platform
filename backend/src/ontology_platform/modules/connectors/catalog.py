@@ -74,6 +74,9 @@ _RELATIONS = text("""
       AND NOT pg_catalog.starts_with(n.nspname, 'pg_toast_temp_')
       AND c.relkind IN ('r', 'p', 'v', 'm', 'f')
       AND c.relpersistence <> 't'
+      -- Partitions are reached through their parent table; listing them would only crowd the
+      -- catalog and its table limit.
+      AND NOT c.relispartition
     LIMIT :row_limit
 """)
 

@@ -1,5 +1,6 @@
 """Catalog discovery, refresh jobs and browsing the persisted catalog (spec 003, 5.5)."""
 
+import asyncio
 from collections.abc import Sequence
 from dataclasses import replace
 from datetime import datetime
@@ -10,7 +11,7 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
-from sqlalchemy import delete, select, text, update
+from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from external_source import ExternalSource
@@ -729,7 +730,9 @@ async def test_browse_cached_tables_by_schema_search_cursor_and_working_type(
         db.add(_cached(source, schema, name, "Yield 10%" if name == "heat" else None))
     await _cache_another_source(db)
     await db.execute(
-        update(DataSource).where(DataSource.id == source).values(catalog_status="ready")
+        update(DataSource)
+        .where(DataSource.id == source)
+        .values(catalog_status="ready", catalog_refreshed_at=func.now())
     )
     await db.commit()
     type_id = uuid4()
@@ -798,3 +801,50 @@ async def test_browse_cached_tables_by_schema_search_cursor_and_working_type(
     page = await client.get(f"{base}/tables")
     assert page.status_code == 200
     assert all(item["boundType"] is None for item in page.json()["items"])
+
+
+async def test_reading_holds_no_lock_and_a_change_meanwhile_reads_again(
+    source: UUID,
+    worker: async_sessionmaker[AsyncSession],
+    client: AsyncClient,
+    db: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    started, release = asyncio.Event(), asyncio.Event()
+    real_read = connection.read_catalog
+
+    async def slow_read(
+        session: AsyncSession, params: connection.ConnectionParams, schema_names: Sequence[str]
+    ) -> list[catalog.DiscoveredTable]:
+        started.set()
+        await release.wait()
+        return await real_read(session, params, schema_names)
+
+    monkeypatch.setattr(connection, "read_catalog", slow_read)
+    await _request(client, source)
+    claim = await _claim(db, worker, source)
+    running = asyncio.create_task(runner._execute(jobs.REFRESH_CATALOG, claim, "catalog-test"))
+    await asyncio.wait_for(started.wait(), 10)
+
+    # While the job reads the external database, the data source can still be changed.
+    await sign_in(client, db, Role.ADMIN)
+    current = (await client.get(f"{BASE}/{source}")).json()
+    async with asyncio.timeout(5):
+        patched = await client.patch(
+            f"{BASE}/{source}",
+            json={"name": "钢铁 MES 2", "revision": current["revision"]},
+            headers=csrf_headers(client),
+        )
+    assert patched.status_code == 200
+    release.set()
+    await running
+
+    # What was read may describe the old settings: nothing is kept, the refresh runs again.
+    assert (await _info(client, source))["status"] == "refreshing"
+    assert await _audits(db, source) == []
+    await db.commit()
+    queued = select(Job.id).where(Job.kind == jobs.REFRESH_CATALOG, Job.status == "queued")
+    assert len(list(await db.scalars(queued))) == 1
+    monkeypatch.setattr(connection, "read_catalog", real_read)
+    await _run(db, worker, source)
+    assert (await _info(client, source))["status"] == "ready"

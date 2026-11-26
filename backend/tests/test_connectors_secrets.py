@@ -161,15 +161,13 @@ async def _run_jobs(factory: async_sessionmaker[AsyncSession]) -> None:
         await runner._execute(job.kind, context, "secret-scan")
 
 
-async def _stored_text(db: AsyncSession) -> str:
-    """Everything the platform keeps about the flow, as text."""
+_KEPT = ("audit.events", "jobs.jobs", "connectors.catalog_tables")
+
+
+async def _stored_text(db: AsyncSession, *tables: str) -> str:
+    """What the platform keeps in these tables, as text."""
     parts: list[str] = []
-    for table in (
-        "audit.events",
-        "jobs.jobs",
-        "connectors.data_sources",
-        "connectors.catalog_tables",
-    ):
+    for table in tables:
         rows = await db.execute(text(f"SELECT to_jsonb(t)::text FROM {table} t"))  # noqa: S608
         parts.extend(row[0] for row in rows)
     return "\n".join(parts)
@@ -183,11 +181,13 @@ async def test_passwords_hosts_and_users_never_show(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.DEBUG)
+    # The pool logs connection reprs (host, user, database); the platform engine's own SQL
+    # echo is a development switch that also shows the platform's rows, so it stays off.
+    caplog.set_level(logging.DEBUG, logger="sqlalchemy.pool")
     good = external_source.reader_password
     bad = "op-secret-pw-" + uuid4().hex
     bad_host = f"op-secret-host-{uuid4().hex[:12]}.invalid"
     bad_user = f"op_secret_user_{uuid4().hex[:12]}"
-    markers = [good, bad, bad_host, bad_user]
     call = _Recorder(client)
     await sign_in(client, db, Role.ADMIN)
     connection: dict[str, Any] = {
@@ -225,6 +225,20 @@ async def test_passwords_hosts_and_users_never_show(
     unknown_user = await call(
         "POST", "/api/data-sources/test", json={**connection, "username": bad_user, "password": bad}
     )
+    # Saved data sources with the same markers, read by the catalog job.
+    saved_failures = []
+    for index, changes in enumerate(({"host": bad_host}, {"username": bad_user})):
+        saved = await call(
+            "POST",
+            "/api/data-sources",
+            json={**connection, **changes, "name": f"MES bad {index}", "password": bad},
+        )
+        await call("POST", f"/api/data-sources/{saved.json()['id']}/catalog/refresh")
+        saved_failures.append(saved.json()["id"])
+    await _run_jobs(worker)
+    for saved_id in saved_failures:
+        info = await call("GET", f"/api/data-sources/{saved_id}")
+        assert info.json()["catalog"]["errorCode"] == "datasource.connect_failed"
     renamed = await call(
         "PATCH", base, json={"name": "MES 2", "revision": changed.json()["revision"]}
     )
@@ -239,14 +253,25 @@ async def test_passwords_hosts_and_users_never_show(
     assert renamed.status_code == 200
     assert archived.json()["status"] == "archived"
     assert archived.json()["hasCredential"] is False
-    stored = await _stored_text(db)
     logs = "\n".join([record.getMessage() for record in caplog.records] + [caplog.text])
-    for marker in markers:
+    # Passwords: nowhere at all.
+    stored = await _stored_text(db, *_KEPT, "connectors.data_sources")
+    for marker in (good, bad):
         for response in call.responses:
             assert marker not in response.text, response.request.url
             assert all(marker not in value for value in response.headers.values())
         assert marker not in logs
         assert marker not in stored
+    # Host and user names are settings, which the data source shows editors and stores; what
+    # must not carry them is anything made from a driver error: test results, logs, jobs, audit.
+    results = [r for r in call.responses if r.request.url.path.endswith("/test")]
+    assert len(results) == 6
+    kept = await _stored_text(db, *_KEPT)
+    for marker in (bad_host, bad_user):
+        for response in results:
+            assert marker not in response.text, response.request.url
+        assert marker not in logs
+        assert marker not in kept
     job_rows = (await db.execute(select(Job.error_code, Job.error_detail))).all()
     assert job_rows
     assert all(detail is None for _, detail in job_rows)

@@ -16,6 +16,7 @@ from ontology_platform.modules.connectors.errors import (
     PlatformDatabaseError,
 )
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
+from ontology_platform.modules.jobs import service as queue
 from ontology_platform.modules.jobs.runner import JobContext, register
 from ontology_platform.settings import Settings
 
@@ -66,20 +67,38 @@ def register_handlers(
 
     async def refresh_catalog(job: JobContext) -> None:
         source_id = UUID(job.payload["dataSourceId"])
-        async with session_factory.begin() as db:
-            # Serialize refreshes with each other and with edits to the connection settings.
-            row = await db.get(DataSource, source_id, with_for_update=True)
-            if row is None or row.status == "archived":
+        # Read the data source without holding its row: the read may take as long as its
+        # timeouts, and edits, tests and archiving must not wait for it.
+        async with session_factory() as db:
+            row = await db.get(DataSource, source_id)
+            # A refresh that already finished after this job was queued satisfied it. Every
+            # later request sets refreshing again before making its job visible.
+            if row is None or row.status == "archived" or row.catalog_status != "refreshing":
                 return
-            # A worker that acquired this lock after the refresh requests can satisfy them all.
-            # Every later request sets refreshing again before making its job visible.
-            if row.catalog_status in ("ready", "failed"):
-                return
-            detail: dict[str, str | int]
+            revision = row.revision
+            tables: list[DiscoveredTable] | None = None
+            failure: ConnectorError | None = None
+            unexpected: Exception | None = None
             try:
                 tables = await connection.read_catalog(db, connection.params_of(row), row.schemas)
             except ConnectorError as error:
-                code = _error_code(error)
+                failure = error
+            except Exception as error:
+                # A bug, not a connector error: record the refresh as failed so that the page
+                # does not wait for ever, then let the runner log and fail the job.
+                unexpected = error
+        async with session_factory.begin() as db:
+            row = await db.get(DataSource, source_id, with_for_update=True, populate_existing=True)
+            if row is None or row.status == "archived" or row.catalog_status != "refreshing":
+                return
+            if row.revision != revision:
+                # The settings changed while reading: what was read may be another database.
+                await queue.enqueue(db, REFRESH_CATALOG, {"dataSourceId": str(source_id)})
+                await job.check_lease(db)
+                return
+            detail: dict[str, str | int]
+            if failure is not None or tables is None:
+                code = _error_code(failure) if failure is not None else "datasource.connect_failed"
                 row.catalog_status = "failed"
                 row.catalog_error_code = code
                 detail = {"errorCode": code}
@@ -94,5 +113,7 @@ def register_handlers(
                 detail=detail,
             )
             await job.check_lease(db)
+        if unexpected is not None:
+            raise unexpected
 
     register(REFRESH_CATALOG, refresh_catalog)

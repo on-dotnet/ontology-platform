@@ -172,8 +172,10 @@ def _not_found() -> AppError:
     return AppError(404, "datasource.not_found", "The data source was not found.")
 
 
-async def _active_source(db: AsyncSession, source_id: UUID) -> DataSource:
-    row = await db.get(DataSource, source_id, with_for_update=True, populate_existing=True)
+async def _active_source(db: AsyncSession, source_id: UUID, *, lock: bool = True) -> DataSource:
+    # Reads that connect to the data source afterwards take no lock: a connection may take as
+    # long as its timeouts, and edits of the same data source must not wait for it.
+    row = await db.get(DataSource, source_id, with_for_update=lock, populate_existing=True)
     if row is None:
         raise _not_found()
     if row.status == "archived":
@@ -442,8 +444,9 @@ async def check_connection(
     if password is None:
         if body.data_source_id is None:
             raise AppError(422, "validation.failed", "A password or data source is required.")
-        row = await _active_source(db, body.data_source_id)
+        row = await _active_source(db, body.data_source_id, lock=False)
         password = _saved_params(row).password
+    target = body.data_source_id if body.password is None else None
     params = connection.ConnectionParams(
         host=body.host,
         port=body.port,
@@ -453,7 +456,7 @@ async def check_connection(
         ssl_mode=body.ssl_mode,
         kind=body.kind,
     )
-    result = await _test_and_audit(db, params, body.data_source_id, actor, ip)
+    result = await _test_and_audit(db, params, target, actor, ip)
     await db.commit()
     return result
 
@@ -465,12 +468,16 @@ async def check_data_source(
     actor: Principal,
     ip: str | None,
 ) -> schemas.ConnectionTest:
-    row = await _active_source(db, data_source_id)
+    row = await _active_source(db, data_source_id, lock=False)
+    revision = row.revision
     result = await _test_and_audit(db, _saved_params(row), data_source_id, actor, ip)
-    row.last_test_at = datetime.now(UTC)
-    row.last_test_ok = result.ok
-    row.last_test_code = result.code
-    row.last_test_warnings = list(result.warnings)
+    current = await db.get(DataSource, data_source_id, with_for_update=True, populate_existing=True)
+    # Changed while the test ran: the result may describe the old settings, so it is not kept.
+    if current is not None and current.status == "active" and current.revision == revision:
+        current.last_test_at = datetime.now(UTC)
+        current.last_test_ok = result.ok
+        current.last_test_code = result.code
+        current.last_test_warnings = list(result.warnings)
     await db.commit()
     return result
 
@@ -491,12 +498,17 @@ async def request_catalog_refresh(
 
 
 async def _require_catalog(db: AsyncSession, source_id: UUID) -> None:
-    status = await db.scalar(
-        sql_select(DataSource.catalog_status).where(DataSource.id == source_id)
-    )
-    if status is None:
+    found = (
+        await db.execute(
+            sql_select(DataSource.id, DataSource.catalog_refreshed_at).where(
+                DataSource.id == source_id
+            )
+        )
+    ).first()
+    if found is None:
         raise _not_found()
-    if status == "never":
+    # Never read successfully: a first refresh still running or failed has no catalog either.
+    if found.catalog_refreshed_at is None:
         raise AppError(409, "catalog.not_ready", "The catalog has not been read yet.")
 
 
