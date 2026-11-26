@@ -145,14 +145,16 @@ ontologies/steel/
 | rolling | `Reheating`、`HotRolling`、`ColdRolling`、`Annealing`、`Coating`、`Recoiling`、`CoilSplitting`、`CoilJoining`、`Packing` | `Coil`（`HotRolledCoil`、`ColdRolledCoil`、`CoatedCoil`）、`Plate`、`Sheet`、`Bar`、`WireRod`、`Section` | 热连轧、中厚板轧机、冷轧、连退、镀锌、棒材、线材、型钢轧机；`coating-type` |
 | tubemaking | `Piercing`、`TubeRolling`、`TubeWelding`、`SizingAndReducing` | `HollowShell`、`SeamlessTube`、`WeldedPipe` | 穿孔机、连轧管机、焊管机组；`weld-method` |
 | heattreatment | `HeatTreatment`（工艺用代码） | `HeatTreatmentLoad`（一个装炉批，`⊑ MaterialLot`） | 热处理炉；`heat-treatment-process` |
-| finishing | `Straightening`、`Shearing`、`SurfaceConditioning`（修磨、扒皮）、`InlineInspection`、`Marking` | | 精整线设备 |
+| finishing | `Straightening`、`Shearing`、`SurfaceConditioning`（修磨、扒皮）、`InlineInspection`、`Marking` | `Bundle ⊑ Package`（定尺交货捆，含单支定尺、支数、计重方式） | 精整线设备 |
 
 ### 6.3 plain 普钢
 
 | 模块 | 内容 |
 |---|---|
-| products | 普钢产品族代码（碳素结构钢、低合金高强度结构钢、钢筋、冷轧低碳、热镀层板带、型钢、焊管）；普钢常用标准牌号条目（只写牌号与所属标准，不写成分限值）；`Rebar ⊑ Bar`（钢筋，有表面形状、牌号后缀等自己的属性）；按捆交货的定尺长度与理论重量口径 |
+| products | 普钢产品族代码（碳素结构钢、低合金高强度结构钢、钢筋、冷轧低碳、热镀层板带、型钢、焊管）；普钢常用标准牌号条目（只写牌号与所属标准，不写成分限值）；`Rebar ⊑ Bar`（钢筋，有表面形状、牌号后缀等自己的属性） |
 | quality | 普钢特有的组批维度代码（加进核心的组批规则）、普钢按批判定的口径 |
+
+按捆交货普钢、特钢都用，已上提到通用工艺层的 finishing 模块（PR 8）。
 
 涂镀（`Coating`、`CoatedCoil`、`coating-type`）与组批规则普特都用，留在通用层。普钢层的类、属性和新建的代码方案都要写下沉理由（第 2 节），写不出的上提。
 

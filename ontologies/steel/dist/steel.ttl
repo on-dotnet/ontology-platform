@@ -149,7 +149,7 @@ stl:BreakdownRolling a owl:Class ;
         "初轧开坯"@zh .
 
 stl:BundleLengthShape a sh:PropertyShape ;
-    rdfs:comment "定尺交货捆须标明一个正的单支定尺长度，以米计。"@zh ;
+    rdfs:comment "每捆须记录一个单支交货定尺，以米计且大于零。"@zh ;
     sh:datatype xsd:decimal ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -161,22 +161,22 @@ stl:BundleLengthShape a sh:PropertyShape ;
 stl:BundleMassBasisCode a rdfs:Datatype ;
     rdfs:label "Delivery bundle mass basis code"@en,
         "交货捆计重方式代码"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
     skos:definition "Datatype for the primary notations in the delivery bundle mass basis scheme."@en,
         "用于标记交货捆计重方式方案内主记号的字面量类型。"@zh ;
     skos:prefLabel "Delivery bundle mass basis code"@en,
         "交货捆计重方式代码"@zh .
 
 stl:BundleMassBasisSchemeShape a sh:PropertyShape ;
-    rdfs:comment "捆的计重依据须取自交货捆计重方式方案。"@zh ;
+    rdfs:comment "交货捆所用代码须属于交货捆计重方式方案。"@zh ;
     sh:hasValue <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
     sh:path skos:inScheme ;
     sh:severity sh:Violation ;
     sh:targetObjectsOf stl:bundleMassBasis .
 
 stl:BundleMassBasisShape a sh:PropertyShape ;
-    rdfs:comment "定尺交货捆须明确一个整捆结算所用的计重方式。"@zh ;
+    rdfs:comment "每捆须指定一种交货结算所用的计重方式。"@zh ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:path stl:bundleMassBasis ;
@@ -184,7 +184,7 @@ stl:BundleMassBasisShape a sh:PropertyShape ;
     sh:targetClass stl:Bundle .
 
 stl:BundlePieceCountShape a sh:PropertyShape ;
-    rdfs:comment "交货捆的实交支数按整支清点，填写时须为非负整数。"@zh ;
+    rdfs:comment "每捆可记录一个实交支数，所填数值须为非负整数。"@zh ;
     sh:datatype xsd:nonNegativeInteger ;
     sh:maxCount 1 ;
     sh:path stl:bundlePieceCount ;
@@ -2918,7 +2918,7 @@ stl:coatingMass a owl:DatatypeProperty ;
 <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis/ACTUAL> a skos:Concept ;
     rdfs:label "Actual mass"@en,
         "实际计重"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
     skos:definition "Settles on the weighed mass of the bundle after deducting packaging tare."@en,
         "按称量取得的整捆质量扣除包装皮重后结算。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
@@ -2930,7 +2930,7 @@ stl:coatingMass a owl:DatatypeProperty ;
 <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis/THEORY> a skos:Concept ;
     rdfs:label "Theoretical mass"@en,
         "理论计重"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
     skos:definition "Determines delivered mass from nominal mass per unit length, cut length and piece count."@en,
         "按公称单位长度质量、单支定尺及实交支数计算整捆交货重量。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
@@ -10487,14 +10487,13 @@ stl:assessedSpecification a owl:ObjectProperty ;
 stl:bundleCutLength a owl:DatatypeProperty ;
     rdfs:label "Ordered length per bundled piece"@en,
         "捆内单支定尺"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024>,
-        <https://w3id.org/ontology-platform/steel/std/gbt-11263-2024> ;
-    rdfs:comment "下沉理由：普钢长材按捆交货时，以捆内单支的约定定尺配合支数核算整捆理论重量。"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-11263-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-702-2017> ;
     rdfs:domain stl:Bundle ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
     rdfs:range xsd:decimal ;
-    skos:definition "The ordered cut length in metres of each individual length in this delivery bundle."@en,
-        "本交货捆内每支长材约定的定尺长度，以米计。"@zh ;
+    skos:definition "The agreed delivery length in metres of each piece in the bundle."@en,
+        "捆内各支长材共同约定的交货长度，以米计。"@zh ;
     skos:prefLabel "Ordered length per bundled piece"@en,
         "捆内单支定尺"@zh ;
     stl:quantityKind quantitykind:Length ;
@@ -10504,12 +10503,11 @@ stl:bundlePieceCount a owl:DatatypeProperty ;
     rdfs:label "Delivered pieces per bundle"@en,
         "交货捆支数"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2101-2017> ;
-    rdfs:comment "下沉理由：普钢定尺捆的交货清点和理计以同一定尺下的实交支数为依据。"@zh ;
     rdfs:domain stl:Bundle ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
     rdfs:range xsd:nonNegativeInteger ;
-    skos:definition "The count of steel lengths delivered in a fixed-length bundle, as checked against the bundle tag and delivery quantity."@en,
-        "给出定尺交货捆中实交长材的支数，用于对照捆牌和交货数量。"@zh ;
+    skos:definition "The number of individual lengths delivered in the bundle."@en,
+        "按支清点的本捆实交长材数量。"@zh ;
     skos:prefLabel "Delivered pieces per bundle"@en,
         "交货捆支数"@zh ;
     stl:quantityKind quantitykind:Count ;
@@ -11534,15 +11532,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75D46D3A7E05397BE0A0AB82A> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-702-2017> a stl:StandardEdition ;
-    dcterms:description "废止"@zh ;
-    dcterms:identifier "GB/T 702-2017" ;
-    dcterms:issued "2017"^^xsd:gYear ;
-    dcterms:title "Hot-rolled steel bars—Dimensions,shape,weight and tolerances"@en,
-        "热轧钢棒尺寸、外形、重量及允许偏差"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81C41D3A7E05397BE0A0AB82A> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-702-2026> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 702-2026" ;
@@ -12076,14 +12065,13 @@ stl:assessedObject a owl:ObjectProperty ;
 stl:bundleMassBasis a owl:ObjectProperty ;
     rdfs:label "Delivery bundle mass basis"@en,
         "交货捆计重方式"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
-    rdfs:comment "下沉理由：定尺普钢长材可按尺寸和支数理计或按净重实计，交货捆需标明选用的口径。"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:domain stl:Bundle ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
     rdfs:range skos:Concept ;
     rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
-    skos:definition "Identifies the mass used for settlement of this bundle, either theoreticalMass or the weighed netMass after tare."@en,
-        "标明结算本捆时采用的质量口径，理论值取 theoreticalMass，实际值取扣皮后的 netMass。"@zh ;
+    skos:definition "Indicates whether the bundle is settled using its calculated theoreticalMass or its weighed netMass after tare."@en,
+        "指明本捆交货结算采用理论重量（theoreticalMass）或称量扣皮后的净重（netMass）。"@zh ;
     skos:prefLabel "Delivery bundle mass basis"@en,
         "交货捆计重方式"@zh .
 
@@ -12885,6 +12873,15 @@ stl:specialProductFamily a owl:ObjectProperty ;
         "废钢铁"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LCsCZ0c8eO0%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-702-2017> a stl:StandardEdition ;
+    dcterms:description "废止"@zh ;
+    dcterms:identifier "GB/T 702-2017" ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:title "Hot-rolled steel bars—Dimensions,shape,weight and tolerances"@en,
+        "热轧钢棒尺寸、外形、重量及允许偏差"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81C41D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-706-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -14121,14 +14118,13 @@ stl:occurredAt a owl:DatatypeProperty ;
 stl:Bundle a owl:Class ;
     rdfs:label "Fixed-length delivery bundle"@en,
         "定尺交货捆"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024>,
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice>,
         <https://w3id.org/ontology-platform/steel/std/gbt-2101-2017> ;
-    rdfs:comment "下沉理由：普钢长材的定尺成捆交货要把单支定尺、支数和整捆计重方式关联到同一包装件。"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
     rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/packing-form/BUNDLE> ;
     rdfs:subClassOf stl:Package ;
-    skos:definition "An identified package of commodity steel lengths counted to one ordered cut length and transferred on an agreed mass basis."@en,
-        "以捆号移交的一组定尺普钢长材，每支按同一交货长度清点，整捆按约定方式计重。"@zh ;
+    skos:definition "A package of long steel products of the same ordered cut length, identified by a bundle number and delivered on an agreed mass basis."@en,
+        "由一组交货定尺相同的长材组成的包装件，以捆号标识，按约定方式整捆计重。"@zh ;
     skos:prefLabel "Fixed-length delivery bundle"@en,
         "定尺交货捆"@zh .
 
@@ -14190,11 +14186,10 @@ stl:Steelmaking a owl:Class ;
 <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> a skos:ConceptScheme ;
     rdfs:label "Delivery bundle mass basis"@en,
         "交货捆计重方式"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
-    rdfs:comment "下沉理由：成捆普钢长材交货可在按定尺支数理计和整捆实称之间选择，需在捆号上保留依据。"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
-    skos:definition "Distinguishes how the delivered mass of a fixed-length bundle is determined."@en,
-        "区分普钢定尺长材整捆交接时所采用的计重依据。"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "Distinguishes calculated and weighed mass for the delivery of fixed-length bundles."@en,
+        "区分定尺长材按捆交货时使用的理论计重和实际计重。"@zh ;
     skos:prefLabel "Delivery bundle mass basis"@en,
         "交货捆计重方式"@zh .
 
@@ -15127,6 +15122,16 @@ stl:Observation a owl:Class ;
     skos:prefLabel "Special steel product family"@en,
         "特钢产品族"@zh .
 
+<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB 1499.2-2024" ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en,
+        "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=1BD5B9878E5A2FCEE06397BE0A0A10CC> .
+
 stl:MaterialLot a owl:Class ;
     rdfs:label "Material lot"@en,
         "物料批"@zh ;
@@ -15155,16 +15160,6 @@ stl:MaterialLot a owl:Class ;
         "钢产品 词汇"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.iso.org/standard/52949.html> .
-
-<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB 1499.2-2024" ;
-    dcterms:issued "2024"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
-    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en,
-        "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=1BD5B9878E5A2FCEE06397BE0A0A10CC> .
 
 <https://w3id.org/ontology-platform/steel/code/material-category> a skos:ConceptScheme ;
     rdfs:label "Material category"@en,

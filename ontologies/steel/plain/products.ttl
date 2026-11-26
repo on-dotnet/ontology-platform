@@ -11,7 +11,7 @@
 <ontology/plain/products> a owl:Ontology ;
     owl:versionIRI <ontology/plain/products/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "普钢产品与交货"@zh, "Commodity steel products and delivery"@en ;
-    rdfs:comment "收录普钢牌号的订货产品族、钢筋的产品标识以及定尺成捆交货所需的数据。"@zh, "Defines the ordering families of commodity steel grades, identifying features of reinforcing bars and delivery particulars of fixed-length bundles."@en ;
+    rdfs:comment "关联普钢牌号与订货产品族，描述钢筋的表面形状、牌号后缀和公称直径。"@zh, "Relates commodity steel grades to ordering families and describes the surface pattern, grade suffix and nominal diameter of reinforcing bars."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 stl:Rebar a owl:Class ; rdfs:subClassOf stl:Bar ;
@@ -19,12 +19,6 @@ stl:Rebar a owl:Class ; rdfs:subClassOf stl:Bar ;
     skos:definition "普钢产品标准中供钢筋混凝土配筋使用的条状钢材，以公称直径标示规格。"@zh, "A commodity steel bar supplied for reinforcement of concrete and designated by nominal diameter."@en ;
     rdfs:comment "下沉理由：混凝土配筋用普钢棒材按光圆或带肋及钢筋公称直径交验，需要在棒材上细分。"@zh ;
     dcterms:source <std/gb-1499-1-2024>, <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products> .
-
-stl:Bundle a owl:Class ; rdfs:subClassOf stl:Package ; rdfs:seeAlso <code/packing-form/BUNDLE> ;
-    rdfs:label "定尺交货捆"@zh, "Fixed-length delivery bundle"@en ; skos:prefLabel "定尺交货捆"@zh, "Fixed-length delivery bundle"@en ;
-    skos:definition "以捆号移交的一组定尺普钢长材，每支按同一交货长度清点，整捆按约定方式计重。"@zh, "An identified package of commodity steel lengths counted to one ordered cut length and transferred on an agreed mass basis."@en ;
-    rdfs:comment "下沉理由：普钢长材的定尺成捆交货要把单支定尺、支数和整捆计重方式关联到同一包装件。"@zh ;
-    dcterms:source <std/gbt-2101-2017>, <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products> .
 
 stl:plainProductFamily a owl:ObjectProperty ; rdfs:domain stl:StandardGrade ; rdfs:range skos:Concept ; rdfs:seeAlso <code/plain-product-family> ;
     rdfs:label "普钢订货产品族"@zh, "Commodity steel ordering family"@en ; skos:prefLabel "普钢订货产品族"@zh, "Commodity steel ordering family"@en ;
@@ -49,21 +43,3 @@ stl:rebarNominalDiameter a owl:DatatypeProperty ; rdfs:domain stl:Rebar ; rdfs:r
     skos:definition "以毫米记录钢筋公称截面对应的直径，带肋钢筋也依此识别规格。"@zh, "The diameter in millimetres corresponding to the nominal section of a reinforcing bar, including ribbed bars."@en ;
     rdfs:comment "下沉理由：带肋钢筋按公称截面计算理论重量和归并规格，肋顶外径不能代表该尺寸。"@zh ;
     dcterms:source <std/gb-1499-1-2024>, <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products> .
-
-stl:bundleCutLength a owl:DatatypeProperty ; rdfs:domain stl:Bundle ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
-    rdfs:label "捆内单支定尺"@zh, "Ordered length per bundled piece"@en ; skos:prefLabel "捆内单支定尺"@zh, "Ordered length per bundled piece"@en ;
-    skos:definition "本交货捆内每支长材约定的定尺长度，以米计。"@zh, "The ordered cut length in metres of each individual length in this delivery bundle."@en ;
-    rdfs:comment "下沉理由：普钢长材按捆交货时，以捆内单支的约定定尺配合支数核算整捆理论重量。"@zh ;
-    dcterms:source <std/gb-1499-2-2024>, <std/gbt-11263-2024> ; rdfs:isDefinedBy <ontology/plain/products> .
-
-stl:bundlePieceCount a owl:DatatypeProperty ; rdfs:domain stl:Bundle ; rdfs:range xsd:nonNegativeInteger ; stl:unit unit:NUM ; stl:quantityKind quantitykind:Count ;
-    rdfs:label "交货捆支数"@zh, "Delivered pieces per bundle"@en ; skos:prefLabel "交货捆支数"@zh, "Delivered pieces per bundle"@en ;
-    skos:definition "给出定尺交货捆中实交长材的支数，用于对照捆牌和交货数量。"@zh, "The count of steel lengths delivered in a fixed-length bundle, as checked against the bundle tag and delivery quantity."@en ;
-    rdfs:comment "下沉理由：普钢定尺捆的交货清点和理计以同一定尺下的实交支数为依据。"@zh ;
-    dcterms:source <std/gbt-2101-2017> ; rdfs:isDefinedBy <ontology/plain/products> .
-
-stl:bundleMassBasis a owl:ObjectProperty ; rdfs:domain stl:Bundle ; rdfs:range skos:Concept ; rdfs:seeAlso <code/bundle-mass-basis> ;
-    rdfs:label "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ; skos:prefLabel "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ;
-    skos:definition "标明结算本捆时采用的质量口径，理论值取 theoreticalMass，实际值取扣皮后的 netMass。"@zh, "Identifies the mass used for settlement of this bundle, either theoreticalMass or the weighed netMass after tare."@en ;
-    rdfs:comment "下沉理由：定尺普钢长材可按尺寸和支数理计或按净重实计，交货捆需标明选用的口径。"@zh ;
-    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products> .

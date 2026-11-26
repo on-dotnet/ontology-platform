@@ -4,14 +4,31 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <ontology/process/finishing-shapes> a owl:Ontology ;
     owl:versionIRI <ontology/process/finishing-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "精整数据约束"@zh, "Finishing data constraints"@en ;
-    rdfs:comment "校验局部修磨的实测去除深度。"@zh, "Checks the measured depth of material removed by local grinding."@en ;
+    rdfs:comment "校验局部修磨深度，以及定尺交货捆的单支长度、支数和计重方式。"@zh, "Checks local grinding depth and the cut length, piece count and mass basis of fixed-length delivery bundles."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 stl:GrindingDepthShape a sh:PropertyShape ; sh:targetSubjectsOf stl:maximumGrindingDepth ;
     sh:path stl:maximumGrindingDepth ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
     sh:severity sh:Violation ; rdfs:comment "最大修磨深度按去除量记录，应为非负的十进制毫米数。"@zh .
+
+stl:BundleLengthShape a sh:PropertyShape ; sh:targetClass stl:Bundle ;
+    sh:path stl:bundleCutLength ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "每捆须记录一个单支交货定尺，以米计且大于零。"@zh .
+
+stl:BundlePieceCountShape a sh:PropertyShape ; sh:targetClass stl:Bundle ;
+    sh:path stl:bundlePieceCount ; sh:maxCount 1 ; sh:datatype xsd:nonNegativeInteger ;
+    sh:severity sh:Violation ; rdfs:comment "每捆可记录一个实交支数，所填数值须为非负整数。"@zh .
+
+stl:BundleMassBasisShape a sh:PropertyShape ; sh:targetClass stl:Bundle ;
+    sh:path stl:bundleMassBasis ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每捆须指定一种交货结算所用的计重方式。"@zh .
+
+stl:BundleMassBasisSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:bundleMassBasis ;
+    sh:path skos:inScheme ; sh:hasValue <code/bundle-mass-basis> ;
+    sh:severity sh:Violation ; rdfs:comment "交货捆所用代码须属于交货捆计重方式方案。"@zh .

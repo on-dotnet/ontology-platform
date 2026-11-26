@@ -11,7 +11,7 @@
 <ontology/process/finishing> a owl:Ontology ;
     owl:versionIRI <ontology/process/finishing/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "精整工序"@zh, "Finishing operations"@en ;
-    rdfs:comment "描述交付或后续加工前的矫形、剪切、表面修整、在线检验和标记。"@zh, "Describes shape correction, shearing, surface conditioning, in-line inspection and marking before delivery or further processing."@en ;
+    rdfs:comment "描述矫形、剪切、表面修整、在线检验和标记，以及定尺长材按捆交货时的单支长度、支数和计重方式。"@zh, "Describes shape correction, shearing, surface conditioning, in-line inspection and marking. Records the cut length, piece count and mass basis of long products delivered in bundles."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 stl:Straightening a owl:Class ; rdfs:subClassOf stl:Operation ;
@@ -43,8 +43,28 @@ stl:Marking a owl:Class ; rdfs:subClassOf stl:Operation ;
     skos:definition "在钢材或其标签上施加可辨识标记的作业，用于识别实物或定位需要复查的部位。"@zh, "An operation that marks steel or its tag to identify a piece or locate an area for follow-up inspection."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
 
+stl:Bundle a owl:Class ; rdfs:subClassOf stl:Package ; rdfs:seeAlso <code/packing-form/BUNDLE> ;
+    rdfs:label "定尺交货捆"@zh, "Fixed-length delivery bundle"@en ; skos:prefLabel "定尺交货捆"@zh, "Fixed-length delivery bundle"@en ;
+    skos:definition "由一组交货定尺相同的长材组成的包装件，以捆号标识，按约定方式整捆计重。"@zh, "A package of long steel products of the same ordered cut length, identified by a bundle number and delivered on an agreed mass basis."@en ;
+    dcterms:source <std/gbt-2101-2017>, <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+
 stl:maximumGrindingDepth a owl:DatatypeProperty ; rdfs:domain stl:LocalGrinding ; rdfs:range xsd:decimal ;
     rdfs:label "最大修磨深度"@zh, "Maximum grinding depth"@en ; skos:prefLabel "最大修磨深度"@zh, "Maximum grinding depth"@en ;
     stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
     skos:definition "一次局部修磨在所处理区域内相对于原表面测得的最大去除深度，以毫米计。"@zh, "The greatest depth removed within the area of a local grinding operation, measured in millimetres from the original surface."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+
+stl:bundleCutLength a owl:DatatypeProperty ; rdfs:domain stl:Bundle ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "捆内单支定尺"@zh, "Ordered length per bundled piece"@en ; skos:prefLabel "捆内单支定尺"@zh, "Ordered length per bundled piece"@en ;
+    skos:definition "捆内各支长材共同约定的交货长度，以米计。"@zh, "The agreed delivery length in metres of each piece in the bundle."@en ;
+    dcterms:source <std/gbt-702-2017>, <std/gbt-11263-2024> ; rdfs:isDefinedBy <ontology/process/finishing> .
+
+stl:bundlePieceCount a owl:DatatypeProperty ; rdfs:domain stl:Bundle ; rdfs:range xsd:nonNegativeInteger ; stl:unit unit:NUM ; stl:quantityKind quantitykind:Count ;
+    rdfs:label "交货捆支数"@zh, "Delivered pieces per bundle"@en ; skos:prefLabel "交货捆支数"@zh, "Delivered pieces per bundle"@en ;
+    skos:definition "按支清点的本捆实交长材数量。"@zh, "The number of individual lengths delivered in the bundle."@en ;
+    dcterms:source <std/gbt-2101-2017> ; rdfs:isDefinedBy <ontology/process/finishing> .
+
+stl:bundleMassBasis a owl:ObjectProperty ; rdfs:domain stl:Bundle ; rdfs:range skos:Concept ; rdfs:seeAlso <code/bundle-mass-basis> ;
+    rdfs:label "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ; skos:prefLabel "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ;
+    skos:definition "指明本捆交货结算采用理论重量（theoreticalMass）或称量扣皮后的净重（netMass）。"@zh, "Indicates whether the bundle is settled using its calculated theoreticalMass or its weighed netMass after tare."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
