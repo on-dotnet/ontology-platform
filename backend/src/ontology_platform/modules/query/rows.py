@@ -89,3 +89,23 @@ def next_cursor(
             raise errors.source_mismatch()
         position.append(None if last[i] is None else values.string_value(last[i]))
     return cursor.encode_page(release, context, position)
+
+
+def joined_objects(
+    table: Table, query: SelectQuery, page: Rows
+) -> list[tuple[str, schemas.ObjectRow]]:
+    # ColumnRef includes the side, even when the two tables use identical key names.
+    slots = {col: i for i, col in enumerate(query.columns)}
+    main = {col.name: i for col, i in slots.items() if col.side == "main"}
+    origin = [i for col, i in slots.items() if col.side == "joined"]
+    cuts: dict[int, set[int]] = {}
+    for r, c in page.truncated:
+        cuts.setdefault(r, set()).add(c)
+    pairs = []
+    for r, record in enumerate(page.rows):
+        cut = cuts.get(r, set())
+        if any(record[i] is None or i in cut for i in origin):
+            raise errors.source_mismatch()
+        key = cursor.encode_key([values.string_value(record[i]) for i in origin])
+        pairs.append((key, _object(table, record, main, cut)))
+    return pairs
