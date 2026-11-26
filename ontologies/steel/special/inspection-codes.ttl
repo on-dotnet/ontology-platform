@@ -1,0 +1,132 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/inspection-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/inspection-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢检验代码"@zh, "Specialty steel inspection codes"@en ;
+    rdfs:comment "登记夹杂物形态与系列、低倍分项、棒材探伤验收等级及锭源部位。"@zh, "Registers inclusion morphologies and series, macrodefect items, ultrasonic acceptance classes and ingot zones."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/inclusion-type> a skos:ConceptScheme ;
+    rdfs:label "夹杂物形态类别"@zh, "Inclusion morphology category"@en ; skos:prefLabel "夹杂物形态类别"@zh, "Inclusion morphology category"@en ;
+    skos:definition "按金相观察面上夹杂物的形态对显微评级分组，类别名称不代表逐粒作过化学鉴定。"@zh, "Groups micrographic ratings by the appearance of inclusions on a polished section. The morphology is assigned optically."@en ;
+    rdfs:comment "下沉理由：疲劳敏感特钢交验分别报告各类夹杂物级别。"@zh ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+stl:InclusionTypeCode a rdfs:Datatype ;
+    rdfs:label "夹杂物形态类别代码"@zh, "Inclusion morphology category code"@en ; skos:prefLabel "夹杂物形态类别代码"@zh, "Inclusion morphology category code"@en ;
+    skos:definition "标记夹杂物形态类别方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the inclusion morphology category scheme."@en ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+
+<code/inclusion-type/A> a skos:Concept ; skos:inScheme <code/inclusion-type> ; skos:topConceptOf <code/inclusion-type> ;
+    skos:notation "A"^^stl:InclusionTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "A 类硫化物型"@zh, "Type A, sulphide type"@en ; skos:prefLabel "A 类硫化物型"@zh, "Type A, sulphide type"@en ;
+    skos:definition "随加工方向伸长、呈条带的硫化物型夹杂物形态组。"@zh, "Sulphide-type morphology appearing as elongated streaks along the working direction."@en .
+
+<code/inclusion-type/B> a skos:Concept ; skos:inScheme <code/inclusion-type> ; skos:topConceptOf <code/inclusion-type> ;
+    skos:notation "B"^^stl:InclusionTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "B 类氧化铝型"@zh, "Type B, aluminate type"@en ; skos:prefLabel "B 类氧化铝型"@zh, "Type B, aluminate type"@en ;
+    skos:definition "多个棱角状颗粒沿加工方向排成断续列的氧化铝型形态组。"@zh, "Aluminate-type morphology with angular particles aligned in discontinuous strings."@en .
+
+<code/inclusion-type/C> a skos:Concept ; skos:inScheme <code/inclusion-type> ; skos:topConceptOf <code/inclusion-type> ;
+    skos:notation "C"^^stl:InclusionTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "C 类硅酸盐型"@zh, "Type C, silicate type"@en ; skos:prefLabel "C 类硅酸盐型"@zh, "Type C, silicate type"@en ;
+    skos:definition "沿加工方向延展成细长条的硅酸盐型夹杂物形态组。"@zh, "Silicate-type morphology with elongated inclusions drawn out along the working direction."@en .
+
+<code/inclusion-type/D> a skos:Concept ; skos:inScheme <code/inclusion-type> ; skos:topConceptOf <code/inclusion-type> ;
+    skos:notation "D"^^stl:InclusionTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "D 类球状氧化物型"@zh, "Type D, globular oxide type"@en ; skos:prefLabel "D 类球状氧化物型"@zh, "Type D, globular oxide type"@en ;
+    skos:definition "在观察面上分散分布、以圆形或近圆形截面出现的氧化物型形态组。"@zh, "Oxide-type morphology appearing as dispersed round or nearly round sections."@en .
+
+<code/inclusion-type/DS> a skos:Concept ; skos:inScheme <code/inclusion-type> ; skos:topConceptOf <code/inclusion-type> ;
+    skos:notation "DS"^^stl:InclusionTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "DS 类单颗粒球状型"@zh, "Type DS, single globular inclusion"@en ; skos:prefLabel "DS 类单颗粒球状型"@zh, "Type DS, single globular inclusion"@en ;
+    skos:definition "对观察面上的单个较大球状颗粒按其自身尺寸单独评级的类别。"@zh, "Category used to rate an individual large globular inclusion by its own size."@en .
+
+<code/inclusion-series> a skos:ConceptScheme ;
+    rdfs:label "夹杂物粗细系列"@zh, "Inclusion thickness series"@en ; skos:prefLabel "夹杂物粗细系列"@zh, "Inclusion thickness series"@en ;
+    skos:definition "对同一夹杂物类别按其横向尺寸分别使用的评级系列。"@zh, "Series distinguishing transverse size within a rated inclusion category."@en ;
+    rdfs:comment "下沉理由：特钢夹杂物逐类交验时须保留粗细系列，才能匹配同系列的订货要求。"@zh ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+stl:InclusionSeriesCode a rdfs:Datatype ;
+    rdfs:label "夹杂物粗细系列代码"@zh, "Inclusion thickness series code"@en ; skos:prefLabel "夹杂物粗细系列代码"@zh, "Inclusion thickness series code"@en ;
+    skos:definition "标记夹杂物粗细系列方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the inclusion thickness series scheme."@en ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+
+<code/inclusion-series/THIN> a skos:Concept ; skos:inScheme <code/inclusion-series> ; skos:topConceptOf <code/inclusion-series> ;
+    skos:notation "THIN"^^stl:InclusionSeriesCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "细系"@zh, "Thin series"@en ; skos:prefLabel "细系"@zh, "Thin series"@en ;
+    skos:definition "在一个夹杂物类别中用于较小横向尺寸组的评级系列。"@zh, "Rating series for the smaller transverse sizes within a given category."@en .
+
+<code/inclusion-series/THICK> a skos:Concept ; skos:inScheme <code/inclusion-series> ; skos:topConceptOf <code/inclusion-series> ;
+    skos:notation "THICK"^^stl:InclusionSeriesCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "粗系"@zh, "Thick series"@en ; skos:prefLabel "粗系"@zh, "Thick series"@en ;
+    skos:definition "在一个夹杂物类别中用于较大横向尺寸组的评级系列。"@zh, "Rating series for the larger transverse sizes within a given category."@en .
+
+<code/macro-defect-type> a skos:ConceptScheme ;
+    rdfs:label "低倍受评缺陷类别"@zh, "Rated macrodefect"@en ; skos:prefLabel "低倍受评缺陷类别"@zh, "Rated macrodefect"@en ;
+    skos:definition "区分低倍截面上需分别给出级别的组织缺陷。"@zh, "Distinguishes features graded separately on a macrostructural section of a piece."@en ;
+    rdfs:comment "下沉理由：特钢交验需把各项低倍缺陷的观察结果对应到规定的评级项目。"@zh ;
+    dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+stl:MacroDefectTypeCode a rdfs:Datatype ;
+    rdfs:label "低倍受评缺陷类别代码"@zh, "Rated macrodefect code"@en ; skos:prefLabel "低倍受评缺陷类别代码"@zh, "Rated macrodefect code"@en ;
+    skos:definition "标记低倍受评缺陷类别方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the rated macrodefect scheme."@en ;
+    dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+
+<code/macro-defect-type/CENTPOR> a skos:Concept ; skos:inScheme <code/macro-defect-type> ; skos:topConceptOf <code/macro-defect-type> ;
+    skos:notation "CENTPOR"^^stl:MacroDefectTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "中心疏松"@zh, "Central porosity"@en ; skos:prefLabel "中心疏松"@zh, "Central porosity"@en ;
+    skos:definition "疏松集中在截面中心区域的低倍评级项目。"@zh, "Macrostructural item concerning porosity concentrated in the central region of a section."@en .
+
+<code/macro-defect-type/GENPOR> a skos:Concept ; skos:inScheme <code/macro-defect-type> ; skos:topConceptOf <code/macro-defect-type> ;
+    skos:notation "GENPOR"^^stl:MacroDefectTypeCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "一般疏松"@zh, "General porosity"@en ; skos:prefLabel "一般疏松"@zh, "General porosity"@en ;
+    skos:definition "截面多处出现分散疏松的低倍评级项目。"@zh, "Macrostructural item concerning dispersed porosity in multiple regions of a section."@en .
+
+<code/ndt-acceptance-class> a skos:ConceptScheme ;
+    rdfs:label "锻轧棒材超声验收等级"@zh, "Ultrasonic acceptance class for wrought bars"@en ; skos:prefLabel "锻轧棒材超声验收等级"@zh, "Ultrasonic acceptance class for wrought bars"@en ;
+    skos:definition "按所引棒材检测方法和版次区分用来判读显示的等级。"@zh, "Distinguishes the acceptance classes used to evaluate indications under an identified bar test method and edition."@en ;
+    rdfs:comment "下沉理由：特钢棒材逐支交验要记录指定验收级别，与通用的探伤方法和判定结论分别查询。"@zh ;
+    dcterms:source <std/gbt-4162-2022> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+stl:NdtAcceptanceClassCode a rdfs:Datatype ;
+    rdfs:label "锻轧棒材超声验收等级代码"@zh, "Ultrasonic acceptance class for wrought bars code"@en ; skos:prefLabel "锻轧棒材超声验收等级代码"@zh, "Ultrasonic acceptance class for wrought bars code"@en ;
+    skos:definition "标记锻轧棒材超声验收等级方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the ultrasonic acceptance class for wrought bars scheme."@en ;
+    dcterms:source <std/gbt-4162-2022> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+
+<code/ndt-acceptance-class/A> a skos:Concept ; skos:inScheme <code/ndt-acceptance-class> ; skos:topConceptOf <code/ndt-acceptance-class> ;
+    skos:notation "A"^^stl:NdtAcceptanceClassCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "棒材超声 A 级"@zh, "Bar ultrasonic class A"@en ; skos:prefLabel "棒材超声 A 级"@zh, "Bar ultrasonic class A"@en ;
+    skos:definition "表示该次棒材超声交验采用所引版次中标作 A 的判读条件。"@zh, "Designates the conditions identified as class A in the cited edition for bar ultrasonic inspection."@en .
+
+<code/ndt-acceptance-class/B> a skos:Concept ; skos:inScheme <code/ndt-acceptance-class> ; skos:topConceptOf <code/ndt-acceptance-class> ;
+    skos:notation "B"^^stl:NdtAcceptanceClassCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "棒材超声 B 级"@zh, "Bar ultrasonic class B"@en ; skos:prefLabel "棒材超声 B 级"@zh, "Bar ultrasonic class B"@en ;
+    skos:definition "表示该次棒材超声交验采用所引版次中标作 B 的判读条件。"@zh, "Designates the conditions identified as class B in the cited edition for bar ultrasonic inspection."@en .
+
+<code/ingot-position> a skos:ConceptScheme ;
+    rdfs:label "钢锭轴向部位"@zh, "Axial position on an ingot"@en ; skos:prefLabel "钢锭轴向部位"@zh, "Axial position on an ingot"@en ;
+    skos:definition "按浇注或凝固时确定的锭体轴向划分来源部位，后续翻转或锻造仍沿用原锭方向。"@zh, "Locates material along the original ingot axis as established at casting or solidification, retaining that orientation after working."@en ;
+    rdfs:comment "下沉理由：追查特钢锻材的探伤异常时，要区分来自同一锭体的不同轴向部位。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+stl:IngotPositionCode a rdfs:Datatype ;
+    rdfs:label "钢锭轴向部位代码"@zh, "Axial position on an ingot code"@en ; skos:prefLabel "钢锭轴向部位代码"@zh, "Axial position on an ingot code"@en ;
+    skos:definition "标记钢锭轴向部位方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the axial position on an ingot scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
+
+<code/ingot-position/HEAD> a skos:Concept ; skos:inScheme <code/ingot-position> ; skos:topConceptOf <code/ingot-position> ;
+    skos:notation "HEAD"^^stl:IngotPositionCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "锭头"@zh, "Ingot head"@en ; skos:prefLabel "锭头"@zh, "Ingot head"@en ;
+    skos:definition "原锭凝固时的上端区域，用于追踪头部材料去向。"@zh, "Upper end of the ingot in its solidification orientation, used to trace head material."@en .
+
+<code/ingot-position/MIDDLE> a skos:Concept ; skos:inScheme <code/ingot-position> ; skos:topConceptOf <code/ingot-position> ;
+    skos:notation "MIDDLE"^^stl:IngotPositionCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "锭中"@zh, "Ingot middle"@en ; skos:prefLabel "锭中"@zh, "Ingot middle"@en ;
+    skos:definition "原锭头部与尾部之间的主体区域。"@zh, "Main body of the ingot between its head and foot."@en .
+
+<code/ingot-position/TAIL> a skos:Concept ; skos:inScheme <code/ingot-position> ; skos:topConceptOf <code/ingot-position> ;
+    skos:notation "TAIL"^^stl:IngotPositionCode ; rdfs:isDefinedBy <ontology/special/inspection-codes> ;
+    rdfs:label "锭尾"@zh, "Ingot foot"@en ; skos:prefLabel "锭尾"@zh, "Ingot foot"@en ;
+    skos:definition "原锭凝固时的下端区域，用于追踪底部材料去向。"@zh, "Lower end of the ingot in its solidification orientation, used to trace foot material."@en .

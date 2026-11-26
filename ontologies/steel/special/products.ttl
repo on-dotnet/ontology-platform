@@ -1,0 +1,22 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/products> a owl:Ontology ;
+    owl:versionIRI <ontology/special/products/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢产品"@zh, "Special steel products"@en ;
+    rdfs:comment "本模块把标准版次中的牌号关联到特钢和高温合金的订货产品族。"@zh,
+        "Links edition-specific grades to the families used to order special steels and superalloys."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:specialProductFamily a owl:ObjectProperty ;
+    rdfs:domain stl:StandardGrade ; rdfs:range skos:Concept ; rdfs:seeAlso <code/special-product-family> ;
+    rdfs:label "特钢产品族"@zh, "Special steel product family"@en ;
+    skos:prefLabel "特钢产品族"@zh, "Special steel product family"@en ;
+    skos:definition "指出特定标准版次中的牌号可按哪个特钢或高温合金产品系列订货。同一牌号可用于多个系列。"@zh,
+        "Identifies a special steel or superalloy product family under which an edition-specific grade may be ordered. A grade may serve several families."@en ;
+    rdfs:comment "下沉理由：特钢订货同时按材料系列和零件用途选牌号，例如保证淬透性的结构钢牌号可用于齿轮。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/products> .

@@ -1,0 +1,20 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/special/products-standards> a owl:Ontology ;
+    owl:versionIRI <ontology/special/products-standards/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢产品标准书目"@zh, "Special steel product standards bibliography"@en ;
+    rdfs:comment "记录特钢产品族历史牌号所依据的标准版次。"@zh, "Records the editions that identify historical grades in special steel product families."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<std/gbt-1222-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1222-2016" ;
+    dcterms:title "弹簧钢"@zh, "Spring steels"@en ;
+    dcterms:issued "2016"^^xsd:gYear ; dcterms:description "废止"@zh ;
+    dcterms:isReplacedBy <std/gbt-1222-2025> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8170BD3A7E05397BE0A0AB82A> ;
+    rdfs:isDefinedBy <ontology/special/products-standards> .

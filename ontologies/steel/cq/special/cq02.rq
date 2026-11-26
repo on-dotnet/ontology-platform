@@ -1,0 +1,13 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT ?forgingId ?operationId ?method ?ratio WHERE {
+  VALUES ?piece { <urn:synthetic:steel:forgedproduct/F71> }
+  ?piece a/rdfs:subClassOf* stl:ForgedProduct ; dcterms:identifier ?forgingId ;
+         (stl:producedBy|^stl:outputPiece) ?operation .
+  ?operation a/rdfs:subClassOf* stl:Forging ; dcterms:identifier ?operationId ;
+             stl:forgingMethod/skos:notation ?method ; stl:forgingRatio ?ratio .
+}
+ORDER BY ?forgingId ?operationId ?method

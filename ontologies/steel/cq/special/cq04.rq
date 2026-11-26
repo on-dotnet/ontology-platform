@@ -1,0 +1,25 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+PREFIX result: <https://w3id.org/ontology-platform/steel/code/judgement-result/>
+
+SELECT ?lotId ?barId ?method ?acceptance ?judgement ?ingotId ?position WHERE {
+  VALUES ?lot { <urn:synthetic:steel:inspectionlot/L71> }
+  ?lot dcterms:identifier ?lotId ; stl:lotMember ?bar .
+  ?bar a/rdfs:subClassOf* stl:Bar ; dcterms:identifier ?barId .
+  ?test a/rdfs:subClassOf* stl:NondestructiveTest ; stl:inspectedPiece ?bar ;
+        stl:ndtMethod/skos:notation ?method ; stl:ndtAcceptanceClass/skos:notation ?acceptance .
+  ?decision stl:assessedObject ?bar ; stl:inspectionEvidence ?test ; stl:judgementResult ?outcome .
+  ?outcome skos:notation ?judgement .
+  OPTIONAL {
+    ?decision stl:judgementResult result:NONCONFORM .
+    ?bar stl:derivedFrom* ?cut .
+    ?interval stl:intervalOutput ?cut ; stl:intervalSource ?ingot ; stl:intervalIngotPosition ?zone .
+    ?cut stl:derivedFrom ?ingot .
+    ?ingot a/rdfs:subClassOf* stl:Ingot ; dcterms:identifier ?ingotId .
+    ?zone skos:notation ?position .
+  }
+}
+ORDER BY ?barId ?method ?ingotId ?position

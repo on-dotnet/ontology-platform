@@ -1,0 +1,92 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/forging-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/forging-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "锻造方法与设备代码"@zh, "Forging method and equipment codes"@en ;
+    rdfs:comment "收录特钢锻件履历中的成形方法、工序、设备、实物形态和锻件缺陷代码。"@zh, "Registers forming methods, route segments, equipment, product forms and defects for special steel forging records."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/forging-method> a skos:ConceptScheme ;
+    rdfs:label "锻造方法"@zh, "Forging method"@en ; skos:prefLabel "锻造方法"@zh, "Forging method"@en ;
+    skos:definition "按作业实际采用的工具、施力方式或成形目的标识主要锻造方法。"@zh, "Identifies the principal forging method by tooling, mode of force application or forming objective."@en ;
+    rdfs:comment "下沉理由：特钢锻造作业的逐件履历须能按所记锻造方法查回锻造比。"@zh ;
+    dcterms:source <std/gbt-8541-2012> ; rdfs:isDefinedBy <ontology/special/forging-codes> .
+
+stl:ForgingMethodCode a rdfs:Datatype ;
+    rdfs:label "锻造方法代码"@zh, "Forging method code"@en ; skos:prefLabel "锻造方法代码"@zh, "Forging method code"@en ;
+    skos:definition "用于记录锻造方法方案内主记号的字面量类型。"@zh, "Datatype of the primary notations in the forging method scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/forging-codes> .
+
+<code/forging-method/OPEN> a skos:Concept ; skos:inScheme <code/forging-method> ; skos:topConceptOf <code/forging-method> ;
+    skos:notation "OPEN"^^stl:ForgingMethodCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "自由锻"@zh, "Open-die forging"@en ; skos:prefLabel "自由锻"@zh, "Open-die forging"@en ;
+    skos:definition "使用砧块或通用工具施力，使坯料能沿未受工具约束的方向流动成形。"@zh, "Deforms stock between anvils or general-purpose tools, allowing it to flow in directions unconstrained by the tooling."@en .
+
+<code/forging-method/RAPID> a skos:Concept ; skos:inScheme <code/forging-method> ; skos:topConceptOf <code/forging-method> ;
+    skos:notation "RAPID"^^stl:ForgingMethodCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "快锻"@zh, "Rapid forging"@en ; skos:prefLabel "快锻"@zh, "Rapid forging"@en ;
+    skos:definition "利用快锻机短行程连续压下，配合送进使坯料逐段变形。"@zh, "Uses repeated short press strokes with stock feed to deform successive portions of the workpiece."@en .
+
+<code/forging-method/RADIAL> a skos:Concept ; skos:inScheme <code/forging-method> ; skos:topConceptOf <code/forging-method> ;
+    skos:notation "RADIAL"^^stl:ForgingMethodCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "径向锻造"@zh, "Radial forging"@en ; skos:prefLabel "径向锻造"@zh, "Radial forging"@en ;
+    skos:altLabel "径锻"@zh ;
+    skos:definition "由坯料周围布置的锻模沿径向反复压下，使坯料断面逐段成形。"@zh, "Shapes successive sections of a workpiece by repeated radial blows from dies arranged around it."@en .
+
+<code/forging-method/PRECISION> a skos:Concept ; skos:inScheme <code/forging-method> ; skos:topConceptOf <code/forging-method> ;
+    skos:notation "PRECISION"^^stl:ForgingMethodCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "精密锻造"@zh, "Precision forging"@en ; skos:prefLabel "精密锻造"@zh, "Precision forging"@en ;
+    skos:altLabel "精锻"@zh ;
+    skos:definition "通过控制模具和坯料变形使锻件接近所需的最终形状与尺寸。"@zh, "Controls tooling and stock deformation to forge a piece close to the required final shape and dimensions."@en .
+
+<code/forging-method/DIE> a skos:Concept ; skos:inScheme <code/forging-method> ; skos:topConceptOf <code/forging-method> ;
+    skos:notation "DIE"^^stl:ForgingMethodCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "模锻"@zh, "Impression-die forging"@en ; skos:prefLabel "模锻"@zh, "Impression-die forging"@en ;
+    skos:definition "将坯料置于有型腔的锻模中施力，使金属流动并取得型腔限定的轮廓。"@zh, "Forces stock to flow into a shaped die impression that defines the forged contour."@en .
+
+<code/process-type/FORGE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "FORGE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "锻造工序"@zh, "Forging segment"@en ; skos:prefLabel "锻造工序"@zh, "Forging segment"@en ;
+    skos:definition "以锻压使钢料发生塑性变形的工艺路线段。"@zh, "A route segment that shapes steel stock by plastic deformation under forging loads."@en ;
+    dcterms:source <std/gbt-8541-2012> .
+
+<code/process-type/COG> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/FORGE> ;
+    skos:notation "COG"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "锻造开坯工序"@zh, "Cogging segment"@en ; skos:prefLabel "锻造开坯工序"@zh, "Cogging segment"@en ;
+    skos:definition "对锭或大断面坯料逐段锻压，为后续成形准备坯料的锻造段。"@zh, "A forging segment that progressively breaks down an ingot or large blank into stock for further forming."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/equipment-type/FORGEPRESS> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "FORGEPRESS"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "锻造压力机"@zh, "Forging press"@en ; skos:prefLabel "锻造压力机"@zh, "Forging press"@en ;
+    skos:definition "以压力行程使锻造工具对坯料施加变形载荷的设备。"@zh, "A press whose working stroke applies forming loads to stock through forging tools."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/equipment-type/FORGEHAM> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "FORGEHAM"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "锻锤"@zh, "Forging hammer"@en ; skos:prefLabel "锻锤"@zh, "Forging hammer"@en ;
+    skos:definition "以锤头冲击通过锻造工具向坯料传递变形能量的设备。"@zh, "A machine that transfers impact energy from a falling or driven ram to stock through forging tools."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/product-form/FORGING> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "FORGING"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "锻件形态"@zh, "Forging form"@en ; skos:prefLabel "锻件形态"@zh, "Forging form"@en ;
+    skos:definition "以锻造取得可单件交接或继续加工的坯件或成品形状。"@zh, "The form of a forged piece that can be transferred individually as a blank or finished product."@en ;
+    dcterms:source <std/gbt-8541-2012> .
+
+<code/defect-type/FORGELAP> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:broader <code/defect-type/FORGED> ;
+    skos:notation "FORGELAP"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "锻造折叠"@zh, "Forging lap"@en ; skos:prefLabel "锻造折叠"@zh, "Forging lap"@en ;
+    skos:definition "锻压时表层金属翻折并压入锻件，在折叠处留下未结合的界面。"@zh, "A discontinuity where surface metal folds over during forging and is pressed into the workpiece without bonding."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/defect-type/UNDERFILL> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:broader <code/defect-type/FORGED> ;
+    skos:notation "UNDERFILL"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/special/forging-codes> ;
+    rdfs:label "模锻欠充满"@zh, "Forging underfill"@en ; skos:prefLabel "模锻欠充满"@zh, "Forging underfill"@en ;
+    skos:definition "模锻时金属未充满模膛某一部位，使锻件在该处缺少应成形的轮廓。"@zh, "A missing portion of the intended forged contour where metal failed to fill part of the die impression."@en ;
+    dcterms:source <source/industry-practice> .

@@ -1,0 +1,34 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/special/forging-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/forging-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "锻造作业约束"@zh, "Forging operation constraints"@en ;
+    rdfs:comment "检查特钢锻造作业所记的方法、锻造比及供核算的截面积。"@zh, "Checks the recorded method and forging ratio for a special steel forging operation and the cross sections used to check deformation."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:ForgingMethodShape a sh:PropertyShape ; sh:targetClass stl:Forging ;
+    sh:path stl:forgingMethod ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每次锻造作业应给出一种实际采用的主要锻造方法。"@zh .
+
+stl:ForgingMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:forgingMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/forging-method> ;
+    sh:severity sh:Violation ; rdfs:comment "作业的锻造方法代码应属于锻造方法方案。"@zh .
+
+stl:ForgingRatioShape a sh:PropertyShape ; sh:targetClass stl:Forging ;
+    sh:path stl:forgingRatio ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "一次锻造作业应记录一个大于零的十进制锻造比。"@zh .
+
+stl:InitialCrossSectionAreaShape a sh:PropertyShape ; sh:targetSubjectsOf stl:initialCrossSectionArea ;
+    sh:path stl:initialCrossSectionArea ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "填写锻前截面积时应给出一个大于零的十进制数，单位为平方毫米。"@zh .
+
+stl:FinalCrossSectionAreaShape a sh:PropertyShape ; sh:targetSubjectsOf stl:finalCrossSectionArea ;
+    sh:path stl:finalCrossSectionArea ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "填写锻后截面积时应给出一个大于零的十进制数，单位为平方毫米。"@zh .

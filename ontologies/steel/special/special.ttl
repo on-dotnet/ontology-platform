@@ -1,0 +1,14 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<ontology/special> a owl:Ontology ;
+    owl:versionIRI <ontology/special/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢与特冶扩展层"@zh, "Specialty steel and special melting extension"@en ;
+    rdfs:comment "汇集重熔链、锻造实绩、特钢产品族、专门交验与逐件追溯约束。"@zh, "Collects remelting genealogy, forging records, specialty product families, inspection and piece traceability."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    owl:imports <ontology/special/remelting>, <ontology/special/remelting-codes>, <ontology/special/remelting-shapes>,
+        <ontology/special/forging>, <ontology/special/forging-codes>, <ontology/special/forging-shapes>,
+        <ontology/special/products>, <ontology/special/products-codes>, <ontology/special/products-shapes>, <ontology/special/products-standards>,
+        <ontology/special/inspection>, <ontology/special/inspection-codes>, <ontology/special/inspection-shapes> .

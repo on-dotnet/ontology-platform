@@ -1,0 +1,132 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix grade: <urn:synthetic:steel:steelgrade/> .
+@prefix heat: <urn:synthetic:steel:heat/> .
+@prefix bar: <urn:synthetic:steel:bar/> .
+@prefix el: <urn:synthetic:steel:electrode/> .
+@prefix ri: <urn:synthetic:steel:remeltedingot/> .
+@prefix forge: <urn:synthetic:steel:forging/> .
+@prefix fp: <urn:synthetic:steel:forgedproduct/> .
+@prefix interval: <urn:synthetic:steel:sourceinterval/> .
+@prefix sample: <urn:synthetic:steel:sample/> .
+@prefix inc: <urn:synthetic:steel:inclusionratingresult/> .
+@prefix ndt: <urn:synthetic:steel:nondestructivetest/> .
+@prefix dec: <urn:synthetic:steel:qualitydecision/> .
+@prefix spec: <urn:synthetic:steel:materialspecification/> .
+@prefix eq: <urn:synthetic:steel:equipment/> .
+@prefix work: <urn:synthetic:steel:workunit/> .
+
+# All identities, reported values and decisions are synthetic.
+grade:G71 a stl:SteelGrade ; dcterms:identifier "G71" ;
+    stl:steelQualityClass <code/steel-class-quality/SPECIAL> ; stl:satisfies <std/gbt-18254-2016/grade/GCr15> .
+grade:G73 a stl:SteelGrade ; dcterms:identifier "G73" ;
+    stl:steelQualityClass <code/steel-class-quality/SPECIAL> ; stl:satisfies <std/gbt-3077-2015/grade/42CrMo> .
+grade:G75 a stl:SteelGrade ; dcterms:identifier "G75" ; stl:steelQualityClass <code/steel-class-quality/BASIC> .
+bar:B75 a stl:Bar ; dcterms:identifier "B75" ; stl:steelGrade grade:G75 .
+
+# Two successive remelts. Only the primary ingot carries the liquid heat reference.
+work:V71 a stl:WorkUnit ; stl:equipmentType <code/equipment-type/VIM> .
+work:S71 a stl:WorkUnit ; stl:equipmentType <code/equipment-type/ESR> .
+work:A72 a stl:WorkUnit ; stl:equipmentType <code/equipment-type/VAR> .
+eq:M71 a stl:Equipment ; stl:equipmentType <code/equipment-type/INGOTMOULD> .
+<urn:synthetic:steel:vacuuminductionmelting/V71> a stl:VacuumInductionMelting ; stl:performedOn work:V71 .
+heat:H71 a stl:Heat ; dcterms:identifier "H71" ; stl:steelGrade grade:G71 ;
+    prov:wasGeneratedBy <urn:synthetic:steel:vacuuminductionmelting/V71> .
+<urn:synthetic:steel:ingotcasting/P71> a stl:IngotCasting ; stl:processedHeat heat:H71 ;
+    stl:teemingMethod <code/teeming-method/BOTTOM> .
+<urn:synthetic:steel:ingot/I71> a stl:Ingot ; dcterms:identifier "I71" ; stl:steelGrade grade:G71 ;
+    stl:sourceHeat heat:H71 ; stl:producedBy <urn:synthetic:steel:ingotcasting/P71> ; stl:teemedInMould eq:M71 .
+el:E71 a stl:Electrode ; dcterms:identifier "E71" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom <urn:synthetic:steel:ingot/I71> .
+<urn:synthetic:steel:electroslagremelting/S71> a stl:ElectroslagRemelting ; stl:performedOn work:S71 ;
+    stl:remeltNumber "S71" ; stl:remeltSequence "1"^^xsd:positiveInteger ; stl:inputPiece el:E71 ; stl:outputPiece ri:R71 .
+ri:R71 a stl:RemeltedIngot ; dcterms:identifier "R71" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom el:E71 ; stl:meltingRoute <code/melting-route/VIMESR> .
+el:E72 a stl:Electrode ; dcterms:identifier "E72" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom ri:R71 ; stl:meltingRoute <code/melting-route/VIMESR> .
+<urn:synthetic:steel:vacuumarcremelting/A72> a stl:VacuumArcRemelting ; stl:performedOn work:A72 ;
+    stl:remeltNumber "A72" ; stl:remeltSequence "2"^^xsd:positiveInteger ; stl:inputPiece el:E72 ; stl:outputPiece ri:R72 .
+ri:R72 a stl:RemeltedIngot ; dcterms:identifier "R72" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom el:E72 ; stl:meltingRoute <code/melting-route/VIMESRVAR> ;
+    stl:ingotPosition <code/ingot-position/HEAD>, <code/ingot-position/TAIL> .
+
+# Keep the allocation to each forging separate, even when both use the same ingot.
+forge:K71 a stl:Forging ; dcterms:identifier "K71" ; stl:inputPiece ri:R72 ;
+    stl:forgingMethod <code/forging-method/OPEN> ; stl:forgingRatio 4.0 ;
+    stl:initialCrossSectionArea 48000.0 ; stl:finalCrossSectionArea 12000.0 .
+fp:F71 a stl:ForgedProduct ; dcterms:identifier "F71" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom ri:R72 ; stl:producedBy forge:K71 ; stl:meltingRoute <code/melting-route/VIMESRVAR> .
+fp:F72 a stl:ForgedProduct ; dcterms:identifier "F72" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom ri:R72 ; stl:producedBy forge:K71 ; stl:meltingRoute <code/melting-route/VIMESRVAR> .
+interval:Z71 a stl:SourceInterval ; stl:intervalSource ri:R72 ; stl:intervalOutput fp:F71 ;
+    stl:intervalIngotPosition <code/ingot-position/HEAD> .
+interval:Z72 a stl:SourceInterval ; stl:intervalSource ri:R72 ; stl:intervalOutput fp:F72 ;
+    stl:intervalIngotPosition <code/ingot-position/TAIL> .
+bar:B71 a stl:Bar ; dcterms:identifier "B71" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom fp:F71 ; stl:meltingRoute <code/melting-route/VIMESRVAR> .
+bar:B72 a stl:Bar ; dcterms:identifier "B72" ; stl:steelGrade grade:G71 ;
+    stl:derivedFrom fp:F72 ; stl:meltingRoute <code/melting-route/VIMESRVAR> .
+
+# Direct cast-to-bar route and bundled delivery.
+<urn:synthetic:steel:electricarcfurnacesteelmaking/A73> a stl:ElectricArcFurnaceSteelmaking .
+heat:H73 a stl:Heat ; dcterms:identifier "H73" ; stl:steelGrade grade:G73 ;
+    prov:wasGeneratedBy <urn:synthetic:steel:electricarcfurnacesteelmaking/A73> .
+<urn:synthetic:steel:refining/L73> a stl:Refining ; stl:processedHeat heat:H73 ; stl:refiningMethod <code/refining-method/LF> ;
+    stl:actualEndAt "2026-06-04T08:00:00+08:00"^^xsd:dateTime .
+<urn:synthetic:steel:refining/V73> a stl:Refining ; stl:processedHeat heat:H73 ; stl:refiningMethod <code/refining-method/VD> ;
+    stl:actualStartAt "2026-06-04T08:05:00+08:00"^^xsd:dateTime .
+<urn:synthetic:steel:continuouscasting/C73> a stl:ContinuousCasting ; stl:processedHeat heat:H73 .
+<urn:synthetic:steel:continuouslycastpiece/C73> a stl:ContinuouslyCastPiece, stl:Billet ; dcterms:identifier "C73" ; stl:productForm <code/product-form/SQBILLET> ;
+    stl:steelGrade grade:G73 ; stl:sourceHeat heat:H73 ; stl:producedBy <urn:synthetic:steel:continuouscasting/C73> .
+bar:B73 a stl:Bar ; dcterms:identifier "B73" ; stl:steelGrade grade:G73 ;
+    stl:derivedFrom <urn:synthetic:steel:continuouslycastpiece/C73> ; stl:meltingRoute <code/melting-route/EAFLFVD> .
+bar:B74 a stl:Bar ; dcterms:identifier "B74" ; stl:steelGrade grade:G73 ;
+    stl:derivedFrom <urn:synthetic:steel:continuouslycastpiece/C73> ; stl:meltingRoute <code/melting-route/EAFLFVD> .
+<urn:synthetic:steel:package/P73> a stl:Package ; dcterms:identifier "P73" ;
+    dcterms:type <code/packing-form/BUNDLE> ; stl:hasPart bar:B73, bar:B74 .
+
+# Each decision cites the tested piece, specification and individual evidence.
+spec:S71 a stl:MaterialSpecification ; dcterms:identifier "S71" ; stl:requiresGrade <std/gbt-18254-2016/grade/GCr15> .
+sample:M71 a stl:Sample ; stl:sampleOf fp:F71 ; stl:sampleType <code/sample-type/METALLOG> .
+<urn:synthetic:steel:inclusionrating/T71> a stl:InclusionRating ; dcterms:identifier "T71" ;
+    stl:testedSample sample:M71 ; stl:methodStandard <std/gbt-10561-2023> .
+inc:B71 a stl:InclusionRatingResult ; stl:resultOfInspection <urn:synthetic:steel:inclusionrating/T71> ;
+    stl:inclusionType <code/inclusion-type/B> ; stl:inclusionSeries <code/inclusion-series/THIN> ; stl:ratingDesignation "1.0" .
+inc:DS71 a stl:InclusionRatingResult ; stl:resultOfInspection <urn:synthetic:steel:inclusionrating/T71> ;
+    stl:inclusionType <code/inclusion-type/DS> ; stl:ratingDesignation "1.0" .
+<urn:synthetic:steel:macroexamination/T72> a stl:MacroExamination ; dcterms:identifier "T72" ;
+    stl:testedSample sample:M71 ; stl:methodStandard <std/gbt-1979-2025> .
+<urn:synthetic:steel:macrodefectrating/M72> a stl:MacroDefectRating ; stl:ratedMacroDefect <code/macro-defect-type/CENTPOR> ;
+    stl:resultOfInspection <urn:synthetic:steel:macroexamination/T72> ; stl:ratingDesignation "0.5" .
+<urn:synthetic:steel:bandedstructurerating/T73> a stl:BandedStructureRating ; dcterms:identifier "T73" ;
+    stl:testedSample sample:M71 ; stl:methodStandard <std/gbt-18254-2016> .
+<urn:synthetic:steel:ratingresult/M73> a stl:RatingResult ; stl:resultOfInspection <urn:synthetic:steel:bandedstructurerating/T73> ;
+    stl:ratingDesignation "1.0" .
+<urn:synthetic:steel:lotformationrule/L70> a stl:LotFormationRule ; stl:formationDimension <code/lot-formation-dimension/HEAT> .
+<urn:synthetic:steel:inspectionlot/L70> a stl:InspectionLot ; dcterms:identifier "L70" ; stl:lotMember fp:F71, fp:F72 ;
+    stl:formationRule <urn:synthetic:steel:lotformationrule/L70> .
+dec:J71 a stl:QualityDecision ; stl:assessedObject <urn:synthetic:steel:inspectionlot/L70> ; stl:assessedSpecification spec:S71 ;
+    stl:inspectionEvidence inc:B71, inc:DS71, <urn:synthetic:steel:macrodefectrating/M72>, <urn:synthetic:steel:ratingresult/M73> ;
+    stl:judgementResult <code/judgement-result/CONFORM> ; stl:occurredAt "2026-06-04T12:00:00+08:00"^^xsd:dateTime .
+
+sample:G72 a stl:Sample ; stl:sampleOf ri:R72 .
+<urn:synthetic:steel:gascontentanalysis/G72> a stl:GasContentAnalysis ; stl:analysedRemelt <urn:synthetic:steel:vacuumarcremelting/A72> ;
+    stl:testedSample sample:G72 ; stl:methodStandard <std/gbt-11261-2006> .
+<urn:synthetic:steel:elementresult/O72> a stl:ElementResult ; stl:element <code/chemical-element/O> ; stl:massFraction 0.0008 ;
+    stl:resultOfInspection <urn:synthetic:steel:gascontentanalysis/G72> ; stl:partOf <urn:synthetic:steel:gascontentanalysis/G72> .
+<urn:synthetic:steel:cleanlinessassessment/C72> a stl:CleanlinessAssessment ;
+    stl:cleanlinessEvidence inc:B71, inc:DS71, <urn:synthetic:steel:elementresult/O72> .
+
+# Opposite judgements in one lot. The rejected piece traces only to its own source interval.
+<urn:synthetic:steel:inspectionlot/L71> a stl:InspectionLot ; dcterms:identifier "L71" ; stl:lotMember bar:B71, bar:B72 .
+ndt:U71 a stl:NondestructiveTest ; stl:inspectedPiece bar:B71 ; stl:methodStandard <std/gbt-4162-2022> ;
+    stl:ndtMethod <code/ndt-method/UT> ; stl:ndtAcceptanceClass <code/ndt-acceptance-class/A> .
+ndt:U72 a stl:NondestructiveTest ; stl:inspectedPiece bar:B72 ; stl:methodStandard <std/gbt-4162-2022> ;
+    stl:ndtMethod <code/ndt-method/UT> ; stl:ndtAcceptanceClass <code/ndt-acceptance-class/A> .
+dec:U71 a stl:QualityDecision ; stl:assessedObject bar:B71 ; stl:assessedSpecification spec:S71 ; stl:inspectionEvidence ndt:U71 ;
+    stl:judgementResult <code/judgement-result/NONCONFORM> ; stl:occurredAt "2026-06-05T09:00:00+08:00"^^xsd:dateTime .
+dec:U72 a stl:QualityDecision ; stl:assessedObject bar:B72 ; stl:assessedSpecification spec:S71 ; stl:inspectionEvidence ndt:U72 ;
+    stl:judgementResult <code/judgement-result/CONFORM> ; stl:occurredAt "2026-06-05T09:15:00+08:00"^^xsd:dateTime .
