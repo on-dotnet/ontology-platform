@@ -1,0 +1,184 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/plain/products-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/plain/products-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "普钢产品代码与牌号"@zh, "Commodity steel product codes and grades"@en ;
+    rdfs:comment "登记普钢订货产品族、钢筋表面、定尺捆计重方式，以及按产品标准版次区分的常用牌号。"@zh, "Registers commodity steel ordering families, bar surfaces, delivery mass bases and common grades distinguished by product standard edition."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/plain-product-family> a skos:ConceptScheme ;
+    rdfs:label "普钢产品族"@zh, "Commodity steel product family"@en ; skos:prefLabel "普钢产品族"@zh, "Commodity steel product family"@en ;
+    skos:definition "按普钢订货采用的材质系列、产品用途或成品交货标准归集适用牌号，产品族可以交叉。"@zh, "Groups applicable grades by material series, use or finished product specification in commodity steel orders. Families may overlap."@en ;
+    rdfs:comment "下沉理由：这些系列用于普钢大宗订单选材，其中结构钢牌号可跨型钢、焊管等交货品种。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+stl:PlainProductFamilyCode a rdfs:Datatype ;
+    rdfs:label "普钢产品族代码"@zh, "Commodity steel product family code"@en ; skos:prefLabel "普钢产品族代码"@zh, "Commodity steel product family code"@en ;
+    skos:definition "用于标记普钢产品族方案内主记号的字面量类型。"@zh, "Datatype for the primary notations in the commodity steel product family scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<code/plain-product-family/CARBONSTR> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "CARBONSTR"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "碳素结构钢"@zh, "Carbon structural steel"@en ; skos:prefLabel "碳素结构钢"@zh, "Carbon structural steel"@en ;
+    skos:definition "供一般结构件选材，按碳素结构钢牌号订货的产品系列。"@zh, "Products ordered by carbon structural steel grade for general structural use."@en ;
+    dcterms:source <std/gbt-700-2006> .
+<code/plain-product-family/HSLA> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "HSLA"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "低合金高强度结构钢"@zh, "High-strength low-alloy structural steel"@en ; skos:prefLabel "低合金高强度结构钢"@zh, "High-strength low-alloy structural steel"@en ;
+    skos:definition "按低合金高强度结构钢牌号和相应交货条件订货的产品系列。"@zh, "Structural products ordered by high-strength low-alloy grade and its delivery conditions."@en ;
+    dcterms:source <std/gbt-1591-2018> .
+<code/plain-product-family/REBAR> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "REBAR"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "钢筋"@zh, "Reinforcing bar"@en ; skos:prefLabel "钢筋"@zh, "Reinforcing bar"@en ;
+    skos:definition "按配筋用途、公称直径及钢筋牌号交货的产品系列。"@zh, "Bars ordered for concrete reinforcement by nominal diameter and reinforcing grade."@en ;
+    dcterms:source <std/gb-1499-1-2024>, <std/gb-1499-2-2024> .
+<code/plain-product-family/COLDLC> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "COLDLC"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "冷轧低碳钢板带"@zh, "Cold-rolled low-carbon sheet and strip"@en ; skos:prefLabel "冷轧低碳钢板带"@zh, "Cold-rolled low-carbon sheet and strip"@en ;
+    skos:definition "按冷轧低碳板带的成形用途选取牌号的产品系列。"@zh, "Cold-rolled low-carbon flat products ordered by grade for the intended forming operation."@en ;
+    dcterms:source <std/gbt-5213-2019> .
+<code/plain-product-family/HOTDIP> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "HOTDIP"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "热镀层板带"@zh, "Hot-dip coated sheet and strip"@en ; skos:prefLabel "热镀层板带"@zh, "Hot-dip coated sheet and strip"@en ;
+    skos:definition "以板带基材与热浸镀层的组合标明交货品种的产品系列。"@zh, "Flat products supplied with a designation identifying the substrate and hot-dip coating."@en ;
+    dcterms:source <std/gbt-2518-2019> .
+<code/plain-product-family/SECTION> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "SECTION"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "型钢"@zh, "Rolled structural sections"@en ; skos:prefLabel "型钢"@zh, "Rolled structural sections"@en ;
+    skos:definition "按型钢截面规格、材质和交货长度订货的普钢系列。"@zh, "Commodity steel ordered by structural section profile, grade and delivery length."@en ;
+    dcterms:source <std/gbt-706-2016>, <std/gbt-11263-2024> .
+<code/plain-product-family/WELDPIPE> a skos:Concept ; skos:inScheme <code/plain-product-family> ; skos:topConceptOf <code/plain-product-family> ;
+    skos:notation "WELDPIPE"^^stl:PlainProductFamilyCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "焊管"@zh, "Welded pipe"@en ; skos:prefLabel "焊管"@zh, "Welded pipe"@en ;
+    skos:definition "按焊接钢管的用途、管体尺寸和材料牌号订货的普钢系列。"@zh, "Commodity welded pipe ordered by service, pipe dimensions and steel grade."@en ;
+    dcterms:source <std/gbt-3091-2025> .
+
+<code/rebar-surface> a skos:ConceptScheme ;
+    rdfs:label "钢筋表面形状"@zh, "Rebar surface pattern"@en ; skos:prefLabel "钢筋表面形状"@zh, "Rebar surface pattern"@en ;
+    skos:definition "按混凝土配筋用钢筋的外周几何特征区分钢筋表面。"@zh, "Classifies the surface of concrete reinforcing bars by their external geometry."@en ;
+    rdfs:comment "下沉理由：光圆和带肋是钢筋产品交验时的分类，直接关联钢筋与混凝土的黏结特征。"@zh ;
+    dcterms:source <std/gb-1499-1-2024>, <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+stl:RebarSurfaceCode a rdfs:Datatype ;
+    rdfs:label "钢筋表面形状代码"@zh, "Rebar surface pattern code"@en ; skos:prefLabel "钢筋表面形状代码"@zh, "Rebar surface pattern code"@en ;
+    skos:definition "用于标记钢筋表面形状方案内主记号的字面量类型。"@zh, "Datatype for the primary notations in the rebar surface pattern scheme."@en ;
+    dcterms:source <std/gb-1499-1-2024>, <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<code/rebar-surface/PLAIN> a skos:Concept ; skos:inScheme <code/rebar-surface> ; skos:topConceptOf <code/rebar-surface> ;
+    skos:notation "PLAIN"^^stl:RebarSurfaceCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "光圆"@zh, "Plain round"@en ; skos:prefLabel "光圆"@zh, "Plain round"@en ;
+    skos:definition "以光滑圆周表面与混凝土接触的钢筋表面形状。"@zh, "A smooth round bar surface in contact with concrete."@en ;
+    dcterms:source <std/gb-1499-1-2024> .
+<code/rebar-surface/RIBBED> a skos:Concept ; skos:inScheme <code/rebar-surface> ; skos:topConceptOf <code/rebar-surface> ;
+    skos:notation "RIBBED"^^stl:RebarSurfaceCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "带肋"@zh, "Ribbed"@en ; skos:prefLabel "带肋"@zh, "Ribbed"@en ;
+    skos:definition "外周带有轧制凸肋以增强混凝土黏结的钢筋表面形状。"@zh, "A bar surface with rolled ribs for bonding to concrete."@en ;
+    dcterms:source <std/gb-1499-2-2024> .
+
+<code/bundle-mass-basis> a skos:ConceptScheme ;
+    rdfs:label "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ; skos:prefLabel "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ;
+    skos:definition "区分普钢定尺长材整捆交接时所采用的计重依据。"@zh, "Distinguishes how the delivered mass of a fixed-length bundle is determined."@en ;
+    rdfs:comment "下沉理由：成捆普钢长材交货可在按定尺支数理计和整捆实称之间选择，需在捆号上保留依据。"@zh ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+stl:BundleMassBasisCode a rdfs:Datatype ;
+    rdfs:label "交货捆计重方式代码"@zh, "Delivery bundle mass basis code"@en ; skos:prefLabel "交货捆计重方式代码"@zh, "Delivery bundle mass basis code"@en ;
+    skos:definition "用于标记交货捆计重方式方案内主记号的字面量类型。"@zh, "Datatype for the primary notations in the delivery bundle mass basis scheme."@en ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<code/bundle-mass-basis/THEORY> a skos:Concept ; skos:inScheme <code/bundle-mass-basis> ; skos:topConceptOf <code/bundle-mass-basis> ;
+    skos:notation "THEORY"^^stl:BundleMassBasisCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "理论计重"@zh, "Theoretical mass"@en ; skos:prefLabel "理论计重"@zh, "Theoretical mass"@en ;
+    skos:definition "按公称单位长度质量、单支定尺及实交支数计算整捆交货重量。"@zh, "Determines delivered mass from nominal mass per unit length, cut length and piece count."@en .
+<code/bundle-mass-basis/ACTUAL> a skos:Concept ; skos:inScheme <code/bundle-mass-basis> ; skos:topConceptOf <code/bundle-mass-basis> ;
+    skos:notation "ACTUAL"^^stl:BundleMassBasisCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
+    rdfs:label "实际计重"@zh, "Actual mass"@en ; skos:prefLabel "实际计重"@zh, "Actual mass"@en ;
+    skos:definition "按称量取得的整捆质量扣除包装皮重后结算。"@zh, "Settles on the weighed mass of the bundle after deducting packaging tare."@en .
+
+# Grade IRIs include the defining edition. Ordering families record applicable product lines.
+# Quality class under GB/T 13304.2 is not asserted here: the per-grade grouping could not be checked against the standard text.
+
+<std/gbt-700-2006/grade/Q195> a stl:StandardGrade ; skos:notation "Q195" ;
+    stl:definedIn <std/gbt-700-2006> ;
+    stl:plainProductFamily <code/plain-product-family/CARBONSTR>, <code/plain-product-family/WELDPIPE> ;
+    dcterms:source <std/gbt-700-2006> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-700-2006/grade/Q215A> a stl:StandardGrade ; skos:notation "Q215A" ;
+    stl:definedIn <std/gbt-700-2006> ;
+    stl:plainProductFamily <code/plain-product-family/CARBONSTR>, <code/plain-product-family/WELDPIPE> ;
+    dcterms:source <std/gbt-700-2006> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-700-2006/grade/Q235A> a stl:StandardGrade ; skos:notation "Q235A" ;
+    stl:definedIn <std/gbt-700-2006> ;
+    stl:plainProductFamily <code/plain-product-family/CARBONSTR>, <code/plain-product-family/SECTION>, <code/plain-product-family/WELDPIPE> ;
+    dcterms:source <std/gbt-700-2006> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-700-2006/grade/Q235B> a stl:StandardGrade ; skos:notation "Q235B" ;
+    stl:definedIn <std/gbt-700-2006> ;
+    stl:plainProductFamily <code/plain-product-family/CARBONSTR>, <code/plain-product-family/SECTION>, <code/plain-product-family/WELDPIPE> ;
+    dcterms:source <std/gbt-700-2006> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<std/gbt-1591-2018/grade/Q355B> a stl:StandardGrade ; skos:notation "Q355B" ;
+    stl:definedIn <std/gbt-1591-2018> ;
+    stl:plainProductFamily <code/plain-product-family/HSLA>, <code/plain-product-family/SECTION> ;
+    dcterms:source <std/gbt-1591-2018> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-1591-2018/grade/Q355C> a stl:StandardGrade ; skos:notation "Q355C" ;
+    stl:definedIn <std/gbt-1591-2018> ;
+    stl:plainProductFamily <code/plain-product-family/HSLA>, <code/plain-product-family/SECTION> ;
+    dcterms:source <std/gbt-1591-2018> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-1591-2018/grade/Q355D> a stl:StandardGrade ; skos:notation "Q355D" ;
+    stl:definedIn <std/gbt-1591-2018> ;
+    stl:plainProductFamily <code/plain-product-family/HSLA>, <code/plain-product-family/SECTION> ;
+    dcterms:source <std/gbt-1591-2018> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<std/gb-1499-1-2024/grade/HPB300> a stl:StandardGrade ; skos:notation "HPB300" ;
+    stl:definedIn <std/gb-1499-1-2024> ;
+    stl:plainProductFamily <code/plain-product-family/REBAR> ;
+    dcterms:source <std/gb-1499-1-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<std/gbt-1499-2-2018/grade/HRB400E> a stl:StandardGrade ; skos:notation "HRB400E" ;
+    stl:definedIn <std/gbt-1499-2-2018> ;
+    stl:plainProductFamily <code/plain-product-family/REBAR> ;
+    dcterms:source <std/gbt-1499-2-2018> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<std/gb-1499-2-2024/grade/HRB400> a stl:StandardGrade ; skos:notation "HRB400" ;
+    stl:definedIn <std/gb-1499-2-2024> ;
+    stl:plainProductFamily <code/plain-product-family/REBAR> ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gb-1499-2-2024/grade/HRB400E> a stl:StandardGrade ; skos:notation "HRB400E" ;
+    stl:definedIn <std/gb-1499-2-2024> ;
+    stl:plainProductFamily <code/plain-product-family/REBAR> ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gb-1499-2-2024/grade/HRB500> a stl:StandardGrade ; skos:notation "HRB500" ;
+    stl:definedIn <std/gb-1499-2-2024> ;
+    stl:plainProductFamily <code/plain-product-family/REBAR> ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gb-1499-2-2024/grade/HRB500E> a stl:StandardGrade ; skos:notation "HRB500E" ;
+    stl:definedIn <std/gb-1499-2-2024> ;
+    stl:plainProductFamily <code/plain-product-family/REBAR> ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<std/gbt-5213-2019/grade/DC01> a stl:StandardGrade ; skos:notation "DC01" ;
+    stl:definedIn <std/gbt-5213-2019> ;
+    stl:plainProductFamily <code/plain-product-family/COLDLC> ;
+    dcterms:source <std/gbt-5213-2019> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-5213-2019/grade/DC03> a stl:StandardGrade ; skos:notation "DC03" ;
+    stl:definedIn <std/gbt-5213-2019> ;
+    stl:plainProductFamily <code/plain-product-family/COLDLC> ;
+    dcterms:source <std/gbt-5213-2019> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-5213-2019/grade/DC04> a stl:StandardGrade ; skos:notation "DC04" ;
+    stl:definedIn <std/gbt-5213-2019> ;
+    stl:plainProductFamily <code/plain-product-family/COLDLC> ;
+    dcterms:source <std/gbt-5213-2019> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+
+<std/gbt-2518-2019/grade/DX51D-Z> a stl:StandardGrade ; skos:notation "DX51D+Z" ;
+    stl:definedIn <std/gbt-2518-2019> ;
+    stl:plainProductFamily <code/plain-product-family/HOTDIP> ;
+    dcterms:source <std/gbt-2518-2019> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-2518-2019/grade/DX52D-Z> a stl:StandardGrade ; skos:notation "DX52D+Z" ;
+    stl:definedIn <std/gbt-2518-2019> ;
+    stl:plainProductFamily <code/plain-product-family/HOTDIP> ;
+    dcterms:source <std/gbt-2518-2019> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
+<std/gbt-2518-2019/grade/DX53D-Z> a stl:StandardGrade ; skos:notation "DX53D+Z" ;
+    stl:definedIn <std/gbt-2518-2019> ;
+    stl:plainProductFamily <code/plain-product-family/HOTDIP> ;
+    dcterms:source <std/gbt-2518-2019> ; rdfs:isDefinedBy <ontology/plain/products-codes> .

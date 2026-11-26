@@ -1,13 +1,15 @@
 """Browse objects through the bindings of the active release."""
 
 import asyncio
-from collections.abc import Awaitable, Sequence
+from collections.abc import AsyncIterator, Awaitable, Sequence
+from contextlib import asynccontextmanager
 from uuid import UUID
 
 from fastapi import HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError, not_implemented
+from ontology_platform.modules.connectors import config
 from ontology_platform.modules.connectors import errors as connector_errors
 from ontology_platform.modules.connectors import service as connectors
 from ontology_platform.modules.connectors.schemas import CatalogColumn
@@ -16,6 +18,8 @@ from ontology_platform.modules.ontology import bindings
 from ontology_platform.modules.ontology import service as ontology
 from ontology_platform.modules.query import cursor as tokens
 from ontology_platform.modules.query import errors, planner, rows, schemas
+from ontology_platform.modules.query import scan as scanning
+from ontology_platform.modules.query import traverse as traversal
 
 
 async def until_disconnected[T](request: Request, work: Awaitable[T]) -> T:
@@ -210,16 +214,32 @@ async def related(
     return await _page(db, model, target, query, context, key_specs)
 
 
+@asynccontextmanager
+async def _execution(db: AsyncSession, ontology_id: UUID) -> AsyncIterator[scanning.Execution]:
+    async with scanning.query_budget() as budget:
+        model = await _model(db, ontology_id)
+        budget.pin(model)
+        execution = scanning.Execution(db, model, planner.Catalog(db), budget, _read)
+        yield execution
+        await execution.check_release()
+
+
 async def traverse(
     db: AsyncSession, ontology_id: UUID, body: schemas.PathQuery, *, limit: int = 50
 ) -> schemas.PathResult:
-    raise NotImplementedError
+    if not 1 <= limit <= schemas.PAGE_MAX:
+        raise AppError(422, "validation.failed", "The page size is out of range.")
+    async with _execution(db, ontology_id) as execution:
+        walk = await traversal.walk(execution, body)
+        return walk.result(_release(execution.model), limit)
 
 
 async def traverse_keys(
     db: AsyncSession, ontology_id: UUID, body: schemas.PathQuery
 ) -> schemas.KeySet:
-    raise NotImplementedError
+    async with _execution(db, ontology_id) as execution:
+        walk = await traversal.walk(execution, body)
+        return schemas.KeySet(walk.type_id, tuple(walk.paths))
 
 
 async def scan(
@@ -232,4 +252,16 @@ async def scan(
     within: schemas.KeySet | None = None,
     max_rows: int,
 ) -> schemas.ScanResult:
-    raise NotImplementedError
+    async with _execution(db, ontology_id) as execution:
+        table = await execution.catalog.table(planner.bound_type(execution.model, type_id))
+        table.require_available()
+        maximum = min(max_rows, config.current().metric_rows_max)
+        start = execution.budget.statements
+        objects: list[schemas.ObjectRow] = []
+        async for page in scanning.object_pages(
+            execution, table, filters, property_ids=property_ids, within=within
+        ):
+            scanning.check_size(len(objects) + len(page), maximum)
+            objects.extend(page)
+        step = scanning.step(table, filters, execution.budget.statements - start, len(objects))
+        return schemas.ScanResult(_release(execution.model), tuple(objects), (step,))

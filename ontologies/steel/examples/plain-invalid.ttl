@@ -1,0 +1,31 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# EXPECT <urn:synthetic:steel:rebar/R91> <https://w3id.org/ontology-platform/steel/RebarSurfaceShape> MinCountConstraintComponent
+<urn:synthetic:steel:rebar/R91> a stl:Rebar .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> <https://w3id.org/ontology-platform/steel/RebarSurfaceSchemeShape> HasValueConstraintComponent
+# EXPECT <urn:synthetic:steel:rebar/R92> <https://w3id.org/ontology-platform/steel/RebarDiameterShape> MinExclusiveConstraintComponent
+<urn:synthetic:steel:rebar/R92> a stl:Rebar ; stl:rebarSurface <code/plain-product-family/REBAR> ; stl:rebarNominalDiameter 0.0 .
+
+# EXPECT <urn:synthetic:steel:bundle/B91> <https://w3id.org/ontology-platform/steel/BundleLengthShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:bundle/B91> <https://w3id.org/ontology-platform/steel/BundleMassBasisShape> MinCountConstraintComponent
+<urn:synthetic:steel:bundle/B91> a stl:Bundle .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/rebar-surface/RIBBED> <https://w3id.org/ontology-platform/steel/BundleMassBasisSchemeShape> HasValueConstraintComponent
+# EXPECT <urn:synthetic:steel:bundle/B92> <https://w3id.org/ontology-platform/steel/BundlePieceCountShape> DatatypeConstraintComponent
+<urn:synthetic:steel:bundle/B92> a stl:Bundle ; stl:bundleCutLength 12.0 ;
+    stl:bundleMassBasis <code/rebar-surface/RIBBED> ; stl:bundlePieceCount "several" .
+
+# EXPECT <urn:synthetic:steel:standardgrade/G91> <https://w3id.org/ontology-platform/steel/PlainGradeEditionShape> MinCountConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/steel-class-quality/BASIC> <https://w3id.org/ontology-platform/steel/PlainProductFamilySchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:standardgrade/G91> a stl:StandardGrade ; stl:plainProductFamily <code/steel-class-quality/BASIC> .
+
+# EXPECT <urn:synthetic:steel:qualitydecision/Q91> <https://w3id.org/ontology-platform/steel/RebarLotDecisionTargetShape> ClassConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension/SPEC> <https://w3id.org/ontology-platform/steel/RebarLotBasisSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:qualitydecision/Q91> a stl:QualityDecision ; stl:assessedObject <urn:synthetic:steel:bundle/B92> ;
+    stl:assessedSpecification <urn:synthetic:steel:materialspecification/S91> ;
+    stl:judgementResult <code/judgement-result/PENDING> ; stl:occurredAt "2026-06-02T10:00:00+08:00"^^xsd:dateTime ;
+    stl:rebarLotAssessmentBasis <code/lot-formation-dimension/SPEC> .
+<urn:synthetic:steel:materialspecification/S91> a stl:MaterialSpecification .

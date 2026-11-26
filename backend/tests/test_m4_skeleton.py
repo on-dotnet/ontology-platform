@@ -229,7 +229,6 @@ async def test_metric_publish_requires_active_subject_type(
     assert [p["elementId"] for p in result.json()["problems"]] == [str(metric.id)]
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 2: a zero-hop path returns the start objects")
 async def test_batch_2_zero_hops(
     client: AsyncClient, db: AsyncSession, external_source: ExternalSource
 ) -> None:

@@ -1,0 +1,18 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/plain/quality> a owl:Ontology ;
+    owl:versionIRI <ontology/plain/quality/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "普钢按批交验"@zh, "Commodity steel lot acceptance"@en ;
+    rdfs:comment "补充钢筋交验批的组批维度，以及以钢筋产品检验结果作出整批判定的依据。"@zh, "Extends inspection lot dimensions and records the product-specific evidence used to assess a whole reinforcing bar lot."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:rebarLotAssessmentBasis a owl:ObjectProperty ; rdfs:domain stl:QualityDecision ; rdfs:range skos:Concept ; rdfs:seeAlso <code/rebar-lot-basis> ;
+    rdfs:label "钢筋按批判定基准"@zh, "Rebar lot assessment basis"@en ; skos:prefLabel "钢筋按批判定基准"@zh, "Rebar lot assessment basis"@en ;
+    skos:definition "标明整批钢筋判定所采用的产品检验项目口径，可结合多个基准作出一次判定。"@zh, "Identifies a product inspection basis used to assess a reinforcing bar lot. Several bases may support one decision."@en ;
+    rdfs:comment "下沉理由：钢筋批验收须区分按公称米重核对的重量偏差和抗震钢筋的性能检验，以说明整批判定所据项目。"@zh ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/quality> .
