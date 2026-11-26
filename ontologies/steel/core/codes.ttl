@@ -1,0 +1,1154 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<ontology/core/codes> a owl:Ontology ;
+    owl:versionIRI <ontology/core/codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁冶金共享代码表"@zh, "Shared steel industry code schemes"@en ;
+    rdfs:comment "供生产、质量和物流记录共同引用的类别与主记号，代码的来源可继承所属方案。"@zh, "Categories and primary notations shared across production, quality and logistics records. A code inherits its scheme’s source unless it cites its own."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/equipment-type> a skos:ConceptScheme ;
+    rdfs:label "设备类型"@zh, "Equipment type"@en ; skos:prefLabel "设备类型"@zh, "Equipment type"@en ;
+    skos:definition "按设备在作业中承担的功能对生产、检验和搬运设备分组，设备编号用于识别其中的具体一台。"@zh, "Classifies equipment by its role in production, inspection or handling independently of the identity of each asset."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:EquipmentTypeCode a rdfs:Datatype ;
+    rdfs:label "设备类型代码"@zh, "Equipment type code"@en ; skos:prefLabel "设备类型代码"@zh, "Equipment type code"@en ;
+    skos:definition "标识“设备类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the equipment type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/equipment-type/PCK> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "PCK"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "包装机组"@zh, "packing line"@en ; skos:prefLabel "包装机组"@zh, "packing line"@en ;
+    skos:definition "对成品执行捆扎、包覆或固定以形成发运包装的机组。"@zh, "A line that secures or wraps finished pieces into packages for shipment."@en ;
+    skos:altLabel "PCK"@zh, "PCK"@en ; dcterms:source <source/industry-practice> .
+<code/equipment-type/CRANE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "CRANE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "起重机"@zh, "Crane"@en ; skos:prefLabel "起重机"@zh, "Crane"@en ;
+    skos:definition "以吊具承载并移动实物的设备，按一次起吊识别所搬运的物料。"@zh, "Equipment that lifts and moves a load suspended from a lifting attachment."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/SCALE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "SCALE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "衡器"@zh, "Weighing instrument"@en ; skos:prefLabel "衡器"@zh, "Weighing instrument"@en ;
+    skos:definition "通过称量取得实物或物料批质量的设备。"@zh, "Equipment used to determine the mass of a piece or batch by weighing."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type> a skos:ConceptScheme ;
+    rdfs:label "工序类型"@zh, "Process type"@en ; skos:prefLabel "工序类型"@zh, "Process type"@en ;
+    skos:definition "按一次生产作业对投入所做的事区分路线中的工序段。"@zh, "Identifies the transformation or service that a route segment calls for."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:ProcessTypeCode a rdfs:Datatype ;
+    rdfs:label "工序类型代码"@zh, "Process type code"@en ; skos:prefLabel "工序类型代码"@zh, "Process type code"@en ;
+    skos:definition "标识“工序类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the process type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/process-type/PACK> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "PACK"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "包装"@zh, "Packing"@en ; skos:prefLabel "包装"@zh, "Packing"@en ;
+    skos:definition "把已识别的实物组成可独立搬运和交付的包装单元。"@zh, "Assembles identified pieces into a handling unit for shipment."@en .
+<code/process-type/TRANSFORM> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "TRANSFORM"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "物料转换"@zh, "Material transformation"@en ; skos:prefLabel "物料转换"@zh, "Material transformation"@en ;
+    skos:definition "以一项或多项物料为投入，产生可独立识别的新物料的作业类型。"@zh, "Work that consumes or alters input material to produce separately identifiable output material."@en .
+<code/process-type/INSPECT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "INSPECT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "检验"@zh, "Inspection"@en ; skos:prefLabel "检验"@zh, "Inspection"@en ;
+    skos:definition "通过检查或试验取得物料质量证据的工序类型。"@zh, "Work that obtains evidence of material quality through examination or testing."@en .
+<code/process-type/MOVE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "MOVE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "搬运"@zh, "Material handling"@en ; skos:prefLabel "搬运"@zh, "Material handling"@en ;
+    skos:definition "将已识别的物料从一处转移到另一处并保留其身份的作业类型。"@zh, "Work that relocates identified material while preserving its identity."@en .
+
+<code/product-form> a skos:ConceptScheme ;
+    rdfs:label "产品形态"@zh, "Product form"@en ; skos:prefLabel "产品形态"@zh, "Product form"@en ;
+    skos:definition "以可识别的几何外形或中间件形态描述规格和实物。"@zh, "Describes the physical form in which material is handled or specified at a given stage."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:ProductFormCode a rdfs:Datatype ;
+    rdfs:label "产品形态代码"@zh, "Product form code"@en ; skos:prefLabel "产品形态代码"@zh, "Product form code"@en ;
+    skos:definition "标识“产品形态”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the product form scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/product-form/INGOT> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "INGOT"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢锭"@zh, "Steel ingot"@en ; skos:prefLabel "钢锭"@zh, "Steel ingot"@en ;
+    skos:definition "在单个锭模或重熔结晶器内凝固成形、供后续加工的整块金属。"@zh, "A discrete solid mass cast in an ingot mould or remelting mould for subsequent working."@en .
+<code/product-form/SLAB> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "SLAB"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "板坯"@zh, "Slab"@en ; skos:prefLabel "板坯"@zh, "Slab"@en ;
+    skos:definition "断面宽而扁、通常供轧板或轧带的半成品坯。"@zh, "A wide flat semi-finished section suitable for rolling into plate or strip."@en ;
+    dcterms:source <std/ybt-2012-2014> .
+<code/product-form/SQBILLET> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "SQBILLET"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "方坯"@zh, "Square billet"@en ; skos:prefLabel "方坯"@zh, "Square billet"@en ;
+    skos:definition "供后续成形的实心半成品，横截面的两边名义上相等且成直角。"@zh, "Solid semi-finished stock with nominally equal perpendicular sides."@en ;
+    dcterms:source <std/ybt-2011-2014> .
+<code/product-form/RECTBILLET> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "RECTBILLET"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "矩形坯"@zh, "Rectangular billet"@en ; skos:prefLabel "矩形坯"@zh, "Rectangular billet"@en ;
+    skos:definition "以长边和短边分别定尺且在产品规格中归作矩形坯的半成品。"@zh, "Semi-finished stock ordered as a rectangular billet with distinct broad and narrow faces."@en ;
+    dcterms:source <std/ybt-2011-2014> .
+<code/product-form/ROUNDBIL> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "ROUNDBIL"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "圆坯"@zh, "Round billet"@en ; skos:prefLabel "圆坯"@zh, "Round billet"@en ;
+    skos:definition "以公称直径描述断面的实心圆形半成品，可供轧管或锻造。"@zh, "Solid round feedstock specified by diameter for processing such as piercing or forging."@en .
+<code/product-form/BEAMBLANK> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "BEAMBLANK"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "异型坯"@zh, "Beam blank"@en ; skos:prefLabel "异型坯"@zh, "Beam blank"@en ;
+    skos:definition "断面预先形成翼缘区和腹板区以供型钢轧制的坯料。"@zh, "A near-net structural blank with flange and web regions for subsequent section rolling."@en .
+<code/product-form/COIL> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "COIL"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢卷"@zh, "Steel coil"@en ; skos:prefLabel "钢卷"@zh, "Steel coil"@en ;
+    skos:definition "将连续扁平钢材沿长度方向缠绕成可整体吊运的一卷。"@zh, "Flat steel wound along its length into a single handling piece."@en .
+<code/product-form/PLATE> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "PLATE"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "中厚钢板"@zh, "Steel plate"@en ; skos:prefLabel "中厚钢板"@zh, "Steel plate"@en ;
+    skos:definition "按板式产品规格订货、以单张平直板材流转的钢材，板与薄板的划分按所引产品标准。"@zh, "Flat steel ordered and handled as individual plates under the applicable product specification."@en .
+<code/product-form/STRIP> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "STRIP"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢带"@zh, "Steel strip"@en ; skos:prefLabel "钢带"@zh, "Steel strip"@en ;
+    skos:definition "长度显著大于宽度、可连续通过机组的扁平钢材。"@zh, "An elongated flat steel product suited to continuous passage through a line."@en .
+<code/product-form/BAR> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "BAR"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "棒材"@zh, "Bar"@en ; skos:prefLabel "棒材"@zh, "Bar"@en ;
+    skos:definition "横截面沿长度基本恒定的实心条状钢材。"@zh, "A solid elongated product with a substantially uniform section along its length."@en ;
+    dcterms:source <std/gbt-702-2026> .
+<code/product-form/WIREROD> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "WIREROD"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "线材"@zh, "Wire rod"@en ; skos:prefLabel "线材"@zh, "Wire rod"@en ;
+    skos:definition "以较小断面热轧并成圈收集的实心长材，常供再拉拔。"@zh, "A relatively small hot-rolled long product laid in coils, often for subsequent drawing."@en ;
+    skos:altLabel "盘条"@zh ; dcterms:source <std/gbt-701-2008> .
+<code/product-form/SECTION> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "SECTION"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "型材"@zh, "Section"@en ; skos:prefLabel "型材"@zh, "Section"@en ;
+    skos:definition "沿长度保持规定轮廓并按该轮廓定规格的长材。"@zh, "A long product specified by a shaped cross-sectional profile."@en ;
+    dcterms:source <std/gbt-706-2026> .
+<code/product-form/TUBE> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "TUBE"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "管材"@zh, "Tube or pipe"@en ; skos:prefLabel "管材"@zh, "Tube or pipe"@en ;
+    skos:definition "沿长度具有封闭空腔并以外形和壁厚表征的钢材。"@zh, "Steel stock with a closed hollow section specified by outside dimensions and wall thickness."@en ;
+    dcterms:source <std/gbt-17395-2024> .
+<code/product-form/SHELL> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "SHELL"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "毛管"@zh, "Pierced shell"@en ; skos:prefLabel "毛管"@zh, "Pierced shell"@en ;
+    skos:definition "实心坯穿孔后、尚待延伸或定径的空心中间件。"@zh, "A hollow intermediate after piercing and before elongation or sizing."@en .
+<code/product-form/SHEET> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "SHEET"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢薄板"@zh, "Steel sheet"@en ; skos:prefLabel "钢薄板"@zh, "Steel sheet"@en ;
+    skos:definition "以单张平直薄板交付的钢材，薄板与钢带分别按平片和连续带材标识。"@zh, "Flat steel supplied in individual sheets under the applicable product specification."@en .
+
+<code/material-category> a skos:ConceptScheme ;
+    rdfs:label "物料类别"@zh, "Material category"@en ; skos:prefLabel "物料类别"@zh, "Material category"@en ;
+    skos:definition "按材质或冶金用途划分物料，批号和件号用于标识该类中的具体物料。"@zh, "Groups materials by substance or metallurgical use independently of the identifiers assigned to lots and pieces."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:MaterialCategoryCode a rdfs:Datatype ;
+    rdfs:label "物料类别代码"@zh, "Material category code"@en ; skos:prefLabel "物料类别代码"@zh, "Material category code"@en ;
+    skos:definition "标识“物料类别”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the material category scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/material-category/ORE> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "ORE"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铁矿石"@zh, "Iron ore"@en ; skos:prefLabel "铁矿石"@zh, "Iron ore"@en ;
+    skos:definition "以可还原铁氧化物供铁、可直接选作块矿或先选矿造块的矿料。"@zh, "Iron-bearing mineral feed that supplies reducible oxide, as lump ore or after beneficiation and agglomeration."@en ;
+    dcterms:source <std/gbt-10322-1-2023> .
+<code/material-category/SINTER> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "SINTER"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "烧结矿"@zh, "Iron ore sinter"@en ; skos:prefLabel "烧结矿"@zh, "Iron ore sinter"@en ;
+    skos:definition "经料层烧结破碎筛分后供高炉使用的不规则多孔块料。"@zh, "Porous irregular burden pieces screened from an iron ore sinter cake."@en ;
+    dcterms:source <std/ybt-421-2014> .
+<code/material-category/PELLET> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "PELLET"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "球团矿"@zh, "Iron ore pellets"@en ; skos:prefLabel "球团矿"@zh, "Iron ore pellets"@en ;
+    skos:definition "由含铁细粉造球并固结形成、以球状颗粒入炉的矿料。"@zh, "Hardened balls of iron-bearing fines charged as a sized furnace feed."@en ;
+    dcterms:source <std/gbt-27692-2024> .
+<code/material-category/COKE> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "COKE"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "冶金焦炭"@zh, "Metallurgical coke"@en ; skos:prefLabel "冶金焦炭"@zh, "Metallurgical coke"@en ;
+    skos:definition "煤经干馏所得的多孔碳质块料，可在高炉内供热、还原和支撑料柱。"@zh, "Porous carbonaceous lumps from coal carbonization serving as fuel, reductant and burden support."@en ;
+    dcterms:source <std/gbt-1996-2017> .
+<code/material-category/FLUX> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "FLUX"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "熔剂"@zh, "Flux"@en ; skos:prefLabel "熔剂"@zh, "Flux"@en ;
+    skos:definition "加入炉内与脉石或氧化产物成渣并调节渣性的材料。"@zh, "An addition that combines with gangue or oxidation products to adjust slag chemistry and behavior."@en ;
+    dcterms:source <source/industry-practice> .
+<code/material-category/HOTMETAL> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "HOTMETAL"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铁水"@zh, "Hot metal"@en ; skos:prefLabel "铁水"@zh, "Hot metal"@en ;
+    skos:definition "以液态送往预处理或炼钢工位的含碳铁料。"@zh, "Carbon-bearing iron transferred in liquid form to pretreatment or steelmaking."@en ;
+    dcterms:source <source/industry-practice> .
+<code/material-category/PIGIRON> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "PIGIRON"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "固态生铁"@zh, "Solid pig iron"@en ; skos:prefLabel "固态生铁"@zh, "Solid pig iron"@en ;
+    skos:definition "铁水经铸块凝固形成、需再熔化使用的含碳铁料。"@zh, "Carbon-bearing iron cast into solid pieces for subsequent remelting."@en ;
+    skos:altLabel "生铁块"@zh, "pig iron"@en ; dcterms:source <std/ybt-5296-2011> .
+<code/material-category/SCRAP> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "SCRAP"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "废钢"@zh, "Steel scrap"@en ; skos:prefLabel "废钢"@zh, "Steel scrap"@en ;
+    skos:definition "回收并作为金属炉料重新熔炼的钢件、切边或返回料。"@zh, "Recovered steel pieces, offcuts or returns charged for their metallic content."@en ;
+    dcterms:source <std/gbt-4223-2017> .
+<code/material-category/FERROALLOY> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "FERROALLOY"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铁合金"@zh, "Ferroalloy"@en ; skos:prefLabel "铁合金"@zh, "Ferroalloy"@en ;
+    skos:definition "以铁为载体向熔池加入合金元素或脱氧元素的合金料。"@zh, "An iron-based addition carrying an alloying or deoxidizing element into the bath."@en ;
+    dcterms:source <source/industry-practice> .
+<code/material-category/DRI> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "DRI"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "直接还原铁"@zh, "Direct reduced iron"@en ; skos:prefLabel "直接还原铁"@zh, "Direct reduced iron"@en ;
+    skos:definition "矿石在固态被还原后得到、保有原料孔隙特征的金属化铁料。"@zh, "Metallized iron made by reducing iron oxides without melting the ore."@en ;
+    dcterms:source <source/industry-practice> .
+<code/material-category/STEEL> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "STEEL"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢"@zh, "Steel"@en ; skos:prefLabel "钢"@zh, "Steel"@en ;
+    skos:definition "以钢作为材质登记的物料，可再按钢种和产品形态细分。"@zh, "Material identified as steel before a grade or product form is specified."@en ;
+    dcterms:source <std/gbt-20566-2006> .
+<code/material-category/SLAG> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "SLAG"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "冶金渣"@zh, "Metallurgical slag"@en ; skos:prefLabel "冶金渣"@zh, "Metallurgical slag"@en ;
+    skos:definition "冶金过程中形成、与金属分相并可另行收集的非金属物料。"@zh, "Nonmetallic material formed in a metallurgical operation and separated from the metal phase."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/chemical-element> a skos:ConceptScheme ;
+    rdfs:label "化学元素分析项"@zh, "chemical element analyte"@en ; skos:prefLabel "化学元素分析项"@zh, "chemical element analyte"@en ;
+    skos:definition "确定成分质量分数对应的元素，必要时区分同一元素的测定形态。"@zh, "Identifies the element and, where required, the analytical fraction used for a composition mass fraction."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:ChemicalElementCode a rdfs:Datatype ;
+    rdfs:label "化学元素分析项代码"@zh, "chemical element analyte code"@en ; skos:prefLabel "化学元素分析项代码"@zh, "chemical element analyte code"@en ;
+    skos:definition "标识“化学元素分析项”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the chemical element analyte scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/chemical-element/C> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "C"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "碳"@zh, "carbon"@en ; skos:prefLabel "碳"@zh, "carbon"@en ;
+    skos:definition "按碳元素计量钢样中的碳，以便核对牌号成分和脱碳控制。"@zh, "Quantifies carbon for grade chemistry and decarburization control."@en ;
+    skos:altLabel "C"@zh, "C"@en ; dcterms:source <std/gbt-223-86-2009> .
+<code/chemical-element/SI> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "SI"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "硅"@zh, "silicon"@en ; skos:prefLabel "硅"@zh, "silicon"@en ;
+    skos:definition "按元素计量硅，可用于核对脱氧后残留量或合金化要求。"@zh, "Measures silicon retained after deoxidation or specified as an alloy addition."@en ;
+    skos:altLabel "Si"@zh, "Si"@en .
+<code/chemical-element/MN> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "MN"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "锰"@zh, "manganese"@en ; skos:prefLabel "锰"@zh, "manganese"@en ;
+    skos:definition "定量钢中的锰，用于检查炉次调整或牌号规定的锰含量。"@zh, "Quantifies manganese for heat adjustment and grade chemistry checks."@en ;
+    skos:altLabel "Mn"@zh, "Mn"@en .
+<code/chemical-element/P> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "P"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "磷"@zh, "phosphorus"@en ; skos:prefLabel "磷"@zh, "phosphorus"@en ;
+    skos:definition "以元素质量报告磷，以便比较成品或熔炼成分的限值。"@zh, "Reports phosphorus for comparison against heat or product chemistry limits."@en ;
+    skos:altLabel "P"@zh, "P"@en .
+<code/chemical-element/S> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "S"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "硫"@zh, "sulfur"@en ; skos:prefLabel "硫"@zh, "sulfur"@en ;
+    skos:definition "以硫元素计量成分，可用于核查脱硫结果或易切削钢目标。"@zh, "Measures sulfur for purposes such as desulfurization checks or free-machining grade control."@en ;
+    skos:altLabel "S"@zh, "S"@en ; dcterms:source <std/gbt-223-85-2009> .
+<code/chemical-element/ALS> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "ALS"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "酸溶铝"@zh, "acid-soluble aluminium"@en ; skos:prefLabel "酸溶铝"@zh, "acid-soluble aluminium"@en ;
+    skos:definition "在规定酸处理条件下，以溶入溶液的那部分铝作为报告对象。"@zh, "Reports only the aluminium recovered in solution under the stated acid treatment."@en ;
+    skos:altLabel "Als"@zh, "Als"@en, "酸溶性铝"@zh, "acid-soluble aluminum"@en ; skos:scopeNote "酸溶铝和全铝分别记为 ALS 和 AL。"@zh .
+<code/chemical-element/N> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "N"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "氮"@zh, "nitrogen"@en ; skos:prefLabel "氮"@zh, "nitrogen"@en ;
+    skos:definition "以元素质量报告氮，可用于核对限制残余氮或有意氮合金化的要求。"@zh, "Quantifies nitrogen whether controlled as a residual or specified as an alloying addition."@en ;
+    skos:altLabel "N"@zh, "N"@en ; dcterms:source <std/gbt-20124-2006> .
+<code/chemical-element/H> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "H"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "氢"@zh, "hydrogen"@en ; skos:prefLabel "氢"@zh, "hydrogen"@en ;
+    skos:definition "按成分样品及规定测定口径报告氢元素的质量分数。"@zh, "Quantifies hydrogen in the composition sample on the analytical basis specified for that result."@en ;
+    skos:altLabel "H"@zh, "H"@en ; dcterms:source <std/gbt-223-82-2018> .
+<code/chemical-element/O> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "O"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "氧"@zh, "oxygen"@en ; skos:prefLabel "氧"@zh, "oxygen"@en ;
+    skos:definition "按化学成分检验的口径报告氧的质量分数，保留所用方法。"@zh, "Reports oxygen as a composition mass fraction with its analytical method identified."@en ;
+    skos:altLabel "O"@zh, "O"@en ; dcterms:source <std/gbt-11261-2006> .
+<code/chemical-element/FE> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "FE"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铁"@zh, "Iron"@en ; skos:prefLabel "铁"@zh, "Iron"@en ;
+    skos:definition "按分析所报铁元素的质量分数表征基体或合金中的铁量。"@zh, "Quantifies iron in the matrix or alloy on an elemental mass basis."@en ;
+    skos:altLabel "Fe"@zh, "Fe"@en .
+<code/chemical-element/AL> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "AL"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "全铝"@zh, "Total aluminium"@en ; skos:prefLabel "全铝"@zh, "Total aluminium"@en ;
+    skos:definition "以整份试样中的铝计量，包含酸溶与不溶部分。"@zh, "Reports aluminium across both soluble and insoluble fractions of the sample."@en ;
+    skos:altLabel "Al"@zh, "Al"@en, "Alt"@en, "total aluminum"@en .
+<code/chemical-element/CR> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "CR"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铬"@zh, "Chromium"@en ; skos:prefLabel "铬"@zh, "Chromium"@en ;
+    skos:definition "定量钢中铬元素，用于核对含铬结构钢、不锈钢等材料的配比。"@zh, "Quantifies chromium for chemistry checks on grades such as alloy structural and stainless steels."@en ;
+    skos:altLabel "Cr"@zh, "Cr"@en .
+<code/chemical-element/NI> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "NI"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "镍"@zh, "Nickel"@en ; skos:prefLabel "镍"@zh, "Nickel"@en ;
+    skos:definition "以镍元素计量合金化镍或作为残余元素的镍。"@zh, "Measures nickel whether deliberately alloyed or controlled as a residual element."@en ;
+    skos:altLabel "Ni"@zh, "Ni"@en .
+<code/chemical-element/MO> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "MO"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钼"@zh, "Molybdenum"@en ; skos:prefLabel "钼"@zh, "Molybdenum"@en ;
+    skos:definition "表征试样中钼的质量分数，用于核对淬透性或高温性能相关的成分要求。"@zh, "Quantifies molybdenum for composition requirements linked to hardenability or hot strength."@en ;
+    skos:altLabel "Mo"@zh, "Mo"@en .
+<code/chemical-element/V> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "V"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钒"@zh, "Vanadium"@en ; skos:prefLabel "钒"@zh, "Vanadium"@en ;
+    skos:definition "按钒元素报告微合金化或工具钢合金化带入的钒量。"@zh, "Measures vanadium contributed by microalloying or by larger tool-steel additions."@en ;
+    skos:altLabel "V"@zh, "V"@en .
+<code/chemical-element/TI> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "TI"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钛"@zh, "Titanium"@en ; skos:prefLabel "钛"@zh, "Titanium"@en ;
+    skos:definition "定量钢中钛元素，供核对微合金化或稳定化要求。"@zh, "Quantifies titanium against microalloying or stabilization requirements."@en ;
+    skos:altLabel "Ti"@zh, "Ti"@en .
+<code/chemical-element/NB> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "NB"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铌"@zh, "Niobium"@en ; skos:prefLabel "铌"@zh, "Niobium"@en ;
+    skos:definition "测定试样中用于微合金化或高温合金设计的铌含量。"@zh, "Measures niobium for microalloyed grades or superalloy chemistry control."@en ;
+    skos:altLabel "Nb"@zh, "Nb"@en .
+<code/chemical-element/B> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "B"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "硼"@zh, "Boron"@en ; skos:prefLabel "硼"@zh, "Boron"@en ;
+    skos:definition "按元素质量报告钢中微量硼，必要时另记分析形态。"@zh, "Reports trace boron on an elemental basis with the analytical fraction identified where relevant."@en ;
+    skos:altLabel "B"@zh, "B"@en .
+<code/chemical-element/CU> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "CU"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铜"@zh, "Copper"@en ; skos:prefLabel "铜"@zh, "Copper"@en ;
+    skos:definition "定量有意添加的铜或由废钢等炉料带入的残余铜。"@zh, "Measures copper whether specified as an addition or monitored as a charge residual."@en ;
+    skos:altLabel "Cu"@zh, "Cu"@en .
+<code/chemical-element/W> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "W"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钨"@zh, "Tungsten"@en ; skos:prefLabel "钨"@zh, "Tungsten"@en ;
+    skos:definition "按元素计量材料中的钨，常用于核对工具钢与耐热合金配比。"@zh, "Quantifies tungsten for composition checks on materials such as tool steels and heat-resistant alloys."@en ;
+    skos:altLabel "W"@zh, "W"@en .
+<code/chemical-element/CO> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "CO"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钴"@zh, "Cobalt"@en ; skos:prefLabel "钴"@zh, "Cobalt"@en ;
+    skos:definition "按元素计量合金中钴的份额，适用于钴合金化或钴基材料。"@zh, "Measures cobalt in cobalt-alloyed steels or in cobalt-base products."@en ;
+    skos:altLabel "Co"@zh, "Co"@en .
+<code/chemical-element/CA> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "CA"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钙"@zh, "Calcium"@en ; skos:prefLabel "钙"@zh, "Calcium"@en ;
+    skos:definition "定量处理后试样中钙元素，用于关联钙处理与成分记录。"@zh, "Quantifies calcium in a sample when relating treatment history to measured chemistry."@en ;
+    skos:altLabel "Ca"@zh, "Ca"@en .
+<code/chemical-element/MG> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "MG"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "镁"@zh, "Magnesium"@en ; skos:prefLabel "镁"@zh, "Magnesium"@en ;
+    skos:definition "按元素报告钢样中残留的镁，供精炼或夹杂物控制记录使用。"@zh, "Measures retained magnesium for refining and inclusion-control records."@en ;
+    skos:altLabel "Mg"@zh, "Mg"@en .
+<code/chemical-element/SN> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "SN"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "锡"@zh, "Tin"@en ; skos:prefLabel "锡"@zh, "Tin"@en ;
+    skos:definition "以元素质量计量随金属炉料进入钢中的残余锡。"@zh, "Measures residual tin introduced with metallic charge materials."@en ;
+    skos:altLabel "Sn"@zh, "Sn"@en .
+<code/chemical-element/AS> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "AS"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "砷"@zh, "Arsenic"@en ; skos:prefLabel "砷"@zh, "Arsenic"@en ;
+    skos:definition "按元素计量炉料或钢样中需单独监控的残余砷。"@zh, "Quantifies arsenic where the residual content of a charge or steel sample is controlled."@en ;
+    skos:altLabel "As"@zh, "As"@en .
+<code/chemical-element/SB> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "SB"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "锑"@zh, "Antimony"@en ; skos:prefLabel "锑"@zh, "Antimony"@en ;
+    skos:definition "以质量分数记录钢样中的残余锑以核对痕量元素控制要求。"@zh, "Reports residual antimony against trace-element requirements on the sample."@en ;
+    skos:altLabel "Sb"@zh, "Sb"@en .
+<code/chemical-element/PB> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "PB"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铅"@zh, "Lead"@en ; skos:prefLabel "铅"@zh, "Lead"@en ;
+    skos:definition "定量钢中的铅，可用于易切削钢添加量或其他钢的残余限值。"@zh, "Quantifies lead as an intentional free-machining addition or a limited residual."@en ;
+    skos:altLabel "Pb"@zh, "Pb"@en .
+<code/chemical-element/ZR> a skos:Concept ; skos:inScheme <code/chemical-element> ; skos:topConceptOf <code/chemical-element> ;
+    skos:notation "ZR"^^stl:ChemicalElementCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "锆"@zh, "Zirconium"@en ; skos:prefLabel "锆"@zh, "Zirconium"@en ;
+    skos:definition "测定合金化或夹杂物调控所涉及的锆元素含量。"@zh, "Quantifies zirconium associated with alloy additions or inclusion control."@en ;
+    skos:altLabel "Zr"@zh, "Zr"@en .
+
+<code/sample-type> a skos:ConceptScheme ;
+    rdfs:label "样品类型"@zh, "sample type"@en ; skos:prefLabel "样品类型"@zh, "sample type"@en ;
+    skos:definition "从取样部位、物料状态或试料用途标识已取得的样品。"@zh, "Identifies a physical sample by its collection stage, material or intended specimen use."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:SampleTypeCode a rdfs:Datatype ;
+    rdfs:label "样品类型代码"@zh, "sample type code"@en ; skos:prefLabel "样品类型代码"@zh, "sample type code"@en ;
+    skos:definition "标识“样品类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the sample type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/sample-type/ENDPOINT> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "ENDPOINT"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "转炉终点样"@zh, "converter endpoint sample"@en ; skos:prefLabel "转炉终点样"@zh, "converter endpoint sample"@en ;
+    skos:definition "在转炉吹炼终点取得、用于描述终点钢水的样品。"@zh, "Liquid steel sampled at the end of converter blowing to characterize that endpoint."@en ;
+    dcterms:source <std/gbt-20066-2006> .
+<code/sample-type/REFINING> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "REFINING"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "精炼工位样"@zh, "refining sample"@en ; skos:prefLabel "精炼工位样"@zh, "refining sample"@en ;
+    skos:definition "在精炼工位的处理过程中或处理结束时取得的钢水样。"@zh, "Liquid steel sampled at the refining station during treatment or on its completion."@en ;
+    dcterms:source <std/gbt-20066-2006> .
+<code/sample-type/TUNDISH> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "TUNDISH"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "中间包样"@zh, "tundish sample"@en ; skos:prefLabel "中间包样"@zh, "tundish sample"@en ;
+    skos:definition "由中间包内的钢液取得、可对应至浇注时间段的样品。"@zh, "A sample drawn from steel in the tundish and associated with its casting interval."@en ;
+    dcterms:source <std/gbt-20066-2006> .
+<code/sample-type/PRODUCT> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "PRODUCT"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "成品样"@zh, "product sample"@en ; skos:prefLabel "成品样"@zh, "product sample"@en ;
+    skos:definition "从可识别成品件上取得、代表所取部位材料的样品。"@zh, "Material taken at a known position on an identified finished piece."@en .
+<code/sample-type/MECHANICAL> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "MECHANICAL"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "力学性能样"@zh, "mechanical test sample"@en ; skos:prefLabel "力学性能样"@zh, "mechanical test sample"@en ;
+    skos:definition "从产品上取得、供制备力学性能试样的样料。"@zh, "A portion taken from the product for preparation of mechanical test specimens."@en ;
+    dcterms:source <std/gbt-2975-2018> .
+<code/sample-type/COATING> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "COATING"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "镀层试样"@zh, "coating specimen"@en ; skos:prefLabel "镀层试样"@zh, "coating specimen"@en ;
+    skos:definition "保留基板和相应表面覆盖层、供检验镀层的试片。"@zh, "A coupon retaining the substrate and covering on the faces selected for coating tests."@en ;
+    dcterms:source <std/gbt-1839-2025> .
+<code/sample-type/METALLOG> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "METALLOG"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "金相样"@zh, "Metallographic specimen"@en ; skos:prefLabel "金相样"@zh, "Metallographic specimen"@en ;
+    skos:definition "从已知位置取材并制备观察面，用以显示组织或夹杂物的试样。"@zh, "A specimen from an identified location prepared with an observation surface for structures or inclusions."@en ;
+    dcterms:source <std/gbt-13298-2015> .
+
+<code/analysis-type> a skos:ConceptScheme ;
+    rdfs:label "化学分析类型"@zh, "chemical analysis type"@en ; skos:prefLabel "化学分析类型"@zh, "chemical analysis type"@en ;
+    skos:definition "区分化学分析代表的材料范围以及该结果在工艺或验收中的用途。"@zh, "Distinguishes the material represented and the control or acceptance purpose of a chemistry result."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:AnalysisTypeCode a rdfs:Datatype ;
+    rdfs:label "化学分析类型代码"@zh, "chemical analysis type code"@en ; skos:prefLabel "化学分析类型代码"@zh, "chemical analysis type code"@en ;
+    skos:definition "标识“化学分析类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the chemical analysis type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/analysis-type/HEAT> a skos:Concept ; skos:inScheme <code/analysis-type> ; skos:topConceptOf <code/analysis-type> ;
+    skos:notation "HEAT"^^stl:AnalysisTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "熔炼分析"@zh, "heat analysis"@en ; skos:prefLabel "熔炼分析"@zh, "heat analysis"@en ;
+    skos:definition "在一个炉次上指定一次代表整炉的成分分析，用于按熔炼成分规定判定。"@zh, "The single analysis designated to represent the heat against the specified heat-analysis chemistry."@en .
+<code/analysis-type/PROCESS> a skos:Concept ; skos:inScheme <code/analysis-type> ; skos:topConceptOf <code/analysis-type> ;
+    skos:notation "PROCESS"^^stl:AnalysisTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "过程分析"@zh, "process analysis"@en ; skos:prefLabel "过程分析"@zh, "process analysis"@en ;
+    skos:definition "为判断当前冶炼进度和调整作业而进行的成分分析。"@zh, "An analysis used to guide operating adjustments at the sampled stage."@en .
+<code/analysis-type/PRODUCT> a skos:Concept ; skos:inScheme <code/analysis-type> ; skos:topConceptOf <code/analysis-type> ;
+    skos:notation "PRODUCT"^^stl:AnalysisTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "成品分析"@zh, "product analysis"@en ; skos:prefLabel "成品分析"@zh, "product analysis"@en ;
+    skos:definition "从成品取样并按成品分析口径核对交付材料成分的分析。"@zh, "An analysis performed on finished product against the applicable product-analysis allowances."@en ;
+    dcterms:source <std/gbt-222-2025> .
+
+<code/test-type> a skos:ConceptScheme ;
+    rdfs:label "试验类型"@zh, "Test type"@en ; skos:prefLabel "试验类型"@zh, "Test type"@en ;
+    skos:definition "按试样受到的载荷或检验目的区分取得性能证据的试验。"@zh, "Identifies the test used to establish a performance characteristic of a specimen or product."@en ;
+    dcterms:source <std/gbt-10623-2008> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:TestTypeCode a rdfs:Datatype ;
+    rdfs:label "试验类型代码"@zh, "Test type code"@en ; skos:prefLabel "试验类型代码"@zh, "Test type code"@en ;
+    skos:definition "标识“试验类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the test type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/test-type/TENSILE> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "TENSILE"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "拉伸试验"@zh, "Tensile test"@en ; skos:prefLabel "拉伸试验"@zh, "Tensile test"@en ;
+    skos:definition "沿试样轴向逐步加载，在拉伸过程中测定强度和延性。"@zh, "Applies increasing axial tension to determine strength and ductility."@en ;
+    dcterms:source <std/gbt-228-1-2021> .
+<code/test-type/IMPACT> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "IMPACT"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "冲击试验"@zh, "Impact test"@en ; skos:prefLabel "冲击试验"@zh, "Impact test"@en ;
+    skos:definition "使规定试样承受快速冲击，以断裂过程吸收的能量评价其响应。"@zh, "Subjects a specimen to an impact and measures the energy absorbed in fracture."@en ;
+    dcterms:source <std/gbt-229-2020> .
+<code/test-type/BEND> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "BEND"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "弯曲试验"@zh, "Bend test"@en ; skos:prefLabel "弯曲试验"@zh, "Bend test"@en ;
+    skos:definition "把试样弯至约定程度，检查受拉表面是否出现规定的开裂。"@zh, "Bends a specimen to the specified extent and examines the tensile surface for cracking."@en ;
+    dcterms:source <std/gbt-232-2024> .
+<code/test-type/HARDNESS> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "HARDNESS"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "硬度试验"@zh, "Hardness test"@en ; skos:prefLabel "硬度试验"@zh, "Hardness test"@en ;
+    skos:definition "以规定方式评价材料抵抗局部压入等变形的能力并记录标尺。"@zh, "Determines resistance to localized deformation using a stated hardness method and scale."@en .
+<code/test-type/BRINELL> a skos:Concept ; skos:inScheme <code/test-type> ; skos:broader <code/test-type/HARDNESS> ;
+    skos:notation "BRINELL"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "布氏硬度试验"@zh, "Brinell hardness test"@en ; skos:prefLabel "布氏硬度试验"@zh, "Brinell hardness test"@en ;
+    skos:definition "将硬质合金球压入试样，以卸载后压痕直径求取硬度。"@zh, "Indents the specimen with a carbide ball and derives hardness from the residual impression diameter."@en ;
+    dcterms:source <std/gbt-231-1-2018> .
+<code/test-type/VICKERS> a skos:Concept ; skos:inScheme <code/test-type> ; skos:broader <code/test-type/HARDNESS> ;
+    skos:notation "VICKERS"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "维氏硬度试验"@zh, "Vickers hardness test"@en ; skos:prefLabel "维氏硬度试验"@zh, "Vickers hardness test"@en ;
+    skos:definition "用金刚石正四棱锥压出印痕并按对角线测定硬度。"@zh, "Measures the diagonals of an impression made by a square-based diamond pyramid."@en ;
+    dcterms:source <std/gbt-4340-1-2024> .
+<code/test-type/ROCKWELL> a skos:Concept ; skos:inScheme <code/test-type> ; skos:broader <code/test-type/HARDNESS> ;
+    skos:notation "ROCKWELL"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "洛氏硬度试验"@zh, "Rockwell hardness test"@en ; skos:prefLabel "洛氏硬度试验"@zh, "Rockwell hardness test"@en ;
+    skos:definition "按规定初、主试验力循环中压头的压入深度变化读出硬度。"@zh, "Determines hardness from the change in indentation depth over a specified loading cycle."@en ;
+    dcterms:source <std/gbt-230-1-2018> .
+<code/test-type/FLATTEN> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "FLATTEN"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢管压扁试验"@zh, "Tube flattening test"@en ; skos:prefLabel "钢管压扁试验"@zh, "Tube flattening test"@en ;
+    skos:definition "将管段夹在压板间压扁至规定间距，检查管壁或焊缝的响应。"@zh, "Flattens a tube section between platens to a specified separation and examines the wall or seam."@en ;
+    dcterms:source <source/industry-practice> .
+<code/test-type/FLARE> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "FLARE"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢管扩口试验"@zh, "Tube drift-expanding test"@en ; skos:prefLabel "钢管扩口试验"@zh, "Tube drift-expanding test"@en ;
+    skos:definition "用锥形工具扩大管端并检查扩口区的开裂情况。"@zh, "Expands a tube end over a tapered tool and checks the flared region for cracking."@en ;
+    dcterms:source <source/industry-practice> .
+<code/test-type/HYDRO> a skos:Concept ; skos:inScheme <code/test-type> ; skos:topConceptOf <code/test-type> ;
+    skos:notation "HYDRO"^^stl:TestTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "液压试验"@zh, "Hydrostatic pressure test"@en ; skos:prefLabel "液压试验"@zh, "Hydrostatic pressure test"@en ;
+    skos:definition "在管内施加规定液体压力并保压，检查承压完整性。"@zh, "Holds a tube under specified internal liquid pressure to check pressure integrity."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/ndt-method> a skos:ConceptScheme ;
+    rdfs:label "无损检测方法"@zh, "Nondestructive testing method"@en ; skos:prefLabel "无损检测方法"@zh, "Nondestructive testing method"@en ;
+    skos:definition "按形成可观察指示的物理机制标记无损检测记录。"@zh, "Identifies the physical principle used to obtain indications while preserving the test piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:NdtMethodCode a rdfs:Datatype ;
+    rdfs:label "无损检测方法代码"@zh, "Nondestructive testing method code"@en ; skos:prefLabel "无损检测方法代码"@zh, "Nondestructive testing method code"@en ;
+    skos:definition "标识“无损检测方法”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the nondestructive testing method scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/ndt-method/UT> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "UT"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "超声检测"@zh, "Ultrasonic testing"@en ; skos:prefLabel "超声检测"@zh, "Ultrasonic testing"@en ;
+    skos:definition "以入射声波的回波或透射变化定位材料中的不连续。"@zh, "Locates discontinuities from reflected or transmitted ultrasonic waves."@en ;
+    skos:altLabel "UT"@zh, "UT"@en ; dcterms:source <std/gbt-4162-2022> .
+<code/ndt-method/PAUT> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:broader <code/ndt-method/UT> ;
+    skos:notation "PAUT"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "相控阵超声检测"@zh, "Phased array ultrasonic testing"@en ; skos:prefLabel "相控阵超声检测"@zh, "Phased array ultrasonic testing"@en ;
+    skos:definition "控制阵列各阵元的激励时序，使声束可电子偏转或聚焦。"@zh, "Controls element timing in an array to steer or focus the ultrasonic beam."@en ;
+    skos:altLabel "PAUT"@zh, "PAUT"@en .
+<code/ndt-method/MT> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "MT"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "磁粉检测"@zh, "Magnetic particle testing"@en ; skos:prefLabel "磁粉检测"@zh, "Magnetic particle testing"@en ;
+    skos:definition "磁化铁磁工件并观察漏磁场聚集磁粉所形成的指示。"@zh, "Magnetizes a ferromagnetic part and observes particles attracted at leakage fields."@en ;
+    skos:altLabel "MT"@zh, "MT"@en ; dcterms:source <std/gbt-15822-1-2024> .
+<code/ndt-method/PT> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "PT"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "渗透检测"@zh, "Penetrant testing"@en ; skos:prefLabel "渗透检测"@zh, "Penetrant testing"@en ;
+    skos:definition "使渗透液进入表面开口，在清除表面余液后显出指示。"@zh, "Reveals surface-breaking discontinuities by drawing retained penetrant back out of their openings."@en ;
+    skos:altLabel "PT"@zh, "PT"@en ; dcterms:source <std/gbt-18851-1-2024> .
+<code/ndt-method/ET> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "ET"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "涡流检测"@zh, "Eddy current testing"@en ; skos:prefLabel "涡流检测"@zh, "Eddy current testing"@en ;
+    skos:definition "通过线圈感应电流并监测其响应变化以识别导电材料异常。"@zh, "Detects anomalies in conducting material through changes in the response of induced eddy currents."@en ;
+    skos:altLabel "ET"@zh, "ET"@en ; dcterms:source <std/gbt-7735-2016> .
+<code/ndt-method/RT> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "RT"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "射线检测"@zh, "Radiographic testing"@en ; skos:prefLabel "射线检测"@zh, "Radiographic testing"@en ;
+    skos:definition "记录穿过工件后射线强度的空间差异以显示内部不连续。"@zh, "Images internal discontinuities from spatial differences in radiation transmitted through a part."@en ;
+    skos:altLabel "RT"@zh, "RT"@en .
+<code/ndt-method/VT> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "VT"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "目视检测"@zh, "Visual testing"@en ; skos:prefLabel "目视检测"@zh, "Visual testing"@en ;
+    skos:definition "用直接观察或光学辅助方式检查可见表面、外形和焊缝状态。"@zh, "Examines accessible surfaces, profiles and welds directly or with optical aids."@en ;
+    skos:altLabel "VT"@zh, "VT"@en .
+<code/ndt-method/MFL> a skos:Concept ; skos:inScheme <code/ndt-method> ; skos:topConceptOf <code/ndt-method> ;
+    skos:notation "MFL"^^stl:NdtMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "漏磁检测"@zh, "Magnetic flux leakage testing"@en ; skos:prefLabel "漏磁检测"@zh, "Magnetic flux leakage testing"@en ;
+    skos:definition "用传感器拾取磁化材料缺陷附近逸出的磁通以定位异常。"@zh, "Measures magnetic flux escaping near discontinuities in magnetized stock."@en ;
+    skos:altLabel "MFL"@zh, "MFL"@en .
+
+<code/defect-type> a skos:ConceptScheme ;
+    rdfs:label "缺陷类型"@zh, "defect type"@en ; skos:prefLabel "缺陷类型"@zh, "defect type"@en ;
+    skos:definition "按观察到的异常给缺陷分类，产品分组用于归集依赖产品形态的缺陷。"@zh, "Classifies observed flaws and groups product-specific defects by the form of material inspected."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:DefectTypeCode a rdfs:Datatype ;
+    rdfs:label "缺陷类型代码"@zh, "defect type code"@en ; skos:prefLabel "缺陷类型代码"@zh, "defect type code"@en ;
+    skos:definition "标识“缺陷类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the defect type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/defect-type/FLAT> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:topConceptOf <code/defect-type> ;
+    skos:notation "FLAT"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "板带缺陷"@zh, "Flat product defects"@en ; skos:prefLabel "板带缺陷"@zh, "Flat product defects"@en ;
+    skos:definition "归集以板面、带边、镀层或板形为识别依据的缺陷。"@zh, "Groups flaws identified by flat-stock features such as edges, coating coverage or flatness."@en .
+<code/defect-type/EDGECRACK> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:broader <code/defect-type/FLAT> ;
+    skos:notation "EDGECRACK"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "边裂"@zh, "edge crack"@en ; skos:prefLabel "边裂"@zh, "edge crack"@en ;
+    skos:definition "板带边缘出现并可向板面内部扩展的裂纹。"@zh, "A fissure originating at a flat product edge that may extend towards its interior."@en .
+<code/defect-type/SCRATCH> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:topConceptOf <code/defect-type> ;
+    skos:notation "SCRATCH"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "划伤"@zh, "scratch"@en ; skos:prefLabel "划伤"@zh, "scratch"@en ;
+    skos:definition "表面接触较硬物体并发生相对滑动所留下的线状损伤。"@zh, "A line of surface damage produced by sliding contact with a harder object."@en .
+<code/defect-type/CAST> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:topConceptOf <code/defect-type> ;
+    skos:notation "CAST"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铸坯缺陷"@zh, "Cast semiproduct defects"@en ; skos:prefLabel "铸坯缺陷"@zh, "Cast semiproduct defects"@en ;
+    skos:definition "按铸坯形态和凝固阶段归集检查记录中的缺陷。"@zh, "Groups flaws specific to cast stock and its solidification history."@en .
+<code/defect-type/LONG> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:topConceptOf <code/defect-type> ;
+    skos:notation "LONG"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "长材缺陷"@zh, "Long product defects"@en ; skos:prefLabel "长材缺陷"@zh, "Long product defects"@en ;
+    skos:definition "归集以轧制棒线或型材的长度方向和断面轮廓为依据的缺陷。"@zh, "Groups flaws characterized on rolled bars, rod or sections along their length or profile."@en .
+<code/defect-type/PIPE> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:topConceptOf <code/defect-type> ;
+    skos:notation "PIPE"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢管缺陷"@zh, "Tube and pipe defects"@en ; skos:prefLabel "钢管缺陷"@zh, "Tube and pipe defects"@en ;
+    skos:definition "归集以管壁、管腔或焊缝为识别位置的缺陷。"@zh, "Groups flaws described by their position in the wall, bore or seam of tubular products."@en .
+<code/defect-type/FORGED> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:topConceptOf <code/defect-type> ;
+    skos:notation "FORGED"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "锻件缺陷"@zh, "Forging defects"@en ; skos:prefLabel "锻件缺陷"@zh, "Forging defects"@en ;
+    skos:definition "归集与锻压流动、锻件轮廓或锻件内部完整性有关的缺陷。"@zh, "Groups flaws characterized by forging flow, forging geometry or internal integrity."@en .
+
+<code/judgement-result> a skos:ConceptScheme ;
+    rdfs:label "判定结果"@zh, "conformity judgement result"@en ; skos:prefLabel "判定结果"@zh, "conformity judgement result"@en ;
+    skos:definition "记录证据对规定要求的判定结论，处置授权另行关联。"@zh, "Records the finding against specified requirements before any separate disposition authorization."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:JudgementResultCode a rdfs:Datatype ;
+    rdfs:label "判定结果代码"@zh, "conformity judgement result code"@en ; skos:prefLabel "判定结果代码"@zh, "conformity judgement result code"@en ;
+    skos:definition "标识“判定结果”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the conformity judgement result scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/judgement-result/CONFORM> a skos:Concept ; skos:inScheme <code/judgement-result> ; skos:topConceptOf <code/judgement-result> ;
+    skos:notation "CONFORM"^^stl:JudgementResultCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "合格"@zh, "conforming"@en ; skos:prefLabel "合格"@zh, "conforming"@en ;
+    skos:definition "经判定，受检对象在本次判定范围内满足引用要求。"@zh, "The examined subject meets the cited requirements within the scope of this decision."@en .
+<code/judgement-result/NONCONFORM> a skos:Concept ; skos:inScheme <code/judgement-result> ; skos:topConceptOf <code/judgement-result> ;
+    skos:notation "NONCONFORM"^^stl:JudgementResultCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "不合格"@zh, "nonconforming"@en ; skos:prefLabel "不合格"@zh, "nonconforming"@en ;
+    skos:definition "本次判定发现至少一项适用要求未满足。"@zh, "At least one applicable requirement was found unmet in this decision."@en .
+<code/judgement-result/PENDING> a skos:Concept ; skos:inScheme <code/judgement-result> ; skos:topConceptOf <code/judgement-result> ;
+    skos:notation "PENDING"^^stl:JudgementResultCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "待判"@zh, "pending judgement"@en ; skos:prefLabel "待判"@zh, "pending judgement"@en ;
+    skos:definition "判断所需结果或审核尚未齐备，当前保留待判状态。"@zh, "The decision awaits required results or review before conformity can be established."@en .
+
+<code/disposition-type> a skos:ConceptScheme ;
+    rdfs:label "质量处置类型"@zh, "quality disposition type"@en ; skos:prefLabel "质量处置类型"@zh, "quality disposition type"@en ;
+    skos:definition "区分判定后对实物的流转、规格、修复或使用资格采取的决定。"@zh, "Distinguishes actions affecting release, specification, repair or further use after a quality decision."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:DispositionTypeCode a rdfs:Datatype ;
+    rdfs:label "质量处置类型代码"@zh, "quality disposition type code"@en ; skos:prefLabel "质量处置类型代码"@zh, "quality disposition type code"@en ;
+    skos:definition "标识“质量处置类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the quality disposition type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/disposition-type/RELEASE> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "RELEASE"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "放行"@zh, "release"@en ; skos:prefLabel "放行"@zh, "release"@en ;
+    skos:definition "授权实物进入规定的下一道作业或发运环节。"@zh, "Authorizes the piece to proceed to its next approved operation or shipment."@en .
+<code/disposition-type/HOLD> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "HOLD"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "封闭待处理"@zh, "hold"@en ; skos:prefLabel "封闭待处理"@zh, "hold"@en ;
+    skos:definition "暂时冻结流转，等候检查、复核或处置授权。"@zh, "Suspends further movement or use pending inspection, review or disposition authority."@en .
+<code/disposition-type/DEGRADE> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "DEGRADE"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "降级"@zh, "downgrade"@en ; skos:prefLabel "降级"@zh, "downgrade"@en ;
+    skos:definition "将同一实物的质量规格调整到较低档次，是否保留原订单由分配记录确定。"@zh, "Assigns the same piece to a lower quality specification while recording its order allocation separately."@en .
+<code/disposition-type/REASSIGN> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "REASSIGN"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "改判"@zh, "reassignment"@en ; skos:prefLabel "改判"@zh, "reassignment"@en ;
+    skos:definition "撤销原适配关系，将同一实物改配给另一规格或订单行。"@zh, "Supersedes the original allocation and designates the piece for another specification or order line."@en .
+<code/disposition-type/CONCESSION> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "CONCESSION"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "让步接收"@zh, "acceptance under concession"@en ; skos:prefLabel "让步接收"@zh, "acceptance under concession"@en ;
+    skos:definition "对已识别偏差给予有范围和期限的接收授权并保留原规格。"@zh, "Authorizes acceptance of a defined deviation for a bounded order, quantity and period under the original specification."@en .
+<code/disposition-type/REWORK> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "REWORK"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "返修"@zh, "rework"@en ; skos:prefLabel "返修"@zh, "rework"@en ;
+    skos:definition "安排对实物采取修复加工并按约定重新检验。"@zh, "Routes the material for corrective processing and the required subsequent inspection."@en .
+<code/disposition-type/SCRAP> a skos:Concept ; skos:inScheme <code/disposition-type> ; skos:topConceptOf <code/disposition-type> ;
+    skos:notation "SCRAP"^^stl:DispositionTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "报废"@zh, "scrap"@en ; skos:prefLabel "报废"@zh, "scrap"@en ;
+    skos:definition "取消按成品继续使用或交付的资格，将材料导向报废处置。"@zh, "Withdraws the material from product use or delivery and directs it to scrap disposition."@en .
+
+<code/inspection-document-type> a skos:ConceptScheme ;
+    rdfs:label "检验文件类型"@zh, "inspection document type"@en ; skos:prefLabel "检验文件类型"@zh, "inspection document type"@en ;
+    skos:definition "按交货检验结果的代表性和确认方区分采购方收到的文件。"@zh, "Distinguishes documents delivered to the purchaser by the inspection evidence and its validation."@en ;
+    dcterms:source <std/en-10204-2004> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:InspectionDocumentTypeCode a rdfs:Datatype ;
+    rdfs:label "检验文件类型代码"@zh, "inspection document type code"@en ; skos:prefLabel "检验文件类型代码"@zh, "inspection document type code"@en ;
+    skos:definition "标识“检验文件类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the inspection document type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/inspection-document-type/T21> a skos:Concept ; skos:inScheme <code/inspection-document-type> ; skos:topConceptOf <code/inspection-document-type> ;
+    skos:notation "T21"^^stl:InspectionDocumentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "符合订单声明"@zh, "declaration of compliance with the order"@en ; skos:prefLabel "符合订单声明"@zh, "declaration of compliance with the order"@en ;
+    skos:definition "供方确认交货符合订单，文件仅载明该项声明。"@zh, "The manufacturer states compliance with the order without supplying test results."@en ;
+    skos:altLabel "2.1"@zh, "2.1"@en .
+<code/inspection-document-type/T22> a skos:Concept ; skos:inScheme <code/inspection-document-type> ; skos:topConceptOf <code/inspection-document-type> ;
+    skos:notation "T22"^^stl:InspectionDocumentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "试验报告"@zh, "test report"@en ; skos:prefLabel "试验报告"@zh, "test report"@en ;
+    skos:definition "制造方声明符合订单并随附非特定检验的结果。"@zh, "The manufacturer confirms order compliance and supplies results of non-specific inspection."@en ;
+    skos:altLabel "2.2"@zh, "2.2"@en .
+<code/inspection-document-type/T31> a skos:Concept ; skos:inScheme <code/inspection-document-type> ; skos:topConceptOf <code/inspection-document-type> ;
+    skos:notation "T31"^^stl:InspectionDocumentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "3.1 检验证书"@zh, "type 3.1 inspection certificate"@en ; skos:prefLabel "3.1 检验证书"@zh, "type 3.1 inspection certificate"@en ;
+    skos:definition "由独立于制造部门的制造方授权检验代表确认，并列出对本交货检验单元适用的结果。"@zh, "The manufacturer's authorized representative independent of production validates results from specific inspection of the delivery unit."@en ;
+    skos:altLabel "3.1"@zh, "3.1"@en .
+<code/inspection-document-type/T32> a skos:Concept ; skos:inScheme <code/inspection-document-type> ; skos:topConceptOf <code/inspection-document-type> ;
+    skos:notation "T32"^^stl:InspectionDocumentTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "3.2 检验证书"@zh, "type 3.2 inspection certificate"@en ; skos:prefLabel "3.2 检验证书"@zh, "type 3.2 inspection certificate"@en ;
+    skos:definition "在制造方独立检验代表之外，由买方授权代表或法规指定的检验员共同确认特定检验结果。"@zh, "Specific inspection results are validated by the manufacturer's independent representative together with the purchaser's authorized representative or an inspector designated by regulation."@en ;
+    skos:altLabel "3.2"@zh, "3.2"@en .
+
+<code/delivery-condition> a skos:ConceptScheme ;
+    rdfs:label "交货状态"@zh, "Delivery condition"@en ; skos:prefLabel "交货状态"@zh, "Delivery condition"@en ;
+    skos:definition "记录供方承诺交付时材料所处的加工或热处理状态。"@zh, "States the processing or thermal condition promised for the material at delivery."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:DeliveryConditionCode a rdfs:Datatype ;
+    rdfs:label "交货状态代码"@zh, "Delivery condition code"@en ; skos:prefLabel "交货状态代码"@zh, "Delivery condition code"@en ;
+    skos:definition "标识“交货状态”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the delivery condition scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/delivery-condition/ASROLLED> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "ASROLLED"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "轧制态"@zh, "As-rolled"@en ; skos:prefLabel "轧制态"@zh, "As-rolled"@en ;
+    skos:definition "以轧制及其常规冷却后的状态供货，规格另列后续处理时需另行标明。"@zh, "Supplies stock in the condition left by rolling and the associated routine cooling."@en .
+<code/delivery-condition/NORMALIZED> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "NORMALIZED"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "正火态"@zh, "Normalized"@en ; skos:prefLabel "正火态"@zh, "Normalized"@en ;
+    skos:definition "产品在规定的正火循环后达到订货要求的交货组织。"@zh, "Supplies material after a normalizing cycle specified for the delivered product."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/delivery-condition/ANNEALED> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "ANNEALED"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "退火态"@zh, "Annealed"@en ; skos:prefLabel "退火态"@zh, "Annealed"@en ;
+    skos:definition "在规定退火处理后以相应软化或组织调整状态交付。"@zh, "Supplies material in the softened or microstructurally adjusted condition of the specified anneal."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/delivery-condition/QT> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "QT"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "淬火回火态"@zh, "Quenched and tempered"@en ; skos:prefLabel "淬火回火态"@zh, "Quenched and tempered"@en ;
+    skos:definition "以完成规定淬火和回火后的组织与性能交货。"@zh, "Supplies stock after the specified quenching and tempering sequence."@en ;
+    skos:altLabel "Q+T"@zh, "Q+T"@en ; dcterms:source <std/gbt-7232-2023> .
+<code/delivery-condition/TMCP> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "TMCP"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "热机械轧制态"@zh, "Thermomechanically rolled"@en ; skos:prefLabel "热机械轧制态"@zh, "Thermomechanically rolled"@en ;
+    skos:definition "供方以规定的热变形与冷却组合取得交货性能。"@zh, "Delivers properties established by a specified combination of controlled hot deformation and cooling."@en .
+<code/delivery-condition/SOLUTION> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "SOLUTION"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "固溶态"@zh, "Solution treated"@en ; skos:prefLabel "固溶态"@zh, "Solution treated"@en ;
+    skos:definition "交付时材料处于产品规定的固溶处理状态。"@zh, "Supplies an alloy in the solution-treated condition designated in the product specification."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/delivery-condition/FULLHARD> a skos:Concept ; skos:inScheme <code/delivery-condition> ; skos:topConceptOf <code/delivery-condition> ;
+    skos:notation "FULLHARD"^^stl:DeliveryConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "冷硬态"@zh, "Full hard"@en ; skos:prefLabel "冷硬态"@zh, "Full hard"@en ;
+    skos:definition "以冷轧加工硬化的状态交货，保留冷变形带来的强度。"@zh, "Supplies cold-reduced steel with the work hardening of reduction retained."@en .
+
+<code/surface-condition> a skos:ConceptScheme ;
+    rdfs:label "表面状态"@zh, "Surface condition"@en ; skos:prefLabel "表面状态"@zh, "Surface condition"@en ;
+    skos:definition "描述交货表面保留的覆盖物、处理痕迹或精饰形貌。"@zh, "Identifies the surface finish or covering actually presented at delivery."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:SurfaceConditionCode a rdfs:Datatype ;
+    rdfs:label "表面状态代码"@zh, "Surface condition code"@en ; skos:prefLabel "表面状态代码"@zh, "Surface condition code"@en ;
+    skos:definition "标识“表面状态”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the surface condition scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/surface-condition/BLACK> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "BLACK"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "黑皮表面"@zh, "Black surface"@en ; skos:prefLabel "黑皮表面"@zh, "Black surface"@en ;
+    skos:definition "交付表面保留热加工或热处理形成的氧化皮。"@zh, "Retains oxide scale from hot working or heat treatment on the delivery surface."@en .
+<code/surface-condition/PICKLED> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "PICKLED"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "酸洗表面"@zh, "Pickled surface"@en ; skos:prefLabel "酸洗表面"@zh, "Pickled surface"@en ;
+    skos:definition "钢基经酸洗去鳞后以该表面状态供检验或交付。"@zh, "Presents a substrate surface descaled by acid pickling."@en .
+<code/surface-condition/OILED> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "OILED"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "涂油表面"@zh, "Oiled surface"@en ; skos:prefLabel "涂油表面"@zh, "Oiled surface"@en ;
+    skos:definition "交货表面带有为储运防护或后续加工而施加的油膜。"@zh, "Carries an applied oil film for transit protection or subsequent processing."@en .
+<code/surface-condition/BLASTED> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "BLASTED"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "喷抛丸表面"@zh, "Blast-cleaned surface"@en ; skos:prefLabel "喷抛丸表面"@zh, "Blast-cleaned surface"@en ;
+    skos:definition "由喷射或抛射磨料去除表面氧化物并留下冲击纹理。"@zh, "Exposes a textured surface by removing scale with propelled abrasives."@en .
+<code/surface-condition/GROUND> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "GROUND"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "磨光表面"@zh, "Ground surface"@en ; skos:prefLabel "磨光表面"@zh, "Ground surface"@en ;
+    skos:definition "经磨削去除表层金属并保留相应磨削纹理。"@zh, "Exposes a mechanically ground surface with the resulting abrasive texture."@en .
+<code/surface-condition/PEELED> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "PEELED"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "剥皮表面"@zh, "Peeled surface"@en ; skos:prefLabel "剥皮表面"@zh, "Peeled surface"@en ;
+    skos:definition "棒材经剥皮切削后露出新鲜金属圆周面。"@zh, "Exposes a freshly cut circumferential surface on a peeled bar."@en .
+<code/surface-condition/POLISHED> a skos:Concept ; skos:inScheme <code/surface-condition> ; skos:topConceptOf <code/surface-condition> ;
+    skos:notation "POLISHED"^^stl:SurfaceConditionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "抛光表面"@zh, "Polished surface"@en ; skos:prefLabel "抛光表面"@zh, "Polished surface"@en ;
+    skos:definition "经过细磨或抛光以达到约定的光洁或反射特征。"@zh, "Presents a finely finished surface with a specified smoothness or reflectance."@en .
+
+<code/steel-class-composition> a skos:ConceptScheme ;
+    rdfs:label "钢的化学成分类别"@zh, "Steel composition class"@en ; skos:prefLabel "钢的化学成分类别"@zh, "Steel composition class"@en ;
+    skos:definition "按规定的成分口径把一个钢种归入非合金、低合金或合金组。"@zh, "Groups a steel grade according to its specified chemistry and the applicable alloying criteria."@en ;
+    dcterms:source <std/gbt-13304-1-2008> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:SteelClassCompositionCode a rdfs:Datatype ;
+    rdfs:label "钢的化学成分类别代码"@zh, "Steel composition class code"@en ; skos:prefLabel "钢的化学成分类别代码"@zh, "Steel composition class code"@en ;
+    skos:definition "标识“钢的化学成分类别”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the steel composition class scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/steel-class-composition/NONALLOY> a skos:Concept ; skos:inScheme <code/steel-class-composition> ; skos:topConceptOf <code/steel-class-composition> ;
+    skos:notation "NONALLOY"^^stl:SteelClassCompositionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "非合金钢"@zh, "Non-alloy steel"@en ; skos:prefLabel "非合金钢"@zh, "Non-alloy steel"@en ;
+    skos:definition "按适用成分界限与判别规则归入非合金组的钢种。"@zh, "A grade whose specified chemistry falls in the non-alloy group under the applicable classification rules."@en .
+<code/steel-class-composition/LOWALLOY> a skos:Concept ; skos:inScheme <code/steel-class-composition> ; skos:topConceptOf <code/steel-class-composition> ;
+    skos:notation "LOWALLOY"^^stl:SteelClassCompositionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "低合金钢"@zh, "Low-alloy steel"@en ; skos:prefLabel "低合金钢"@zh, "Low-alloy steel"@en ;
+    skos:definition "按标准规定的元素种类和含量范围，落在低合金类别而区别于非合金及合金组的钢种。"@zh, "A grade assigned to the low-alloy category from the specified levels and combination of relevant elements."@en .
+<code/steel-class-composition/ALLOY> a skos:Concept ; skos:inScheme <code/steel-class-composition> ; skos:topConceptOf <code/steel-class-composition> ;
+    skos:notation "ALLOY"^^stl:SteelClassCompositionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "合金钢"@zh, "Alloy steel"@en ; skos:prefLabel "合金钢"@zh, "Alloy steel"@en ;
+    skos:definition "按规定合金元素及其界限归入合金组的钢种。"@zh, "A grade meeting the composition rules for the alloy category under the cited classification."@en .
+
+<code/steel-class-quality> a skos:ConceptScheme ;
+    rdfs:label "钢的质量等级类别"@zh, "Steel quality class"@en ; skos:prefLabel "钢的质量等级类别"@zh, "Steel quality class"@en ;
+    skos:definition "按生产控制与质量要求的严格程度归类钢种，每次判定的合格结论另记。"@zh, "Classifies grades by the demands placed on their manufacture and material quality."@en ;
+    dcterms:source <std/gbt-13304-2-2008> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:SteelClassQualityCode a rdfs:Datatype ;
+    rdfs:label "钢的质量等级类别代码"@zh, "Steel quality class code"@en ; skos:prefLabel "钢的质量等级类别代码"@zh, "Steel quality class code"@en ;
+    skos:definition "标识“钢的质量等级类别”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the steel quality class scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/steel-class-quality/BASIC> a skos:Concept ; skos:inScheme <code/steel-class-quality> ; skos:topConceptOf <code/steel-class-quality> ;
+    skos:notation "BASIC"^^stl:SteelClassQualityCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "普通质量"@zh, "Basic quality"@en ; skos:prefLabel "普通质量"@zh, "Basic quality"@en ;
+    skos:definition "按相应成分类别的一般生产控制和使用要求归入普通质量组的钢。"@zh, "A grade falling under the ordinary production and service requirements of its applicable composition group."@en .
+<code/steel-class-quality/QUALITY> a skos:Concept ; skos:inScheme <code/steel-class-quality> ; skos:topConceptOf <code/steel-class-quality> ;
+    skos:notation "QUALITY"^^stl:SteelClassQualityCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "优质"@zh, "Quality steel"@en ; skos:prefLabel "优质"@zh, "Quality steel"@en ;
+    skos:definition "材料性能或制造质量需要对相应成分类别施加专门控制的质量组。"@zh, "A quality group requiring particular controls on material properties or production within its composition category."@en .
+<code/steel-class-quality/SPECIAL> a skos:Concept ; skos:inScheme <code/steel-class-quality> ; skos:topConceptOf <code/steel-class-quality> ;
+    skos:notation "SPECIAL"^^stl:SteelClassQualityCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "特殊质量"@zh, "Special quality"@en ; skos:prefLabel "特殊质量"@zh, "Special quality"@en ;
+    skos:definition "对纯净度、热处理响应或其他关键性能有更严格控制要求的质量组。"@zh, "A group with more demanding controls on features such as cleanliness or response to heat treatment."@en .
+
+<code/steel-class-use> a skos:ConceptScheme ;
+    rdfs:label "钢的主要用途类别"@zh, "Steel end-use class"@en ; skos:prefLabel "钢的主要用途类别"@zh, "Steel end-use class"@en ;
+    skos:definition "按选材时起主导作用的服役用途或性能归类钢种。"@zh, "Groups grades by the intended service or property that drives material selection."@en ;
+    skos:scopeNote "用途代码用于按选材目的检索，同一钢种可有多种用途。"@zh ;
+    dcterms:source <std/gbt-13304-2-2008> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:SteelClassUseCode a rdfs:Datatype ;
+    rdfs:label "钢的主要用途类别代码"@zh, "Steel end-use class code"@en ; skos:prefLabel "钢的主要用途类别代码"@zh, "Steel end-use class code"@en ;
+    skos:definition "标识“钢的主要用途类别”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the steel end-use class scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/steel-class-use/STRUCT> a skos:Concept ; skos:inScheme <code/steel-class-use> ; skos:topConceptOf <code/steel-class-use> ;
+    skos:notation "STRUCT"^^stl:SteelClassUseCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "结构承载用"@zh, "Structural service"@en ; skos:prefLabel "结构承载用"@zh, "Structural service"@en ;
+    skos:definition "以承受设计载荷并满足制造连接要求为主要目的。"@zh, "Selected primarily to carry structural loads while meeting fabrication and joining needs."@en ;
+    dcterms:source <source/industry-practice> .
+<code/steel-class-use/MACHINE> a skos:Concept ; skos:inScheme <code/steel-class-use> ; skos:topConceptOf <code/steel-class-use> ;
+    skos:notation "MACHINE"^^stl:SteelClassUseCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "机械零件用"@zh, "Machine component service"@en ; skos:prefLabel "机械零件用"@zh, "Machine component service"@en ;
+    skos:definition "供轴、齿轮等零件使用，按零件受力和热处理响应选材。"@zh, "Selected for mechanical components on the basis of service loading and processing response."@en ;
+    dcterms:source <source/industry-practice> .
+<code/steel-class-use/TOOL> a skos:Concept ; skos:inScheme <code/steel-class-use> ; skos:topConceptOf <code/steel-class-use> ;
+    skos:notation "TOOL"^^stl:SteelClassUseCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "工具与模具用"@zh, "Tooling service"@en ; skos:prefLabel "工具与模具用"@zh, "Tooling service"@en ;
+    skos:definition "作为切削、测量或成形工具的工作材料，重点考虑工作面耐用性。"@zh, "Selected to provide durable working surfaces in cutting, measuring or forming tools."@en ;
+    dcterms:source <source/industry-practice> .
+<code/steel-class-use/CORROSION> a skos:Concept ; skos:inScheme <code/steel-class-use> ; skos:topConceptOf <code/steel-class-use> ;
+    skos:notation "CORROSION"^^stl:SteelClassUseCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "耐蚀服役用"@zh, "Corrosive service"@en ; skos:prefLabel "耐蚀服役用"@zh, "Corrosive service"@en ;
+    skos:definition "主要依据材料抵抗规定介质腐蚀的能力选用。"@zh, "Selected primarily for resistance to attack by a specified corrosive environment."@en ;
+    dcterms:source <source/industry-practice> .
+<code/steel-class-use/HIGHTEMP> a skos:Concept ; skos:inScheme <code/steel-class-use> ; skos:topConceptOf <code/steel-class-use> ;
+    skos:notation "HIGHTEMP"^^stl:SteelClassUseCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "高温服役用"@zh, "Elevated-temperature service"@en ; skos:prefLabel "高温服役用"@zh, "Elevated-temperature service"@en ;
+    skos:definition "面向长期或反复高温下的承载、抗氧化等使用要求。"@zh, "Selected for load retention or oxidation resistance during elevated-temperature service."@en ;
+    dcterms:source <source/industry-practice> .
+<code/steel-class-use/MAGNETIC> a skos:Concept ; skos:inScheme <code/steel-class-use> ; skos:topConceptOf <code/steel-class-use> ;
+    skos:notation "MAGNETIC"^^stl:SteelClassUseCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "电磁功能用"@zh, "Electromagnetic service"@en ; skos:prefLabel "电磁功能用"@zh, "Electromagnetic service"@en ;
+    skos:definition "主要利用铁磁材料的磁化或磁损耗特性完成电磁功能。"@zh, "Selected for magnetic response or magnetic loss in an electromagnetic application."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/measurement-item> a skos:ConceptScheme ;
+    rdfs:label "测量项"@zh, "measurement item"@en ; skos:prefLabel "测量项"@zh, "measurement item"@en ;
+    skos:definition "标识一次观测、在线测量或试验结果所量取的具体指标。"@zh, "Identifies the quantity represented by a field reading or test result."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:MeasurementItemCode a rdfs:Datatype ;
+    rdfs:label "测量项代码"@zh, "measurement item code"@en ; skos:prefLabel "测量项代码"@zh, "measurement item code"@en ;
+    skos:definition "标识“测量项”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the measurement item scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/measurement-item/TEMP> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "TEMP"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "温度"@zh, "temperature"@en ; skos:prefLabel "温度"@zh, "temperature"@en ;
+    skos:definition "在指定时刻和测点取得的材料温度。"@zh, "Temperature of the material at the stated point and sampling time."@en .
+<code/measurement-item/OXYACT> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "OXYACT"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "钢水活性氧"@zh, "active oxygen in liquid steel"@en ; skos:prefLabel "钢水活性氧"@zh, "active oxygen in liquid steel"@en ;
+    skos:definition "通过在线探头观测钢水中活性氧并按规定的百万分数口径表示。"@zh, "An in-process probe reading of active oxygen in liquid steel expressed on the specified ppm basis."@en .
+<code/measurement-item/TENSILE> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "TENSILE"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "抗拉强度"@zh, "tensile strength"@en ; skos:prefLabel "抗拉强度"@zh, "tensile strength"@en ;
+    skos:definition "由拉伸过程的最大载荷相对于试样初始截面积确定的强度指标。"@zh, "Strength calculated from the peak tensile force and the initial cross-sectional area."@en ;
+    dcterms:source <std/gbt-228-1-2021> .
+<code/measurement-item/IMPACT> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "IMPACT"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "冲击吸收能量"@zh, "absorbed impact energy"@en ; skos:prefLabel "冲击吸收能量"@zh, "absorbed impact energy"@en ;
+    skos:definition "在规定冲击条件下使试样发生断裂所吸收的能量。"@zh, "Energy absorbed by the specimen as it fractures under the stated impact conditions."@en ;
+    skos:altLabel "冲击功"@zh ; dcterms:source <std/gbt-229-2020> .
+<code/measurement-item/COATMASS> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "COATMASS"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "单位面积镀层质量"@zh, "coating mass per unit area"@en ; skos:prefLabel "单位面积镀层质量"@zh, "coating mass per unit area"@en ;
+    skos:definition "指定单面或双面合计的镀层质量与板带投影面积之比。"@zh, "Mass of coating on the specified face or faces divided by projected substrate area."@en ;
+    skos:scopeNote "与要求值比较时须采用相同的单面或双面合计口径。"@zh ; dcterms:source <std/gbt-1839-2025> .
+<code/measurement-item/THICKNESS> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "THICKNESS"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "厚度"@zh, "thickness"@en ; skos:prefLabel "厚度"@zh, "thickness"@en ;
+    skos:definition "在指定点沿板带厚度方向量得的两表面间距。"@zh, "Separation of the two faces of flat stock measured through thickness at the stated point."@en .
+<code/measurement-item/WIDTH> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "WIDTH"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "宽度"@zh, "width"@en ; skos:prefLabel "宽度"@zh, "width"@en ;
+    skos:definition "在给定断面上沿横向量得的产品两侧边缘间距。"@zh, "Edge-to-edge transverse dimension measured at the nominated section."@en .
+
+<code/measurement-method> a skos:ConceptScheme ;
+    rdfs:label "采集方式"@zh, "measurement acquisition method"@en ; skos:prefLabel "采集方式"@zh, "measurement acquisition method"@en ;
+    skos:definition "标识现场观测的读数经人或设备取得的方式。"@zh, "Identifies whether the reading was obtained by an operator or acquired by the equipment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:MeasurementMethodCode a rdfs:Datatype ;
+    rdfs:label "采集方式代码"@zh, "measurement acquisition method code"@en ; skos:prefLabel "采集方式代码"@zh, "measurement acquisition method code"@en ;
+    skos:definition "标识“采集方式”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the measurement acquisition method scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/measurement-method/MANUAL> a skos:Concept ; skos:inScheme <code/measurement-method> ; skos:topConceptOf <code/measurement-method> ;
+    skos:notation "MANUAL"^^stl:MeasurementMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "手工"@zh, "manual"@en ; skos:prefLabel "手工"@zh, "manual"@en ;
+    skos:definition "由操作者读数并将数值作为本次观测结果登记。"@zh, "An operator reads the quantity and registers it for the observation."@en .
+<code/measurement-method/AUTOMATIC> a skos:Concept ; skos:inScheme <code/measurement-method> ; skos:topConceptOf <code/measurement-method> ;
+    skos:notation "AUTOMATIC"^^stl:MeasurementMethodCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "自动"@zh, "automatic"@en ; skos:prefLabel "自动"@zh, "automatic"@en ;
+    skos:definition "仪器或控制系统取得读数并直接采集到观测记录中。"@zh, "The instrument or control system acquires the reading directly for the observation record."@en .
+
+<code/contribution-evidence> a skos:ConceptScheme ;
+    rdfs:label "来源证据等级"@zh, "contribution evidence level"@en ; skos:prefLabel "来源证据等级"@zh, "contribution evidence level"@en ;
+    skos:definition "标示来源已知时对所记贡献份额具有什么依据。"@zh, "Identifies the support available for the size of a contribution from a known source."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:ContributionEvidenceCode a rdfs:Datatype ;
+    rdfs:label "来源证据等级代码"@zh, "contribution evidence level code"@en ; skos:prefLabel "来源证据等级代码"@zh, "contribution evidence level code"@en ;
+    skos:definition "标识“来源证据等级”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the contribution evidence level scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/contribution-evidence/MEASURED> a skos:Concept ; skos:inScheme <code/contribution-evidence> ; skos:topConceptOf <code/contribution-evidence> ;
+    skos:notation "MEASURED"^^stl:ContributionEvidenceCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "实测份额"@zh, "measured share"@en ; skos:prefLabel "实测份额"@zh, "measured share"@en ;
+    skos:definition "份额以可查的称量或长度测量记录为根据。"@zh, "The attributed fraction rests on traceable measurements such as mass or length."@en .
+<code/contribution-evidence/ESTIMATED> a skos:Concept ; skos:inScheme <code/contribution-evidence> ; skos:topConceptOf <code/contribution-evidence> ;
+    skos:notation "ESTIMATED"^^stl:ContributionEvidenceCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "估算份额"@zh, "estimated share"@en ; skos:prefLabel "估算份额"@zh, "estimated share"@en ;
+    skos:definition "份额依据有说明的规则或估算模型确定。"@zh, "The fraction comes from a documented allocation rule or estimate."@en .
+<code/contribution-evidence/UNKNOWN> a skos:Concept ; skos:inScheme <code/contribution-evidence> ; skos:topConceptOf <code/contribution-evidence> ;
+    skos:notation "UNKNOWN"^^stl:ContributionEvidenceCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "份额未知"@zh, "unknown share"@en ; skos:prefLabel "份额未知"@zh, "unknown share"@en ;
+    skos:definition "确认该来源参与了产出，但尚无可报告的份额值。"@zh, "Participation of the source is known while its fraction is undetermined."@en ;
+    skos:scopeNote "份额可以留空；已知有两个来源不足以支持均分。"@zh .
+
+<code/share-basis> a skos:ConceptScheme ;
+    rdfs:label "份额基准"@zh, "contribution share basis"@en ; skos:prefLabel "份额基准"@zh, "contribution share basis"@en ;
+    skos:definition "标识把来源对某个产出的贡献换算为份额所用的物理量。"@zh, "Identifies the physical quantity used to express how much of an output is attributed to a source."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:ShareBasisCode a rdfs:Datatype ;
+    rdfs:label "份额基准代码"@zh, "contribution share basis code"@en ; skos:prefLabel "份额基准代码"@zh, "contribution share basis code"@en ;
+    skos:definition "标识“份额基准”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the contribution share basis scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/share-basis/LENGTH> a skos:Concept ; skos:inScheme <code/share-basis> ; skos:topConceptOf <code/share-basis> ;
+    skos:notation "LENGTH"^^stl:ShareBasisCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "按长度"@zh, "by length"@en ; skos:prefLabel "按长度"@zh, "by length"@en ;
+    skos:definition "将指定来源的贡献长度与该产出所用总长度相比较。"@zh, "Expresses the source contribution as a proportion of the applicable total length."@en .
+<code/share-basis/MASS> a skos:Concept ; skos:inScheme <code/share-basis> ; skos:topConceptOf <code/share-basis> ;
+    skos:notation "MASS"^^stl:ShareBasisCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "按质量"@zh, "by mass"@en ; skos:prefLabel "按质量"@zh, "by mass"@en ;
+    skos:definition "将指定来源的贡献质量与该产出所用总质量相比较。"@zh, "Expresses the source contribution as a proportion of the applicable total mass."@en .
+
+<code/movement-event-type> a skos:ConceptScheme ;
+    rdfs:label "移动事件类型"@zh, "movement event type"@en ; skos:prefLabel "移动事件类型"@zh, "movement event type"@en ;
+    skos:definition "区分影响实物承载关系、落位或出厂事实的已发生动作。"@zh, "Classifies actual handling events that change support, establish placement or confirm dispatch."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:MovementEventTypeCode a rdfs:Datatype ;
+    rdfs:label "移动事件类型代码"@zh, "movement event type code"@en ; skos:prefLabel "移动事件类型代码"@zh, "movement event type code"@en ;
+    skos:definition "标识“移动事件类型”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the movement event type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/movement-event-type/LIFT> a skos:Concept ; skos:inScheme <code/movement-event-type> ; skos:topConceptOf <code/movement-event-type> ;
+    skos:notation "LIFT"^^stl:MovementEventTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "吊起"@zh, "lift"@en ; skos:prefLabel "吊起"@zh, "lift"@en ;
+    skos:definition "天车起吊实物使其脱离原支承并由吊具承载。"@zh, "A crane takes the load off its former support and carries it on the lifting attachment."@en .
+<code/movement-event-type/RELEASE> a skos:Concept ; skos:inScheme <code/movement-event-type> ; skos:topConceptOf <code/movement-event-type> ;
+    skos:notation "RELEASE"^^stl:MovementEventTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "释放落位"@zh, "set-down"@en ; skos:prefLabel "释放落位"@zh, "set-down"@en ;
+    skos:definition "受吊实物在目标位置获得支承，吊具随后解除承载。"@zh, "The load is set down at its actual destination and released by the lifting attachment."@en .
+<code/movement-event-type/LOAD> a skos:Concept ; skos:inScheme <code/movement-event-type> ; skos:topConceptOf <code/movement-event-type> ;
+    skos:notation "LOAD"^^stl:MovementEventTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "装车"@zh, "vehicle loading"@en ; skos:prefLabel "装车"@zh, "vehicle loading"@en ;
+    skos:definition "将已识别货件装到承运车辆并建立装载关系。"@zh, "Places an identified handling unit on its transport vehicle and records that load association."@en .
+<code/movement-event-type/DISPATCH> a skos:Concept ; skos:inScheme <code/movement-event-type> ; skos:topConceptOf <code/movement-event-type> ;
+    skos:notation "DISPATCH"^^stl:MovementEventTypeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "出厂"@zh, "dispatch"@en ; skos:prefLabel "出厂"@zh, "dispatch"@en ;
+    skos:definition "已装载货件实际离开厂区进入对外交运环节。"@zh, "Confirms that the loaded goods left the works on their outbound journey."@en .
+
+<code/personnel-role> a skos:ConceptScheme ;
+    rdfs:label "人员角色"@zh, "Personnel role"@en ; skos:prefLabel "人员角色"@zh, "Personnel role"@en ;
+    skos:definition "按作业所承担的职责对人员分类，可由不同人员在不同执行记录中承担同一职责。"@zh, "Groups people by the responsibility they exercise in an operation, independently of the individual assigned."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:PersonnelRoleCode a rdfs:Datatype ;
+    rdfs:label "人员角色代码"@zh, "Personnel role code"@en ; skos:prefLabel "人员角色代码"@zh, "Personnel role code"@en ;
+    skos:definition "标识“人员角色”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the personnel role scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/personnel-role/OPERATOR> a skos:Concept ; skos:inScheme <code/personnel-role> ; skos:topConceptOf <code/personnel-role> ;
+    skos:notation "OPERATOR"^^stl:PersonnelRoleCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "操作人员"@zh, "Operator"@en ; skos:prefLabel "操作人员"@zh, "Operator"@en ;
+    skos:definition "负责执行设备操作或生产步骤的角色。"@zh, "Role responsible for operating equipment or carrying out production steps."@en ;
+    dcterms:source <source/industry-practice> .
+<code/personnel-role/INSPECTOR> a skos:Concept ; skos:inScheme <code/personnel-role> ; skos:topConceptOf <code/personnel-role> ;
+    skos:notation "INSPECTOR"^^stl:PersonnelRoleCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "检验人员"@zh, "Inspector"@en ; skos:prefLabel "检验人员"@zh, "Inspector"@en ;
+    skos:definition "负责检查实物、试样或记录并报告检验结果的角色。"@zh, "Role responsible for examining material, specimens or records and reporting the findings."@en ;
+    dcterms:source <source/industry-practice> .
+<code/personnel-role/APPROVER> a skos:Concept ; skos:inScheme <code/personnel-role> ; skos:topConceptOf <code/personnel-role> ;
+    skos:notation "APPROVER"^^stl:PersonnelRoleCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "批准人员"@zh, "Approver"@en ; skos:prefLabel "批准人员"@zh, "Approver"@en ;
+    skos:definition "负责在授权范围内批准质量处置或放行决定的角色。"@zh, "Role responsible for authorizing a disposition or release within a delegated scope."@en ;
+    dcterms:source <source/industry-practice> .
+<code/personnel-role/PLANNER> a skos:Concept ; skos:inScheme <code/personnel-role> ; skos:topConceptOf <code/personnel-role> ;
+    skos:notation "PLANNER"^^stl:PersonnelRoleCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "计划人员"@zh, "Production planner"@en ; skos:prefLabel "计划人员"@zh, "Production planner"@en ;
+    skos:definition "负责把生产需求安排到作业时段和资源上的角色。"@zh, "Role responsible for scheduling production requirements against time and available resources."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/sample-orientation> a skos:ConceptScheme ;
+    rdfs:label "试样取向"@zh, "Specimen orientation"@en ; skos:prefLabel "试样取向"@zh, "Specimen orientation"@en ;
+    skos:definition "记录试样轴线相对于材料加工方向或产品几何轴的取向。"@zh, "Relates the specimen axis to a working direction or a named axis of the product."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:SampleOrientationCode a rdfs:Datatype ;
+    rdfs:label "试样取向代码"@zh, "Specimen orientation code"@en ; skos:prefLabel "试样取向代码"@zh, "Specimen orientation code"@en ;
+    skos:definition "标识“试样取向”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the specimen orientation scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/sample-orientation/L> a skos:Concept ; skos:inScheme <code/sample-orientation> ; skos:topConceptOf <code/sample-orientation> ;
+    skos:notation "L"^^stl:SampleOrientationCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "纵向"@zh, "Longitudinal"@en ; skos:prefLabel "纵向"@zh, "Longitudinal"@en ;
+    skos:definition "试样规定轴线平行于材料主加工方向或约定纵轴。"@zh, "The designated specimen axis is parallel to the principal working direction or declared longitudinal axis."@en .
+<code/sample-orientation/T> a skos:Concept ; skos:inScheme <code/sample-orientation> ; skos:topConceptOf <code/sample-orientation> ;
+    skos:notation "T"^^stl:SampleOrientationCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "横向"@zh, "Transverse"@en ; skos:prefLabel "横向"@zh, "Transverse"@en ;
+    skos:definition "试样规定轴线位于产品平面内并垂直于约定纵向。"@zh, "The specimen axis lies in the product plane across its designated longitudinal direction."@en .
+<code/sample-orientation/Z> a skos:Concept ; skos:inScheme <code/sample-orientation> ; skos:topConceptOf <code/sample-orientation> ;
+    skos:notation "Z"^^stl:SampleOrientationCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "厚度方向"@zh, "Through-thickness"@en ; skos:prefLabel "厚度方向"@zh, "Through-thickness"@en ;
+    skos:definition "试样规定轴线沿板面法向贯穿厚度方向。"@zh, "The designated specimen axis follows the plate normal through its thickness."@en .
+<code/sample-orientation/R> a skos:Concept ; skos:inScheme <code/sample-orientation> ; skos:topConceptOf <code/sample-orientation> ;
+    skos:notation "R"^^stl:SampleOrientationCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "径向"@zh, "Radial"@en ; skos:prefLabel "径向"@zh, "Radial"@en ;
+    skos:definition "圆形件试样的规定轴线朝向或背离工件中心轴。"@zh, "The designated axis runs outward or inward along a radius of the circular product."@en ;
+    dcterms:source <source/industry-practice> .
+<code/sample-orientation/C> a skos:Concept ; skos:inScheme <code/sample-orientation> ; skos:topConceptOf <code/sample-orientation> ;
+    skos:notation "C"^^stl:SampleOrientationCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "周向"@zh, "Circumferential"@en ; skos:prefLabel "周向"@zh, "Circumferential"@en ;
+    skos:definition "试样规定方向沿圆筒或圆环的圆周切线。"@zh, "The specified specimen direction follows the tangent to a tube or ring circumference."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/packing-form> a skos:ConceptScheme ;
+    rdfs:label "交货包装形式"@zh, "Packing form"@en ; skos:prefLabel "交货包装形式"@zh, "Packing form"@en ;
+    skos:definition "区分哪些实物作为一个包装单元清点和搬运。"@zh, "Identifies the handling unit in which pieces are counted and presented for shipment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:PackingFormCode a rdfs:Datatype ;
+    rdfs:label "交货包装形式代码"@zh, "Packing form code"@en ; skos:prefLabel "交货包装形式代码"@zh, "Packing form code"@en ;
+    skos:definition "标识“交货包装形式”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the packing form scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/packing-form/BUNDLE> a skos:Concept ; skos:inScheme <code/packing-form> ; skos:topConceptOf <code/packing-form> ;
+    skos:notation "BUNDLE"^^stl:PackingFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "捆"@zh, "Bundle"@en ; skos:prefLabel "捆"@zh, "Bundle"@en ;
+    skos:definition "若干条、根或支用带材捆扎成一个可计件的搬运单元。"@zh, "Several lengths secured together by strapping form one counted handling unit."@en .
+<code/packing-form/COILUNIT> a skos:Concept ; skos:inScheme <code/packing-form> ; skos:topConceptOf <code/packing-form> ;
+    skos:notation "COILUNIT"^^stl:PackingFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "单卷包装"@zh, "Single-coil package"@en ; skos:prefLabel "单卷包装"@zh, "Single-coil package"@en ;
+    skos:definition "一卷钢材单独捆扎或包覆，保留其卷号对应的包装身份。"@zh, "One coil is secured or wrapped as a package associated with its coil identifier."@en ;
+    dcterms:source <std/gbt-247-2025> .
+<code/packing-form/STACK> a skos:Concept ; skos:inScheme <code/packing-form> ; skos:topConceptOf <code/packing-form> ;
+    skos:notation "STACK"^^stl:PackingFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "板垛包装"@zh, "Sheet or plate pack"@en ; skos:prefLabel "板垛包装"@zh, "Sheet or plate pack"@en ;
+    skos:definition "多张板材对齐堆叠并固定成一个包装单元。"@zh, "An aligned stack of sheets or plates is secured for handling as one pack."@en ;
+    dcterms:source <std/gbt-247-2025> .
+<code/packing-form/CRATE> a skos:Concept ; skos:inScheme <code/packing-form> ; skos:topConceptOf <code/packing-form> ;
+    skos:notation "CRATE"^^stl:PackingFormCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "箱装"@zh, "Crated package"@en ; skos:prefLabel "箱装"@zh, "Crated package"@en ;
+    skos:definition "将零件或精整材固定在防护箱内交付。"@zh, "Pieces or finished stock are secured inside a protective crate for delivery."@en .
+
+<code/transport-mode> a skos:ConceptScheme ;
+    rdfs:label "发运运输方式"@zh, "Shipment transport mode"@en ; skos:prefLabel "发运运输方式"@zh, "Shipment transport mode"@en ;
+    skos:definition "按一段发运实际采用的承运工具区分运输方式。"@zh, "Identifies the carrier mode for one leg of an outbound shipment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:TransportModeCode a rdfs:Datatype ;
+    rdfs:label "发运运输方式代码"@zh, "Shipment transport mode code"@en ; skos:prefLabel "发运运输方式代码"@zh, "Shipment transport mode code"@en ;
+    skos:definition "标识“发运运输方式”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the shipment transport mode scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/transport-mode/ROAD> a skos:Concept ; skos:inScheme <code/transport-mode> ; skos:topConceptOf <code/transport-mode> ;
+    skos:notation "ROAD"^^stl:TransportModeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "公路运输"@zh, "Road transport"@en ; skos:prefLabel "公路运输"@zh, "Road transport"@en ;
+    skos:definition "货物装载于公路车辆并经道路完成本运输段。"@zh, "The shipment leg is carried on a road vehicle."@en .
+<code/transport-mode/RAIL> a skos:Concept ; skos:inScheme <code/transport-mode> ; skos:topConceptOf <code/transport-mode> ;
+    skos:notation "RAIL"^^stl:TransportModeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "铁路运输"@zh, "Rail transport"@en ; skos:prefLabel "铁路运输"@zh, "Rail transport"@en ;
+    skos:definition "货物装入铁路车辆后经轨道列车运送。"@zh, "Rail wagons carry the stock over the specified transport leg."@en .
+<code/transport-mode/WATER> a skos:Concept ; skos:inScheme <code/transport-mode> ; skos:topConceptOf <code/transport-mode> ;
+    skos:notation "WATER"^^stl:TransportModeCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "水路运输"@zh, "Water transport"@en ; skos:prefLabel "水路运输"@zh, "Water transport"@en ;
+    skos:definition "货物在船舶或驳船上经海运或内河航运承运。"@zh, "A vessel or barge carries the cargo on a sea or inland waterway leg."@en .
+
+<code/lot-formation-dimension> a skos:ConceptScheme ;
+    rdfs:label "组批维度"@zh, "Lot formation dimension"@en ; skos:prefLabel "组批维度"@zh, "Lot formation dimension"@en ;
+    skos:definition "列出组建检验批时可要求成员相同的特征，每条组批规则选用其中适用的维度。"@zh, "Identifies characteristics that a lot formation rule can require members of an inspection lot to share."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:LotFormationDimensionCode a rdfs:Datatype ;
+    rdfs:label "组批维度代码"@zh, "Lot formation dimension code"@en ; skos:prefLabel "组批维度代码"@zh, "Lot formation dimension code"@en ;
+    skos:definition "标识“组批维度”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the lot formation dimension scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/lot-formation-dimension/HEAT> a skos:Concept ; skos:inScheme <code/lot-formation-dimension> ; skos:topConceptOf <code/lot-formation-dimension> ;
+    skos:notation "HEAT"^^stl:LotFormationDimensionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "炉次"@zh, "Heat"@en ; skos:prefLabel "炉次"@zh, "Heat"@en ;
+    skos:definition "要求检验批成员的钢水来源可追溯至同一炉次，以来源记录核实炉次身份。"@zh, "Requires members of an inspection lot to trace to the same steelmaking heat through their material records."@en .
+<code/lot-formation-dimension/SPEC> a skos:Concept ; skos:inScheme <code/lot-formation-dimension> ; skos:topConceptOf <code/lot-formation-dimension> ;
+    skos:notation "SPEC"^^stl:LotFormationDimensionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "规格"@zh, "Material specification"@en ; skos:prefLabel "规格"@zh, "Material specification"@en ;
+    skos:definition "要求检验批成员适用同一物料规格，以该规格的身份判断能否合批。"@zh, "Requires members of an inspection lot to be covered by the same material specification."@en .
+<code/lot-formation-dimension/DELIVERY> a skos:Concept ; skos:inScheme <code/lot-formation-dimension> ; skos:topConceptOf <code/lot-formation-dimension> ;
+    skos:notation "DELIVERY"^^stl:LotFormationDimensionCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "交货状态"@zh, "Delivery condition"@en ; skos:prefLabel "交货状态"@zh, "Delivery condition"@en ;
+    skos:definition "要求检验批成员具有相同的交货加工或热处理状态，例如均以正火态交付。"@zh, "Requires members of an inspection lot to share a processing or heat-treatment condition at delivery, such as the normalized condition."@en .
+
+<code/rating-comparison> a skos:ConceptScheme ;
+    rdfs:label "评级比较关系"@zh, "Rating comparison operator"@en ; skos:prefLabel "评级比较关系"@zh, "Rating comparison operator"@en ;
+    skos:definition "规定实测级别在所引用评级标尺上与要求值如何比较。"@zh, "Relates an observed rating to a specified value on the named rating scale."@en ;
+    skos:scopeNote "要求值与实测值应采用同一版次的有序评级标尺。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+stl:RatingComparisonCode a rdfs:Datatype ;
+    rdfs:label "评级比较关系代码"@zh, "Rating comparison operator code"@en ; skos:prefLabel "评级比较关系代码"@zh, "Rating comparison operator code"@en ;
+    skos:definition "标识“评级比较关系”方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the rating comparison operator scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/codes> .
+
+<code/rating-comparison/LT> a skos:Concept ; skos:inScheme <code/rating-comparison> ; skos:topConceptOf <code/rating-comparison> ;
+    skos:notation "LT"^^stl:RatingComparisonCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "小于"@zh, "Less than"@en ; skos:prefLabel "小于"@zh, "Less than"@en ;
+    skos:definition "实测评级数值须严格低于所列界值。"@zh, "Requires the observed rating to lie strictly below the specified value."@en ;
+    skos:altLabel "<"@zh, "<"@en .
+<code/rating-comparison/LE> a skos:Concept ; skos:inScheme <code/rating-comparison> ; skos:topConceptOf <code/rating-comparison> ;
+    skos:notation "LE"^^stl:RatingComparisonCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "不大于"@zh, "Less than or equal to"@en ; skos:prefLabel "不大于"@zh, "Less than or equal to"@en ;
+    skos:definition "实测评级数值允许等于上限或位于其下。"@zh, "Accepts values up to and including the upper rating limit."@en ;
+    skos:altLabel "≤"@zh, "≤"@en .
+<code/rating-comparison/EQ> a skos:Concept ; skos:inScheme <code/rating-comparison> ; skos:topConceptOf <code/rating-comparison> ;
+    skos:notation "EQ"^^stl:RatingComparisonCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "等于"@zh, "Equal to"@en ; skos:prefLabel "等于"@zh, "Equal to"@en ;
+    skos:definition "实测评级须与所列目标级别相同。"@zh, "Requires the observed rating to match the specified grade exactly."@en ;
+    skos:altLabel "="@zh, "="@en .
+<code/rating-comparison/GE> a skos:Concept ; skos:inScheme <code/rating-comparison> ; skos:topConceptOf <code/rating-comparison> ;
+    skos:notation "GE"^^stl:RatingComparisonCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "不小于"@zh, "Greater than or equal to"@en ; skos:prefLabel "不小于"@zh, "Greater than or equal to"@en ;
+    skos:definition "实测评级数值允许等于下限或位于其上。"@zh, "Accepts values at or above the stated lower rating limit."@en ;
+    skos:altLabel "≥"@zh, "≥"@en .
+<code/rating-comparison/GT> a skos:Concept ; skos:inScheme <code/rating-comparison> ; skos:topConceptOf <code/rating-comparison> ;
+    skos:notation "GT"^^stl:RatingComparisonCode ; rdfs:isDefinedBy <ontology/core/codes> ;
+    rdfs:label "大于"@zh, "Greater than"@en ; skos:prefLabel "大于"@zh, "Greater than"@en ;
+    skos:definition "实测评级数值须严格超过所列界值。"@zh, "Requires the observed rating to exceed the specified value."@en ;
+    skos:altLabel ">"@zh, ">"@en .

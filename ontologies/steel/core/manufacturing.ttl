@@ -1,0 +1,284 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/manufacturing> a owl:Ontology ;
+    owl:versionIRI <ontology/core/manufacturing/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "制造与工序执行"@zh, "Manufacturing and operations"@en ;
+    rdfs:comment "描述排产、派工和现场执行，以及每次作业所用的设备和物料。"@zh, "Describes schedules, dispatched work and shop-floor executions with their equipment and material flows."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Business records, planned work and execution
+stl:ManufacturingObject a owl:Class ; rdfs:subClassOf owl:Thing ;
+    rdfs:label "制造业务对象"@zh, "Manufacturing object"@en ; skos:prefLabel "制造业务对象"@zh, "Manufacturing object"@en ;
+    skos:definition "在生产、检验或交付中可以被独立指称的实体或活动。"@zh, "An entity or activity that can be identified in a production, inspection or delivery record."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ManufacturingRecord a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "制造记录"@zh, "Manufacturing record"@en ; skos:prefLabel "制造记录"@zh, "Manufacturing record"@en ;
+    skos:definition "可在制造业务中留存和引用的记录，其内容可以是计划、实绩或凭证。"@zh, "A record preserving a plan, an occurrence or a document for later reference in manufacturing."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:Event a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "事件"@zh, "Event"@en ; skos:prefLabel "事件"@zh, "Event"@en ;
+    skos:definition "在生产或交付履历中能够按实际发生时间定位的一次业务事实。"@zh, "An occurrence locatable in the production or delivery history by its actual time."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:Operation a owl:Class ; rdfs:subClassOf stl:Event, prov:Activity ;
+    rdfs:label "工序执行"@zh, "Operation"@en ; skos:prefLabel "工序执行"@zh, "Operation"@en ;
+    skos:definition "现场某项工序的一次实施，投入、产出和执行设备均可归到本次作业。"@zh, "A particular execution of a shop-floor step to which its equipment and material flows can be attributed."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:Plan a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ; owl:disjointWith stl:Event ;
+    rdfs:label "计划"@zh, "Plan"@en ; skos:prefLabel "计划"@zh, "Plan"@en ;
+    skos:definition "在执行前约定预期作业、资源或时间的记录。"@zh, "A record setting out intended work, resources or timing before execution."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ProductionOrder a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "生产订单"@zh, "Production order"@en ; skos:prefLabel "生产订单"@zh, "Production order"@en ;
+    skos:definition "为了履行制造需求而下达、可由多次现场作业共同履行的计划。"@zh, "A plan authorizing production against demand through one or more actual operations."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ProductionSchedule a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "排产计划"@zh, "Production schedule"@en ; skos:prefLabel "排产计划"@zh, "Production schedule"@en ;
+    skos:definition "在给定排程区间内为一组生产订单安排资源与顺序的计划。"@zh, "A plan assigning resources and sequence to a collection of production orders within a scheduling horizon."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:SalesOrder a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "销售订单"@zh, "Sales order"@en ; skos:prefLabel "销售订单"@zh, "Sales order"@en ;
+    skos:definition "以同一个订货凭证标识汇集客户各项需求的业务记录。"@zh, "A commercial document grouping a customer's order items under one order identity."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:SalesOrderLine a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "订单行"@zh, "Sales order line"@en ; skos:prefLabel "订单行"@zh, "Sales order line"@en ;
+    skos:definition "销售订单中能独立约定规格并承接实物分配的一项。"@zh, "An individually specifiable item of demand within a sales order to which pieces can be assigned."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+
+# Reusable process definitions and scheduling
+stl:ProcessSegment a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "工序段"@zh, "Process segment"@en ; skos:prefLabel "工序段"@zh, "Process segment"@en ;
+    skos:altLabel "工艺段"@zh ;
+    skos:definition "可以被多条路线和多次执行引用的一段可排程工艺定义。"@zh, "A schedulable process step that may be referenced in multiple routes and executions."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ProcessRoute a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "工艺路线"@zh, "Process route"@en ; skos:prefLabel "工艺路线"@zh, "Process route"@en ;
+    skos:definition "规定某种物料从投入到制成所经工序段、顺序和可选分支的可复用路线。"@zh, "A route identifying the ordered operations and permitted branches for making a product."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:RouteStep a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "路线步骤"@zh, "Route step"@en ; skos:prefLabel "路线步骤"@zh, "Route step"@en ;
+    skos:definition "某工艺段在一条路线中的一次占位，同段可在不同顺位重复出现。"@zh, "An occurrence of a segment in a route that can be distinguished from a later use of the same segment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:WorkAssignment a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "工序派工单"@zh, "Work assignment"@en ; skos:prefLabel "工序派工单"@zh, "Work assignment"@en ;
+    skos:definition "把一段待执行作业落实到指定工作单元和作业时段的指令。"@zh, "A dispatch instruction allocating a planned segment to a work unit and time slot."@en ;
+    dcterms:source <std/iec-62264-3-2016> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ProductionCampaign a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "生产工作期"@zh, "Production campaign"@en ; skos:prefLabel "生产工作期"@zh, "Production campaign"@en ;
+    skos:definition "用同一炉衬、工具组或生产安排归集连续作业的一段生产履历。"@zh, "A record grouping successive operations under a common lining, tool set or production arrangement."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ProductionInterruption a owl:Class ; rdfs:subClassOf stl:Event ;
+    rdfs:label "生产中断事件"@zh, "Production interruption"@en ; skos:prefLabel "生产中断事件"@zh, "Production interruption"@en ;
+    skos:definition "实际生产中有起止时刻、影响已开始作业的一次中断。"@zh, "A timed interruption affecting a specific execution already in progress."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:Changeover a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "换型作业"@zh, "Changeover"@en ; skos:prefLabel "换型作业"@zh, "Changeover"@en ;
+    skos:definition "在前后两项生产任务之间为切换规格或工装而单独登记的执行。"@zh, "An execution between successive jobs that changes a setup or tool for the next specification."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:MaterialTransformation a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "物料转换作业"@zh, "Material transformation"@en ; skos:prefLabel "物料转换作业"@zh, "Material transformation"@en ;
+    skos:definition "消耗或改变投入物料并产生可区分产出物料的一次作业。"@zh, "An operation that consumes or changes input material and establishes distinct output material."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:MaterialAggregation a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "实物聚合作业"@zh, "Material aggregation"@en ; skos:prefLabel "实物聚合作业"@zh, "Material aggregation"@en ;
+    skos:definition "将成员装入可整体管理的物流单元且保留各成员身份的作业。"@zh, "An operation that assembles pieces into a handling unit while preserving their identities."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:MaterialDisaggregation a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "实物拆包作业"@zh, "Material disaggregation"@en ; skos:prefLabel "实物拆包作业"@zh, "Material disaggregation"@en ;
+    skos:definition "从包装或装载单元取出一件或多件成员，并在取出后继续沿用各成员原有身份的作业。"@zh, "An operation that takes identifiable pieces out of a handling unit while retaining each piece’s existing identity."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+
+# Production resources and responsibilities
+stl:Equipment a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "设备"@zh, "Equipment"@en ; skos:prefLabel "设备"@zh, "Equipment"@en ;
+    skos:definition "承担生产或搬运任务的可识别资源，包括按职能划分的设备单元及其使用的装置。"@zh, "An identifiable manufacturing resource, including a functional equipment unit or a physical device used for processing or handling."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:EquipmentHierarchyNode a owl:Class ; rdfs:subClassOf stl:Equipment ;
+    rdfs:label "设备层级节点"@zh, "Equipment hierarchy node"@en ; skos:prefLabel "设备层级节点"@zh, "Equipment hierarchy node"@en ;
+    skos:definition "在制造设备层级中按生产职责划定边界的功能节点，可用于定位作业或归集下属资源。"@zh, "A functional node in the equipment hierarchy used to locate work or group resources under a common production responsibility."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:Site a owl:Class ; rdfs:subClassOf stl:EquipmentHierarchyNode ;
+    rdfs:label "厂区"@zh, "Site"@en ; skos:prefLabel "厂区"@zh, "Site"@en ;
+    skos:definition "承载一组生产区域并有独立运营边界的制造场所。"@zh, "A manufacturing site within whose operating boundary areas are organized."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:Area a owl:Class ; rdfs:subClassOf stl:EquipmentHierarchyNode ;
+    rdfs:label "生产区域"@zh, "Area"@en ; skos:prefLabel "生产区域"@zh, "Area"@en ;
+    skos:definition "厂区内按生产职责划分、管理若干工作中心的区域。"@zh, "A functional subdivision of a site that groups work centers for production management."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:WorkCenter a owl:Class ; rdfs:subClassOf stl:EquipmentHierarchyNode ;
+    rdfs:label "工作中心"@zh, "Work center"@en ; skos:prefLabel "工作中心"@zh, "Work center"@en ;
+    skos:definition "生产区域内承接计划并调配工作单元的一组资源。"@zh, "A resource grouping within an area to which work is scheduled and within which units are assigned."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:WorkUnit a owl:Class ; rdfs:subClassOf stl:EquipmentHierarchyNode ;
+    rdfs:label "工作单元"@zh, "Work unit"@en ; skos:prefLabel "工作单元"@zh, "Work unit"@en ;
+    skos:definition "工作中心内能承担某段具体作业的资源单元。"@zh, "A unit within a work center capable of carrying out an assigned segment of work."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ProductionTool a owl:Class ; rdfs:subClassOf stl:Equipment ;
+    rdfs:label "生产工装"@zh, "Production tool"@en ; skos:prefLabel "生产工装"@zh, "Production tool"@en ;
+    skos:definition "可装配、更换并按自身编号跟踪使用履历的生产用具。"@zh, "An interchangeable production tool whose service history is tracked separately from its host equipment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:ToolInstallation a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "工装装配作业"@zh, "Tool installation"@en ; skos:prefLabel "工装装配作业"@zh, "Tool installation"@en ;
+    skos:definition "将有标识的工装装到设备上并确定其使用起点的一次作业。"@zh, "An operation that fits an identifiable tool to equipment and establishes the start of its service there."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:MeasuringInstrument a owl:Class ; rdfs:subClassOf stl:Equipment, sosa:Sensor ;
+    rdfs:label "测量仪器"@zh, "Measuring instrument"@en ; skos:prefLabel "测量仪器"@zh, "Measuring instrument"@en ;
+    skos:definition "按测量原理对被测量作出响应并提供读数的设备，可在不同测点使用。"@zh, "Equipment that responds to a measurand and provides a reading at a measurement point."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:PersonnelRole a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "人员角色"@zh, "Personnel role"@en ; skos:prefLabel "人员角色"@zh, "Personnel role"@en ;
+    skos:definition "按所承担的制造职责识别的人员职能，可由不同人员在不同作业中担任。"@zh, "A manufacturing responsibility that can be assigned to different people across operations."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+
+# Process segments, equipment and material flows
+stl:executesSegment a owl:ObjectProperty ; rdfs:domain stl:Operation ; rdfs:range stl:ProcessSegment ;
+    rdfs:label "执行工序段"@zh, "Implements segment"@en ; skos:prefLabel "执行工序段"@zh, "Implements segment"@en ;
+    skos:definition "指出本次实际作业采用的可复用工序段定义。"@zh, "Identifies the reusable segment definition followed by an execution."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:performedOn a owl:ObjectProperty ; rdfs:domain stl:Event ; rdfs:range stl:Equipment ;
+    rdfs:label "执行设备"@zh, "Performed on"@en ; skos:prefLabel "执行设备"@zh, "Performed on"@en ;
+    skos:definition "指出实际承接本次现场作业或搬运事件的设备。"@zh, "Identifies the physical equipment on which the recorded work took place."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:partOfEquipment a owl:ObjectProperty ; rdfs:subPropertyOf stl:partOf ; rdfs:domain stl:Equipment ; rdfs:range stl:Equipment ;
+    rdfs:label "所属上级设备"@zh, "Parent equipment"@en ; skos:prefLabel "所属上级设备"@zh, "Parent equipment"@en ;
+    skos:definition "从设备或功能单元指向设备层级中直接包含它的上一级资源。"@zh, "Links an equipment resource or functional unit to its immediate parent in the equipment hierarchy."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:equipmentType a owl:ObjectProperty ; rdfs:domain stl:Equipment ; rdfs:range skos:Concept ; rdfs:seeAlso <code/equipment-type> ;
+    rdfs:label "设备类型"@zh, "Equipment type"@en ; skos:prefLabel "设备类型"@zh, "Equipment type"@en ;
+    skos:definition "用设备类型代码标明一台设备按生产职能归入的类别。"@zh, "Identifies the equipment category describing the production function of an equipment resource."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:processType a owl:ObjectProperty ; rdfs:domain stl:ProcessSegment ; rdfs:range skos:Concept ; rdfs:seeAlso <code/process-type> ;
+    rdfs:label "工序类型"@zh, "Process type"@en ; skos:prefLabel "工序类型"@zh, "Process type"@en ;
+    skos:definition "为可排程的工序段指定工艺分类代码。"@zh, "Classifies a schedulable process segment by the manufacturing process it describes."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:installedAtUnit a owl:ObjectProperty ; rdfs:domain stl:Equipment ; rdfs:range stl:WorkUnit ;
+    rdfs:label "服役工作单元"@zh, "Serving work unit"@en ; skos:prefLabel "服役工作单元"@zh, "Serving work unit"@en ;
+    skos:definition "把物理设备关联到它所服务的功能工作单元。"@zh, "Relates a physical asset to the functional work unit it serves."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:installedTool a owl:ObjectProperty ; rdfs:domain stl:ToolInstallation ; rdfs:range stl:ProductionTool ;
+    rdfs:label "装入工装"@zh, "Tool fitted"@en ; skos:prefLabel "装入工装"@zh, "Tool fitted"@en ;
+    skos:definition "指明装配作业实际装入设备的有标识工装。"@zh, "Identifies the traceable tool fitted during an installation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:inputPiece a owl:ObjectProperty ; rdfs:subPropertyOf prov:used ; rdfs:domain stl:Operation ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "投入件"@zh, "Input piece"@en ; skos:prefLabel "投入件"@zh, "Input piece"@en ;
+    skos:definition "列出一次执行实际使用的一件源实物。"@zh, "Identifies an actual input piece used by this execution."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:outputPiece a owl:ObjectProperty ; rdfs:domain stl:Operation ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "产出件"@zh, "Output piece"@en ; skos:prefLabel "产出件"@zh, "Output piece"@en ;
+    skos:definition "列出因本次执行而获得独立身份的一件产出物。"@zh, "Identifies a piece given its own output identity by this execution."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:consumedLot a owl:ObjectProperty ; rdfs:subPropertyOf prov:used ; rdfs:domain stl:Operation ; rdfs:range stl:MaterialLot ;
+    rdfs:label "耗用批次"@zh, "Consumed lot"@en ; skos:prefLabel "耗用批次"@zh, "Consumed lot"@en ;
+    skos:definition "指向本次工序实际取料或加工的一个物料批，一批只耗用部分物料时仍引用原批。"@zh, "Identifies a lot drawn upon in an operation, including a lot from which only part of the material was used."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:outputLot a owl:ObjectProperty ; rdfs:domain stl:Operation ; rdfs:range stl:MaterialLot ;
+    rdfs:label "产出料批"@zh, "Output lot"@en ; skos:prefLabel "产出料批"@zh, "Output lot"@en ;
+    skos:definition "指向一次工序执行形成并取得独立批身份的输出。"@zh, "Identifies a material lot established as an output of an execution."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:consumedQuantity a owl:DatatypeProperty ; rdfs:domain stl:LotAllocation ; rdfs:range xsd:decimal ; stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "批次耗用量"@zh, "Consumed quantity"@en ; skos:prefLabel "批次耗用量"@zh, "Consumed quantity"@en ;
+    skos:definition "一条投料明细中从指定物料批实际耗用于指定工序的质量，以吨计。"@zh, "Mass in tonnes actually drawn from one lot for the operation identified on a consumption entry."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:roleType a owl:ObjectProperty ; rdfs:domain stl:PersonnelRole ; rdfs:range skos:Concept ; rdfs:seeAlso <code/personnel-role> ;
+    rdfs:label "人员角色类别"@zh, "Personnel role type"@en ; skos:prefLabel "人员角色类别"@zh, "Personnel role type"@en ;
+    skos:definition "用人员角色代码归类一项制造职责，以便按职能汇总派工或审批记录。"@zh, "Classifies a manufacturing responsibility by the personnel role used for dispatch or approval."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+
+# Route steps, plans and order allocation
+stl:nextStep a owl:ObjectProperty ; rdfs:domain stl:RouteStep ; rdfs:range stl:RouteStep ;
+    rdfs:label "后续路线步骤"@zh, "Next route step"@en ; skos:prefLabel "后续路线步骤"@zh, "Next route step"@en ;
+    skos:definition "给出同一路线允许直接接续的下一步骤。"@zh, "Identifies a route step permitted to follow the current step directly."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:stepSegment a owl:ObjectProperty ; rdfs:domain stl:RouteStep ; rdfs:range stl:ProcessSegment ;
+    rdfs:label "步骤引用工序段"@zh, "Segment of route step"@en ; skos:prefLabel "步骤引用工序段"@zh, "Segment of route step"@en ;
+    skos:definition "将路线中的一个位置关联到该位置引用的工序段定义。"@zh, "Links one position in a route to the segment definition used there."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:stepNumber a owl:DatatypeProperty ; rdfs:domain stl:RouteStep ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "路线步序"@zh, "Route step number"@en ; skos:prefLabel "路线步序"@zh, "Route step number"@en ;
+    skos:definition "标识同一路线内步骤的展示或引用顺序。"@zh, "Gives the ordinal by which a step is cited within its route."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:scheduledOrder a owl:ObjectProperty ; rdfs:domain stl:ProductionSchedule ; rdfs:range stl:ProductionOrder ;
+    rdfs:label "计划内生产订单"@zh, "Scheduled production order"@en ; skos:prefLabel "计划内生产订单"@zh, "Scheduled production order"@en ;
+    skos:definition "列明一份排产计划实际纳入的生产订单。"@zh, "Identifies a production order included in the schedule."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:assignedUnit a owl:ObjectProperty ; rdfs:domain stl:WorkAssignment ; rdfs:range stl:WorkUnit ;
+    rdfs:label "派工工作单元"@zh, "Assigned work unit"@en ; skos:prefLabel "派工工作单元"@zh, "Assigned work unit"@en ;
+    skos:definition "标识派工时为待执行步骤分配的工作单元。"@zh, "Identifies the work unit allocated to a dispatched step."@en ;
+    dcterms:source <std/iec-62264-3-2016> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:fulfills a owl:ObjectProperty ; rdfs:domain stl:Event ; rdfs:range stl:Plan ;
+    rdfs:label "落实计划"@zh, "Fulfils plan"@en ; skos:prefLabel "落实计划"@zh, "Fulfils plan"@en ;
+    skos:definition "把一项已发生的作业或事件与其完成的计划相连。"@zh, "Relates an actual occurrence to the plan it implements."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:forOrderLine a owl:ObjectProperty ; rdfs:domain stl:ProductionOrder ; rdfs:range stl:SalesOrderLine ;
+    rdfs:label "服务订单行"@zh, "For order line"@en ; skos:prefLabel "服务订单行"@zh, "For order line"@en ;
+    skos:definition "说明该生产订单是为履行哪一订货项目而下达。"@zh, "Identifies the demand item for which the production order was issued."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:allocatedTo a owl:ObjectProperty ; rdfs:domain stl:MaterialPiece ; rdfs:range stl:SalesOrderLine ;
+    rdfs:label "分配订单行"@zh, "Allocated to"@en ; skos:prefLabel "分配订单行"@zh, "Allocated to"@en ;
+    skos:definition "指明当前实物分配所服务的销售订单行。"@zh, "Identifies the sales order item to which a piece is allocated."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:lineNumber a owl:DatatypeProperty ; rdfs:domain stl:SalesOrderLine ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "订单行号"@zh, "Order line number"@en ; skos:prefLabel "订单行号"@zh, "Order line number"@en ;
+    skos:definition "给出订货项目在所属销售订单中的行序号。"@zh, "Gives the assigned line ordinal within a particular sales order."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+
+# Business time and local ordinals
+stl:plannedStartAt a owl:DatatypeProperty ; rdfs:domain stl:Plan ; rdfs:range xsd:dateTime ;
+    rdfs:label "计划开始时刻"@zh, "Planned start"@en ; skos:prefLabel "计划开始时刻"@zh, "Planned start"@en ;
+    skos:definition "给出计划中预期开始作业的时间点。"@zh, "Gives the start instant intended by a plan."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:plannedEndAt a owl:DatatypeProperty ; rdfs:domain stl:Plan ; rdfs:range xsd:dateTime ;
+    rdfs:label "计划结束时刻"@zh, "Planned end"@en ; skos:prefLabel "计划结束时刻"@zh, "Planned end"@en ;
+    skos:definition "给出计划要求或预期完成工作的时间点。"@zh, "Gives the completion instant intended by a plan."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:actualStartAt a owl:DatatypeProperty ; rdfs:domain stl:Event ; rdfs:range xsd:dateTime ;
+    rdfs:label "实际开始时刻"@zh, "Actual start"@en ; skos:prefLabel "实际开始时刻"@zh, "Actual start"@en ;
+    skos:definition "记录一次作业或事件在现场真正开始的时点。"@zh, "Gives the observed start instant of an actual occurrence."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:actualEndAt a owl:DatatypeProperty ; rdfs:domain stl:Event ; rdfs:range xsd:dateTime ;
+    rdfs:label "实际结束时刻"@zh, "Actual end"@en ; skos:prefLabel "实际结束时刻"@zh, "Actual end"@en ;
+    skos:definition "记录一次作业或事件在现场实际结束的时点。"@zh, "Gives the observed completion instant of an actual occurrence."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:occurredAt a owl:DatatypeProperty ; rdfs:domain stl:Event ; rdfs:range xsd:dateTime ;
+    rdfs:label "发生时刻"@zh, "Occurred at"@en ; skos:prefLabel "发生时刻"@zh, "Occurred at"@en ;
+    skos:definition "标识可按单一时点登记的动作发生时刻。"@zh, "Gives the instant at which a recorded point event took place."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:createdAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime ;
+    rdfs:label "创建时刻"@zh, "Created at"@en ; skos:prefLabel "创建时刻"@zh, "Created at"@en ;
+    skos:definition "给出实物或单据以此身份成立的时间点。"@zh, "Gives the instant at which the identified item or document came into existence."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:recordedAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime ;
+    rdfs:label "登记时刻"@zh, "Recorded at"@en ; skos:prefLabel "登记时刻"@zh, "Recorded at"@en ;
+    skos:definition "给出相关信息在业务系统中完成登记的时间。"@zh, "Gives the instant at which the information was entered into the system of record."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:issuedOn a owl:DatatypeProperty ; rdfs:range xsd:date ;
+    rdfs:label "签发日期"@zh, "Issue date"@en ; skos:prefLabel "签发日期"@zh, "Issue date"@en ;
+    skos:definition "记载凭证经正式签发的日历日期。"@zh, "Gives the calendar date of formal document issue."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:serialNumber a owl:DatatypeProperty ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "流水号"@zh, "Serial number"@en ; skos:prefLabel "流水号"@zh, "Serial number"@en ;
+    skos:definition "保留所属编号序列中分配给本对象的顺序号。"@zh, "Preserves the object's ordinal in the applicable serial numbering series."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:unitNumber a owl:DatatypeProperty ; rdfs:domain stl:Equipment ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "设备序号"@zh, "Equipment number"@en ; skos:prefLabel "设备序号"@zh, "Equipment number"@en ;
+    skos:definition "设备在指定编号序列中的序号，可用于区分同类设备。"@zh, "Ordinal assigned to an equipment resource within its designated numbering series."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+
+# Quantity annotations
+stl:unit a owl:AnnotationProperty ;
+    rdfs:label "计量单位"@zh, "Unit of measure"@en ; skos:prefLabel "计量单位"@zh, "Unit of measure"@en ;
+    skos:definition "标明数值属性的所有读数或要求值共同使用的计量单位。"@zh, "Identifies the unit in which every value of the annotated numeric property is expressed."@en ;
+    dcterms:source <std/iso-80000-1-2022> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
+stl:quantityKind a owl:AnnotationProperty ;
+    rdfs:label "量的种类"@zh, "Quantity kind"@en ; skos:prefLabel "量的种类"@zh, "Quantity kind"@en ;
+    skos:definition "标明数值属性所表达的量，例如质量、质量分数或件数。"@zh, "Identifies what the values of a numeric property quantify, such as mass, mass fraction or count."@en ;
+    dcterms:source <std/iso-80000-1-2022> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
