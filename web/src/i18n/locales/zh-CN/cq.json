@@ -1,0 +1,50 @@
+{
+  "title": "能力问题",
+  "empty": "用能力问题记录本体应该能回答什么，并在发布后检验答案。",
+  "create": "新建能力问题",
+  "edit": "编辑能力问题",
+  "archive": "归档问题",
+  "moveUp": "上移",
+  "moveDown": "下移",
+  "import": "从文件导入",
+  "importResult": "已导入 {{created}} 条，跳过 {{skipped}} 条。",
+  "text": "问题",
+  "expectation": "期望答案",
+  "kinds": {
+    "answerable": "能回答",
+    "objects": "一组对象",
+    "number": "一个数"
+  },
+  "type": "对象类型",
+  "keys": "对象主键（每行一个）",
+  "number": "期望数值",
+  "tolerance": "允许误差",
+  "note": "备注",
+  "check": "检验问题",
+  "checkAll": "全部检验",
+  "lastCheck": "最近一次结果",
+  "version": "版本 v{{version}}",
+  "staleVersion": "旧版本的结果，请在当前版本重新检验。",
+  "result": {
+    "pending": "等待结果",
+    "pass": "通过",
+    "fail": "与期望不符",
+    "unanswerable": "答不了",
+    "error": "检验失败"
+  },
+  "coverage": {
+    "title": "覆盖检查",
+    "ok": "所需的本体元素和数据绑定齐全。",
+    "element_missing": "缺少上次检验用到的本体元素。",
+    "binding_missing": "缺少上次检验用到的数据绑定。",
+    "never_checked": "尚未检验这个问题。"
+  },
+  "errors": {
+    "cq": {
+      "not_found": "找不到这个能力问题，请刷新列表。",
+      "stale": "问题已被其他人修改，请刷新后再编辑。",
+      "check_running": "本体的全部检验正在进行，请等它结束。",
+      "invalid_import": "请检查 TOML 文件的格式，文件最多 64 KB、50 条问题。"
+    }
+  }
+}

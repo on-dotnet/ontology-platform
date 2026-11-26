@@ -1,0 +1,59 @@
+{
+  "placeholder": "Soon you’ll be able to calculate published metrics and see which objects violate constraints.",
+  "title": "Metrics",
+  "kind": "Metric",
+  "name": "Metric name",
+  "definition": "Metric definition",
+  "subject": "Subject type",
+  "aggregate": "Aggregation",
+  "aggregates": {
+    "count": "Count",
+    "sum": "Sum",
+    "avg": "Average",
+    "min": "Minimum",
+    "max": "Maximum",
+    "ratio": "Ratio"
+  },
+  "property": "Property to aggregate",
+  "filters": "Population filters",
+  "numerator": "Numerator filters",
+  "decimals": "Decimal places",
+  "percent": "Display as a percentage",
+  "create": "Create metric",
+  "edit": "Edit metric",
+  "evaluate": "Calculate metric",
+  "value": "Metric value",
+  "population": "Population size",
+  "matched": "Matching records",
+  "emptyPopulation": "There are no matching records for this metric.",
+  "noMetrics": "This version has no metrics yet.",
+  "noConstraints": "This object type has no constraints yet.",
+  "rules": "Rule checks",
+  "chooseType": "Choose an object type",
+  "check": "Check rules",
+  "constraint": "Constraint",
+  "violations": "Violation count",
+  "objects": "Objects with violations",
+  "expected": "Expected value",
+  "actual": "Actual value",
+  "unchecked": "Unchecked requirements",
+  "reasons": {
+    "path_not_property": "This constraint does not specify a checkable property.",
+    "path_not_bound": "This property has no data binding yet.",
+    "check_not_supported": "This requirement cannot be checked yet.",
+    "value_mismatch": "The data value does not match the type required by the constraint."
+  },
+  "errors": {
+    "query": {
+      "no_release": "Publish an ontology version before calculating metrics or checking rules."
+    },
+    "changeset": {
+      "invalid_item": "The metric change could not be saved. Check its definition and try again."
+    },
+    "metric": {
+      "not_found": "This metric is not in the current version. Choose another metric.",
+      "invalid": "The metric definition is invalid. Check the subject type, property and filters.",
+      "too_many_rows": "Too many records are included in this calculation. Add a filter."
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "placeholder": "Soon you’ll be able to ask questions about published data and see the evidence behind each answer.",
+  "question": "Your question",
+  "ask": "Ask",
+  "questionLimit": "Use up to 500 characters.",
+  "recent": "My recent questions",
+  "tryAsking": "Try asking",
+  "example": "Which objects meet the current quality requirements?",
+  "progress": {
+    "plan": "Planning",
+    "query": "Querying",
+    "answer": "Answering"
+  },
+  "queued": "Waiting for an answer",
+  "conclusion": "Conclusion",
+  "facts": "Facts",
+  "assumptions": "Assumptions",
+  "counterpoints": "Points to consider",
+  "evidence": {
+    "title": "View evidence",
+    "elements": "Ontology elements",
+    "bindings": "Data bindings",
+    "steps": "Query steps",
+    "rows": "Answer objects",
+    "tail": "Supporting records at the end of the path",
+    "documents": "Document sources",
+    "version": "Based on version v{{version}}"
+  },
+  "unanswerable": "The current version cannot answer this question yet.",
+  "missingElements": "Missing ontology elements",
+  "missingBindings": "Missing data bindings",
+  "gapSource": "Q&A gap",
+  "propose": "Propose changes",
+  "bind": "Set up data bindings",
+  "reviewProposal": "Review proposed changes",
+  "gapEmpty": "No changes could be proposed. Add the relevant business terms or relationships to your question.",
+  "askAgain": "Ask again",
+  "retry": "Retry",
+  "publish": "Go to releases",
+  "settings": "Go to settings",
+  "rowsNotShared": "There is no written explanation because the data source does not allow sharing result rows with AI. You can still view the facts and evidence.",
+  "dataNotice": "When sample sharing is enabled, up to 50 result rows used for an answer are sent to the configured AI model.",
+  "answerUnavailable": "A written explanation is unavailable. You can still inspect the facts and evidence.",
+  "citedUnknown": "Some references could not be verified and were omitted.",
+  "rowsTruncated": "Only some results are shown. The total includes all matches.",
+  "errors": {
+    "http": {
+      "not_implemented": "This feature is not available yet. Try again later."
+    },
+    "query": {
+      "no_release": "Publish a version of this ontology to start asking questions.",
+      "too_many_rows": "Too many records matched. Narrow your question or add a filter."
+    },
+    "ai": {
+      "not_configured": "AI is not configured. Ask an administrator to configure it in Settings.",
+      "unavailable": "AI is temporarily unavailable. Try again later.",
+      "invalid_output": "The answer could not be used. Rephrase your question and try again."
+    },
+    "qa": {
+      "not_found": "Question not found. Select a question from your recent history.",
+      "rate_limited": "You have reached the question limit. Try again after {{time}}.",
+      "invalid_plan": "These conditions could not be used. Rephrase your question or adjust the filters.",
+      "too_many_queries": "This question spans too many related records. Narrow its scope and try again.",
+      "timeout": "The question timed out. Narrow its scope and try again.",
+      "not_unanswerable": "Changes can only be proposed for questions with missing ontology elements. Check the evidence for this question."
+    }
+  }
+}

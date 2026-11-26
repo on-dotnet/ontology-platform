@@ -1,0 +1,105 @@
+# Expected bindings for the synthetic steel ontology.
+
+[[types]]
+type = "urn:synthetic:metals:Heat"
+schema = "mes"
+table = "heat"
+key = ["heat_no"]
+
+[types.properties]
+"urn:ontology-platform:vocabulary:externalId" = "heat_no"
+"urn:synthetic:metals:steelGrade" = "steel_grade"
+"urn:ontology-platform:vocabulary:organizationId" = "org_id"
+"urn:ontology-platform:vocabulary:siteId" = "site_id"
+
+[[types]]
+type = "urn:synthetic:metals:CastingSequence"
+schema = "mes"
+table = "casting_sequence"
+key = ["cast_no"]
+
+[types.properties]
+"urn:ontology-platform:vocabulary:externalId" = "cast_no"
+"urn:ontology-platform:vocabulary:organizationId" = "org_id"
+"urn:ontology-platform:vocabulary:siteId" = "site_id"
+
+[[types]]
+type = "urn:synthetic:metals:Slab"
+schema = "mes"
+table = "slab"
+key = ["slab_no"]
+
+[types.properties]
+"urn:ontology-platform:vocabulary:externalId" = "slab_no"
+"urn:ontology-platform:vocabulary:organizationId" = "org_id"
+"urn:ontology-platform:vocabulary:siteId" = "site_id"
+"urn:ontology-platform:vocabulary:weight" = "weight_t"
+
+[[types]]
+type = "urn:synthetic:metals:RollingEvent"
+schema = "mes"
+table = "rolling_event"
+key = ["rolling_id"]
+
+[types.properties]
+"urn:ontology-platform:vocabulary:externalId" = "rolling_id"
+"urn:ontology-platform:vocabulary:organizationId" = "org_id"
+"urn:ontology-platform:vocabulary:siteId" = "site_id"
+
+[[types]]
+type = "urn:synthetic:metals:Coil"
+schema = "mes"
+table = "coil"
+key = ["coil_no"]
+
+[types.properties]
+"urn:ontology-platform:vocabulary:externalId" = "coil_no"
+"urn:synthetic:metals:coilStatus" = "status"
+"urn:synthetic:metals:thickness" = "thickness_mm"
+"urn:ontology-platform:vocabulary:organizationId" = "org_id"
+"urn:ontology-platform:vocabulary:siteId" = "site_id"
+"urn:ontology-platform:vocabulary:weight" = "weight_t"
+
+[[types]]
+type = "urn:synthetic:metals:QualityInspection"
+schema = "mes"
+table = "quality_inspection"
+key = ["inspection_id"]
+
+[types.properties]
+"urn:synthetic:metals:yieldStrength" = "yield_mpa"
+"urn:synthetic:metals:tensileStrength" = "tensile_mpa"
+"urn:synthetic:metals:elongation" = "elongation_pct"
+"urn:synthetic:metals:impactEnergy" = "impact_j"
+"urn:synthetic:metals:passed" = "passed"
+"urn:synthetic:metals:inspectionDate" = "inspected_on"
+
+[[relations]]
+relation = "urn:synthetic:metals:castIn"
+source = "urn:synthetic:metals:Heat"
+target = "urn:synthetic:metals:CastingSequence"
+join = { kind = "foreign_key", side = "source", columns = ["cast_no"], references = ["cast_no"] }
+
+[[relations]]
+relation = "urn:synthetic:metals:producesSlab"
+source = "urn:synthetic:metals:CastingSequence"
+target = "urn:synthetic:metals:Slab"
+join = { kind = "foreign_key", side = "target", columns = ["cast_no"], references = ["cast_no"] }
+
+[[relations]]
+relation = "urn:synthetic:metals:rolledIn"
+source = "urn:synthetic:metals:Slab"
+target = "urn:synthetic:metals:RollingEvent"
+join = { kind = "link_table", schema = "mes", table = "slab_rolling", sourceColumns = ["slab_no"], targetColumns = ["rolling_id"] }
+
+[[relations]]
+relation = "urn:synthetic:metals:producesCoil"
+source = "urn:synthetic:metals:RollingEvent"
+target = "urn:synthetic:metals:Coil"
+join = { kind = "foreign_key", side = "target", columns = ["rolling_id"], references = ["rolling_id"] }
+
+[[relations]]
+relation = "urn:synthetic:metals:inspects"
+source = "urn:synthetic:metals:QualityInspection"
+target = "urn:synthetic:metals:Coil"
+join = { kind = "foreign_key", side = "source", columns = ["coil_no"], references = ["coil_no"] }

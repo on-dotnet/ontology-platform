@@ -1,0 +1,42 @@
+# Object expectations use the type IRI in the file. Resolve it to typeId on import.
+[[questions]]
+text = "Q235B 一共有哪些炉次？"
+note = "共有 18 个炉次。"
+[questions.expect]
+kind = "objects"
+typeIri = "urn:synthetic:metals:Heat"
+keys = [
+    "H2401001", "H2401002", "H2401003", "H2401004", "H2401005", "H2401006",
+    "H2401007", "H2401008", "H2401009", "H2401010", "H2401011", "H2401012",
+    "H2401013", "H2401014", "H2401015", "H2401016", "H2401017", "H2401018",
+]
+
+[[questions]]
+text = "哪些 Q235B 钢卷检验不合格？"
+note = "共 2 个钢卷，3 条不合格检验记录。W240101201 的两次检验均不合格。"
+[questions.expect]
+kind = "objects"
+typeIri = "urn:synthetic:metals:Coil"
+keys = ["W240101201", "W240101503"]
+
+[[questions]]
+text = "Q235B 钢卷的检验合格率是多少？"
+note = "39 条检验记录中 36 条合格，显示为 92.3%。"
+[questions.expect]
+kind = "number"
+number = "0.9230769230769231"
+tolerance = "0.0005"
+
+[[questions]]
+text = "Q235B 的检验记录有没有违反力学性能要求的？"
+note = "有 3 条记录违反 ReH ≥ 235，实测值依次为 229、230、229 MPa。抗拉强度、断后伸长率、冲击功各有 0 条违规。"
+[questions.expect]
+kind = "answerable"
+
+[[questions]]
+text = "W240100501 有哪些表面缺陷？"
+note = "首次缺少表面缺陷类型及其与钢卷的关系。审核、绑定并发布后应答出 2 处：边裂（严重）、结疤（一般）。"
+[questions.expect]
+kind = "number"
+number = "2"
+tolerance = "0"

@@ -1,0 +1,17 @@
+# Resolve the imported elements' IRIs to their IDs before submitting the edit.
+[[items]]
+op = "create"
+kind = "metric"
+
+[items.fields]
+localName = "inspectionPassRate"
+labelZh = "检验合格率"
+labelEn = "Inspection pass rate"
+subjectRef = "urn:synthetic:metals:QualityInspection"
+
+[items.fields.metric]
+aggregate = "ratio"
+filters = []
+numerator = [{ propertyRef = "urn:synthetic:metals:passed", op = "eq", value = true }]
+decimals = 1
+percent = true

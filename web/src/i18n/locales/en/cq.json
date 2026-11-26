@@ -1,0 +1,50 @@
+{
+  "title": "Competency questions",
+  "empty": "Use competency questions to record what the ontology should answer and check the answers after a release.",
+  "create": "Create question",
+  "edit": "Edit question",
+  "archive": "Archive question",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "import": "Import from file",
+  "importResult": "Imported {{created}} questions and skipped {{skipped}}.",
+  "text": "Question",
+  "expectation": "Expected answer",
+  "kinds": {
+    "answerable": "Can be answered",
+    "objects": "A set of objects",
+    "number": "A number"
+  },
+  "type": "Object type",
+  "keys": "Object keys (one per line)",
+  "number": "Expected value",
+  "tolerance": "Tolerance",
+  "note": "Note",
+  "check": "Check question",
+  "checkAll": "Check all",
+  "lastCheck": "Latest result",
+  "version": "Version v{{version}}",
+  "staleVersion": "This result is from an older version. Check again against the current version.",
+  "result": {
+    "pending": "Pending",
+    "pass": "Passed",
+    "fail": "Did not match",
+    "unanswerable": "Unanswerable",
+    "error": "Check failed"
+  },
+  "coverage": {
+    "title": "Coverage",
+    "ok": "All required elements and data bindings are present.",
+    "element_missing": "An ontology element used in the last check is missing.",
+    "binding_missing": "A data binding used in the last check is missing.",
+    "never_checked": "This question has not been checked yet."
+  },
+  "errors": {
+    "cq": {
+      "not_found": "This competency question could not be found. Refresh the list.",
+      "stale": "Someone else changed this question. Refresh before editing.",
+      "check_running": "A check of all questions is in progress. Wait for it to finish.",
+      "invalid_import": "Check the TOML file format. It can contain up to 50 questions and must be 64 KB or smaller."
+    }
+  }
+}
