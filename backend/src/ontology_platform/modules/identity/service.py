@@ -88,7 +88,7 @@ async def verify_password(password_hash: str | None, password: str) -> bool:
     return await _run_argon2(_verify_password, password_hash, password)
 
 
-def _principal(user: User) -> Principal:
+def principal_of(user: User) -> Principal:
     return Principal(
         id=user.id,
         username=user.username,
@@ -213,7 +213,7 @@ async def login(
         ip=ip,
     )
     await db.commit()
-    return _principal(user), issued
+    return principal_of(user), issued
 
 
 async def authenticate(db: AsyncSession, settings: Settings, token: str) -> AuthContext | None:
@@ -233,7 +233,7 @@ async def authenticate(db: AsyncSession, settings: Settings, token: str) -> Auth
         user_session.last_seen_at = now
         await db.commit()
     return AuthContext(
-        principal=_principal(user_session.user),
+        principal=principal_of(user_session.user),
         session_id=user_session.id,
         csrf_token=user_session.csrf_token,
     )

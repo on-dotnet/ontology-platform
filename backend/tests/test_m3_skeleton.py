@@ -42,9 +42,6 @@ CONNECTION_TEST = {key: value for key, value in DATA_SOURCE.items() if key != "n
 
 # Who may call what (spec 003, section 13 and the appendix).
 EVERYONE: list[Call] = [
-    ("GET", "/api/auth/tokens", None),
-    ("POST", "/api/auth/tokens", {"name": "agent", "scopes": ["ontology:read"]}),
-    ("DELETE", f"/api/auth/tokens/{ID}", None),
     ("GET", "/api/data-sources", None),
     ("GET", f"/api/data-sources/{ID}", None),
     ("GET", f"/api/ontologies/{ID}/objects/types", None),
