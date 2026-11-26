@@ -612,6 +612,78 @@ class EditResult(CamelModel):
     merge: MergeResult | None
 
 
+# ---------- the binding view of an object type (spec 003, 6.5 and 12.2) ----------
+
+# How a binding compares with the cached catalog of its data source.
+CatalogCheck = Literal[
+    "ok", "missing_table", "missing_column", "type_mismatch", "catalog_unavailable"
+]
+
+
+class BoundDataSource(CamelModel):
+    id: UUID
+    name: str
+    status: Literal["active", "archived"]
+
+
+class TableBindingView(CamelModel):
+    element_id: UUID
+    revision: int
+    data_source: BoundDataSource
+    schema_name: str = Field(alias="schema")
+    table: str
+    key_columns: list[str]
+    check: CatalogCheck
+
+
+class ColumnBindingView(CamelModel):
+    element_id: UUID
+    revision: int
+    column: str
+    # The column's type in the cached catalog; null when the catalog does not have it.
+    column_type: str | None
+    check: CatalogCheck
+
+
+class PropertyBindingView(CamelModel):
+    property_id: UUID
+    label: str
+    datatype: Datatype | None
+    # Defined on a parent type (or on no type), not on this one.
+    inherited: bool
+    column: ColumnBindingView | None
+
+
+class JoinBindingView(CamelModel):
+    element_id: UUID
+    revision: int
+    join: Join
+    check: CatalogCheck
+
+
+class RelationBindingView(CamelModel):
+    relation_id: UUID
+    label: str
+    # out: the type is on the domain side; in: on the range side.
+    direction: Literal["out", "in"]
+    other_type_id: UUID
+    other_type_label: str
+    join: JoinBindingView | None
+
+
+class TypeBindingView(CamelModel):
+    """The bindings of one object type in the working version, checked against the cached
+    catalog: its table, its properties (inherited and unbound ones included) and the bindings
+    of the relations into and out of it."""
+
+    type_id: UUID
+    table: TableBindingView | None
+    properties: list[PropertyBindingView]
+    relations: list[RelationBindingView]
+    # Open change sets with binding items for this type.
+    open_change_set_ids: list[UUID]
+
+
 class ElementRef(CamelModel):
     id: UUID
     kind: Kind
