@@ -507,6 +507,7 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
         "properties": None,
         "all": 1.0,
         "checked": 4,
+        "relationsByTable": 0,
     }
     assert replayed["usage"]["total"]["calls"] == 0
     assert replayed["usage"]["total"]["replayed"] == 7  # with the resolve call of b.md

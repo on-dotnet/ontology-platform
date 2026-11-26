@@ -83,6 +83,10 @@ _SENTENCE_RUN = re.compile(
     rf"^\[?\s*(\d+)\s*\.\s*(\d+)\s*[{_RUN_DASHES}]\s*(\d+)\s*\.\s*(\d+)\s*\]?$"
 )
 RUN_MAX = 3
+# A table row of the parsers' Markdown tables (Excel sheets, Word and Markdown tables), and the
+# rule row under a table's header row.
+_TABLE_ROW = re.compile(r"^\s*\|")
+_TABLE_RULE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|?\s*$")
 # Short ids of existing types in prompts (spec 004, 7.2): E1, E2, ...
 _ALIAS = "E{}"
 _ALIAS_LIKE = re.compile(r"^E\d+$")
@@ -134,6 +138,16 @@ class ProposedEvidence:
     quote: str
     char_start: int | None
     char_end: int | None
+
+
+@dataclass(frozen=True)
+class TableContext:
+    """What a cited table row is read by (#60): the table's name (the chunk's heading: the sheet
+    name of a workbook, the section of a Word file) and its header row, when the citation does
+    not include it already. `header` is that row as a passage of its own."""
+
+    names: tuple[str, ...]
+    header: ProposedEvidence | None
 
 
 @dataclass
@@ -241,7 +255,8 @@ class RunStats:
     trimmed: Counter[str] = field(default_factory=Counter)
     # Evidence checked literally (spec 004, 7.2), per kind: "<kind>" counts the items of the
     # model's output (not the proposals: items that turn out to exist already count too),
-    # "<kind>:ok" those whose cited sentence names them (both ends, for a relation).
+    # "<kind>:ok" those whose cited sentence names them (both ends, for a relation), and
+    # "relation_type:table" the relations kept only with their table's name and header row.
     literal: Counter[str] = field(default_factory=Counter)
 
 
@@ -1103,6 +1118,7 @@ class _Builder:
         deleted: Sequence[KnownElement] = (),
     ) -> None:
         self.by_id = {chunk.id: chunk for chunk in chunks}
+        self.by_seq = {chunk.seq: chunk for chunk in chunks}
         self.known = list(known)
         self.known_ids = {str(element.id): element for element in known}
         self.deleted_types = [element for element in deleted if element.kind == "entity_type"]
@@ -1185,7 +1201,11 @@ class _Builder:
         return self._normalized[sentence.ref]
 
     def states_link(
-        self, evidence: Sequence[ProposedEvidence], domain: set[str], range_: set[str]
+        self,
+        evidence: Sequence[ProposedEvidence],
+        domain: set[str],
+        range_: set[str],
+        context: Sequence[str] = (),
     ) -> bool:
         """Whether the cited sentences name both ends (by any of their names).
 
@@ -1193,7 +1213,8 @@ class _Builder:
         the file broke its lines), or a short run of them (`cite_run`), is the unit of direct
         evidence. Only the longest mentions count, and the two ends need mentions that do not
         overlap: a name inside a longer name (钢种 in 钢种成分要求) is not a mention of its own,
-        and a type related to itself has to be named twice.
+        and a type related to itself has to be named twice. `context` are texts read with the
+        cited ones, each a unit of its own (a table's name and header row, `table_context`).
         """
         for item in evidence:
             chunk = self.by_id.get(item.chunk_id)
@@ -1205,9 +1226,14 @@ class _Builder:
             # Units are normalized one by one and kept apart, so that no name is made up of the
             # end of one unit and the start of the next.
             line = "\x00".join(
-                normalize(chunk.text[start:end])
-                for start, end in self.units(chunk)
-                if span[0] <= start and end <= span[1]
+                [
+                    *(normalize(text) for text in context),
+                    *(
+                        normalize(chunk.text[start:end])
+                        for start, end in self.units(chunk)
+                        if span[0] <= start and end <= span[1]
+                    ),
+                ]
             )
             mentions = [
                 (span, side)
@@ -1226,6 +1252,57 @@ class _Builder:
             ):
                 return True
         return False
+
+    def table_context(self, item: ProposedEvidence) -> TableContext | None:
+        """The table name and header row that cited table rows are read by (#60); None when
+        the citation holds no table row.
+
+        A row names the things of its table by numbers: the table's name says what each row
+        is, and the header row what each number is of. The name is the chunk's heading, which
+        reviewers see with every passage. It counts for table rows only: a section's title is
+        no evidence for every sentence in the section.
+        """
+        chunk = self.by_id.get(item.chunk_id)
+        if chunk is None or item.char_start is None or item.char_end is None:
+            return None
+        units = self.units(chunk)
+        end = max(item.char_end, item.char_start + 1)
+        rows = [
+            index
+            for index, (start, stop) in enumerate(units)
+            if start < end and item.char_start < stop and _TABLE_ROW.match(chunk.text[start:stop])
+        ]
+        if not rows:
+            return None
+        names = [chunk.heading] if chunk.heading else []
+        passage = None
+        found = self._header(chunk, rows[-1])
+        if found is not None:
+            where, (start, stop) = found
+            # A header row the citation touches is read with it already.
+            if where is not chunk or not (start < end and item.char_start < stop):
+                names.append(where.text[start:stop])
+                passage = ProposedEvidence(where.id, where.text[start:stop], start, stop)
+        return TableContext(tuple(names), passage)
+
+    def _header(self, chunk: ChunkText, index: int) -> tuple[ChunkText, tuple[int, int]] | None:
+        """The header row of the table that unit `index` of `chunk` is a row of: the row above
+        the table's rule row (`| --- |`). A long table goes on over the chunks of one page and
+        heading (a workbook's sheet), so the search goes on into the chunks before."""
+        below_rule = False
+        while True:
+            units = self.units(chunk)
+            for start, stop in reversed(units[: index + 1]):
+                text = chunk.text[start:stop]
+                if not _TABLE_ROW.match(text):
+                    return None
+                if below_rule:
+                    return chunk, (start, stop)
+                below_rule = _TABLE_RULE.match(text) is not None
+            previous = self.by_seq.get(chunk.seq - 1)
+            if previous is None or (previous.page, previous.heading) != (chunk.page, chunk.heading):
+                return None
+            chunk, index = previous, len(self.units(previous)) - 1
 
     def names_cited(self, evidence: Sequence[ProposedEvidence], names: AbstractSet[str]) -> bool:
         """Whether a sentence that located evidence touches contains one of the (normalized)
@@ -1473,10 +1550,15 @@ def build_proposals(
         if key in seen_relations:
             continue
         cited = builder.cite_run(relation.sentence)
-        stated = cited is not None and builder.states_link(
-            [cited], names_of.get(domain, set()), names_of.get(range_, set())
-        )
+        ends = names_of.get(domain, set()), names_of.get(range_, set())
+        stated = cited is not None and builder.states_link([cited], *ends)
         checked("relation_type", stated)
+        # Cited table rows are read with their table's name and header row (#60). Counted
+        # apart: the literal share keeps measuring what the cited text names by itself.
+        table = builder.table_context(cited) if cited is not None and not stated else None
+        if table is not None and builder.states_link([cited] if cited else [], *ends, table.names):
+            counts["relation_type:table"] += 1
+            stated = True
         if not stated:
             continue  # no direct evidence: the cited sentences do not name both types
         seen_relations.add(key)
@@ -1508,6 +1590,8 @@ def build_proposals(
             True,
             relation.confidence,
         )
+        if table is not None and table.header is not None:
+            builder.proposals[-1].evidence.append(table.header)
 
     seen_properties: set[tuple[str, str]] = set()
     for prop in relations.properties:
