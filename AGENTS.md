@@ -71,7 +71,7 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 
 - **L0**：文案、样式、纯文档。
 - **L1**：纯界面功能、新页面、新接口（含只读接口）、新查询、连接器的只读能力；表结构保持原样。
-- **L2**：仅限数据库迁移；认证、权限、会话、CSRF；AI 写入路径与审核流程；发布与回滚；外部数据源连接与凭据；`compose.yaml`、`dev.ps1`；规则本身，即 `AGENTS.md` 与 `.claude/` 下的文件（技能、子代理、授权规则 `.claude/settings.json`）。
+- **L2**：仅限数据库迁移；认证、权限、会话、CSRF；AI 写入路径与审核流程；发布与回滚；外部数据源连接与凭据；`compose.yaml`、`dev.ps1`；规则本身，即 `AGENTS.md`、`docs/ui-guidelines.md` 与 `.claude/` 下的文件（技能、子代理、授权规则 `.claude/settings.json`）。
 
 ## 7 代码约定
 
