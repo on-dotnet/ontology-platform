@@ -1,0 +1,526 @@
+# 钢铁全流程案例包（开发集）的期望识别结果，用于 ./dev.ps1 eval 计算准确率与召回率（Python 标准库 tomllib 读取）。
+# 本文件写于任何模型运行之前，只依据 samples/steel-industry 的 11 份资料原文，未参考任何模型输出。
+# 本案例包是开发集：可用于调试识别效果，结论不作为留出评测的依据。
+# 资料序号：01 转炉炼钢、02 炉外精炼、03 板坯连铸与切割、04 热轧、05 冷轧、06 取样与检验、07 质量判定与处置、
+# 08 库区与发运、09 订单与生产计划、10 生产与质量记录台账（表名即工作表名）、11 编码与代码规则手册。
+#
+# 匹配规则：模型给出的中文名、英文名或任一同义词，规范化（去空白、全角转半角、小写）后
+# 与 names 中任一项相同即算命中。
+# core = true 的项计入召回率；core = false 为可接受项：识别出来不算错，没识别出来也不扣召回。
+# 关系不计较方向与名称：A→B 与 B→A 都算命中。domain、range 用对应对象类型 names 的第一个名字。
+# 属性按 domain（对象类型主名）+ 属性名匹配；层级为子类 → 父类，方向要对。
+#
+# 收录标准（参照钢铁冶金、设备维修案例包，换成钢铁全流程的说法）。对象类型收录以下几类，依据都要在资料原文里找得到：
+#   1. 有标识的事物：原文给出编号或编码规则（炉次号、浇次号、板坯号、热轧卷号、冷轧段卷号、包装件号、
+#      样品号、检验批号、质量处置单号、质量证明书号、销售订单号、订单行号、生产订单号、发运单号、
+#      内部钢种编码、设备编号、天车编号、库区代码、库位号、切割计划号、执行记录号、分析记录号、
+#      判定记录号、移库指令号、事件记录号等，见 11 编码结构与 10 各表首列）。
+#   2. 原文逐个记录数据的记录或事件：原文写明对每一次记录时刻、实测值、结果，或称为“一次……”“……记录”
+#      “……实绩”（炼钢的测温测氧、精炼的一次处理、连铸的切割实绩、热轧与冷轧的工序实绩、取样检验的
+#      化学分析与检验结果、质量判定记录、库区的移动事件、发运的装车与出厂事件）。
+#   3. 钢在其中或其上被加工、盛装的生产设备，以及库区的天车：10 机组与库区表中有编号的机组；
+#      设备内部的区段与部件（结晶器、真空槽、卷取机、精轧出口、入口计长点）不算。
+#   4. 钢在各工序的实物形态，且原文记录了它的编号或测量值（板坯、热轧卷、冷硬卷、退火卷、镀锌卷、包装件；
+#      钢水、带钢作为可接受项）。
+#   5. 原文写明由哪些有标识的事物组成的计划或单据（切割计划列浇次、流号与生产订单；生产订单列订单行；
+#      发运单列包装件、钢卷与证明书；检验批有成员清单）。
+# 不收录：工艺步骤与操作（开炉、吹炼、终点、出钢、接钢、送样、收样、制样、接浇、换钢种、开浇、切割、
+#   二次切割作业本身、粗精轧、卷取、酸洗冷轧、退火、镀锌、焊接接带、合卷、包装、称量作业、组批、判定、
+#   封闭、放行、改判、让步、返修、报废、吊起、落位、装车、出厂等，其数据记在别的对象上）；
+#   状态与取值（样品类型 ENDPOINT/REFINING/TUNDISH/PRODUCT/MECHANICAL/COATING 及转炉终点样、精炼工位样、
+#   判定样、中间包样、成品样、力学性能样、镀层试样等样别；判定结果 CONFORM/NONCONFORM/PENDING；
+#   处置类型 RELEASE/HOLD/DEGRADE/REASSIGN/CONCESSION/REWORK/SCRAP；来源证据等级、份额基准、采集方式、
+#   检验文件类型 T21–T32、镀层类型 GI/GA、移动事件代码 LIFT/RELEASE/LOAD/DISPATCH、化学元素代码；
+#   过渡坯、普通坯、头坯、尾坯、原坯、新坯、母卷、子卷这类角色或位置叫法）；
+#   只作为执行者或交接对象出现的人员、部门与单位（炉长、主控记录员、取样员、送样员、收样员、化验审核人、
+#   调度、台席、接钢人、分流跟踪员、切割员、编号员、称量员、质量员、质量工程师、判定员、授权批准人、
+#   计划员、接单员、跟单员、库管员、保管员、理货员、发运员、门岗；化验室、检验室、各部门；
+#   客户、订货方、收货方）；没有自身数据的设备部位与辅助物（结晶器、真空槽、卷取机、钢包回转台、样袋、
+#   焊缝与接头、包装材料）；交接用的纸联、回执与标签（随钢卡、随炉单、交接单、交送联、送样联、收样联、
+#   随行联、接收联、凭条、卷牌、包牌、样签、卷卡、来料卡、派工条、交班簿、值班本、配料清单、备料清册、
+#   拣货单、装车清单、提货单）；参考表与代码表本身（机组类型、钢种与订货牌号对照、方法与文件目录、
+#   编码结构及 11 的各代码表）；只在一处出现、没有自身数据的计划与安排（轧制安排、检验计划、派车安排）；
+#   重卷机组 RCL1、包装机组 PCK1 只在机组清单出现，不单列（可归入设备）。
+#   分卷区段卡的起止长度在 10 冷轧卷表记在子卷（冷硬卷）行上，按冷硬卷的属性处理；10 让步适用范围表是
+#   处置单的让步专用栏（10 填表说明“没有让步的处置留空让步专用栏”），并入质量处置单。
+# 拿不准的一律 core = false（例如钢卷这一总称、重卷产品、钢水、带钢、钢包、中间包、铸流、测点、
+#   除转炉和连铸机以外的各类机组、热连轧执行、钢水来源、重切记录、熔炼分析与过程分析、试样、留样、
+#   检验报告、委托单、标准、分配、称量记录、装车与出厂事件）。
+# 同一事物在原文里逐字出现的全称或别称并入同一项的 names（炉座＝转炉；机组＝设备；板坯连铸机、铸机＝连铸机；
+#   热卷＝热轧卷；铸坯＝板坯；包件＝包装件；证明书、随货质量证明书、证书＝质量证明书；改判单、让步单、
+#   让步适用范围＝质量处置单；判定记录、判定台账＝质量判定；行项目、订货行、销售订单行＝订单行；
+#   生产安排＝生产订单（09 §3.3“生产订单是……所下达的生产安排”）；作业实绩、工序记录、执行记录、
+#   酸轧实绩、退火执行记录＝工序实绩；温度测量、测温测氧、终点测量明细＝测量记录；
+#   来源认定、来源记录＝钢水来源；余样＝留样；化验单、化验回单、分析报告＝检验报告；
+#   取样委托、取样任务＝委托单；钢种＝内部钢种（各表“钢种”“前钢种”“投料钢种”栏都填 G 编码）；
+#   牌号、订货牌号、交货牌号＝标准牌号）。
+# 名字相近但原文区分的不合并：内部钢种与标准牌号（07 §3.1“一种内部钢种可对应多个标准牌号”）；销售订单与
+#   订单行（09 §3.1）；销售订单与生产订单（09 §3.3）；化学分析（一次分析，一个分析记录号）与检验结果（一项
+#   实测值，06 §3.3）；质量判定与质量处置单（07 §3.2）；移库指令（安排）与移动事件（已发生动作的确认，08 §3.2）；
+#   样品与试样（06 §3.1）；板坯的编号炉次与钢水来源（03 §3.2）。
+# 关系收录两端都符合上述标准、且原文一句话、列表项或表格行直接写明两者联系的；表格列记录另一事物的编号
+#   算写明联系。core = true 只给正文有一句话写明、且 10 有对应列的典型联系；只见于表格列、或一端是
+#   可能被建成总称“钢卷”的具体卷种（判定、处置、取样、组批、证书、包装、发运都同时涉及板坯、热轧卷、
+#   退火卷、镀锌卷）的，一律 core = false。
+# 属性收录原文写明对某类对象逐个记录的数据项；数据项若是另一对象类型的编号，按关系处理。
+# 层级只收原文写明“是……的设备”“称……”或以类型表列出分类的；只凭类型代码表成立的一律 core = false。
+
+entity_types = [
+  # ---- 炼钢与精炼（01、02）----
+  { names = ["炉次", "Heat"], core = true },                     # 01 §3.1、§5.1 炉次编号 H…；10 炉次表
+  { names = ["转炉", "炉座", "Converter"], core = true },                  # 01 §3.1 炉座是实际生产这炉钢的转炉；10 机组与库区 BOF1、BOF2
+  { names = ["精炼处理", "处理实绩", "RefiningTreatment"], core = true },   # 02 §3.1 一次处理指回炉次、设备、起止；10 精炼处理表
+  { names = ["测量记录", "测温测氧", "温度测量", "温度记录", "终点测量明细", "MeasurementRecord"], core = true }, # 01 §6.1；02 §3.2；10 测温测氧表
+  { names = ["钢包精炼炉", "LF", "LadleFurnace"], core = false },          # 02 §2 钢包精炼炉简称 LF；10 LF1
+  { names = ["真空循环脱气装置", "真空循环脱气", "RH", "VacuumDegasser"], core = false }, # 02 §2 简称 RH；10 RH1
+  { names = ["钢水", "MoltenSteel"], core = false },                       # 01 §3.3、02 §3.2 测温对象是本炉钢水
+  { names = ["钢包", "Ladle"], core = false },                             # 01 §3.1 承接和转运钢水的容器；10 炉次表盛钢钢包（钢包甲…，无编码规则）
+  { names = ["测点", "MeasurementPoint"], core = false },                  # 01 §3.3、02 §3.2 测点写清所属机组和部位；10 测温测氧表测点列
+  # ---- 连铸与切割（03）----
+  { names = ["浇次", "CastingSequence"], core = true },          # 03 §3.1；11 浇次编码；10 浇次表
+  { names = ["连铸机", "板坯连铸机", "铸机", "SlabCaster"], core = true },  # 03 §2、§5.1 双流板坯连铸机 CC1
+  { names = ["板坯", "铸坯", "Slab"], core = true },                       # 03 §7.3 板坯全号；10 板坯表
+  { names = ["切割计划", "CuttingPlan"], core = true },                    # 03 §7.1；10 切割计划表计划号
+  { names = ["切割实绩", "切割记录", "CuttingRecord"], core = true },       # 03 §7.2；10 切割实绩表执行记录号
+  { names = ["中间包", "Tundish"], core = false },                         # 03 §3.1；10 浇次表中间包列（中间包甲…，无编码规则）
+  { names = ["铸流", "Strand"], core = false },                            # 03 §3.1 铸机上各自形成铸坯的通道；板坯号含流号
+  { names = ["钢水来源", "来源认定", "来源记录", "SteelSource"], core = false }, # 03 §6.1 每个来源单独一行；10 钢水来源表；可能被建成板坯与炉次的关系
+  { names = ["重切记录", "二次切割联", "RecuttingRecord"], core = false },  # 03 §8.1 投入栏填原坯号，登记各新坯长度与新号
+  # ---- 热轧与冷轧（04、05）----
+  { names = ["热轧卷", "热卷", "HotRolledCoil"], core = true },            # 04 §3.2、§3.3 热轧卷号 R…；10 热轧卷表
+  { names = ["冷硬卷", "ColdRolledCoil"], core = true },                   # 05 §3.2、§5.2 CPL…；10 冷轧卷表
+  { names = ["退火卷", "AnnealedCoil"], core = true },                     # 05 §3.2、§6.1 CCA…
+  { names = ["镀锌卷", "GalvanizedCoil"], core = true },                   # 05 §6.2 CCG…
+  { names = ["工序实绩", "作业实绩", "执行记录", "工序记录", "酸轧实绩", "退火执行记录", "ProcessExecution"], core = true }, # 09 §3.3、§7.1；05 §5.2；10 冷轧卷表执行记录号
+  { names = ["钢卷", "冷轧段钢卷", "冷轧段卷", "冷轧卷", "Coil"], core = false }, # 总称：07 §3.3、10 填表说明、11 冷轧段钢卷编码
+  { names = ["重卷", "重卷产品", "RecoiledCoil"], core = false },          # 05 §7.1–7.2 CRC126000815；10 冷轧卷表产出品种“重卷”
+  { names = ["带钢", "热轧带钢", "Strip"], core = false },                 # 04 §1、§6.1、§7.2 带钢测温、带钢局部厚度
+  { names = ["热连轧执行", "热连轧实绩", "轧制执行记录", "轧制实绩", "HotRollingExecution"], core = false }, # 04 §3.1、§6.1；10 热轧卷表把执行与成卷合在一行
+  { names = ["热连轧机", "热连轧机组", "HotStripMill"], core = false },     # 04 §3.2；10 HSM1
+  { names = ["酸洗冷连轧机组", "酸轧机组", "PicklingTandemColdMill"], core = false }, # 05 §2；10 PLTCM1
+  { names = ["连续退火机组", "ContinuousAnnealingLine"], core = false },   # 05 §2；10 CAL1
+  { names = ["连续热镀锌机组", "ContinuousGalvanizingLine"], core = false }, # 05 §2；10 CGL1
+  { names = ["称量记录", "磅单", "秤单", "称量单", "WeighingRecord"], core = false }, # 04 §4、§7.2 注明卷号的原始称量记录；05 §3.2、§8.2
+  # ---- 取样与检验（06）----
+  { names = ["样品", "钢样", "实物样", "Sample"], core = true },           # 06 §3.1、§5.3 样品编号 T…；10 样品与取样表
+  { names = ["检验批", "InspectionLot"], core = true },                    # 06 §3.3、§5.2 批号 L…；10 检验批表
+  { names = ["化学分析", "分析记录", "ChemicalAnalysis"], core = true },    # 06 §3.2、§6.2 同一次分析列在同一分析记录下；10 化学分析结果表分析记录号
+  { names = ["检验结果", "分项结果", "化学分析结果", "力学与镀层结果", "InspectionResult"], core = true }, # 06 §3.3；10 化学分析结果、力学与镀层结果表
+  { names = ["熔炼分析", "HeatAnalysis"], core = false },                  # 06 §3.2 每个炉次只有一条（HEAT）
+  { names = ["过程分析", "ProcessAnalysis"], core = false },               # 06 §3.2 转炉终点样和精炼过程样（PROCESS）
+  { names = ["试样", "Specimen"], core = false },                          # 06 §3.1 从样品上制成、供某一项试验使用的部分
+  { names = ["留样", "余样", "RetainedSample"], core = false },            # 06 §3.1 余样卡；§9.1 留样卡记存放位置、封识、保管期限
+  { names = ["检验报告", "化验单", "化验回单", "分析报告", "InspectionReport"], core = false }, # 01 §3.2、06 §2、§9.1 签发、版本、更正
+  { names = ["委托单", "取样委托", "取样任务", "InspectionRequest"], core = false }, # 01 §3.2；06 §2、§4、§5.1
+  { names = ["标准", "产品标准", "方法标准", "试验方法标准", "Standard"], core = false }, # 09 §5.2、06 §8.3；10 方法与文件目录表引用号
+  # ---- 质量判定与处置（07）----
+  { names = ["质量判定", "判定记录", "判定台账", "QualityDecision"], core = true }, # 07 §6.1；10 质量判定表判定记录号
+  { names = ["质量处置单", "处置单", "处置", "改判单", "让步单", "让步适用范围", "QualityDisposition"], core = true }, # 07 §3.2、§6.3 N…；10 处置、让步适用范围表
+  { names = ["质量证明书", "随货质量证明书", "证明书", "证书", "QualityCertificate"], core = true }, # 07 §8.2、08 §3.3 Z…；10 随货质量证明书表
+  # ---- 订单与计划（09）----
+  { names = ["销售订单", "订单", "SalesOrder"], core = true },             # 09 §3.1 D…；10 销售订单行表订单号
+  { names = ["订单行", "销售订单行", "行项目", "订货行", "SalesOrderLine"], core = true }, # 09 §3.1；10 销售订单行表
+  { names = ["生产订单", "生产安排", "ProductionOrder"], core = true },     # 09 §3.3 W…；10 生产订单表
+  { names = ["内部钢种", "钢种", "InternalSteelGrade"], core = true },      # 09 §3.2、11 G…；10 钢种与订货牌号表
+  { names = ["标准牌号", "牌号", "订货牌号", "交货牌号", "StandardGrade"], core = true }, # 07 §3.1、09 §3.2；10 钢种与订货牌号表
+  { names = ["分配", "订单分配", "实物分配", "Allocation"], core = false }, # 09 §3.3 将一件实物指定给某一订单行；分配台账
+  # ---- 库区与发运（08）----
+  { names = ["包装件", "包件", "Package"], core = true },                  # 05 §8.1、08 §3.3 包号 P…；10 包装表
+  { names = ["发运单", "ShippingNote"], core = true },                     # 08 §3.3 F…；10 发运单表
+  { names = ["库区", "StorageArea"], core = true },                        # 08 §3.1 CY1；10 机组与库区
+  { names = ["库位", "StorageLocation"], core = true },                    # 08 §3.1 库位编码；10 库位表
+  { names = ["天车", "Crane"], core = true },                              # 08 §3.1 CRCY12 有自己的设备编号和所属库区；11 天车编码
+  { names = ["移库指令", "MoveOrder"], core = true },                      # 08 §3.2、§6.1；10 移库指令表指令号
+  { names = ["移动事件", "库位移动", "事件记录", "MovementEvent"], core = true }, # 08 §3.2、§6.3；10 库位移动表事件记录号
+  { names = ["装车与出厂事件", "装车事件", "ShipmentEvent"], core = false }, # 08 §7.2 LOAD、DISPATCH；10 装车与出厂事件表
+  # ---- 设备总称 ----
+  { names = ["设备", "机组", "Equipment"], core = true },                  # 10 机组与库区表编号、类型、名称；11 设备编码
+]
+
+relations = [
+  # ---- 炼钢与精炼 ----
+  { domain = "炉次", range = "转炉", core = true },              # 01 §3.1 炉座是实际生产这炉钢的转炉；10 炉次表实际转炉
+  { domain = "炉次", range = "内部钢种", core = true },          # 01 §5.2 当炉记内部钢种；10 炉次表内部钢种
+  { domain = "炉次", range = "浇次", core = true },              # 03 §3.1 浇次是同一铸机上连续浇注的一组炉次；10 浇次表炉次号
+  { domain = "测量记录", range = "炉次", core = true },          # 01 §6.1 每项测量留被测炉次；10 测温测氧表炉次号
+  { domain = "样品", range = "炉次", core = true },              # 01 §6.3 样签填炉号；06 §5.3 来源炉次；10 样品与取样表取自炉次
+  { domain = "精炼处理", range = "炉次", core = true },          # 02 §3.1 记录要能指回炉次；10 精炼处理表炉次号
+  { domain = "炉次", range = "钢包", core = false },             # 10 炉次表盛钢钢包
+  { domain = "炉次", range = "钢水", core = false },             # 01 §3.1 炉次是一炉钢水的身份
+  { domain = "钢包", range = "钢水", core = false },             # 01 §3.1 钢包是承接和转运钢水的容器
+  { domain = "测量记录", range = "测点", core = false },         # 01 §6.1 每项测量留测点；10 测温测氧表测点
+  { domain = "测量记录", range = "设备", core = false },         # 10 测温测氧表机组；02 §3.2 测点归属于当时使用的机组
+  { domain = "测量记录", range = "钢水", core = false },         # 01 §3.3 测温的对象是本炉钢水
+  { domain = "测点", range = "设备", core = false },             # 01 §3.3 写清所属机组；02 §3.2
+  { domain = "样品", range = "设备", core = false },             # 02 §7.1 样签写精炼机组；10 样品与取样表取样位置“BOF2炉内终点测点”
+  { domain = "精炼处理", range = "设备", core = false },         # 02 §3.1 使用的设备；10 精炼处理表实际机组
+  { domain = "精炼处理", range = "钢包精炼炉", core = false },   # 02 §5.2 所用 LF 设备
+  { domain = "精炼处理", range = "真空循环脱气装置", core = false }, # 02 §5.3 所用 RH 设备
+  { domain = "精炼处理", range = "钢包", core = false },         # 10 精炼处理表钢包
+  { domain = "精炼处理", range = "连铸机", core = false },       # 10 精炼处理表交接去向 CC1
+  # ---- 取样与检验 ----
+  { domain = "化学分析", range = "样品", core = true },          # 06 §3.2、§6.1 沿样号查分析用途；10 化学分析结果表样品号
+  { domain = "检验结果", range = "样品", core = true },          # 06 §3.3 项目保留各自的样品来源；10 力学与镀层结果表样品号
+  { domain = "样品", range = "检验批", core = true },            # 06 §5.2 列出哪个成员提供哪个项目的代表样；10 样品与取样表检验批号
+  { domain = "检验结果", range = "化学分析", core = false },     # 06 §6.2 同一次分析的元素逐项列在同一分析记录下
+  { domain = "化学分析", range = "炉次", core = false },         # 02 §3.3、07 §5.2 每个炉次唯一用于判定的熔炼分析
+  { domain = "熔炼分析", range = "炉次", core = false },         # 06 §3.2 每个炉次只有一条
+  { domain = "熔炼分析", range = "样品", core = false },         # 06 §3.2 取精炼结束后的钢水样
+  { domain = "过程分析", range = "样品", core = false },         # 06 §3.2 转炉终点样和精炼过程样作过程分析
+  { domain = "化学分析", range = "标准", core = false },         # 10 化学分析结果表方法标准
+  { domain = "检验结果", range = "标准", core = false },         # 10 力学与镀层结果表试验方法标准；06 §8.3
+  { domain = "试样", range = "样品", core = false },             # 06 §3.1 从该样品上制成
+  { domain = "留样", range = "样品", core = false },             # 06 §3.1 余样均可由包装标记追到原样
+  { domain = "委托单", range = "样品", core = false },           # 01 §3.2 委托单凭同一样品号传递检验要求
+  { domain = "检验报告", range = "样品", core = false },         # 01 §3.2 化验回单列出该号对应的结果
+  { domain = "检验报告", range = "检验结果", core = false },     # 06 §3.3 报告可以汇集多个项目
+  { domain = "样品", range = "钢卷", core = false },             # 10 样品与取样表取自卷号
+  { domain = "样品", range = "镀锌卷", core = false },           # 05 §6.3 T260004567 取自 CCG126000801；06 §7.5
+  { domain = "样品", range = "退火卷", core = false },           # 10 样品与取样表 T260004562 取自 CCA126000812
+  { domain = "样品", range = "热轧卷", core = false },           # 10 样品与取样表 T260004569 取自 R126000458
+  { domain = "检验批", range = "钢卷", core = false },           # 06 §3.3 有成员清单；10 检验批表批内实物件号
+  { domain = "检验批", range = "镀锌卷", core = false },         # 10 检验批表 L26000321、L26000322
+  { domain = "检验批", range = "退火卷", core = false },         # 10 检验批表 L26000320
+  { domain = "检验批", range = "热轧卷", core = false },         # 10 检验批表 L26000323
+  { domain = "检验批", range = "订单行", core = false },         # 10 检验批表订单行号
+  # ---- 连铸与切割 ----
+  { domain = "浇次", range = "连铸机", core = true },            # 03 §3.1 同一铸机上；11 在浇次中明确铸机；10 浇次表铸机
+  { domain = "板坯", range = "炉次", core = true },              # 03 §3.2、§7.3 编号炉次；10 板坯表编号炉次
+  { domain = "切割计划", range = "浇次", core = true },          # 03 §7.1 切割计划列浇次、铸机、流别；10 切割计划表浇次号
+  { domain = "切割实绩", range = "切割计划", core = true },      # 03 §7.2 写明本次实际执行的计划项；10 切割实绩表完成的切割计划
+  { domain = "切割实绩", range = "板坯", core = true },          # 03 §7.2 产出坯号；10 切割实绩表产出板坯号
+  { domain = "板坯", range = "浇次", core = false },             # 10 板坯表浇次号
+  { domain = "板坯", range = "铸流", core = false },             # 03 §1 坯号查铸流；10 板坯表流号
+  { domain = "板坯", range = "内部钢种", core = false },         # 03 §6.1 前钢种、后钢种；10 板坯表
+  { domain = "板坯", range = "板坯", core = false },             # 03 §3.3 重切坯各自列原坯全号
+  { domain = "板坯", range = "订单行", core = false },           # 03 §9 原计划配给订单行 D26001235-010，改给 -020
+  { domain = "浇次", range = "中间包", core = false },           # 10 浇次表中间包
+  { domain = "铸流", range = "连铸机", core = false },           # 03 §3.1 铸流是铸机上的通道
+  { domain = "中间包", range = "铸流", core = false },           # 03 §3.1 中间包向相应铸流分配钢水
+  { domain = "中间包", range = "钢包", core = false },           # 03 §3.1 中间包承接钢包来钢
+  { domain = "钢水来源", range = "板坯", core = false },         # 10 钢水来源表板坯号
+  { domain = "钢水来源", range = "炉次", core = false },         # 03 §6.1 来源炉次；10 钢水来源表
+  { domain = "钢水来源", range = "内部钢种", core = false },     # 10 钢水来源表来源钢种
+  { domain = "切割计划", range = "生产订单", core = false },     # 10 切割计划表所属生产订单
+  { domain = "切割计划", range = "连铸机", core = false },       # 03 §7.1 列铸机
+  { domain = "切割计划", range = "铸流", core = false },         # 03 §7.1 列流别；10 切割计划表流号
+  { domain = "切割实绩", range = "连铸机", core = false },       # 10 切割实绩表机组 CC1
+  { domain = "切割实绩", range = "铸流", core = false },         # 03 §7.2 写明铸流
+  { domain = "重切记录", range = "板坯", core = false },         # 03 §8.1 投入栏填原坯号，登记各新坯号
+  # ---- 热轧与冷轧 ----
+  { domain = "热轧卷", range = "板坯", core = true },            # 04 §3.2 实际投入的板坯是该卷的直接来源；04 §6.2 表；10 热轧卷表投入板坯号
+  { domain = "冷硬卷", range = "热轧卷", core = true },          # 05 §5.2 冷硬卷的来源处写 R126000456；10 冷轧卷表直接母卷号
+  { domain = "退火卷", range = "冷硬卷", core = true },          # 05 §6.1 退火卷的直接母卷填 CPL126000789
+  { domain = "镀锌卷", range = "冷硬卷", core = true },          # 05 §6.2 以 CPL126000790 为投入，产出 CCG126000801
+  { domain = "工序实绩", range = "生产订单", core = true },      # 09 §3.3 写明执行了哪张生产订单；10 冷轧卷表所属生产订单
+  { domain = "工序实绩", range = "设备", core = true },          # 09 §7.1 核实生产订单、实际机组；10 冷轧卷表实际机组
+  { domain = "重卷", range = "退火卷", core = false },           # 05 §7.2 CRC126000815 的两个直接来源卷
+  { domain = "钢卷", range = "钢卷", core = false },             # 05 §3.1 母卷与子卷；11 查卷
+  { domain = "热轧卷", range = "带钢", core = false },           # 04 §3.2 带钢卷取后形成热轧卷
+  { domain = "热轧卷", range = "热连轧机", core = false },       # 04 §3.2 成卷实绩标明产出它的热连轧机组；10 热轧卷表实际机组
+  { domain = "热轧卷", range = "设备", core = false },           # 同上
+  { domain = "热轧卷", range = "生产订单", core = false },       # 10 热轧卷表所属生产订单
+  { domain = "热连轧执行", range = "板坯", core = false },       # 04 §3.1 实际投入板坯
+  { domain = "热连轧执行", range = "热轧卷", core = false },     # 04 §6.2 本次作业的产出项
+  { domain = "热连轧执行", range = "热连轧机", core = false },   # 04 §3.1 具体机组
+  { domain = "热连轧执行", range = "生产订单", core = false },   # 04 §3.1 保存它完成的是哪项生产安排
+  { domain = "冷硬卷", range = "酸洗冷连轧机组", core = false }, # 05 §5.2；11 酸轧出口产出冷硬卷
+  { domain = "退火卷", range = "连续退火机组", core = false },   # 05 §6.1；11 连退出口形成退火卷
+  { domain = "镀锌卷", range = "连续热镀锌机组", core = false }, # 05 §6.2；11 镀锌出口形成镀锌卷
+  { domain = "工序实绩", range = "热轧卷", core = false },       # 05 §5.2 同一份作业实绩填实际投入；10 冷轧卷表直接母卷号
+  { domain = "工序实绩", range = "冷硬卷", core = false },       # 10 冷轧卷表出口卷号、直接母卷号
+  { domain = "工序实绩", range = "退火卷", core = false },       # 同上
+  { domain = "工序实绩", range = "镀锌卷", core = false },       # 同上
+  { domain = "工序实绩", range = "钢卷", core = false },         # 09 §3.3 投入产出了哪些实物
+  { domain = "称量记录", range = "钢卷", core = false },         # 04 §4 注明卷号的原始称量记录
+  # ---- 订单与计划 ----
+  { domain = "订单行", range = "销售订单", core = true },        # 09 §3.1 订单行是其中一项要求；10 销售订单行表
+  { domain = "订单行", range = "标准牌号", core = true },        # 09 §1 逐行写清标准牌号；10 销售订单行表标准牌号
+  { domain = "生产订单", range = "订单行", core = true },        # 09 §3.3 记录任务所对应的订单行；10 生产订单表销售订单行
+  { domain = "生产订单", range = "内部钢种", core = true },      # 09 §6.1 抄入完整订单行、内部钢种；10 生产订单表投料钢种
+  { domain = "标准牌号", range = "内部钢种", core = true },      # 07 §3.1、09 §5.2 对照表；10 钢种与订货牌号表
+  { domain = "订单行", range = "标准", core = false },           # 10 销售订单行表产品标准版次
+  { domain = "标准牌号", range = "标准", core = false },         # 07 §3.1 连同定义该牌号的产品标准版次
+  { domain = "生产订单", range = "设备", core = false },         # 09 §3.3 拟用机组
+  { domain = "分配", range = "订单行", core = false },           # 09 §3.3 将一件实物指定给某一订单行
+  { domain = "分配", range = "板坯", core = false },             # 09 §3.3 按需求预留的板坯
+  { domain = "分配", range = "钢卷", core = false },             # 09 §3.3 待交付的成品卷
+  # ---- 质量判定与处置 ----
+  { domain = "质量判定", range = "订单行", core = true },        # 07 §5.1、§6.1 依据的订单行；10 质量判定表依据订单行
+  { domain = "质量处置单", range = "质量判定", core = true },    # 07 §6.3 填判定依据及结果；10 处置表依据判定记录
+  { domain = "质量处置单", range = "订单行", core = true },      # 07 §6.3 处置前后规格和订单行；10 处置表原订单行、处置后订单行
+  { domain = "质量判定", range = "标准牌号", core = false },     # 10 质量判定表要求牌号
+  { domain = "质量判定", range = "标准", core = false },         # 07 §6.1 标准版次；10 质量判定表产品标准版次
+  { domain = "质量判定", range = "钢卷", core = false },         # 10 质量判定表判定对象号
+  { domain = "质量判定", range = "板坯", core = false },         # 10 质量判定表判定十一月081
+  { domain = "质量判定", range = "热轧卷", core = false },       # 10 质量判定表判定十一月085
+  { domain = "质量判定", range = "退火卷", core = false },       # 07 §7.2 对这卷退火卷按 DC01 判定合格
+  { domain = "质量判定", range = "镀锌卷", core = false },       # 07 §7.3 CCG126000801 判定合格、CCG126000802 不合格
+  { domain = "质量判定", range = "检验批", core = false },       # 07 §6.1 判定对象可以是有边界的检验批
+  { domain = "质量判定", range = "检验结果", core = false },     # 07 §5.2、§6.1 要求与实际结果、证据出处
+  { domain = "质量判定", range = "化学分析", core = false },     # 07 §5.3 据其熔炼分析逐项核对
+  { domain = "质量处置单", range = "标准牌号", core = false },   # 10 处置表原规格、处置后规格
+  { domain = "质量处置单", range = "钢卷", core = false },       # 10 处置表实物件号
+  { domain = "质量处置单", range = "板坯", core = false },       # 07 §7.2 N26000088 改判板坯 S22600123201
+  { domain = "质量处置单", range = "镀锌卷", core = false },     # 07 §7.3 N26000089 让步接收 CCG126000802
+  { domain = "质量处置单", range = "退火卷", core = false },     # 10 处置表 N26000090
+  { domain = "质量处置单", range = "热轧卷", core = false },     # 10 处置表 N26000092、N26000093
+  { domain = "质量处置单", range = "质量处置单", core = false }, # 07 §6.3 替代关系；10 处置表 N26000093 解除 N26000092
+  { domain = "质量处置单", range = "发运单", core = false },     # 10 让步适用范围表核销发运单
+  # ---- 证书、包装与发运 ----
+  { domain = "发运单", range = "质量证明书", core = true },      # 08 §1、§8.1 表；10 发运单表随货质量证明书号
+  { domain = "发运单", range = "包装件", core = true },          # 08 §3.3 发运单明细列出包装件；05 §8.1 表；10 发运单表
+  { domain = "发运单", range = "订单行", core = true },          # 08 §4 发运员整理订单行、实发包装件；10 发运单表订单行号
+  { domain = "发运单", range = "钢卷", core = false },           # 08 §3.3 明细列出该次交付的卷；10 发运单表所发钢卷号
+  { domain = "发运单", range = "镀锌卷", core = false },         # 08 §8.1 表
+  { domain = "包装件", range = "钢卷", core = false },           # 08 §3.3 内装卷有自己的卷号；10 包装表所含钢卷号
+  { domain = "包装件", range = "镀锌卷", core = false },         # 05 §8.1 表；07 §8.2
+  { domain = "包装件", range = "退火卷", core = false },         # 05 §8.1 表 CCA126000812 → P260001233
+  { domain = "包装件", range = "订单行", core = false },         # 10 包装表对应订单行
+  { domain = "包装件", range = "设备", core = false },           # 05 §8.1 PCK1 完成一件包装后取包号；10 包装表包装机组
+  { domain = "质量证明书", range = "钢卷", core = false },       # 08 §3.3 按覆盖的实物列明；10 随货质量证明书表涵盖钢卷号
+  { domain = "质量证明书", range = "镀锌卷", core = false },     # 07 §8.2 Z26000210 覆盖 CCG126000801 和 CCG126000802
+  { domain = "质量证明书", range = "检验批", core = false },     # 10 随货质量证明书表所属检验批
+  { domain = "质量证明书", range = "标准牌号", core = false },   # 10 随货质量证明书表标准牌号
+  { domain = "质量证明书", range = "标准", core = false },       # 08 §8.2 抄录相应产品标准版次
+  { domain = "质量证明书", range = "质量处置单", core = false }, # 07 §8.2 在后一卷的交付资料中指明让步单；10 备注
+  # ---- 库区与移动 ----
+  { domain = "库位", range = "库区", core = true },              # 08 §3.1 库位是区内的一个位置；10 库位表所属库区
+  { domain = "天车", range = "库区", core = true },              # 08 §3.1 CRCY12 是登记在 CY1 的天车；11 天车编码
+  { domain = "移库指令", range = "库位", core = true },          # 08 §3.2 载明出发位置、计划目的地；10 移库指令表
+  { domain = "移动事件", range = "移库指令", core = true },      # 08 §6.3 两笔都指向本次指令；10 库位移动表指令号
+  { domain = "移动事件", range = "天车", core = true },          # 08 §3.2 注明执行天车；10 库位移动表天车
+  { domain = "移动事件", range = "库位", core = true },          # 08 §6.3 出发位置或实际接收位置；10 库位移动表
+  { domain = "移库指令", range = "天车", core = false },         # 08 §6.1 拟用天车
+  { domain = "移库指令", range = "钢卷", core = false },         # 08 §3.2 要移的实物；10 移库指令表钢卷号
+  { domain = "移库指令", range = "包装件", core = false },       # 10 移库指令表包装件号
+  { domain = "移动事件", range = "钢卷", core = false },         # 08 §6.3 事件记录写明卷号；10 库位移动表钢卷号
+  { domain = "装车与出厂事件", range = "发运单", core = false }, # 08 §7.2；10 装车与出厂事件表发运单号
+  { domain = "装车与出厂事件", range = "包装件", core = false }, # 08 §7.2 记入实际装载的包装件
+  { domain = "装车与出厂事件", range = "钢卷", core = false },   # 10 装车与出厂事件表钢卷号
+]
+
+properties = [
+  # 炉次（01 §5.1、§5.4；10 炉次表、浇次表）
+  { domain = "炉次", names = ["炉次号", "炉号", "炉次编号", "HeatNumber"], core = true },
+  { domain = "炉次", names = ["开始冶炼", "开炉时刻", "SmeltingStartTime"], core = true },
+  { domain = "炉次", names = ["开始出钢", "出钢开始", "TappingStartTime"], core = true },
+  { domain = "炉次", names = ["出钢结束", "TappingEndTime"], core = true },
+  { domain = "炉次", names = ["浇次内炉序", "炉序", "SequenceInCast"], core = false },
+  { domain = "炉次", names = ["本炉开始浇注", "CastingStartTime"], core = false },
+  { domain = "炉次", names = ["本炉结束浇注", "CastingEndTime"], core = false },
+  # 精炼处理（02 §3.1、§5.2；10 精炼处理表）
+  { domain = "精炼处理", names = ["实际开始", "处理开始", "StartTime"], core = true },
+  { domain = "精炼处理", names = ["实际结束", "处理结束", "EndTime"], core = true },
+  { domain = "精炼处理", names = ["执行记录号", "RecordNumber"], core = false },
+  { domain = "精炼处理", names = ["交接去向", "Destination"], core = false },
+  { domain = "精炼处理", names = ["到站时间", "ArrivalTime"], core = false },
+  { domain = "精炼处理", names = ["实际离站时刻", "实际离站", "DepartureTime"], core = false },
+  # 测量记录（01 §6.1；02 §3.2、§6.1；10 测温测氧表）
+  { domain = "测量记录", names = ["测量项", "MeasurementItem"], core = true },
+  { domain = "测量记录", names = ["取样时刻", "SamplingTime"], core = true },
+  { domain = "测量记录", names = ["出结果时刻", "ResultTime"], core = true },
+  { domain = "测量记录", names = ["实测值", "数值", "MeasuredValue"], core = true },
+  { domain = "测量记录", names = ["单位", "Unit"], core = false },
+  { domain = "测量记录", names = ["采集方式", "测量方法", "AcquisitionMethod"], core = true },
+  { domain = "测量记录", names = ["登记时刻", "台席登记时刻", "RegistrationTime"], core = false },
+  # 浇次（03 §3.1；10 浇次表）
+  { domain = "浇次", names = ["浇次号", "CastingSequenceNumber"], core = true },
+  { domain = "浇次", names = ["实际连浇炉数", "连浇炉数", "HeatCount"], core = false },
+  { domain = "浇次", names = ["铸流数", "StrandCount"], core = false },
+  # 板坯（03 §3.3、§6.1、§7.2、§7.3；10 板坯表）
+  { domain = "板坯", names = ["板坯号", "坯号", "板坯全号", "SlabNumber"], core = true },
+  { domain = "板坯", names = ["流号", "流别", "StrandNumber"], core = true },
+  { domain = "板坯", names = ["本炉本流顺序", "SequenceInHeatStrand"], core = false },
+  { domain = "板坯", names = ["过渡坯标志", "过渡标志", "TransitionSlabFlag"], core = true },
+  { domain = "板坯", names = ["厚度", "Thickness"], core = false },
+  { domain = "板坯", names = ["宽度", "Width"], core = false },
+  { domain = "板坯", names = ["编码流内序号", "流内序号", "SequenceInStrandCode"], core = false },
+  { domain = "板坯", names = ["本浇次本流累计顺序", "SequenceInCastStrand"], core = false },
+  { domain = "板坯", names = ["前钢种", "PreviousGrade"], core = false },
+  { domain = "板坯", names = ["后钢种", "NextGrade"], core = false },
+  { domain = "板坯", names = ["现场位置说明", "PositionNote"], core = false },
+  # 钢水来源（03 §6.1、§6.2；10 钢水来源表；11 来源证据等级、份额基准）
+  { domain = "钢水来源", names = ["证据等级", "EvidenceLevel"], core = false },
+  { domain = "钢水来源", names = ["份额", "份额数值", "Share"], core = false },
+  { domain = "钢水来源", names = ["份额基准", "ShareBasis"], core = false },
+  { domain = "钢水来源", names = ["依据", "Basis"], core = false },
+  # 切割计划（03 §7.1；10 切割计划表）
+  { domain = "切割计划", names = ["计划号", "PlanNumber"], core = false },
+  { domain = "切割计划", names = ["切序", "切序说明", "CuttingSequence"], core = true },
+  { domain = "切割计划", names = ["计划长度", "PlannedLength"], core = true },
+  { domain = "切割计划", names = ["计划开始", "PlannedStart"], core = false },
+  { domain = "切割计划", names = ["计划结束", "PlannedEnd"], core = false },
+  # 切割实绩（03 §7.2；10 切割实绩表）
+  { domain = "切割实绩", names = ["实际开始", "ActualStart"], core = true },
+  { domain = "切割实绩", names = ["实际结束", "ActualEnd"], core = true },
+  { domain = "切割实绩", names = ["实测长度", "实际长度", "ActualLength"], core = true },
+  { domain = "切割实绩", names = ["执行记录号", "RecordNumber"], core = false },
+  { domain = "切割实绩", names = ["切割时拉速", "拉速", "CastingSpeed"], core = false },
+  # 热轧卷（04 §3.3、§7.2；10 热轧卷表）
+  { domain = "热轧卷", names = ["热轧卷号", "卷号", "HotRolledCoilNumber"], core = true },
+  { domain = "热轧卷", names = ["实测厚度", "厚度", "Thickness"], core = true },
+  { domain = "热轧卷", names = ["实测宽度", "宽度", "Width"], core = true },
+  { domain = "热轧卷", names = ["长度", "卷长", "Length"], core = false },
+  { domain = "热轧卷", names = ["净重", "NetWeight"], core = true },
+  { domain = "热轧卷", names = ["卷取完成", "CoilingTime"], core = false },
+  { domain = "热轧卷", names = ["毛重", "GrossWeight"], core = false },
+  { domain = "热轧卷", names = ["理论重量", "TheoreticalWeight"], core = false },
+  # 热连轧执行（04 §6.1）
+  { domain = "热连轧执行", names = ["实际开始", "ActualStart"], core = false },
+  { domain = "热连轧执行", names = ["实际结束", "ActualEnd"], core = false },
+  # 冷硬卷（05 §3.1、§5.3；10 冷轧卷表）
+  { domain = "冷硬卷", names = ["卷号", "出口卷号", "CoilNumber"], core = true },
+  { domain = "冷硬卷", names = ["母卷起点", "MotherCoilStart"], core = true },
+  { domain = "冷硬卷", names = ["母卷终点", "MotherCoilEnd"], core = true },
+  { domain = "冷硬卷", names = ["实测厚度", "厚度", "Thickness"], core = true },
+  { domain = "冷硬卷", names = ["实测宽度", "宽度", "Width"], core = true },
+  { domain = "冷硬卷", names = ["出口长度", "ExitLength"], core = true },
+  { domain = "冷硬卷", names = ["净重", "NetWeight"], core = true },
+  # 退火卷（05 §6.1；10 冷轧卷表）
+  { domain = "退火卷", names = ["卷号", "出口卷号", "CoilNumber"], core = true },
+  { domain = "退火卷", names = ["实测厚度", "厚度", "Thickness"], core = false },
+  { domain = "退火卷", names = ["出口长度", "ExitLength"], core = false },
+  { domain = "退火卷", names = ["净重", "NetWeight"], core = false },
+  # 镀锌卷（05 §6.2；10 冷轧卷表）
+  { domain = "镀锌卷", names = ["卷号", "出口卷号", "CoilNumber"], core = true },
+  { domain = "镀锌卷", names = ["镀层", "镀层种类", "实际镀层", "CoatingType"], core = true },
+  { domain = "镀锌卷", names = ["实测厚度", "厚度", "Thickness"], core = false },
+  { domain = "镀锌卷", names = ["出口长度", "ExitLength"], core = false },
+  { domain = "镀锌卷", names = ["净重", "NetWeight"], core = false },
+  # 钢卷（05 §3.2；04 §3.3）
+  { domain = "钢卷", names = ["净重", "NetWeight"], core = false },
+  { domain = "钢卷", names = ["理论重量", "TheoreticalWeight"], core = false },
+  # 工序实绩（09 §3.3、§7.1；10 冷轧卷表）
+  { domain = "工序实绩", names = ["实际开始", "ActualStart"], core = true },
+  { domain = "工序实绩", names = ["实际结束", "ActualEnd"], core = true },
+  { domain = "工序实绩", names = ["执行记录号", "RecordNumber"], core = false },
+  # 样品（01 §6.3；06 §5.3；10 样品与取样表）
+  { domain = "样品", names = ["样品号", "样品编号", "样号", "SampleNumber"], core = true },
+  { domain = "样品", names = ["样品类型", "样别", "SampleType"], core = true },
+  { domain = "样品", names = ["取样位置", "取样部位", "SamplingPosition"], core = true },
+  { domain = "样品", names = ["取样时刻", "SamplingTime"], core = true },
+  { domain = "样品", names = ["方向与用途", "用途", "Purpose"], core = false },
+  { domain = "样品", names = ["收样时刻", "ReceiptTime"], core = false },
+  # 化学分析（06 §3.2、§6.2；10 化学分析结果表）
+  { domain = "化学分析", names = ["分析记录号", "AnalysisNumber"], core = false },
+  { domain = "化学分析", names = ["类型", "分析用途", "AnalysisType"], core = true },
+  { domain = "化学分析", names = ["方法标准或厂内方法卡", "Method"], core = false },
+  # 检验结果（06 §3.3、§7.1、§7.4；10 化学分析结果表、力学与镀层结果表）
+  { domain = "检验结果", names = ["试验项目", "检验项目", "TestItem"], core = true },
+  { domain = "检验结果", names = ["实测值", "质量分数", "MeasuredValue"], core = true },
+  { domain = "检验结果", names = ["单位", "Unit"], core = false },
+  { domain = "检验结果", names = ["出结果时刻", "ResultTime"], core = true },
+  { domain = "检验结果", names = ["结果项", "ResultItem"], core = false },
+  { domain = "检验结果", names = ["元素代码", "ElementCode"], core = false },
+  # 留样（06 §9.1）
+  { domain = "留样", names = ["存放位置", "StorageLocation"], core = false },
+  { domain = "留样", names = ["保管期限", "RetentionPeriod"], core = false },
+  # 检验批（06 §5.2；10 检验批表）
+  { domain = "检验批", names = ["检验批号", "批号", "InspectionLotNumber"], core = true },
+  { domain = "检验批", names = ["组批时刻", "LotCreationTime"], core = false },
+  { domain = "检验批", names = ["批界登记", "LotBoundary"], core = false },
+  # 质量判定（07 §3.2、§6.1；10 质量判定表）
+  { domain = "质量判定", names = ["判定记录号", "DecisionNumber"], core = false },
+  { domain = "质量判定", names = ["结果", "判定结果", "Result"], core = true },
+  { domain = "质量判定", names = ["判定时刻", "DecisionTime"], core = true },
+  { domain = "质量判定", names = ["判定理由", "Reason"], core = false },
+  { domain = "质量判定", names = ["判定人", "Judge"], core = false },
+  # 质量处置单（07 §6.3、§7.3；10 处置表、让步适用范围表）
+  { domain = "质量处置单", names = ["处置单号", "DispositionNumber"], core = true },
+  { domain = "质量处置单", names = ["类型", "处置类型", "DispositionType"], core = true },
+  { domain = "质量处置单", names = ["批准时刻", "签认时刻", "ApprovalTime"], core = true },
+  { domain = "质量处置单", names = ["批准人角色", "ApproverRole"], core = false },
+  { domain = "质量处置单", names = ["原规格", "OriginalSpecification"], core = false },
+  { domain = "质量处置单", names = ["处置后规格", "现规格", "NewSpecification"], core = false },
+  { domain = "质量处置单", names = ["原因与处理", "Reason"], core = false },
+  { domain = "质量处置单", names = ["准收数量", "数量", "ApprovedQuantity"], core = false },
+  { domain = "质量处置单", names = ["有效期至", "有效截止日期", "ValidUntil"], core = false },
+  { domain = "质量处置单", names = ["偏差", "Deviation"], core = false },
+  # 质量证明书（08 §8.2；10 随货质量证明书表）
+  { domain = "质量证明书", names = ["质量证明书号", "证书编号", "CertificateNumber"], core = true },
+  { domain = "质量证明书", names = ["检验文件类型", "InspectionDocumentType"], core = true },
+  { domain = "质量证明书", names = ["签发时刻", "IssueTime"], core = false },
+  { domain = "质量证明书", names = ["原类型写法", "OriginalTypeNotation"], core = false },
+  # 销售订单（09 §3.1；10 销售订单行表）
+  { domain = "销售订单", names = ["订单号", "销售订单号", "SalesOrderNumber"], core = true },
+  { domain = "销售订单", names = ["销售订单建单日", "OrderDate"], core = false },
+  # 订单行（09 §3.1、§5.3；10 销售订单行表）
+  { domain = "订单行", names = ["订单行号", "行号", "OrderLineNumber"], core = true },
+  { domain = "订单行", names = ["公称厚度", "NominalThickness"], core = true },
+  { domain = "订单行", names = ["公称宽度", "NominalWidth"], core = true },
+  { domain = "订单行", names = ["镀层", "CoatingType"], core = true },
+  { domain = "订单行", names = ["交付计划日", "PlannedDeliveryDate"], core = false },
+  { domain = "订单行", names = ["订单附加要求", "AdditionalRequirement"], core = false },
+  { domain = "订单行", names = ["产品标准版次", "StandardEdition"], core = false },
+  { domain = "订单行", names = ["数量", "Quantity"], core = false },
+  # 生产订单（09 §3.3、§6.3；10 生产订单表）
+  { domain = "生产订单", names = ["生产订单号", "ProductionOrderNumber"], core = true },
+  { domain = "生产订单", names = ["计划开始", "PlannedStart"], core = true },
+  { domain = "生产订单", names = ["计划结束", "PlannedEnd"], core = true },
+  { domain = "生产订单", names = ["作业范围", "Scope"], core = false },
+  { domain = "生产订单", names = ["生产订单建单日", "OrderDate"], core = false },
+  { domain = "生产订单", names = ["下达说明", "ReleaseNote"], core = false },
+  # 内部钢种、标准牌号（09 §3.2；10 钢种与订货牌号表；11 内部钢种编码）
+  { domain = "内部钢种", names = ["钢种编码", "GradeCode"], core = true },
+  { domain = "标准牌号", names = ["标准版次", "产品标准版次", "StandardEdition"], core = true },
+  { domain = "标准牌号", names = ["产品标准名称", "StandardName"], core = false },
+  # 设备（10 机组与库区表；11 设备编码）
+  { domain = "设备", names = ["编号", "设备编号", "EquipmentCode"], core = true },
+  { domain = "设备", names = ["类型", "机组类型", "EquipmentType"], core = true },
+  { domain = "设备", names = ["名称", "EquipmentName"], core = false },
+  { domain = "设备", names = ["所属作业区", "Area"], core = false },
+  { domain = "设备", names = ["序号", "机组序号", "SerialNumber"], core = false },
+  # 天车（08 §3.1；11 天车编码）
+  { domain = "天车", names = ["设备编号", "编号", "CraneCode"], core = true },
+  # 库区、库位（08 §3.1；10 库位表）
+  { domain = "库区", names = ["库区代码", "AreaCode"], core = true },
+  { domain = "库区", names = ["名称", "AreaName"], core = false },
+  { domain = "库位", names = ["库位号", "库位编码", "LocationCode"], core = true },
+  { domain = "库位", names = ["行", "Row"], core = true },
+  { domain = "库位", names = ["列", "Column"], core = true },
+  { domain = "库位", names = ["层", "层号", "Tier"], core = true },
+  { domain = "库位", names = ["用途", "Purpose"], core = false },
+  # 移库指令（08 §3.2、§6.1；10 移库指令表）
+  { domain = "移库指令", names = ["指令号", "MoveOrderNumber"], core = false },
+  { domain = "移库指令", names = ["计划开始", "PlannedStart"], core = false },
+  { domain = "移库指令", names = ["计划结束", "PlannedEnd"], core = false },
+  # 移动事件（08 §6.3；10 库位移动表）
+  { domain = "移动事件", names = ["动作", "移动事件", "Action"], core = true },
+  { domain = "移动事件", names = ["实际发生", "发生时刻", "OccurredAt"], core = true },
+  { domain = "移动事件", names = ["事件记录号", "EventNumber"], core = false },
+  { domain = "移动事件", names = ["登记时刻", "RegistrationTime"], core = false },
+  # 装车与出厂事件（08 §7.2；10 装车与出厂事件表）
+  { domain = "装车与出厂事件", names = ["实际发生", "发生时刻", "OccurredAt"], core = false },
+  { domain = "装车与出厂事件", names = ["承运车辆", "接载对象", "Vehicle"], core = false },
+  { domain = "装车与出厂事件", names = ["点交岗位", "HandoverPost"], core = false },
+  # 包装件（05 §3.2、§8.1；10 包装表）
+  { domain = "包装件", names = ["包装件号", "包号", "PackageNumber"], core = true },
+  { domain = "包装件", names = ["毛重", "GrossWeight"], core = true },
+  { domain = "包装件", names = ["净重", "NetWeight"], core = false },
+  { domain = "包装件", names = ["包装完成", "PackingTime"], core = false },
+  # 发运单（08 §3.3、§7.2；10 发运单表）
+  { domain = "发运单", names = ["发运单号", "ShippingNoteNumber"], core = true },
+  { domain = "发运单", names = ["实际装车", "LoadingTime"], core = false },
+  { domain = "发运单", names = ["确认出厂", "DispatchTime"], core = false },
+]
+
+hierarchy = [
+  { child = "天车", parent = "设备", core = true },                 # 08 §3.1 天车是执行库内吊运的设备
+  { child = "转炉", parent = "设备", core = false },                # 01 §5.1 转炉设备另有设备编号；11 机组类型 BOF
+  { child = "连铸机", parent = "设备", core = false },              # 11 机组类型 CC；10 机组与库区
+  { child = "钢包精炼炉", parent = "设备", core = false },          # 02 §2 使用 LF1 标识相应设备；11 机组类型 LF
+  { child = "真空循环脱气装置", parent = "设备", core = false },    # 同上，RH1；11 机组类型 RH
+  { child = "热连轧机", parent = "设备", core = false },            # 11 机组类型 HSM
+  { child = "酸洗冷连轧机组", parent = "设备", core = false },      # 11 机组类型 PLTCM
+  { child = "连续退火机组", parent = "设备", core = false },        # 11 机组类型 CAL
+  { child = "连续热镀锌机组", parent = "设备", core = false },      # 11 机组类型 CGL
+  { child = "热轧卷", parent = "钢卷", core = false },              # 04 §3.2 形成一件可以独立交接、称量的钢卷，称热轧卷
+  { child = "冷硬卷", parent = "钢卷", core = false },              # 05 §3.1 子卷指本次产出的钢卷；11 冷轧段钢卷 PL 段码
+  { child = "退火卷", parent = "钢卷", core = false },              # 05 §3.2 各有自己的出口卷号；11 CA 段码
+  { child = "镀锌卷", parent = "钢卷", core = false },              # 同上；11 CG 段码
+  { child = "重卷", parent = "钢卷", core = false },                # 05 §3.2 重卷产出的钢卷；11 RC 段码
+  { child = "熔炼分析", parent = "化学分析", core = false },        # 06 §3.2；11 化学分析类型 HEAT
+  { child = "过程分析", parent = "化学分析", core = false },        # 06 §3.2；11 化学分析类型 PROCESS
+  { child = "装车与出厂事件", parent = "移动事件", core = false },  # 11 移动事件代码表含 LOAD、DISPATCH
+]
