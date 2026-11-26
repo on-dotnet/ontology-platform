@@ -5,6 +5,42 @@
   "bind": "绑定数据",
   "edit": "编辑绑定",
   "loadFailed": "无法读取绑定",
+  "suggest": {
+    "scope": "建议范围",
+    "bySchema": "按模式",
+    "byTable": "按表",
+    "tableCount": "表数：{{count}}",
+    "selectedTableCount": "已选 {{count}} 张表",
+    "tooManySchemas": "一次最多选择 50 个模式，请缩小范围。",
+    "submit": "生成绑定建议",
+    "title": "AI 建议绑定",
+    "noOntologies": "还没有可选本体，请先创建或导入本体。",
+    "noSources": "没有目录已就绪的数据源，请先在数据页读取目录。",
+    "modelInputs": "将发送给模型的数据包括表名、列名、类型和注释。",
+    "modelInputsWithSamples": "将发送给模型的数据包括表名、列名、类型和注释，以及每列最多 5 个样本值。",
+    "sampleEvidence": "样本值会作为证据显示在审核页，所有登录用户都能看到。",
+    "progress": "绑定建议进度",
+    "queued": "正在排队",
+    "currentStep": "当前步骤：{{step}}",
+    "steps": {
+      "catalog": "读取目录",
+      "match": "匹配类型与表",
+      "columns": "匹配属性与关系",
+      "changeset": "生成变更集"
+    },
+    "proposed_one": "已生成 {{count}} 项绑定建议，等待审核",
+    "proposed_other": "已生成 {{count}} 项绑定建议，等待审核",
+    "dropped_one": "有 {{count}} 项无法采用，已忽略",
+    "dropped_other": "有 {{count}} 项无法采用，已忽略",
+    "none": "没有找到可以采用的绑定建议",
+    "failed": "AI 绑定建议暂不可用，已有的绑定不受影响",
+    "manual": "改为手工绑定",
+    "ai": {
+      "not_configured": "尚未配置模型服务，请联系平台管理员配置后重试。",
+      "unavailable": "无法连接模型服务，请稍后重试。",
+      "invalid_output": "模型返回的绑定建议格式有误，请重试。"
+    }
+  },
   "pending": {
     "title": "有待审核的绑定修改",
     "link": "去审核"
