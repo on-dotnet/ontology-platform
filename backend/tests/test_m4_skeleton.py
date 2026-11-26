@@ -261,7 +261,6 @@ async def test_batch_3_released_metric(
     assert (copy.id, copy.subject_id, copy.metric.aggregate) == (metric.id, heat.id, "count")
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 4: a metric shows its subject and binding status")
 async def test_batch_4_metric_list(
     client: AsyncClient, db: AsyncSession, metric_rows: tuple[Ontology, Element, Element]
 ) -> None:

@@ -1,5 +1,4 @@
 {
-  "placeholder": "Soon you’ll be able to calculate published metrics and see which objects violate constraints.",
   "title": "Metrics",
   "kind": "Metric",
   "name": "Metric name",
@@ -25,15 +24,28 @@
   "value": "Metric value",
   "population": "Population size",
   "matched": "Matching records",
+  "nulls": "Null values",
+  "scanned": "Rows scanned",
   "emptyPopulation": "There are no matching records for this metric.",
   "noMetrics": "This version has no metrics yet.",
   "noConstraints": "This object type has no constraints yet.",
   "rules": "Rule checks",
   "chooseType": "Choose an object type",
   "check": "Check rules",
+  "checkSummary": "{{checked}} checked, {{unchecked}} unchecked",
   "constraint": "Constraint",
   "violations": "Violation count",
+  "violationCount_one": "{{count}} violation",
+  "violationCount_other": "{{count}} violations",
   "objects": "Objects with violations",
+  "objectLabel": "Object label",
+  "failedCheck": "Failed check",
+  "partialSamples": "Showing {{shown}} of {{total}} objects with violations.",
+  "allowedValues": "Must be one of {{value}}",
+  "matchesPattern": "Must match {{value}}",
+  "exclusiveMinimum": "Exclusive lower bound",
+  "exclusiveMaximum": "Exclusive upper bound",
+  "nodeKind": "Node kind",
   "expected": "Expected value",
   "actual": "Actual value",
   "unchecked": "Unchecked requirements",
@@ -45,7 +57,8 @@
   },
   "errors": {
     "query": {
-      "no_release": "Publish an ontology version before calculating metrics or checking rules."
+      "no_release": "Publish an ontology version before calculating metrics or checking rules.",
+      "too_many_rows": "Too many records for the selected object type. A single rule check cannot cover them all."
     },
     "changeset": {
       "invalid_item": "The metric change could not be saved. Check its definition and try again."
