@@ -89,7 +89,7 @@ LOCK_TIMEOUT_MS = 2_000
 IDLE_IN_TRANSACTION_TIMEOUT_MS = 60_000
 # A network that drops packets without a reset would leave the cancel and rollback that follow
 # a client-side timeout waiting on the socket; keepalives and a send timeout end that wait.
-_SOCKET_OPTIONS: dict[str, int] = {
+_SOCKET_OPTIONS: dict[str, Any] = {
     "keepalives": 1,
     "keepalives_idle": 10,
     "keepalives_interval": 5,

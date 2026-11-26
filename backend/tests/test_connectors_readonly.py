@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql.psycopg import PGDialectAsync_psycopg
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
-from ontology_platform.modules.connectors import connection, service, statements
+from ontology_platform.modules.connectors import catalog, connection, service, statements
 from ontology_platform.modules.connectors.connection import APPLICATION_NAME, connect
 from ontology_platform.modules.connectors.errors import (
     ConnectorError,
@@ -403,7 +403,7 @@ async def test_a_catalog_read_past_its_deadline_is_cancelled(
         conn.execute(text(SLEEP))
         return []
 
-    monkeypatch.setattr(connection.catalog, "inspect_catalog", slow_catalog)
+    monkeypatch.setattr(catalog, "inspect_catalog", slow_catalog)
     started = time.monotonic()
     task = asyncio.create_task(
         connection.read_catalog(db, reader_params(external_source), ("mes",))
@@ -438,16 +438,17 @@ async def test_reading_a_source_leaves_an_idle_platform_session_idle(
 ) -> None:
     # Not cached, so that the identity of the platform's database is read on this session.
     monkeypatch.setattr(connection, "_platform_identities", {})
-    inspect_catalog = connection.catalog.inspect_catalog
+    inspect_catalog = catalog.inspect_catalog
     seen: list[bool] = []
 
     async with app.state.session_factory() as db:
 
         def watch(conn: Any, schema_names: tuple[str, ...]) -> list[Any]:
             seen.append(db.in_transaction())
-            return inspect_catalog(conn, schema_names)
+            tables: list[Any] = inspect_catalog(conn, schema_names)
+            return tables
 
-        monkeypatch.setattr(connection.catalog, "inspect_catalog", watch)
+        monkeypatch.setattr(catalog, "inspect_catalog", watch)
         await connection.read_catalog(db, reader_params(external_source), ("mes",))
 
     assert seen == [False]

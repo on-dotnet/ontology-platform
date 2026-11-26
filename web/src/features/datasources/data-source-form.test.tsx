@@ -100,7 +100,8 @@ describe('data source dialog', () => {
     expect(screen.queryAllByDisplayValue(newPassword.trim())).toHaveLength(0);
     expect(document.body).not.toHaveTextContent(newPassword.trim());
     expect(api.calls('POST', collection).map((r) => r.body)).toEqual([{ ...connection, name: saved.name, allowSamples: true }]);
-  });
+    // A long walk through the whole form; slow when the gate runs everything at once.
+  }, 15_000);
 
   it('validates on blur and blocks invalid requests with a summary', async () => {
     const { form, user, api } = await openForm('create');
