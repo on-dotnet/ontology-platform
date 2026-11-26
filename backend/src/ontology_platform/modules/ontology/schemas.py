@@ -490,6 +490,8 @@ class ChangeSetSummary(CamelModel):
     # Who submitted it (for AI change sets, who uploaded or asked); null for system work. In
     # separate review mode they may withdraw it but not decide it.
     created_by: UUID | None
+    # The submitter's display name; null when there is none or the user no longer exists.
+    created_by_name: str | None
     created_at: datetime
     merged_at: datetime | None
 

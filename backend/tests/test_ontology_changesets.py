@@ -13,11 +13,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit.models import AuditEvent
-from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.identity.models import Role, User
 from ontology_platform.modules.ontology import service
 from ontology_platform.modules.ontology.models import ChangeItem, ChangeSet, Element, Ontology
 from ontology_platform.modules.ontology.schemas import ProposedItem
-from support import PROBLEM_JSON, csrf_headers
+from support import ADMIN_USERNAME, PROBLEM_JSON, csrf_headers
 from test_ontology_support import (
     CHUNK_ID,
     DOCUMENT_ID,
@@ -547,10 +547,12 @@ async def test_list_change_sets_with_counts_and_filters(
         "status",
         "counts",
         "createdBy",
+        "createdByName",
         "createdAt",
         "mergedAt",
     }
     assert summary["createdBy"] is None  # open_change_set names no creator
+    assert summary["createdByName"] is None
     assert summary["counts"] == {"total": 2, "pending": 2, "accepted": 0, "rejected": 0}
     merged = next(item for item in everything if item["id"] == str(merged_id))
     assert merged["status"] == "merged"
@@ -1269,3 +1271,36 @@ async def test_restores_without_fields_of_one_type_are_both_applied(
     restored = (await elements_by_name(db, steel))["Converter"]
     # Nothing to add: the second restore leaves the element as the first one made it.
     assert (restored.status, restored.revision) == ("active", 2)
+
+
+async def test_change_sets_name_their_submitter(client: AsyncClient, db: AsyncSession) -> None:
+    """Spec 003, 12.3: the review page shows who submitted an MCP proposal, and the name comes
+    with every change set that has a submitter."""
+    steel = await add_ontology(db)
+    admin = await db.scalar(select(User).where(User.username == ADMIN_USERNAME))
+    assert admin is not None
+    ids = {}
+    for source, created_by in (("mcp", admin.id), ("manual", admin.id), ("manual", uuid4())):
+        ids[source if created_by == admin.id else "gone"] = await service.create_change_set(
+            db,
+            ontology_id=steel.id,
+            title=f"{source} 提议",
+            source=source,  # type: ignore[arg-type]
+            document_id=None,
+            created_by=created_by,
+            items=[proposal("create", "entity_type", localName="Ladle", labelZh="钢包")],
+            token_id=uuid4() if source == "mcp" else None,
+        )
+    await db.commit()
+    await sign_in(client, db, Role.ADMIN)
+
+    listed = (await client.get("/api/change-sets", params={"ontologyId": str(steel.id)})).json()
+    detail = (await client.get(f"/api/change-sets/{ids['mcp']}")).json()
+
+    names = {row["id"]: row["createdByName"] for row in listed}
+    assert names == {
+        str(ids["mcp"]): admin.display_name,
+        str(ids["manual"]): admin.display_name,
+        str(ids["gone"]): None,
+    }
+    assert detail["createdByName"] == admin.display_name

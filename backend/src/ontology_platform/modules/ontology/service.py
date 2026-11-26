@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
+from ontology_platform.modules.identity import service as identity
 from ontology_platform.modules.ontology import binding_rules, mergeplan, rules, schemas
 from ontology_platform.modules.ontology.axiom_rules import axiom_problem
 from ontology_platform.modules.ontology.models import (
@@ -1439,7 +1440,9 @@ def _counts(decisions: Counter[str]) -> schemas.DecisionCounts:
     )
 
 
-def _summary_data(change_set: ChangeSet, counts: schemas.DecisionCounts) -> dict[str, Any]:
+def _summary_data(
+    change_set: ChangeSet, counts: schemas.DecisionCounts, names: Mapping[UUID, str]
+) -> dict[str, Any]:
     return {
         "id": change_set.id,
         "ontology_id": change_set.ontology_id,
@@ -1449,9 +1452,17 @@ def _summary_data(change_set: ChangeSet, counts: schemas.DecisionCounts) -> dict
         "status": change_set.status,
         "counts": counts,
         "created_by": change_set.created_by,
+        "created_by_name": names.get(change_set.created_by) if change_set.created_by else None,
         "created_at": change_set.created_at,
         "merged_at": change_set.merged_at,
     }
+
+
+async def _names(db: AsyncSession, change_sets: Sequence[ChangeSet]) -> dict[UUID, str]:
+    """Display names of the change sets' submitters, read in one go from identity."""
+    return await identity.display_names(
+        db, {change_set.created_by for change_set in change_sets if change_set.created_by}
+    )
 
 
 async def _decision_counts(
@@ -1473,7 +1484,8 @@ async def _decision_counts(
 
 async def _summary(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetSummary:
     tallies = await _decision_counts(db, [change_set.id])
-    data = _summary_data(change_set, _counts(tallies[change_set.id]))
+    names = await _names(db, [change_set])
+    data = _summary_data(change_set, _counts(tallies[change_set.id]), names)
     return schemas.ChangeSetSummary.model_validate(data)
 
 
@@ -1491,9 +1503,10 @@ async def list_change_sets(
         statement = statement.where(ChangeSet.status == status)
     change_sets = (await db.scalars(statement)).all()
     tallies = await _decision_counts(db, [change_set.id for change_set in change_sets])
+    names = await _names(db, change_sets)
     return [
         schemas.ChangeSetSummary.model_validate(
-            _summary_data(change_set, _counts(tallies[change_set.id])),
+            _summary_data(change_set, _counts(tallies[change_set.id]), names),
         )
         for change_set in change_sets
     ]
@@ -1507,7 +1520,7 @@ async def _items(db: AsyncSession, change_set: ChangeSet) -> Sequence[ChangeItem
 async def _detail(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetDetail:
     items = await _items(db, change_set)
     counts = _counts(Counter(item.decision for item in items))
-    data = _summary_data(change_set, counts)
+    data = _summary_data(change_set, counts, await _names(db, [change_set]))
     resolutions, token, links = await _resolutions(db, change_set, items)
     return schemas.ChangeSetDetail.model_validate(
         {

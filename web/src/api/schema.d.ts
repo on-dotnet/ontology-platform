@@ -366,6 +366,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/bindings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Bindings
+         * @description The data bindings of the working version by object type (spec 003, 6.5): of one type
+         *     (`typeId`, bound or not), or of every bound type, checked against the cached catalogs.
+         *     404 `element.not_found` when `typeId` is not an active object type.
+         */
+        get: operations["list_bindings_api_ontologies__id__bindings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ontologies/{id}/graph": {
         parameters: {
             query?: never;
@@ -1332,6 +1354,21 @@ export interface components {
              */
             ontologyId: string;
         };
+        /** BoundDataSource */
+        BoundDataSource: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "archived";
+        };
         /** BoundTypeRef */
         BoundTypeRef: {
             /**
@@ -1569,6 +1606,8 @@ export interface components {
             counts: components["schemas"]["DecisionCounts"];
             /** Createdby */
             createdBy: string | null;
+            /** Createdbyname */
+            createdByName: string | null;
             /**
              * Createdat
              * Format: date-time
@@ -1610,6 +1649,8 @@ export interface components {
             counts: components["schemas"]["DecisionCounts"];
             /** Createdby */
             createdBy: string | null;
+            /** Createdbyname */
+            createdByName: string | null;
             /**
              * Createdat
              * Format: date-time
@@ -1653,6 +1694,25 @@ export interface components {
             target: "column";
             /** Column */
             column: string;
+        };
+        /** ColumnBindingView */
+        ColumnBindingView: {
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+            /** Revision */
+            revision: number;
+            /** Column */
+            column: string;
+            /** Columntype */
+            columnType: string | null;
+            /**
+             * Check
+             * @enum {string}
+             */
+            check: "ok" | "missing_table" | "missing_column" | "type_mismatch" | "catalog_unavailable";
         };
         /** CompareCounts */
         CompareCounts: {
@@ -2604,6 +2664,23 @@ export interface components {
             /** Join */
             join: components["schemas"]["ForeignKeyJoin"] | components["schemas"]["LinkTableJoin"];
         };
+        /** JoinBindingView */
+        JoinBindingView: {
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+            /** Revision */
+            revision: number;
+            /** Join */
+            join: components["schemas"]["ForeignKeyJoin"] | components["schemas"]["LinkTableJoin"];
+            /**
+             * Check
+             * @enum {string}
+             */
+            check: "ok" | "missing_table" | "missing_column" | "type_mismatch" | "catalog_unavailable";
+        };
         /** LangText */
         LangText: {
             /** Lang */
@@ -2917,6 +2994,21 @@ export interface components {
             /** Code */
             code: string;
         };
+        /** PropertyBindingView */
+        PropertyBindingView: {
+            /**
+             * Propertyid
+             * Format: uuid
+             */
+            propertyId: string;
+            /** Label */
+            label: string;
+            /** Datatype */
+            datatype: ("string" | "integer" | "decimal" | "boolean" | "date" | "dateTime") | null;
+            /** Inherited */
+            inherited: boolean;
+            column: components["schemas"]["ColumnBindingView"] | null;
+        };
         /**
          * Provenance
          * @description A merged change item that created or modified an element.
@@ -2962,6 +3054,29 @@ export interface components {
             datatype?: string | null;
             /** Lang */
             lang?: string | null;
+        };
+        /** RelationBindingView */
+        RelationBindingView: {
+            /**
+             * Relationid
+             * Format: uuid
+             */
+            relationId: string;
+            /** Label */
+            label: string;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "out" | "in";
+            /**
+             * Othertypeid
+             * Format: uuid
+             */
+            otherTypeId: string;
+            /** Othertypelabel */
+            otherTypeLabel: string;
+            join: components["schemas"]["JoinBindingView"] | null;
         };
         /** ReleaseCreate */
         ReleaseCreate: {
@@ -3101,6 +3216,28 @@ export interface components {
             /** Keycolumns */
             keyColumns: string[];
         };
+        /** TableBindingView */
+        TableBindingView: {
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+            /** Revision */
+            revision: number;
+            dataSource: components["schemas"]["BoundDataSource"];
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Keycolumns */
+            keyColumns: string[];
+            /**
+             * Check
+             * @enum {string}
+             */
+            check: "ok" | "missing_table" | "missing_column" | "type_mismatch" | "catalog_unavailable";
+        };
         /** TableRef */
         TableRef: {
             /** Schema */
@@ -3125,6 +3262,26 @@ export interface components {
         TurtleEdit: {
             /** Turtle */
             turtle: string;
+        };
+        /**
+         * TypeBindingView
+         * @description The bindings of one object type in the working version, checked against the cached
+         *     catalog: its table, its properties (inherited and unbound ones included) and the bindings
+         *     of the relations into and out of it.
+         */
+        TypeBindingView: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            table: components["schemas"]["TableBindingView"] | null;
+            /** Properties */
+            properties: components["schemas"]["PropertyBindingView"][];
+            /** Relations */
+            relations: components["schemas"]["RelationBindingView"][];
+            /** Openchangesetids */
+            openChangeSetIds: string[];
         };
         /** UserInfo */
         UserInfo: {
@@ -4136,6 +4293,66 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    list_bindings_api_ontologies__id__bindings_get: {
+        parameters: {
+            query?: {
+                typeId?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeBindingView"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

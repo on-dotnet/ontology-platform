@@ -21,6 +21,7 @@ from test_ontology_bindings_support import (
     bind,
     bindings,
     change,
+    foreign_key,
     fresh,
     property_binding,
     save,
@@ -396,3 +397,38 @@ async def test_the_binding_view_of_a_type_checks_the_catalog(
     assert [r.direction for r in cast_view.relations] == ["in"]
     assert cast_view.open_change_set_ids == []
     assert batch[0].table is None
+
+
+async def test_the_binding_view_is_read_by_any_signed_in_user(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    s = await steel(db)
+    await sign_in(client, db, Role.ADMIN)
+    await bind(client, s)
+    url = f"/api/ontologies/{s.ontology.id}/bindings"
+    created = await client.post(
+        "/api/auth/tokens",
+        json={"name": "agent", "scopes": ["ontology:read", "objects:read"]},
+        headers=csrf_headers(client),
+    )
+    assert created.status_code == 201, created.json()
+    client.cookies.clear()
+
+    anonymous = await client.get(url)
+    by_token = await client.get(url, headers={"Authorization": f"Bearer {created.json()['token']}"})
+    await sign_in(client, db, Role.VIEWER)
+    every = await client.get(url)
+    one = await client.get(url, params={"typeId": str(s.batch.id)})
+    not_a_type = await client.get(url, params={"typeId": str(s.weight.id)})
+
+    assert (anonymous.status_code, anonymous.json()["code"]) == (401, "auth.not_authenticated")
+    assert (by_token.status_code, by_token.json()["code"]) == (403, "auth.token_not_allowed")
+    assert every.status_code == 200, every.json()
+    assert [view["typeId"] for view in every.json()] == [str(s.cast.id), str(s.heat.id)]
+    heat = every.json()[1]
+    assert heat["table"]["dataSource"] == {"id": str(s.mes.id), "name": "MES", "status": "active"}
+    assert (heat["table"]["schema"], heat["table"]["check"]) == ("mes", "ok")
+    assert heat["relations"][0]["join"]["join"] == foreign_key()["join"]
+    assert one.status_code == 200
+    assert one.json()[0]["table"] is None
+    assert (not_a_type.status_code, not_a_type.json()["code"]) == (404, "element.not_found")

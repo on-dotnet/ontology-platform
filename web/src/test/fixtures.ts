@@ -154,6 +154,7 @@ export function changeSetFixture(items: ChangeItem[], overrides: Partial<ChangeS
     status: 'open',
     counts: countDecisions(items),
     createdBy: null,
+    createdByName: null,
     createdAt: CREATED_AT,
     mergedAt: null,
     items,
