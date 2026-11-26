@@ -103,7 +103,7 @@ stl:CoatedCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
 stl:GalvanizedCoil a owl:Class ; rdfs:subClassOf stl:CoatedCoil, stl:ColdRolledCoil ;
     rdfs:label "镀锌卷"@zh, "Galvanized coil"@en ; skos:prefLabel "镀锌卷"@zh, "Galvanized coil"@en ;
-    skos:definition "以卷为单元交接的镀锌带钢，镀层以锌或锌基合金为主要成分，具体类别可随卷记录。"@zh, "A coil of strip bearing a zinc or zinc-alloy coating whose particular coating type can be recorded for the piece."@en ;
+    skos:definition "冷轧段镀锌线出口以卷为单元交接的镀锌带钢，镀层以锌或锌基合金为主要成分，具体类别可随卷记录；以热轧板为基板的热基镀锌卷直接记为涂镀钢卷。"@zh, "A coil of strip leaving a galvanizing line in the cold-mill route, bearing a zinc or zinc-alloy coating whose particular coating type can be recorded for the piece; a hot-rolled-base galvanized coil is recorded as a coated coil instead."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
 stl:RecoiledCoil a owl:Class ; rdfs:subClassOf stl:ColdRolledCoil ;
     rdfs:label "重卷卷"@zh, "Recoiled coil"@en ; skos:prefLabel "重卷卷"@zh, "Recoiled coil"@en ;
