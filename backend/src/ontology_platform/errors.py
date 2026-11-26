@@ -18,11 +18,20 @@ _HTTP_CODES = {404: "http.not_found", 405: "http.method_not_allowed"}
 class AppError(Exception):
     """An expected failure that maps to a problem response with a stable code."""
 
-    def __init__(self, status: int, code: str, detail: str) -> None:
+    def __init__(
+        self,
+        status: int,
+        code: str,
+        detail: str,
+        *,
+        headers: Mapping[str, str] | None = None,
+    ) -> None:
         super().__init__(detail)
         self.status = status
         self.code = code
         self.detail = detail
+        # Response headers the error calls for, such as an authentication challenge.
+        self.headers = dict(headers) if headers else None
 
 
 def not_implemented(what: str) -> AppError:
@@ -95,7 +104,7 @@ def _issue(error: Any) -> dict[str, Any]:
 def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
-        return problem_response(exc.status, exc.code, exc.detail)
+        return problem_response(exc.status, exc.code, exc.detail, headers=exc.headers)
 
     @app.exception_handler(HTTPException)
     async def handle_http_error(request: Request, exc: HTTPException) -> JSONResponse:
