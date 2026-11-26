@@ -134,7 +134,7 @@ async def test_a_proposal_becomes_a_change_set_waiting_for_review(
 
     content = _content(result)
     assert (content["proposed"], content["dropped"]) == (3, 1)
-    assert "1" in content["notice"]
+    assert content["notice"].startswith("1 of the 4 operations")
     [change_set] = await _change_sets(db)
     assert content["changeSetId"] == str(change_set.id)
     assert change_set.source == "mcp"
@@ -270,6 +270,36 @@ async def test_nothing_valid_makes_no_change_set(
     assert await _change_sets(db) == []
 
 
+async def test_an_operation_that_makes_no_change_item_is_dropped(
+    app: FastAPI, db: AsyncSession, setup: Setup
+) -> None:
+    content = _content(
+        await _propose(
+            app,
+            setup.token,
+            {
+                "ontology": setup.ontology.key,
+                "title": "坏的目标",
+                "operations": [
+                    _create("Ladle", "钢包"),
+                    {
+                        "op": "update",
+                        "kind": "entity_type",
+                        "target": "not-an-id",
+                        "fields": {"labelEn": "Coil"},
+                        "rationale": "补英文名",
+                    },
+                ],
+            },
+        )
+    )
+
+    assert (content["proposed"], content["dropped"]) == (1, 1)
+    [change_set] = await _change_sets(db)
+    items = await db.scalars(select(ChangeItem).where(ChangeItem.change_set_id == change_set.id))
+    assert [(i.op, i.temp_ref) for i in items] == [("create", "new:Ladle")]
+
+
 # ---------- what it cannot do ----------
 
 
@@ -339,6 +369,17 @@ async def test_one_to_fifty_operations(
         app,
         setup.token,
         {"ontology": setup.ontology.key, "title": "批量", "operations": operations},
+    )
+
+    tool_error(result, "validation.failed")
+    assert await _change_sets(db) == []
+
+
+async def test_a_blank_title_is_refused(app: FastAPI, db: AsyncSession, setup: Setup) -> None:
+    result = await _propose(
+        app,
+        setup.token,
+        {"ontology": setup.ontology.key, "title": " \n ", "operations": [_create("Ladle", "钢包")]},
     )
 
     tool_error(result, "validation.failed")
@@ -442,7 +483,7 @@ async def test_an_unknown_ontology_is_a_tool_error(app: FastAPI, setup: Setup) -
 
 
 async def test_ten_change_sets_per_token_and_hour(
-    app: FastAPI, db: AsyncSession, setup: Setup
+    app: FastAPI, client: AsyncClient, db: AsyncSession, setup: Setup
 ) -> None:
     def arguments(n: int) -> dict[str, Any]:
         return {
@@ -456,6 +497,11 @@ async def test_ten_change_sets_per_token_and_hour(
 
     tool_error(await _propose(app, setup.token, arguments(10)), "mcp.rate_limited")
     assert len(await _change_sets(db)) == 10
+    # The limit is the token's: the same owner's other token still may.
+    other, other_id = await new_token(client, db, Role.EDITOR, PROPOSE)
+    assert other_id != setup.token_id
+    assert _content(await _propose(app, other, arguments(11)))["changeSetId"]
+    assert len(await _change_sets(db)) == 11
 
     # An hour later the window has room again.
     await db.execute(

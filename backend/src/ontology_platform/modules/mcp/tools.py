@@ -479,7 +479,8 @@ _REF = "An element id, or the tempRef of an element an earlier operation creates
 
 
 class ProposedFields(Arguments):
-    """The fields an operation sets. Only the keys given are changed; null clears a value."""
+    """The fields an operation sets. Only the keys given are changed: null clears a text, a
+    reference or the unit, and leaves required and multiple as they are."""
 
     local_name: str | None = Field(default=None, max_length=128)
     label_zh: str | None = Field(default=None, max_length=200)
@@ -487,10 +488,10 @@ class ProposedFields(Arguments):
     definition_zh: str | None = Field(default=None, max_length=4000)
     definition_en: str | None = Field(default=None, max_length=4000)
     synonyms_zh: list[str] | None = Field(
-        default=None, description="Replaces the synonyms of both languages when given."
+        default=None, description="Added to the element's synonyms; the existing ones stay."
     )
     synonyms_en: list[str] | None = Field(
-        default=None, description="Replaces the synonyms of both languages when given."
+        default=None, description="Added to the element's synonyms; the existing ones stay."
     )
     parent: ElementRef | None = Field(default=None, description=_REF)
     domain: ElementRef | None = Field(default=None, description=_REF)
@@ -522,7 +523,9 @@ class ProposedOperation(Arguments):
 
 
 class ProposeChangesArguments(OntologyArguments):
-    title: str = Field(min_length=1, max_length=300, description="What the change set is about.")
+    title: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=300)
+    ] = Field(description="What the change set is about.")
     operations: list[ProposedOperation] = Field(min_length=1, max_length=OPERATIONS_MAX)
 
 
