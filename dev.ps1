@@ -18,6 +18,9 @@
                     带参数时只运行 pytest <参数>（单进程），如 test-api tests/test_ai_pipeline.py -x
   test-web          前端检查：eslint、tsc、vitest
   test              同时运行 test-api、test-web，日志在 .verification/test/
+  e2e               端到端冒烟测试：起一套临时的 postgres、api、web（容器与网络都以 op-tmp-e2e- 开头，
+                    库在 tmpfs，不碰开发栈），用 web/e2e/e2e.env 的测试账号跑 Playwright（Chromium），
+                    跑完全部删除；失败时截图与 trace 存 .verification/e2e/
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里对 OP_AI_MODEL、OP_AI_REASONING_MODEL 各发一次最小的结构化调用（带识别时用的推理强度），
@@ -227,6 +230,105 @@ function Invoke-ToolTest([string]$Service, [string[]]$Command = @()) {
         docker rm -f $name *> $null
     }
     if ($code -eq 0) { Write-Ok "$Service 通过" } else { Write-Bad "$Service 失败，退出码 $code" }
+    return $code
+}
+
+# Polls a probe command inside a container until it succeeds; gives up early if the container stops.
+function Wait-Container([string]$Name, [string[]]$Probe, [int]$TimeoutSeconds = 120) {
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        docker exec $Name @Probe *> $null
+        if ($LASTEXITCODE -eq 0) { return $true }
+        if ((docker inspect -f '{{.State.Status}}' $Name 2>$null) -ne 'running') { break }
+        Start-Sleep -Seconds 2
+    }
+    Write-Bad "$Name 未就绪，日志末尾："
+    docker logs --tail 60 $Name 2>&1 | Out-Host
+    return $false
+}
+
+# Test values of the throwaway e2e stack (web/e2e/e2e.env); never the dev stack's settings.
+function Read-E2eFixture {
+    $values = @{}
+    foreach ($line in Get-Content -LiteralPath (Join-Path $Root 'web/e2e/e2e.env')) {
+        if ($line -match '^\s*([A-Z0-9_]+)\s*=\s*(.*)$') { $values[$Matches[1]] = $Matches[2].Trim() }
+    }
+    foreach ($name in @('E2E_USERNAME', 'E2E_PASSWORD', 'E2E_POSTGRES_PASSWORD', 'E2E_SECRET_KEY')) {
+        if (-not $values[$name]) { Stop-Dev "web/e2e/e2e.env 缺少 $name" }
+    }
+    return $values
+}
+
+# End-to-end smoke tests (web/e2e). Postgres, api and web run as op-tmp-e2e-* containers on a
+# network of their own, with the database and documents in tmpfs, so nothing touches the dev stack
+# and nothing is left behind. No port is published: the Playwright container joins that network.
+function Invoke-E2e {
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    $fixture = Read-E2eFixture
+    $version = (Get-Content -Raw -LiteralPath (Join-Path $Root 'web/package.json') | ConvertFrom-Json).devDependencies.'@playwright/test'
+    if ($version -notmatch '^\d+\.\d+\.\d+$') { Stop-Dev "web/package.json 里 @playwright/test 要写确切版本（与 Playwright 镜像一致），现在是 $version" }
+    Confirm-BaseImages
+    # Pulled up front for the same reason as Confirm-BaseImages (BuildKit may get 401 from the mirror).
+    $playwrightImage = "mcr.microsoft.com/playwright:v$version-noble"
+    docker image inspect $playwrightImage *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Step "docker pull $playwrightImage"
+        docker pull --quiet $playwrightImage | Out-Host
+        if ($LASTEXITCODE -ne 0) { Stop-Dev "拉取基础镜像失败：$playwrightImage" }
+    }
+    Write-Step '构建 api、web 与 test-e2e 镜像（纳入当前工作区代码）'
+    Invoke-Compose build api web
+    Invoke-Compose --profile tools build test-e2e
+
+    $prefix = New-TempName 'e2e'
+    $db = "$prefix-db"
+    $api = "$prefix-api"
+    $web = "$prefix-web"
+    $runner = "$prefix-run"
+    $out = Join-Path $Root '.verification/e2e'
+    if (Test-Path -LiteralPath $out) { Remove-Item -LiteralPath $out -Recurse -Force }
+    $databaseUrl = "postgresql+psycopg://ontology:$($fixture.E2E_POSTGRES_PASSWORD)@postgres:5432/ontology"
+    $code = 1
+    $lines = @()
+    $previousConsole = [Console]::OutputEncoding
+    try {
+        try { [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false) } catch { }
+        Write-Step "启动临时环境 $prefix（postgres、api、web；库在 tmpfs，跑完删除）"
+        docker network create $prefix | Out-Null
+        if ($LASTEXITCODE -ne 0) { Stop-Dev "创建网络 $prefix 失败" }
+        docker run -d --name $db --network $prefix --network-alias postgres --tmpfs /var/lib/postgresql `
+            -e POSTGRES_DB=ontology -e POSTGRES_USER=ontology -e "POSTGRES_PASSWORD=$($fixture.E2E_POSTGRES_PASSWORD)" `
+            'pgvector/pgvector:0.8.1-pg18-trixie' | Out-Null
+        # TCP, not the socket: the image's init server listens on the socket only, then restarts.
+        if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $db @('pg_isready', '-h', '127.0.0.1', '-U', 'ontology', '-d', 'ontology'))) { Stop-Dev '临时 postgres 未就绪' }
+        docker run -d --name $api --network $prefix --network-alias api --tmpfs /data/documents:mode=1777 `
+            -e OP_ENV=development -e "OP_DATABASE_URL=$databaseUrl" -e "OP_SECRET_KEY=$($fixture.E2E_SECRET_KEY)" `
+            -e "OP_ADMIN_USERNAME=$($fixture.E2E_USERNAME)" -e "OP_ADMIN_PASSWORD=$($fixture.E2E_PASSWORD)" `
+            -e OP_DOCUMENTS_DIR=/data/documents -e 'FORWARDED_ALLOW_IPS=*' "ontology/api:$ImageTag" | Out-Null
+        $apiProbe = @('python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)")
+        if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $api $apiProbe)) { Stop-Dev '临时 api 未就绪' }
+        docker run -d --name $web --network $prefix --network-alias web "ontology/web:$ImageTag" | Out-Null
+        if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $web @('wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:8080/healthz') 60)) { Stop-Dev '临时 web 未就绪' }
+
+        Write-Step "运行 Playwright 冒烟测试（临时容器 $runner）"
+        docker run --name $runner --network $prefix -e E2E_BASE_URL=http://web:8080 `
+            -e "E2E_USERNAME=$($fixture.E2E_USERNAME)" -e "E2E_PASSWORD=$($fixture.E2E_PASSWORD)" `
+            "ontology/test-e2e:$ImageTag" 2>&1 | Tee-Object -Variable lines | Out-Host
+        $code = $LASTEXITCODE
+        if ($code -ne 0) {
+            New-Item -ItemType Directory -Force -Path $out | Out-Null
+            docker cp "${runner}:/app/test-results/artifacts" (Join-Path $out 'artifacts') *> $null
+            docker logs --tail 200 $api *> (Join-Path $out 'api.log')
+        }
+    } finally {
+        try { [Console]::OutputEncoding = $previousConsole } catch { }
+        docker rm -f $runner $web $api $db *> $null
+        docker network rm $prefix *> $null
+    }
+    $counts = @($lines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -match '^\d+ (passed|failed|flaky|skipped|did not run|interrupted)\b' })
+    $summary = $counts.Count -gt 0 ? ($counts -join '，') : '没有测试结果'
+    Write-Host "e2e summary: $summary；总耗时 $([Math]::Round($watch.Elapsed.TotalSeconds)) 秒"
+    if ($code -eq 0) { Write-Ok 'e2e 通过' } else { Write-Bad "e2e 失败，退出码 $code（截图、trace 与 api 日志在 $out）" }
     return $code
 }
 
@@ -777,6 +879,7 @@ try {
         'lock' { Invoke-Lock ($Rest | Select-Object -First 1) }
         'test-api' { exit (Invoke-ToolTest 'test-api' ($Rest.Count -gt 0 ? @('pytest') + $Rest : @())) }
         'test-web' { exit (Invoke-ToolTest 'test-web') }
+        'e2e' { exit (Invoke-E2e) }
         'test' {
             Confirm-BaseImages
             $codes = Invoke-Parallel @('test-api', 'test-web') (Join-Path $Root '.verification/test')

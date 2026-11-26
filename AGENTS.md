@@ -29,6 +29,7 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 ./dev.ps1 test-api tests/test_x.py   # 开发中：只跑受影响的后端测试文件
 ./dev.ps1 test-api    # 后端全量：ruff、mypy、pytest（8 进程并行）
 ./dev.ps1 test-web    # 前端：eslint、tsc、vitest
+./dev.ps1 e2e         # 端到端冒烟：临时环境里用 Playwright 走登录、本体、审核、探索，跑完即删（不在 ci 里）
 ./dev.ps1 lock api    # 重新生成 backend/uv.lock（web 同理）
 ./dev.ps1 gen-api     # 由后端 OpenAPI 生成 web/src/api/schema.d.ts
 ./dev.ps1 ci -Report  # 校验 Compose 配置，运行后端与前端测试、构建镜像并核对接口类型，结果写入提交状态 local-ci

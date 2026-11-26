@@ -13,10 +13,11 @@
     "preview": "vite preview",
     "routes": "tsr generate",
     "lint": "eslint . --max-warnings=0 && node scripts/lint-selfcheck.mjs",
-    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json && tsc -p tsconfig.e2e.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "sh scripts/check.sh"
+    "check": "sh scripts/check.sh",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.65.1",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/router-cli": "^1.168.0",
     "@tanstack/router-plugin": "^1.169.0",

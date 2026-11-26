@@ -1,4 +1,7 @@
-# Web app images. Targets used by dev.ps1 / compose.yaml: lock, test, runtime.
+# Web app images. Targets used by dev.ps1 / compose.yaml: lock, test, runtime, e2e.
+
+# Must equal the @playwright/test version in package.json (the e2e stage checks it).
+ARG PLAYWRIGHT_VERSION=1.65.1
 
 FROM node:24-alpine AS base
 ARG NPM_REGISTRY=https://registry.npmjs.org
@@ -23,6 +26,20 @@ FROM deps AS test
 COPY . .
 RUN pnpm run routes
 CMD ["sh", "scripts/check.sh"]
+
+# End-to-end smoke tests (`./dev.ps1 e2e`). The official Playwright image carries the browsers, so
+# they stay out of the repository; the test runner and its dependencies are plain JavaScript and
+# come from the deps stage.
+FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble AS e2e
+ARG PLAYWRIGHT_VERSION
+ENV CI=true
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json playwright.config.ts tsconfig.e2e.json ./
+COPY e2e ./e2e
+RUN installed="$(node -p "require('./node_modules/@playwright/test/package.json').version")" \
+  && { [ "$installed" = "$PLAYWRIGHT_VERSION" ] || { echo "@playwright/test $installed does not match the image v$PLAYWRIGHT_VERSION"; exit 1; }; }
+CMD ["node_modules/.bin/playwright", "test"]
 
 FROM deps AS build
 COPY . .
