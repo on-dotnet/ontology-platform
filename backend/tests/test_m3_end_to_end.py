@@ -2,8 +2,9 @@
 (fake gateway) → review → release → query a heat and hop to its coils → the same over MCP with
 an access token.
 
-`run_flow` is also the "全流程" of the credential scan in test_m3_secret_scan.py, so it goes
-through the public interfaces only and keeps every response it got.
+`run_flow` is also the "全流程" of the credential scan in test_m3_secret_scan.py: its requests go
+through the public interfaces only (the jobs run inline and element ids are read from the
+database), and it keeps every response it got and the gateway that saw what the model saw.
 """
 
 import tomllib
@@ -20,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from external_source import ExternalSource
 from ontology_platform.modules.ai.binding_prompts import ColumnsOut
 from ontology_platform.modules.ai.binding_suggest import JOB_KIND, make_handler
+from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.connectors import config as connectors_config
 from ontology_platform.modules.connectors import jobs as connectors_jobs
 from ontology_platform.modules.identity.models import Role
@@ -50,10 +52,11 @@ class Flow:
     ontology_id: str
     source_id: str
     release_id: str
-    change_set_id: str
     token: str
     token_id: str
     ids: dict[str, str]
+    # Everything sent to the model.
+    gateway: CatalogGateway
     # Every response of the flow, the platform's own client and the agent's.
     responses: list[Response] = field(default_factory=list)
     api_pages: list[dict[str, Any]] = field(default_factory=list)
@@ -144,7 +147,8 @@ async def run_flow(
     ontology_id = imported["ontology"]["id"]
     rows = await db.scalars(select(Element).where(Element.ontology_id == UUID(ontology_id)))
     ids = {row.iri: str(row.id) for row in rows if row.iri}
-    runner.register(JOB_KIND, make_handler(factory, _gateway(ids), "test-model"))
+    gateway = _gateway(ids)
+    runner.register(JOB_KIND, make_handler(factory, gateway, "test-model"))
     csrf = csrf_headers(client)
 
     # A data source on the steel sample, tested, its catalog read and browsed.
@@ -193,6 +197,8 @@ async def run_flow(
     url = f"/api/ontologies/{ontology_id}/objects"
     unreleased = await client.post(f"{url}/search", json={"typeId": ids[NS + "Heat"]}, headers=csrf)
     # Nothing released yet: the bindings under review cannot be queried.
+    assert unreleased.status_code == 409
+    assert unreleased.headers["content-type"] == "application/problem+json"
     assert unreleased.json()["code"] == "query.no_release"
     assert (await accept_and_merge(client, UUID(change_set_id)))["skipped"] == []
     release = _ok(
@@ -209,10 +215,10 @@ async def run_flow(
         ontology_id=ontology_id,
         source_id=source["id"],
         release_id=release["id"],
-        change_set_id=change_set_id,
         token=token,
         token_id=token_id,
         ids=ids,
+        gateway=gateway,
         responses=responses,
     )
     heats = _ok(
@@ -286,10 +292,14 @@ async def test_from_a_data_source_to_coils_over_the_api_and_mcp(
     assert all(page["release"]["id"] == flow.release_id for page in flow.api_pages)
     assert flow.mcp_pages == flow.api_pages
     coils = flow.api_pages[-1]
+    # The same path in SQL: the heat's slab S240100101, its rolling, that rolling's coils.
     expected = admin_rows(
         external_source,
-        "SELECT coil_no FROM mes.coil WHERE rolling_id = %s ORDER BY coil_no",
-        "R2401001",
+        "SELECT c.coil_no FROM mes.slab s"
+        " JOIN mes.slab_rolling sr USING (slab_no) JOIN mes.coil c USING (rolling_id)"
+        " WHERE s.heat_no = %s AND s.slab_no = %s ORDER BY c.coil_no",
+        HEAT,
+        "S240100101",
     )
     assert expected
     assert sorted(k["value"] for row in coils["items"] for k in row["source"]["key"]) == [
@@ -297,3 +307,8 @@ async def test_from_a_data_source_to_coils_over_the_api_and_mcp(
     ]
     assert all(row["typeId"] == flow.ids[NS + "Coil"] for row in coils["items"])
     assert coils["nextCursor"] is None
+    # Every MCP call is audited under the token.
+    called = await db.scalars(select(AuditEvent).where(AuditEvent.action == "mcp.tool_called"))
+    assert [(e.target_id, e.detail["tokenId"], e.detail["code"]) for e in called] == [
+        (flow.token_id, flow.token_id, "ok")
+    ] * (len(HOPS) + 2)

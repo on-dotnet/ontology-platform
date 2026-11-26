@@ -4,7 +4,8 @@ release, query and MCP of test_m3_end_to_end.run_flow.
 
 The marker is the data source's password: the flow has to connect with it, so it is the real
 one, a random string from the external_source fixture. The access token's full text is checked
-the same way everywhere but in the one response that hands it out.
+the same way everywhere but in the one response that hands it out. Stored data is read from
+every table of the platform's database, so a new table is scanned without being listed.
 """
 
 import logging
@@ -20,14 +21,14 @@ from ontology_platform.modules.connectors.models import DataSource
 from ontology_platform.settings import Settings
 from test_m3_end_to_end import run_flow
 
-# Everything the flow leaves behind that could have picked a credential up.
-KEPT = (
+# Tables the flow must have written to, so that the scan of every table cannot pass empty.
+WRITTEN = (
     "audit.events",
     "jobs.jobs",
     "ai.binding_suggestions",
-    "ontology.change_sets",
     "ontology.change_items",
     "ontology.evidence",
+    "ontology.elements",
     "ontology.releases",
     "connectors.data_sources",
     "connectors.catalog_tables",
@@ -35,12 +36,20 @@ KEPT = (
 )
 
 
-async def _stored_text(db: AsyncSession) -> str:
-    parts: list[str] = []
-    for table in KEPT:
+async def _stored(db: AsyncSession) -> dict[str, str]:
+    """Every row of every table of the platform's database, as text, by table."""
+    tables = await db.execute(
+        text(
+            "SELECT table_schema || '.' || table_name FROM information_schema.tables"
+            " WHERE table_type = 'BASE TABLE'"
+            " AND table_schema NOT IN ('pg_catalog', 'information_schema')"
+        )
+    )
+    stored: dict[str, str] = {}
+    for (table,) in tables:
         rows = await db.execute(text(f"SELECT to_jsonb(t)::text FROM {table} t"))  # noqa: S608
-        parts.extend(row[0] for row in rows)
-    return "\n".join(parts)
+        stored[table] = "\n".join(row[0] for row in rows)
+    return stored
 
 
 async def test_the_password_and_the_token_never_show_in_the_whole_flow(
@@ -65,7 +74,14 @@ async def test_the_password_and_the_token_never_show_in_the_whole_flow(
     assert any("/related" in path for path in paths)
     assert "/mcp" in paths
     logs = "\n".join([record.getMessage() for record in caplog.records] + [caplog.text])
-    stored = await _stored_text(db)
+    by_table = await _stored(db)
+    assert [table for table in WRITTEN if not by_table.get(table)] == []
+    stored = "\n".join(by_table.values())
+    # What left the platform: the text the model was shown.
+    shown = "\n".join(text for _, text in flow.gateway.texts)
+    assert shown
+    assert password not in shown
+    assert flow.token not in shown
     for response in flow.responses:
         assert password not in response.text, response.request.url
         assert all(password not in value for value in response.headers.values())
