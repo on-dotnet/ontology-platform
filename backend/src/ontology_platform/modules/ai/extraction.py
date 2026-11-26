@@ -73,8 +73,10 @@ _SENTENCE_REF = re.compile(r"^\[?\s*(\d+)\s*\.\s*(\d+)\s*\]?$")
 # A relation may cite a run of consecutive sentences of one chunk, "3.12-3.14" (#58): an
 # introducing sentence and its list items, or a table header and a row, may name both ends
 # only together. At most RUN_MAX sentence units.
+# Hyphen, en dash, em dash or tilde between the two numbers.
+_RUN_DASHES = "-\u2013\u2014~"
 _SENTENCE_RUN = re.compile(
-    r"^\[?\s*(\d+)\s*\.\s*(\d+)\s*[-–—~]\s*(\d+)\s*\.\s*(\d+)\s*\]?$"
+    rf"^\[?\s*(\d+)\s*\.\s*(\d+)\s*[{_RUN_DASHES}]\s*(\d+)\s*\.\s*(\d+)\s*\]?$"
 )
 RUN_MAX = 3
 # Short ids of existing types in prompts (spec 004, 7.2): E1, E2, ...
@@ -1075,15 +1077,16 @@ class _Builder:
         found = _SENTENCE_RUN.match(ref.strip()) if ref else None
         if found is None:
             return self.cite(ref)
-        chunk, first, last_chunk, last = (int(group) for group in found.groups())
-        if chunk != last_chunk or not 0 <= last - first < RUN_MAX:
+        seq, first, last_seq, last = (int(group) for group in found.groups())
+        if seq != last_seq or not 0 <= last - first < RUN_MAX:
             return None
-        start = self.by_ref.get(f"{chunk}.{first}")
-        end = self.by_ref.get(f"{chunk}.{last}")
-        if start is None or end is None:
+        first_sentence = self.by_ref.get(f"{seq}.{first}")
+        last_sentence = self.by_ref.get(f"{seq}.{last}")
+        if first_sentence is None or last_sentence is None:
             return None
-        text = start.chunk.text[start.start : end.end]
-        return ProposedEvidence(start.chunk.id, text, start.start, end.end)
+        chunk = first_sentence.chunk
+        start, end = first_sentence.start, last_sentence.end
+        return ProposedEvidence(chunk.id, chunk.text[start:end], start, end)
 
     def naming(
         self, names: AbstractSet[str], prefer: AbstractSet[str] = frozenset()
@@ -1129,10 +1132,10 @@ class _Builder:
         """Whether the cited sentences name both ends (by any of their names).
 
         A sentence (`sentences.split_sentences`: a sentence, list item or table row, however
-        the file broke its lines) is the unit of direct evidence. Only the longest mentions
-        count, and the two ends need mentions that do not overlap: a name inside a longer name
-        (钢种 in 钢种成分要求) is not a mention of its own, and a type related to itself has to
-        be named twice.
+        the file broke its lines), or a short run of them (`cite_run`), is the unit of direct
+        evidence. Only the longest mentions count, and the two ends need mentions that do not
+        overlap: a name inside a longer name (钢种 in 钢种成分要求) is not a mention of its own,
+        and a type related to itself has to be named twice.
         """
         for item in evidence:
             chunk = self.by_id.get(item.chunk_id)
@@ -1141,7 +1144,13 @@ class _Builder:
             span = covering(self.units(chunk), item.char_start, item.char_end)
             if span is None:
                 continue
-            line = normalize(chunk.text[span[0] : span[1]])
+            # Units are normalized one by one and kept apart, so that no name is made up of the
+            # end of one unit and the start of the next.
+            line = "\x00".join(
+                normalize(chunk.text[start:end])
+                for start, end in self.units(chunk)
+                if span[0] <= start and end <= span[1]
+            )
             mentions = [
                 (span, side)
                 for side, names in enumerate((domain, range_))

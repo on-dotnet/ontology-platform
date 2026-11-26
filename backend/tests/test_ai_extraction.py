@@ -20,6 +20,7 @@ from ontology_platform.modules.ai.extraction import (
     PendingType,
     Proposal,
     ProposedMatch,
+    _Builder,
     batches,
     build_proposals,
     merge_types,
@@ -1644,6 +1645,31 @@ def test_a_relation_can_cite_a_short_run_of_sentences_of_one_chunk() -> None:
     assert (literal["relation_type"], literal["relation_type:ok"]) == (5, 1)
 
 
+def test_a_run_is_one_chunk_forwards_and_at_most_three_units() -> None:
+    first = ChunkText(id=uuid4(), seq=0, text="甲。\n乙。\n丙。\n丁。")
+    second = ChunkText(id=uuid4(), seq=1, text="戊。\n己。\n庚。\n辛。")
+    builder = _Builder([first, second], [])
+    run = builder.cite_run("0.2-0.4")
+    assert run is not None
+    assert (run.chunk_id, run.quote) == (first.id, "乙。\n丙。\n丁。")
+    assert builder.cite_run("0.3") == builder.cite("0.3")
+    for ref in ("0.4-1.1", "0.3-1.4", "0.3-0.1", "0.1-0.4", "0.3-0.5", "0.1-", None):
+        assert builder.cite_run(ref) is None, ref
+
+
+def test_a_run_does_not_join_names_across_units() -> None:
+    # "钢种" would only appear by gluing the end of one unit to the start of the next.
+    chunk = ChunkText(id=uuid4(), seq=0, text="炉次见下钢\n\n种类一。")
+    rels = RelationsOut(
+        relations=[relation("new:Heat", str(EXISTING_GRADE.id), "拼接", "0.1-0.2")],
+        properties=[],
+    )
+    proposals = build_proposals(
+        [chunk], [EXISTING_GRADE], [entity("new:Heat", "炉次", sentence="0.1")], rels
+    )
+    assert [p for p in proposals if p.kind == "relation_type"] == []
+
+
 def test_types_and_properties_still_cite_one_sentence() -> None:
     chunk = ChunkText(id=uuid4(), seq=0, text="炉次按计划组织生产。\n每个炉次记录出钢重量。")
     weight = prop("new:Heat", "出钢重量").model_copy(update={"sentence": "0.1-0.2"})
@@ -1663,6 +1689,8 @@ def test_the_relations_prompt_allows_a_short_run_of_sentences() -> None:
     assert "3.12-3.14" in (RelationOut.model_fields["sentence"].description or "")
     assert "3.12-3.14" not in TYPES_INSTRUCTIONS
     assert "3.12-3.14" not in (PropertyOut.model_fields["sentence"].description or "")
+    # The shared citing rule must not tell the relations stage to cite one sentence only.
+    assert "Cite the one sentence" not in RELATIONS_INSTRUCTIONS
 
 
 def test_types_and_resolve_judge_a_thing_and_its_record_alike() -> None:
@@ -1671,6 +1699,8 @@ def test_types_and_resolve_judge_a_thing_and_its_record_alike() -> None:
     assert RECORD_RULE in RESOLVE_INSTRUCTIONS
     assert "a thing and the record of it (" not in RESOLVE_INSTRUCTIONS
     assert "identified and kept track of" in RECORD_RULE
+    # An event and its numbered record stay one concept (the number identifies the event).
+    assert "even when the record has a number" in RECORD_RULE
 
 
 def test_the_types_prompt_names_what_is_not_a_type() -> None:
@@ -1679,7 +1709,8 @@ def test_the_types_prompt_names_what_is_not_a_type() -> None:
     for phrase in (
         "by an action noun",
         "Registers, ledgers, directories, lists",
-        "table of records to keep",
+        "which documents are kept, by whom and for how long",
+        "stays a type even without a number of its own",
         "Requests, applications, permits and notifications",
         "Lines or items of a plan",
         "a role that an existing kind of thing plays",
