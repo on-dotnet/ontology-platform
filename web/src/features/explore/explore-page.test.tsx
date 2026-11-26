@@ -13,13 +13,13 @@ import { firstPage, heatRow, heatType, mockExplore, release, searchPath, typesPa
 
 describe('explore published objects', () => {
   it('opens a bookmarked tab and keeps keyboard, address and history in sync', async () => {
-    mockExplore();
+    mockExplore({ [`GET /api/ontologies/${ONTOLOGY_ID}/qa/questions`]: () => ({ items: [], nextCursor: null }) });
     const user = userEvent.setup();
     const { router } = renderApp('/explore?tab=ask');
     const ask = await screen.findByRole('tab', { name: '问答', selected: true });
     expect(screen.getByRole('heading', { level: 1, name: '探索' })).toBeVisible();
     expect(await screen.findByRole('combobox', { name: '本体' })).toBeVisible();
-    expect(screen.getByRole('tabpanel', { name: '问答' })).toHaveTextContent(i18n.t('qa.placeholder'));
+    expect(within(screen.getByRole('tabpanel', { name: '问答' })).getByRole('textbox', { name: i18n.t('qa.question') })).toBeVisible();
     ask.focus();
     await user.keyboard('{ArrowRight}');
     const metrics = await screen.findByRole('tab', { name: '指标与规则', selected: true });
@@ -38,6 +38,7 @@ describe('explore published objects', () => {
     const ingot = { ...heatType, typeId: 'ingot', label: '铸锭', localName: 'Ingot' };
     const api = mockExplore({
       'GET /api/ontologies': () => [ontologyFixture(), copper],
+      'GET /api/ontologies/:id/qa/questions': () => ({ items: [], nextCursor: null }),
       [`GET /api/ontologies/${copper.id}/objects/types`]: () => ({ release, items: [ingot] }),
       [`POST /api/ontologies/${copper.id}/objects/search`]: () => ({ ...firstPage, typeId: ingot.typeId, items: [] }),
     });
@@ -69,7 +70,7 @@ describe('explore published objects', () => {
       await user.click(await screen.findByRole('tab', { name }));
       const panel = within(await screen.findByRole('tabpanel', { name }));
       expect(await panel.findByRole('heading', { name: '还没有可探索的本体' })).toBeVisible();
-      expect(panel.queryByText(i18n.t('qa.placeholder'))).toBeNull();
+      expect(panel.queryByRole('textbox', { name: i18n.t('qa.question') })).toBeNull();
       expect(panel.queryByText(i18n.t('metrics.placeholder'))).toBeNull();
     }
   });
