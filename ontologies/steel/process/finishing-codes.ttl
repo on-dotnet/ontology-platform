@@ -1,0 +1,49 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/finishing-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/finishing-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "精整设备与工序代码"@zh, "Finishing equipment and process codes"@en ;
+    rdfs:comment "给设备类型和工序类型方案增加精整线及其常用作业类型。"@zh, "Extends shared schemes with finishing line equipment and operations."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/equipment-type/FINLINE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "FINLINE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "精整线"@zh, "Finishing line"@en ; skos:prefLabel "精整线"@zh, "Finishing line"@en ;
+    skos:definition "组合多道精整工位、对成形钢材连续或依次进行整理的生产线。"@zh ; dcterms:source <source/industry-practice> .
+<code/equipment-type/STR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "STR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "矫直机"@zh, "Straightening machine"@en ; skos:prefLabel "矫直机"@zh, "Straightening machine"@en ;
+    skos:definition "用矫直辊或压力机构对钢材施加校正变形的设备。"@zh ; dcterms:source <source/industry-practice> .
+<code/equipment-type/SHR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "SHR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "剪切机"@zh, "Shear"@en ; skos:prefLabel "剪切机"@zh, "Shear"@en ;
+    skos:definition "利用剪刃的相对运动横断、分条或修剪钢材的设备。"@zh ; dcterms:source <source/industry-practice> .
+<code/equipment-type/GRIND> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "GRIND"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "修磨机"@zh, "Conditioning grinder"@en ; skos:prefLabel "修磨机"@zh, "Conditioning grinder"@en ;
+    skos:definition "装有磨具并用于去除钢材表层金属的设备。"@zh ; dcterms:source <source/industry-practice> .
+<code/process-type/STRAIGHTEN> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "STRAIGHTEN"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "矫直"@zh, "Straightening"@en ; skos:prefLabel "矫直"@zh, "Straightening"@en ;
+    skos:definition "将钢材的弯曲、扭转或不平校正至要求形状的工序段。"@zh ; dcterms:source <source/industry-practice> .
+<code/process-type/SHEAR> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "SHEAR"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "剪切"@zh, "Shearing"@en ; skos:prefLabel "剪切"@zh, "Shearing"@en ;
+    skos:definition "通过剪刃分离材料以形成切断件、条材或修剪边部的工序段。"@zh ; dcterms:source <source/industry-practice> .
+<code/process-type/SURFCOND> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "SURFCOND"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "表面修整"@zh, "Surface conditioning"@en ; skos:prefLabel "表面修整"@zh, "Surface conditioning"@en ;
+    skos:definition "通过去除金属对钢材表面实施修磨、扒皮等处理的工序段。"@zh ; dcterms:source <source/industry-practice> .
+<code/process-type/INLINETEST> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/INSPECT> ;
+    skos:notation "INLINETEST"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "在线检验"@zh, "In-line inspection"@en ; skos:prefLabel "在线检验"@zh, "In-line inspection"@en ;
+    skos:definition "在材料通过产线期间采集和评定质量证据的工序段。"@zh ; dcterms:source <source/industry-practice> .
+<code/process-type/MARK> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "MARK"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "标记"@zh, "Marking"@en ; skos:prefLabel "标记"@zh, "Marking"@en ;
+    skos:definition "在实物或所附标签上施加身份或位置标记的工序段。"@zh ; dcterms:source <source/industry-practice> .

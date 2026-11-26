@@ -1,0 +1,171 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/rolling> a owl:Ontology ;
+    owl:versionIRI <ontology/process/rolling/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "轧制与板带、长材"@zh, "Rolling and flat and long products"@en ;
+    rdfs:comment "描述轧制、涂镀及钢卷转换作业，记录逐件来源和轧制实绩。"@zh, "Describes rolling, coating and coil handling with piece genealogy and rolling process measurements."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Reheating a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "坯料加热"@zh, "Stock reheating"@en ; skos:prefLabel "坯料加热"@zh, "Stock reheating"@en ;
+    skos:definition "在变形加工前将坯料或钢锭加热到可供下一道工序加工的温度。"@zh, "An operation that heats stock or ingots in preparation for the next forming step."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Rolling a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "轧制"@zh, "Rolling"@en ; skos:prefLabel "轧制"@zh, "Rolling"@en ;
+    skos:definition "使钢料通过旋转轧辊的辊缝，在轧辊压力下改变厚度或断面轮廓的作业。"@zh, "An operation that passes steel through rotating rolls to change its thickness or cross-sectional profile."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:HotRolling a owl:Class ; rdfs:subClassOf stl:Rolling ;
+    rdfs:label "热轧"@zh, "Hot rolling"@en ; skos:prefLabel "热轧"@zh, "Hot rolling"@en ;
+    skos:altLabel "热轧执行"@zh ;
+    skos:definition "在钢的热加工温度范围内轧制坯料，可产出板带、棒线材或型钢。"@zh, "Rolling performed in the hot-working range of the steel to produce flat or long products."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:BreakdownRolling a owl:Class ; rdfs:subClassOf stl:HotRolling ;
+    rdfs:label "初轧开坯"@zh, "Breakdown rolling"@en ; skos:prefLabel "初轧开坯"@zh, "Breakdown rolling"@en ;
+    skos:definition "把热钢锭或大断面坯初轧成供后续成形使用的较小断面坯料的作业。"@zh, "Hot rolling an ingot or large semiproduct into smaller stock for subsequent forming."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:ColdRolling a owl:Class ; rdfs:subClassOf stl:Rolling ;
+    rdfs:label "冷轧"@zh, "Cold rolling"@en ; skos:prefLabel "冷轧"@zh, "Cold rolling"@en ;
+    skos:definition "在钢的再结晶温度以下通过一个或多个轧制道次改变厚度或断面。"@zh, "Rolling that changes thickness or section in one or more passes below the recrystallization temperature of the steel."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:PicklingAndColdRolling a owl:Class ; rdfs:subClassOf stl:ColdRolling ;
+    rdfs:label "酸轧"@zh, "Pickling and cold rolling"@en ; skos:prefLabel "酸轧"@zh, "Pickling and cold rolling"@en ;
+    skos:altLabel "酸轧执行"@zh ;
+    skos:definition "带钢经酸洗去除氧化皮后实施冷轧减薄并形成出口卷的作业。"@zh, "An operation that removes scale from strip by pickling, reduces the strip by cold rolling and delivers it in coils."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Annealing a owl:Class ; rdfs:subClassOf stl:HeatTreatment ;
+    rdfs:label "退火"@zh, "Annealing"@en ; skos:prefLabel "退火"@zh, "Annealing"@en ;
+    skos:altLabel "退火执行"@zh ;
+    skos:definition "使钢材经历受控的加热、保温和冷却过程，以软化材料、消除内应力或调整组织的热处理作业。"@zh, "A heat treatment with controlled heating, holding and cooling to soften steel, relieve internal stress or alter its microstructure."@en ;
+    dcterms:source <std/gbt-7232-2023> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Coating a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "涂镀"@zh, "Coating"@en ; skos:prefLabel "涂镀"@zh, "Coating"@en ;
+    skos:definition "在钢材表面施加一层或多层金属或有机材料，使表面获得规定的防护或使用性能。"@zh, "An operation that applies one or more metallic or organic layers to steel to provide the specified surface protection or function."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Galvanizing a owl:Class ; rdfs:subClassOf stl:Coating ;
+    rdfs:label "镀锌"@zh, "Galvanizing"@en ; skos:prefLabel "镀锌"@zh, "Galvanizing"@en ;
+    skos:altLabel "镀锌执行"@zh ;
+    skos:definition "在钢材表面施加锌或锌基合金镀层的作业，连续热镀锌是其中一种方式。"@zh, "A coating operation that deposits zinc or a zinc-based alloy on steel, including continuous hot-dip galvanizing."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Recoiling a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "重卷"@zh, "Recoiling"@en ; skos:prefLabel "重卷"@zh, "Recoiling"@en ;
+    skos:altLabel "重卷执行"@zh ;
+    skos:definition "将已有的带钢卷展开，再按出口卷取条件卷起以形成产出卷的作业。"@zh, "An operation that unwinds strip from an existing coil and winds it again into an output coil."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:CoilSplitting a owl:Class ; rdfs:subClassOf stl:MaterialTransformation ;
+    rdfs:label "分卷"@zh, "Coil splitting"@en ; skos:prefLabel "分卷"@zh, "Coil splitting"@en ;
+    skos:definition "将同一母卷中的带钢分作两卷或多卷，各产出卷取得独立身份并记录其直接来源。"@zh, "An operation that divides strip from one parent coil into two or more output coils, each tracked separately against that parent."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:CoilJoining a owl:Class ; rdfs:subClassOf stl:MaterialTransformation ;
+    rdfs:label "合卷"@zh, "Coil joining"@en ; skos:prefLabel "合卷"@zh, "Coil joining"@en ;
+    skos:definition "将两卷或多卷的带钢接续并卷成一个新卷，产出卷保留各投入卷的来源关系。"@zh, "An operation that joins strip from multiple input coils into one new coil whose genealogy includes the contributing coils."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Packing a owl:Class ; rdfs:subClassOf stl:MaterialAggregation ;
+    rdfs:label "包装"@zh, "Packing"@en ; skos:prefLabel "包装"@zh, "Packing"@en ;
+    skos:altLabel "包装执行"@zh ;
+    skos:definition "把一件或多件实物装成一个可独立搬运的包装件，装入的各件仍可按原身份追踪。"@zh, "An operation that forms a handling package from one or more pieces while preserving the identity of each member."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:BreakdownRolledStock a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "初轧坯"@zh, "Breakdown-rolled stock"@en ; skos:prefLabel "初轧坯"@zh, "Breakdown-rolled stock"@en ;
+    skos:definition "钢锭或大断面坯经过开坯轧制后单独编号的坯件，可按其实际断面同时标注为板坯、大方坯或小钢坯。"@zh, "An individually identified piece of stock produced by breakdown rolling, which may also be classified by its section as a slab, bloom or billet."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Coil a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "钢卷"@zh, "Steel coil"@en ; skos:prefLabel "钢卷"@zh, "Steel coil"@en ;
+    skos:definition "将一段带钢沿长度方向卷绕成可整体吊运、按件跟踪的实物，卷形可出现在热轧、冷轧及后续作业中。"@zh, "An individually tracked length of flat steel strip wound for handling as a unit, at the hot mill, cold mill or a later operation."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:HotRolledCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+    rdfs:label "热轧卷"@zh, "Hot-rolled coil"@en ; skos:prefLabel "热轧卷"@zh, "Hot-rolled coil"@en ;
+    skos:definition "由热轧出口的带钢卷取形成的钢卷，其直接来源可沿轧制路线逐步追溯。"@zh, "A steel coil formed by winding strip at the output of hot rolling."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:ColdRolledCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+    rdfs:label "冷轧段钢卷"@zh, "Cold-line coil"@en ; skos:prefLabel "冷轧段钢卷"@zh, "Cold-line coil"@en ;
+    skos:definition "在冷轧或其后续精整工序的出口按件登记的钢卷，常见产线包括退火线、涂镀线和重卷线。"@zh, "A coil identified at the exit of cold rolling or a subsequent finishing operation, such as annealing, coating or recoiling."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:FullHardCoil a owl:Class ; rdfs:subClassOf stl:ColdRolledCoil ;
+    rdfs:label "冷硬卷"@zh, "Full-hard coil"@en ; skos:prefLabel "冷硬卷"@zh, "Full-hard coil"@en ;
+    skos:altLabel "轧硬卷"@zh ;
+    skos:definition "冷轧减薄后保留加工硬化状态、尚未经退火的带钢卷。"@zh, "A coil of cold-reduced strip that retains its work-hardened condition before annealing."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:AnnealedCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+    rdfs:label "退火卷"@zh, "Annealed coil"@en ; skos:prefLabel "退火卷"@zh, "Annealed coil"@en ;
+    skos:definition "以卷为实物件跟踪、带钢已完成退火热循环的钢卷，可由连续或成批退火取得。"@zh, "A coil of strip identified after an annealing cycle, whether the strip was annealed continuously or in a batch."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:CoatedCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+    rdfs:label "涂镀钢卷"@zh, "Coated coil"@en ; skos:prefLabel "涂镀钢卷"@zh, "Coated coil"@en ;
+    skos:definition "带钢表面带有金属镀层、有机涂层或两者组合，并以卷形按件跟踪的钢材。"@zh, "A coil of steel strip bearing a metallic coating, an organic coating or a combination of layers."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:GalvanizedCoil a owl:Class ; rdfs:subClassOf stl:CoatedCoil ;
+    rdfs:label "镀锌卷"@zh, "Galvanized coil"@en ; skos:prefLabel "镀锌卷"@zh, "Galvanized coil"@en ;
+    skos:definition "以卷为单元交接的镀锌带钢，镀层以锌或锌基合金为主要成分，具体类别可随卷记录。"@zh, "A coil of strip bearing a zinc or zinc-alloy coating whose particular coating type can be recorded for the piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:RecoiledCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+    rdfs:label "重卷卷"@zh, "Recoiled coil"@en ; skos:prefLabel "重卷卷"@zh, "Recoiled coil"@en ;
+    skos:definition "将原卷带钢展开后再次卷取，并在重卷出口取得独立件号的钢卷。"@zh, "A coil assigned its own piece identity after strip from existing coils is unwound and wound again."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Plate a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "中厚钢板"@zh, "Steel plate"@en ; skos:prefLabel "中厚钢板"@zh, "Steel plate"@en ;
+    skos:altLabel "中厚板"@zh ;
+    skos:definition "按适用产品标准归为中厚板、以单张平直实物跟踪的扁平钢材，板厚分类界限随所引标准确定。"@zh, "A discrete flat steel piece classed as plate in its product standard, which sets the applicable thickness boundary with sheet."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Sheet a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "薄钢板"@zh, "Steel sheet"@en ; skos:prefLabel "薄钢板"@zh, "Steel sheet"@en ;
+    skos:definition "按适用产品标准归为薄板、以平片逐张跟踪的扁平钢材，既可单张轧成也可由带钢横切取得。"@zh, "A discrete flat steel piece classed as sheet in its product standard, rolled individually or cut to length from strip."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Bar a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "棒材"@zh, "Steel bar"@en ; skos:prefLabel "棒材"@zh, "Steel bar"@en ;
+    skos:definition "具有圆形、方形、扁形或其他棒材断面、可按件交接的实心长条钢材。"@zh, "An individually tracked solid long product with a round, square, flat or other bar section."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:WireRod a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "线材"@zh, "Wire rod"@en ; skos:prefLabel "线材"@zh, "Wire rod"@en ;
+    skos:altLabel "盘条"@zh ;
+    skos:definition "以较小的实心断面热轧成长度连续的长材并成圈收集，常作为拉丝等后续加工的原料。"@zh, "A hot-rolled long product of small solid section collected in successive loops, often as stock for wire drawing."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:Section a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "型钢"@zh, "Steel section"@en ; skos:prefLabel "型钢"@zh, "Steel section"@en ;
+    skos:definition "沿长度保持规定截面轮廓的型材实物件，其截面由翼缘、腹板、肢边等相应部位的尺寸描述。"@zh, "A long steel piece with a specified profile along its length, described by features such as flanges, a web or legs."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/rolling> .
+
+stl:reheatingDischargeTemperature a owl:DatatypeProperty ; rdfs:domain stl:Reheating ; rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "加热炉出炉温度"@zh, "Reheating furnace discharge temperature"@en ; skos:prefLabel "加热炉出炉温度"@zh, "Reheating furnace discharge temperature"@en ;
+    skos:definition "坯料离开加热炉时的实际料温，炉膛气氛温度另行记录。"@zh, "The temperature of the stock as it leaves the reheating furnace."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:finishRollingTemperature a owl:DatatypeProperty ; rdfs:domain stl:HotRolling ; rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "终轧温度"@zh, "Finish rolling temperature"@en ; skos:prefLabel "终轧温度"@zh, "Finish rolling temperature"@en ;
+    skos:definition "轧件通过热轧最后一道变形道次时在出口记录的料温。"@zh, "The temperature of the rolled steel at the exit of its final hot rolling pass."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:coilingTemperature a owl:DatatypeProperty ; rdfs:domain stl:HotRolling ; rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "热轧卷取温度"@zh, "Hot strip coiling temperature"@en ; skos:prefLabel "热轧卷取温度"@zh, "Hot strip coiling temperature"@en ;
+    skos:definition "热轧带钢经轧后冷却、进入卷取机时记录的带钢温度。"@zh, "The temperature of hot-rolled strip as it reaches the coiler after runout cooling."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:reductionRatio a owl:DatatypeProperty ; rdfs:domain stl:Rolling ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "压下率"@zh, "Thickness reduction ratio"@en ; skos:prefLabel "压下率"@zh, "Thickness reduction ratio"@en ;
+    skos:definition "一道或一组轧制道次中，入口厚度减去出口厚度所得差值占该段入口厚度的百分比。"@zh, "The difference between entry and exit thickness for a pass or group of passes, expressed as a percentage of entry thickness."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:startLength a owl:DatatypeProperty ; rdfs:domain stl:Coil ; rdfs:range xsd:decimal ;
+    stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "母卷区段起点"@zh, "Start along source coil"@en ; skos:prefLabel "母卷区段起点"@zh, "Start along source coil"@en ;
+    skos:definition "以单一直接母卷约定的起算端为零，沿带钢量到子卷所取区段起点的距离。"@zh, "Distance along the strip from the reference end of its single direct parent coil to the start of the interval taken for this coil."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+stl:endLength a owl:DatatypeProperty ; rdfs:domain stl:Coil ; rdfs:range xsd:decimal ;
+    stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "母卷区段终点"@zh, "End along source coil"@en ; skos:prefLabel "母卷区段终点"@zh, "End along source coil"@en ;
+    skos:definition "以母卷区段起点所用的同一母卷和零点为基准，沿带钢量到该区段终点的距离。"@zh, "Distance to the end of the interval taken for this coil, measured along the same parent strip from the same origin as the start."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
+
+stl:coatingType a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MaterialPiece stl:MaterialSpecification ) ] ;
+    rdfs:range skos:Concept ; rdfs:seeAlso <code/coating-type> ;
+    rdfs:label "涂镀层类型"@zh, "Coating type"@en ; skos:prefLabel "涂镀层类型"@zh, "Coating type"@en ;
+    skos:altLabel "镀层类型"@zh ;
+    skos:definition "给出实物件表面的实际涂镀层类别，或物料规格对涂镀层类别的要求。"@zh, "Identifies a coating present on a material piece or specified as a requirement for a material."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .

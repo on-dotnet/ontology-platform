@@ -1,0 +1,103 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/tubemaking-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/tubemaking-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "制管代码表"@zh, "Tube making code schemes"@en ;
+    rdfs:comment "登记管体焊接方法，并补充两条制管路线的设备、工序和产品形态。"@zh, "Defines tube seam welding methods and adds equipment, operation and product form codes for seamless and welded routes."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/weld-method> a skos:ConceptScheme ;
+    rdfs:label "管体焊接方法"@zh, "Tube seam welding methods"@en ; skos:prefLabel "管体焊接方法"@zh, "Tube seam welding methods"@en ;
+    skos:definition "按管边的接合工艺划分制管焊接方法，部分方法再按制造焊缝的走向细分。"@zh, "Classifies methods of joining tube edges by welding process, with seam orientation distinguishing variants of a process."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> .
+stl:WeldMethodCode a rdfs:Datatype ;
+    rdfs:label "管体焊接方法代码"@zh, "Tube seam welding method code"@en ; skos:prefLabel "管体焊接方法代码"@zh, "Tube seam welding method code"@en ;
+    skos:definition "管体焊接方法方案中主记号所用的字面量类型。"@zh, "Datatype of the primary notations identifying tube seam welding methods."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> .
+
+<code/equipment-type/PIERCER> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "PIERCER"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "穿孔机"@zh, "Tube billet piercer"@en ; skos:prefLabel "穿孔机"@zh, "Tube billet piercer"@en ;
+    skos:definition "在实心管坯内开出轴向孔并产出毛管的制管设备。"@zh, "Equipment that opens an axial bore in a solid tube billet to produce a shell."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/CONTTUBE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "CONTTUBE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "连轧管机"@zh, "Continuous tube rolling mill"@en ; skos:prefLabel "连轧管机"@zh, "Continuous tube rolling mill"@en ;
+    skos:definition "使毛管连续通过串列轧机机架，逐架减壁延伸的轧管设备。"@zh, "A tube mill with tandem stands that successively reduce the wall and elongate the shell."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/SIZER> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "SIZER"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "钢管定径机"@zh, "Tube sizing mill"@en ; skos:prefLabel "钢管定径机"@zh, "Tube sizing mill"@en ;
+    skos:definition "用定径孔型调整管体外部截面尺寸的轧机。"@zh, "A mill that controls the outside dimensions of a tube by passing it through sizing grooves."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/WELDLINE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "WELDLINE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "焊管机组"@zh, "Welded pipe production line"@en ; skos:prefLabel "焊管机组"@zh, "Welded pipe production line"@en ;
+    skos:definition "将板带成形和管体合缝焊接设备配套起来以生产焊管的机组。"@zh, "A production line combining plate or strip forming equipment with seam welding equipment to make pipe."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/ERW> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/WELDLINE> ;
+    skos:notation "ERW"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "电阻焊管机组"@zh, "Electric resistance welded tube line"@en ; skos:prefLabel "电阻焊管机组"@zh, "Electric resistance welded tube line"@en ;
+    skos:definition "以电阻热加热管边并以挤压辊使接缝闭合的焊管机组。"@zh, "A pipe line using electrical resistance heat at the edges and squeeze rolls to close the seam."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/SAW> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/WELDLINE> ;
+    skos:notation "SAW"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "埋弧焊管机组"@zh, "Submerged arc welded pipe line"@en ; skos:prefLabel "埋弧焊管机组"@zh, "Submerged arc welded pipe line"@en ;
+    skos:definition "配有焊丝送进和焊剂供给设备、以埋弧焊接合管缝的焊管机组。"@zh, "A pipe line equipped to feed wire and flux for submerged arc welding of the pipe seam."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type/TUBEPIERCE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "TUBEPIERCE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "管坯穿孔"@zh, "Tube billet piercing"@en ; skos:prefLabel "管坯穿孔"@zh, "Tube billet piercing"@en ;
+    skos:definition "以实心管坯为投入、穿出轴向内孔并形成毛管的工序。"@zh, "Forms a hollow shell by opening a bore along a solid billet."@en .
+<code/process-type/TUBEROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "TUBEROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "轧管"@zh, "Tube rolling"@en ; skos:prefLabel "轧管"@zh, "Tube rolling"@en ;
+    skos:definition "以空心管料为投入，通过轧制延伸管身并调整管壁厚度。"@zh, "Elongates hollow stock by rolling and adjusts the wall thickness."@en .
+<code/process-type/TUBEWELD> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "TUBEWELD"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "管体焊接"@zh, "Tube seam welding"@en ; skos:prefLabel "管体焊接"@zh, "Tube seam welding"@en ;
+    skos:definition "沿成形板带的相邻边缘施焊，使开口管坯成为闭合的焊管。"@zh, "Joins the adjoining edges of formed flat stock to turn an open blank into welded pipe."@en .
+<code/process-type/TUBESIZE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "TUBESIZE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "钢管定径与减径"@zh, "Tube sizing and reducing"@en ; skos:prefLabel "钢管定径与减径"@zh, "Tube sizing and reducing"@en ;
+    skos:definition "按所需外径对管体截面进行定径或减径的工序。"@zh, "Sizes or reduces the outside diameter of tubular stock."@en .
+
+<code/product-form/SEAMLESS> a skos:Concept ; skos:inScheme <code/product-form> ; skos:broader <code/product-form/TUBE> ;
+    skos:notation "SEAMLESS"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "无缝管"@zh, "Seamless tube"@en ; skos:prefLabel "无缝管"@zh, "Seamless tube"@en ;
+    skos:definition "管壁由整块钢坯形成、周向连续的管材形态。"@zh, "Tubular product form with a circumferentially continuous wall formed from solid stock."@en ;
+    dcterms:source <std/iso-6929-2013> .
+<code/product-form/WELDED> a skos:Concept ; skos:inScheme <code/product-form> ; skos:broader <code/product-form/TUBE> ;
+    skos:notation "WELDED"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "焊管"@zh, "Welded pipe"@en ; skos:prefLabel "焊管"@zh, "Welded pipe"@en ;
+    skos:definition "由板带成形、边缘经焊接闭合的管材形态。"@zh, "Tubular product form closed by welding the edges of formed plate or strip."@en ;
+    dcterms:source <std/iso-6929-2013> .
+
+<code/weld-method/ERW> a skos:Concept ; skos:inScheme <code/weld-method> ; skos:topConceptOf <code/weld-method> ;
+    skos:notation "ERW"^^stl:WeldMethodCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "电阻焊"@zh, "Electric resistance welding"@en ; skos:prefLabel "电阻焊"@zh, "Electric resistance welding"@en ;
+    skos:definition "利用流经管边的电流所产生的电阻热加热接合面，再加压焊合。"@zh, "Heats the mating edges by electrical resistance and applies pressure to join them."@en .
+<code/weld-method/HFW> a skos:Concept ; skos:inScheme <code/weld-method> ; skos:broader <code/weld-method/ERW> ;
+    skos:notation "HFW"^^stl:WeldMethodCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "高频焊"@zh, "High-frequency welding"@en ; skos:prefLabel "高频焊"@zh, "High-frequency welding"@en ;
+    skos:definition "以高频电流集中加热待接合的管边，随后挤压焊合的电阻焊方法。"@zh, "A resistance welding method using high-frequency current to concentrate heat at the edges before they are squeezed together."@en .
+<code/weld-method/SAW> a skos:Concept ; skos:inScheme <code/weld-method> ; skos:topConceptOf <code/weld-method> ;
+    skos:notation "SAW"^^stl:WeldMethodCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "埋弧焊"@zh, "Submerged arc welding"@en ; skos:prefLabel "埋弧焊"@zh, "Submerged arc welding"@en ;
+    skos:definition "在颗粒焊剂覆盖下以电弧熔合管边和焊丝，形成管体焊缝。"@zh, "Fuses the pipe edges and electrode wire with an arc beneath a blanket of granular flux."@en .
+<code/weld-method/LSAW> a skos:Concept ; skos:inScheme <code/weld-method> ; skos:broader <code/weld-method/SAW> ;
+    skos:notation "LSAW"^^stl:WeldMethodCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "直缝埋弧焊"@zh, "Longitudinal submerged arc welding"@en ; skos:prefLabel "直缝埋弧焊"@zh, "Longitudinal submerged arc welding"@en ;
+    skos:definition "沿管体轴向对已成形的管边进行埋弧焊接。"@zh, "Applies submerged arc welding along a seam parallel to the pipe axis."@en ;
+    skos:altLabel "SAWL"@en .
+<code/weld-method/SSAW> a skos:Concept ; skos:inScheme <code/weld-method> ; skos:broader <code/weld-method/SAW> ;
+    skos:notation "SSAW"^^stl:WeldMethodCode ; rdfs:isDefinedBy <ontology/process/tubemaking-codes> ;
+    rdfs:label "螺旋缝埋弧焊"@zh, "Helical submerged arc welding"@en ; skos:prefLabel "螺旋缝埋弧焊"@zh, "Helical submerged arc welding"@en ;
+    skos:definition "对带钢螺旋成形后形成的螺旋接缝进行埋弧焊接。"@zh, "Applies submerged arc welding along the helical seam of spiral-formed strip."@en ;
+    skos:altLabel "SAWH"@en .

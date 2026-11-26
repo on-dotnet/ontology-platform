@@ -1,0 +1,22 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX form: <https://w3id.org/ontology-platform/steel/code/product-form/>
+
+SELECT DISTINCT ?pieceId ?stockId ?heatId WHERE {
+  VALUES ?piece { <urn:synthetic:steel:hotrolledcoil/R126000001> <urn:synthetic:steel:galvanizedcoil/CCG126000044>
+                  <urn:synthetic:steel:plate/P41> <urn:synthetic:steel:bar/B41> <urn:synthetic:steel:bar/B42> }
+  VALUES ?productClass { stl:Coil stl:Plate stl:Bar }
+  ?piece a/rdfs:subClassOf* ?productClass ; dcterms:identifier ?pieceId ; stl:derivedFrom+ ?stock .
+  {
+    VALUES ?stockClass { stl:Slab stl:Bloom stl:Billet stl:BeamBlank stl:ContinuouslyCastPiece stl:BreakdownRolledStock stl:Ingot }
+    ?stock a/rdfs:subClassOf* ?stockClass .
+  } UNION {
+    VALUES ?stockForm { form:SLAB form:BLOOM form:SQBILLET form:RECTBILLET form:ROUNDBIL form:BEAMBLANK form:INGOT }
+    ?stock stl:productForm/skos:broader* ?stockForm .
+  }
+  ?stock dcterms:identifier ?stockId ; stl:derivedFrom*/stl:sourceHeat ?heat .
+  ?heat a/rdfs:subClassOf* stl:Heat ; dcterms:identifier ?heatId .
+}
+ORDER BY ?pieceId ?stockId ?heatId

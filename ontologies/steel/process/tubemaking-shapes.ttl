@@ -1,0 +1,36 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/tubemaking-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/tubemaking-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "制管数据约束"@zh, "Tube making data constraints"@en ;
+    rdfs:comment "校验无缝管的来源物料、管件尺寸以及制管焊接作业的方法记录。"@zh, "Checks seamless tube stock, recorded tube dimensions and the methods used in seam welding operations."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:SeamlessTubeStockShape a sh:PropertyShape ; sh:targetClass stl:SeamlessTube ;
+    sh:path [ sh:oneOrMorePath stl:derivedFrom ] ;
+    sh:qualifiedValueShape [ sh:or (
+        [ sh:class stl:TubeBillet ] [ sh:class stl:RoundBillet ] [ sh:class stl:HollowShell ]
+        [ sh:property [ sh:path ( stl:productForm [ sh:zeroOrMorePath skos:broader ] ) ;
+            sh:qualifiedValueShape [ sh:in ( <code/product-form/ROUNDBIL> <code/product-form/SHELL> ) ] ; sh:qualifiedMinCount 1 ] ]
+    ) ] ;
+    sh:qualifiedMinCount 1 ; sh:severity sh:Violation ;
+    rdfs:comment "沿无缝钢管的直接来源逐段回溯，应至少找到一件制管用实心管坯、圆坯或毛管。圆坯与毛管也可按产品形态代码识别。"@zh .
+
+stl:TubeDimensionValueShape a sh:PropertyShape ; sh:targetSubjectsOf stl:tubeOutsideDiameter, stl:tubeWallThickness ;
+    sh:path [ sh:alternativePath ( stl:tubeOutsideDiameter stl:tubeWallThickness ) ] ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "已记录的管外径和管壁厚度均应为大于零的十进制数，单位为毫米。"@zh .
+
+stl:TubeWeldingMethodShape a sh:PropertyShape ; sh:targetClass stl:TubeWelding ;
+    sh:path stl:weldMethod ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每次管体焊接作业至少应记录一种实际用于接合管边的焊接方法。"@zh .
+
+stl:WeldMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:weldMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/weld-method> ;
+    sh:severity sh:Violation ; rdfs:comment "管体焊接作业的每个方法取值都应属于管体焊接方法代码表。"@zh .

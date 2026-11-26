@@ -32,6 +32,29 @@ stl:AnalysisTypeCode a rdfs:Datatype ;
     skos:prefLabel "chemical analysis type code"@en,
         "化学分析类型代码"@zh .
 
+stl:AnnealedCoil a owl:Class ;
+    rdfs:label "Annealed coil"@en,
+        "退火卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coil ;
+    skos:definition "A coil of strip identified after an annealing cycle, whether the strip was annealed continuously or in a batch."@en,
+        "以卷为实物件跟踪、带钢已完成退火热循环的钢卷，可由连续或成批退火取得。"@zh ;
+    skos:prefLabel "Annealed coil"@en,
+        "退火卷"@zh .
+
+stl:Annealing a owl:Class ;
+    rdfs:label "Annealing"@en,
+        "退火"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:HeatTreatment ;
+    skos:altLabel "退火执行"@zh ;
+    skos:definition "A heat treatment with controlled heating, holding and cooling to soften steel, relieve internal stress or alter its microstructure."@en,
+        "使钢材经历受控的加热、保温和冷却过程，以软化材料、消除内应力或调整组织的热处理作业。"@zh ;
+    skos:prefLabel "Annealing"@en,
+        "退火"@zh .
+
 stl:Area a owl:Class ;
     rdfs:label "Area"@en,
         "生产区域"@zh ;
@@ -43,17 +66,27 @@ stl:Area a owl:Class ;
     skos:prefLabel "Area"@en,
         "生产区域"@zh .
 
-stl:BeamBlank a owl:Class ;
-    rdfs:label "Beam blank"@en,
-        "异型坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/en-10079-2007> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:altLabel "梁坯"@zh ;
-    skos:definition "A steel semiproduct with a web and flange preform in its cross-section for subsequent rolling into a beam."@en,
-        "截面已具梁腹和翼缘雏形、供进一步轧成梁材的钢坯。"@zh ;
-    skos:prefLabel "Beam blank"@en,
-        "异型坯"@zh .
+stl:Bar a owl:Class ;
+    rdfs:label "Steel bar"@en,
+        "棒材"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individually tracked solid long product with a round, square, flat or other bar section."@en,
+        "具有圆形、方形、扁形或其他棒材断面、可按件交接的实心长条钢材。"@zh ;
+    skos:prefLabel "Steel bar"@en,
+        "棒材"@zh .
+
+stl:BarPeeling a owl:Class ;
+    rdfs:label "Bar peeling"@en,
+        "棒材扒皮"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:SurfaceConditioning ;
+    skos:definition "A machining operation that cuts a continuous layer from the circumference of a bar to expose the underlying metal."@en,
+        "用切削刀具沿棒材外周连续去除表层，使加工后的圆周表面露出基体金属的作业。"@zh ;
+    skos:prefLabel "Bar peeling"@en,
+        "棒材扒皮"@zh .
 
 stl:BendTest a owl:Class ;
     rdfs:label "Bend test"@en,
@@ -103,16 +136,16 @@ stl:BlastFurnaceSlag a owl:Class ;
     skos:prefLabel "Blast furnace slag lot"@en,
         "高炉渣批"@zh .
 
-stl:Bloom a owl:Class ;
-    rdfs:label "Bloom"@en,
-        "大方坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:definition "A square or rectangular semiproduct supplied as large-section stock for breakdown or direct working into heavy sections."@en,
-        "作为大断面坯料交接的方形或矩形钢坯，可供开坯或直接轧制重型断面产品。"@zh ;
-    skos:prefLabel "Bloom"@en,
-        "大方坯"@zh .
+stl:BreakdownRolling a owl:Class ;
+    rdfs:label "Breakdown rolling"@en,
+        "初轧开坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:HotRolling ;
+    skos:definition "Hot rolling an ingot or large semiproduct into smaller stock for subsequent forming."@en,
+        "把热钢锭或大断面坯初轧成供后续成形使用的较小断面坯料的作业。"@zh ;
+    skos:prefLabel "Breakdown rolling"@en,
+        "初轧开坯"@zh .
 
 stl:CastHeatPositionShape a sh:PropertyShape ;
     rdfs:comment "已记入浇次的炉次应给出一个正整数炉序。"@zh ;
@@ -133,14 +166,14 @@ stl:CastIngotMouldShape a sh:NodeShape ;
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
         SELECT DISTINCT $this WHERE {
-          { $this stl:producedBy/a/rdfs:subClassOf* stl:IngotCasting .
+          { $this (stl:producedBy|^stl:outputPiece)/a/rdfs:subClassOf* stl:IngotCasting .
             FILTER NOT EXISTS {
               $this stl:teemedInMould ?mould .
               ?mould a/rdfs:subClassOf* stl:Equipment ; stl:equipmentType/skos:broader* eq:INGOTMOULD .
             }
           } UNION {
             $this stl:teemedInMould ?mould .
-            FILTER NOT EXISTS { $this stl:producedBy/a/rdfs:subClassOf* stl:IngotCasting }
+            FILTER NOT EXISTS { $this (stl:producedBy|^stl:outputPiece)/a/rdfs:subClassOf* stl:IngotCasting }
           } UNION {
             $this stl:teemedInMould ?first, ?second . FILTER (!sameTerm(?first, ?second))
           }
@@ -271,6 +304,77 @@ stl:CoatingTest a owl:Class ;
     skos:prefLabel "Coating test"@en,
         "镀层试验"@zh .
 
+stl:CoatingTypeCode a rdfs:Datatype ;
+    rdfs:label "Coating type code"@en,
+        "涂镀层类型代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "镀层类型代码"@zh ;
+    skos:definition "Datatype for the primary notations in the coating type scheme."@en,
+        "标记涂镀层类型方案中各项主记号的字面量类型。"@zh ;
+    skos:prefLabel "Coating type code"@en,
+        "涂镀层类型代码"@zh .
+
+stl:CoatingTypeSchemeShape a sh:PropertyShape ;
+    rdfs:comment "规格或实物所引用的涂镀层类型应属于涂镀层类型方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:coatingType .
+
+stl:CoilJoining a owl:Class ;
+    rdfs:label "Coil joining"@en,
+        "合卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialTransformation ;
+    skos:definition "An operation that joins strip from multiple input coils into one new coil whose genealogy includes the contributing coils."@en,
+        "将两卷或多卷的带钢接续并卷成一个新卷，产出卷保留各投入卷的来源关系。"@zh ;
+    skos:prefLabel "Coil joining"@en,
+        "合卷"@zh .
+
+stl:CoilSourceIntervalEndShape a sh:PropertyShape ;
+    rdfs:comment "登记母卷区段时须给出终点，并使用与起点相同的非负十进制米数口径。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:minInclusive 0.0 ;
+    sh:path stl:endLength ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:endLength,
+        stl:startLength .
+
+stl:CoilSourceIntervalShape a sh:PropertyShape ;
+    rdfs:comment "登记母卷区段时须给出起点，以非负十进制米数记录，起点可以与终点重合。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:lessThanOrEquals stl:endLength ;
+    sh:minCount 1 ;
+    sh:minInclusive 0.0 ;
+    sh:path stl:startLength ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:endLength,
+        stl:startLength .
+
+stl:CoilSourceStockShape a sh:PropertyShape ;
+    rdfs:comment "每卷应沿一步或多步直接来源关系追到至少一件坯料或钢锭。分卷、合卷可经过中间卷；坯锭可由实物类或坯形代码识别。"@zh ;
+    sh:path [ sh:oneOrMorePath stl:derivedFrom ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:or ( [ sh:class stl:ContinuouslyCastPiece ] [ sh:class stl:BreakdownRolledStock ] [ sh:class stl:Slab ] [ sh:class stl:Bloom ] [ sh:class stl:Billet ] [ sh:class stl:BeamBlank ] [ sh:class stl:Ingot ] [ sh:property [ sh:path ( stl:productForm [ sh:zeroOrMorePath skos:broader ] ) ;
+                                sh:qualifiedMinCount 1 ;
+                                sh:qualifiedValueShape [ sh:in ( <https://w3id.org/ontology-platform/steel/code/product-form/SLAB> <https://w3id.org/ontology-platform/steel/code/product-form/BLOOM> <https://w3id.org/ontology-platform/steel/code/product-form/SQBILLET> <https://w3id.org/ontology-platform/steel/code/product-form/RECTBILLET> <https://w3id.org/ontology-platform/steel/code/product-form/ROUNDBIL> <https://w3id.org/ontology-platform/steel/code/product-form/BEAMBLANK> <https://w3id.org/ontology-platform/steel/code/product-form/INGOT> ) ] ] ] ) ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Coil .
+
+stl:CoilSplitting a owl:Class ;
+    rdfs:label "Coil splitting"@en,
+        "分卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialTransformation ;
+    skos:definition "An operation that divides strip from one parent coil into two or more output coils, each tracked separately against that parent."@en,
+        "将同一母卷中的带钢分作两卷或多卷，各产出卷取得独立身份并记录其直接来源。"@zh ;
+    skos:prefLabel "Coil splitting"@en,
+        "分卷"@zh .
+
 stl:Coking a owl:Class ;
     rdfs:label "Coking"@en,
         "炼焦"@zh ;
@@ -306,7 +410,7 @@ stl:ContributionEvidenceCode a rdfs:Datatype ;
 stl:ConverterSteelmaking a owl:Class ;
     rdfs:label "Converter steelmaking"@en,
         "转炉炼钢"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-6393-2025> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking> ;
     rdfs:subClassOf stl:Steelmaking ;
     skos:definition "A steelmaking operation in which gas is blown through or onto the converter bath to oxidize carbon and other constituents before tapping."@en,
@@ -827,6 +931,88 @@ stl:Flux a owl:Class ;
     skos:prefLabel "Flux lot"@en,
         "熔剂批"@zh .
 
+stl:FullHardCoil a owl:Class ;
+    rdfs:label "Full-hard coil"@en,
+        "冷硬卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
+    skos:altLabel "轧硬卷"@zh ;
+    skos:definition "A coil of cold-reduced strip that retains its work-hardened condition before annealing."@en,
+        "冷轧减薄后保留加工硬化状态、尚未经退火的带钢卷。"@zh ;
+    skos:prefLabel "Full-hard coil"@en,
+        "冷硬卷"@zh .
+
+stl:GalvanizedCoil a owl:Class ;
+    rdfs:label "Galvanized coil"@en,
+        "镀锌卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:CoatedCoil ;
+    skos:definition "A coil of strip bearing a zinc or zinc-alloy coating whose particular coating type can be recorded for the piece."@en,
+        "以卷为单元交接的镀锌带钢，镀层以锌或锌基合金为主要成分，具体类别可随卷记录。"@zh ;
+    skos:prefLabel "Galvanized coil"@en,
+        "镀锌卷"@zh .
+
+stl:Galvanizing a owl:Class ;
+    rdfs:label "Galvanizing"@en,
+        "镀锌"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coating ;
+    skos:altLabel "镀锌执行"@zh ;
+    skos:definition "A coating operation that deposits zinc or a zinc-based alloy on steel, including continuous hot-dip galvanizing."@en,
+        "在钢材表面施加锌或锌基合金镀层的作业，连续热镀锌是其中一种方式。"@zh ;
+    skos:prefLabel "Galvanizing"@en,
+        "镀锌"@zh .
+
+stl:GrindingDepthShape a sh:PropertyShape ;
+    rdfs:comment "最大修磨深度按去除量记录，应为非负的十进制毫米数。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:minInclusive 0.0 ;
+    sh:path stl:maximumGrindingDepth ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:maximumGrindingDepth .
+
+stl:HeatTreatmentHoldOrderShape a sh:PropertyShape ;
+    rdfs:comment "同一次保温同时记有实际开始和结束时刻时，结束不得早于开始。"@zh ;
+    sh:lessThanOrEquals stl:actualEndAt ;
+    sh:path stl:actualStartAt ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:HeatTreatmentHold .
+
+stl:HeatTreatmentLoadMethodShape a sh:PropertyShape ;
+    rdfs:comment "每个装炉批至少要记录一种实际采用的热处理工艺。"@zh ;
+    sh:minCount 1 ;
+    sh:path stl:heatTreatmentMethod ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:HeatTreatmentLoad .
+
+stl:HeatTreatmentLoadPieceShape a sh:PropertyShape ;
+    rdfs:comment "每个装炉批至少应包含一件实物件，可从批列出成员，也可由实物件指回装炉批。"@zh ;
+    sh:path [ sh:alternativePath ( stl:hasPart [ sh:inversePath stl:partOf ] ) ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:class stl:MaterialPiece ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:HeatTreatmentLoad .
+
+stl:HeatTreatmentMethodSchemeShape a sh:PropertyShape ;
+    rdfs:comment "装炉批或作业引用的每个热处理方法都应来自热处理工艺代码方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:heatTreatmentMethod .
+
+stl:HeatTreatmentProcessCode a rdfs:Datatype ;
+    rdfs:label "Heat treatment process code"@en,
+        "热处理工艺代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "Datatype of the primary notations in the heat treatment process scheme."@en,
+        "标识热处理工艺方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Heat treatment process code"@en,
+        "热处理工艺代码"@zh .
+
 stl:HotMetalTapShape a sh:PropertyShape ;
     rdfs:comment "按铁次建批的铁水应指向生成该批的唯一出铁作业；同一铁次可以分罐接收。"@zh ;
     sh:class stl:BlastFurnaceTapping ;
@@ -835,6 +1021,17 @@ stl:HotMetalTapShape a sh:PropertyShape ;
     sh:path prov:wasGeneratedBy ;
     sh:severity sh:Violation ;
     sh:targetClass stl:HotMetal .
+
+stl:HotRolledCoil a owl:Class ;
+    rdfs:label "Hot-rolled coil"@en,
+        "热轧卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coil ;
+    skos:definition "A steel coil formed by winding strip at the output of hot rolling."@en,
+        "由热轧出口的带钢卷取形成的钢卷，其直接来源可沿轧制路线逐步追溯。"@zh ;
+    skos:prefLabel "Hot-rolled coil"@en,
+        "热轧卷"@zh .
 
 stl:ImpactTest a owl:Class ;
     rdfs:label "Impact test"@en,
@@ -854,6 +1051,17 @@ stl:IngotTeemingMethodShape a sh:PropertyShape ;
     sh:path stl:teemingMethod ;
     sh:severity sh:Violation ;
     sh:targetClass stl:IngotCasting .
+
+stl:InlineInspection a owl:Class ;
+    rdfs:label "In-line inspection"@en,
+        "在线检验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that checks dimensions, surface condition or internal soundness as steel passes along the line and can group several inspection records for that pass."@en,
+        "在钢材通过生产线时检查其尺寸、表面或内部质量的作业，可关联该次过线取得的多项检验记录。"@zh ;
+    skos:prefLabel "In-line inspection"@en,
+        "在线检验"@zh .
 
 stl:InspectionDocumentTypeCode a rdfs:Datatype ;
     rdfs:label "inspection document type code"@en,
@@ -897,6 +1105,16 @@ stl:JudgementResultCode a rdfs:Datatype ;
     skos:prefLabel "conformity judgement result code"@en,
         "判定结果代码"@zh .
 
+stl:LineSegmentCode a rdfs:Datatype ;
+    rdfs:label "Cold-line segment code"@en,
+        "冷轧机组段码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "Datatype for the segment of a cold-line coil identifier indicating its producing line type, used as an additional notation of that equipment type."@en,
+        "冷轧段卷号中表示产出机组类型的一段代码，可作为设备类型代码项的附加记号。"@zh ;
+    skos:prefLabel "Cold-line segment code"@en,
+        "冷轧机组段码"@zh .
+
 stl:LotFormationDimensionCode a rdfs:Datatype ;
     rdfs:label "Lot formation dimension code"@en,
         "组批维度代码"@zh ;
@@ -906,6 +1124,17 @@ stl:LotFormationDimensionCode a rdfs:Datatype ;
         "标识“组批维度”方案中主记号的字面量类型。"@zh ;
     skos:prefLabel "Lot formation dimension code"@en,
         "组批维度代码"@zh .
+
+stl:Marking a owl:Class ;
+    rdfs:label "Marking"@en,
+        "标记"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that marks steel or its tag to identify a piece or locate an area for follow-up inspection."@en,
+        "在钢材或其标签上施加可辨识标记的作业，用于识别实物或定位需要复查的部位。"@zh ;
+    skos:prefLabel "Marking"@en,
+        "标记"@zh .
 
 stl:MassBalance a owl:Class ;
     rdfs:label "Material balance"@en,
@@ -917,17 +1146,6 @@ stl:MassBalance a owl:Class ;
         "在同一作业边界内对照投料、成品、副产物及损耗的核算记录。"@zh ;
     skos:prefLabel "Material balance"@en,
         "物料平衡"@zh .
-
-stl:MaterialAggregation a owl:Class ;
-    rdfs:label "Material aggregation"@en,
-        "实物聚合作业"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:subClassOf stl:Operation ;
-    skos:definition "An operation that assembles pieces into a handling unit while preserving their identities."@en,
-        "将成员装入可整体管理的物流单元且保留各成员身份的作业。"@zh ;
-    skos:prefLabel "Material aggregation"@en,
-        "实物聚合作业"@zh .
 
 stl:MaterialCategoryCode a rdfs:Datatype ;
     rdfs:label "Material category code"@en,
@@ -1035,6 +1253,18 @@ stl:OrderAmendment a owl:Class ;
     skos:prefLabel "Order amendment"@en,
         "订单变更单"@zh .
 
+stl:Packing a owl:Class ;
+    rdfs:label "Packing"@en,
+        "包装"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialAggregation ;
+    skos:altLabel "包装执行"@zh ;
+    skos:definition "An operation that forms a handling package from one or more pieces while preserving the identity of each member."@en,
+        "把一件或多件实物装成一个可独立搬运的包装件，装入的各件仍可按原身份追踪。"@zh ;
+    skos:prefLabel "Packing"@en,
+        "包装"@zh .
+
 stl:PackingFormCode a rdfs:Datatype ;
     rdfs:label "Packing form code"@en,
         "交货包装形式代码"@zh ;
@@ -1088,6 +1318,29 @@ stl:PersonnelRoleCode a rdfs:Datatype ;
     skos:prefLabel "Personnel role code"@en,
         "人员角色代码"@zh .
 
+stl:PicklingAndColdRolling a owl:Class ;
+    rdfs:label "Pickling and cold rolling"@en,
+        "酸轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:ColdRolling ;
+    skos:altLabel "酸轧执行"@zh ;
+    skos:definition "An operation that removes scale from strip by pickling, reduces the strip by cold rolling and delivers it in coils."@en,
+        "带钢经酸洗去除氧化皮后实施冷轧减薄并形成出口卷的作业。"@zh ;
+    skos:prefLabel "Pickling and cold rolling"@en,
+        "酸轧"@zh .
+
+stl:Piercing a owl:Class ;
+    rdfs:label "Tube billet piercing"@en,
+        "管坯穿孔"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:MaterialTransformation ;
+    skos:definition "An operation that opens an axial bore through a solid tube billet and produces an individually traceable hollow shell."@en,
+        "使实心管坯沿轴向形成贯通内孔、得到可单独跟踪的毛管的一次作业。"@zh ;
+    skos:prefLabel "Tube billet piercing"@en,
+        "管坯穿孔"@zh .
+
 stl:PigIron a owl:Class ;
     rdfs:label "Solid pig iron lot"@en,
         "固态生铁批"@zh ;
@@ -1099,6 +1352,18 @@ stl:PigIron a owl:Class ;
         "铁水凝固后按同一批号接收或交付的生铁，常以铸块形态储运和配入熔炼炉。"@zh ;
     skos:prefLabel "Solid pig iron lot"@en,
         "固态生铁批"@zh .
+
+stl:Plate a owl:Class ;
+    rdfs:label "Steel plate"@en,
+        "中厚钢板"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:altLabel "中厚板"@zh ;
+    skos:definition "A discrete flat steel piece classed as plate in its product standard, which sets the applicable thickness boundary with sheet."@en,
+        "按适用产品标准归为中厚板、以单张平直实物跟踪的扁平钢材，板厚分类界限随所引标准确定。"@zh ;
+    skos:prefLabel "Steel plate"@en,
+        "中厚钢板"@zh .
 
 stl:PretreatmentMethodCode a rdfs:Datatype ;
     rdfs:label "Hot metal pretreatment method code"@en,
@@ -1180,6 +1445,29 @@ stl:RatingComparisonCode a rdfs:Datatype ;
     skos:prefLabel "Rating comparison operator code"@en,
         "评级比较关系代码"@zh .
 
+stl:RecoiledCoil a owl:Class ;
+    rdfs:label "Recoiled coil"@en,
+        "重卷卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coil ;
+    skos:definition "A coil assigned its own piece identity after strip from existing coils is unwound and wound again."@en,
+        "将原卷带钢展开后再次卷取，并在重卷出口取得独立件号的钢卷。"@zh ;
+    skos:prefLabel "Recoiled coil"@en,
+        "重卷卷"@zh .
+
+stl:Recoiling a owl:Class ;
+    rdfs:label "Recoiling"@en,
+        "重卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:altLabel "重卷执行"@zh ;
+    skos:definition "An operation that unwinds strip from an existing coil and winds it again into an output coil."@en,
+        "将已有的带钢卷展开，再按出口卷取条件卷起以形成产出卷的作业。"@zh ;
+    skos:prefLabel "Recoiling"@en,
+        "重卷"@zh .
+
 stl:RecoveredLot a owl:Class ;
     rdfs:label "Recovered lot"@en,
         "回收料批"@zh ;
@@ -1244,17 +1532,6 @@ stl:RetestRule a owl:Class ;
         "规定首次结果出现特定情形后可增加哪些试样或试验的要求。"@zh ;
     skos:prefLabel "Retest rule"@en,
         "复验规则"@zh .
-
-stl:RoundBillet a owl:Class ;
-    rdfs:label "Round billet"@en,
-        "圆坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-15574-2016> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:Billet ;
-    skos:definition "A solid billet with a circular section specified by nominal diameter, suitable for piercing or other forming operations."@en,
-        "用公称直径描述圆形截面的实心坯料，可供穿孔或其他成形作业。"@zh ;
-    skos:prefLabel "Round billet"@en,
-        "圆坯"@zh .
 
 stl:SalesOrder a owl:Class ;
     rdfs:label "Sales order"@en,
@@ -1343,6 +1620,27 @@ stl:ScrapBasketCharge a owl:Class ;
     skos:prefLabel "Scrap basket charge"@en,
         "单篮废钢装料"@zh .
 
+stl:SeamlessTubeStockShape a sh:PropertyShape ;
+    rdfs:comment "沿无缝钢管的直接来源逐段回溯，应至少找到一件制管用实心管坯、圆坯或毛管。圆坯与毛管也可按产品形态代码识别。"@zh ;
+    sh:path [ sh:oneOrMorePath stl:derivedFrom ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:or ( [ sh:class stl:TubeBillet ] [ sh:class stl:RoundBillet ] [ sh:class stl:HollowShell ] [ sh:property [ sh:path ( stl:productForm [ sh:zeroOrMorePath skos:broader ] ) ;
+                                sh:qualifiedMinCount 1 ;
+                                sh:qualifiedValueShape [ sh:in ( <https://w3id.org/ontology-platform/steel/code/product-form/ROUNDBIL> <https://w3id.org/ontology-platform/steel/code/product-form/SHELL> ) ] ] ] ) ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:SeamlessTube .
+
+stl:Section a owl:Class ;
+    rdfs:label "Steel section"@en,
+        "型钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "A long steel piece with a specified profile along its length, described by features such as flanges, a web or legs."@en,
+        "沿长度保持规定截面轮廓的型材实物件，其截面由翼缘、腹板、肢边等相应部位的尺寸描述。"@zh ;
+    skos:prefLabel "Steel section"@en,
+        "型钢"@zh .
+
 stl:ShapeRequirement a owl:Class ;
     rdfs:label "Shape requirement"@en,
         "外形要求"@zh ;
@@ -1363,6 +1661,28 @@ stl:ShareBasisCode a rdfs:Datatype ;
         "标识“份额基准”方案中主记号的字面量类型。"@zh ;
     skos:prefLabel "contribution share basis code"@en,
         "份额基准代码"@zh .
+
+stl:Shearing a owl:Class ;
+    rdfs:label "Shearing"@en,
+        "剪切"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that separates steel between moving blades, for example to cut lengths, slit strip or trim edges."@en,
+        "利用相对运动的剪刃分开钢材的作业，可按长度切断、沿纵向分条或剪除边部。"@zh ;
+    skos:prefLabel "Shearing"@en,
+        "剪切"@zh .
+
+stl:Sheet a owl:Class ;
+    rdfs:label "Steel sheet"@en,
+        "薄钢板"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "A discrete flat steel piece classed as sheet in its product standard, rolled individually or cut to length from strip."@en,
+        "按适用产品标准归为薄板、以平片逐张跟踪的扁平钢材，既可单张轧成也可由带钢横切取得。"@zh ;
+    skos:prefLabel "Steel sheet"@en,
+        "薄钢板"@zh .
 
 stl:Sintering a owl:Class ;
     rdfs:label "Iron ore sintering"@en,
@@ -1385,6 +1705,17 @@ stl:Site a owl:Class ;
         "承载一组生产区域并有独立运营边界的制造场所。"@zh ;
     skos:prefLabel "Site"@en,
         "厂区"@zh .
+
+stl:SizingAndReducing a owl:Class ;
+    rdfs:label "Tube sizing and reducing"@en,
+        "钢管定径与减径"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that passes tubular stock through roll grooves to size the outside diameter or reduce it to a target size."@en,
+        "使管料通过轧辊孔型，校准其外径或将其减小到目标尺寸的一次作业。"@zh ;
+    skos:prefLabel "Tube sizing and reducing"@en,
+        "钢管定径与减径"@zh .
 
 stl:SpecificationRevision a owl:Class ;
     rdfs:label "Specification revision"@en,
@@ -1542,6 +1873,17 @@ stl:StorageArea a owl:Class ;
     skos:prefLabel "Storage area"@en,
         "库区"@zh .
 
+stl:Straightening a owl:Class ;
+    rdfs:label "Straightening"@en,
+        "矫直"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that corrects bend, twist or lack of flatness in a steel product by applying deformation."@en,
+        "对弯曲、扭转或不平的钢材施加校正变形，使其更接近规定几何形状的作业。"@zh ;
+    skos:prefLabel "Straightening"@en,
+        "矫直"@zh .
+
 stl:SurfaceConditionCode a rdfs:Datatype ;
     rdfs:label "Surface condition code"@en,
         "表面状态代码"@zh ;
@@ -1637,6 +1979,33 @@ stl:TransportModeCode a rdfs:Datatype ;
     skos:prefLabel "Shipment transport mode code"@en,
         "发运运输方式代码"@zh .
 
+stl:TubeDimensionValueShape a sh:PropertyShape ;
+    rdfs:comment "已记录的管外径和管壁厚度均应为大于零的十进制数，单位为毫米。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:minExclusive 0.0 ;
+    sh:path [ sh:alternativePath ( stl:tubeOutsideDiameter stl:tubeWallThickness ) ] ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:tubeOutsideDiameter,
+        stl:tubeWallThickness .
+
+stl:TubeRolling a owl:Class ;
+    rdfs:label "Tube rolling"@en,
+        "轧管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that elongates hollow stock between rolls and changes its wall thickness and section dimensions."@en,
+        "用轧辊使已有内孔的管料延伸，并改变其壁厚和截面尺寸的一次作业。"@zh ;
+    skos:prefLabel "Tube rolling"@en,
+        "轧管"@zh .
+
+stl:TubeWeldingMethodShape a sh:PropertyShape ;
+    rdfs:comment "每次管体焊接作业至少应记录一种实际用于接合管边的焊接方法。"@zh ;
+    sh:minCount 1 ;
+    sh:path stl:weldMethod ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:TubeWelding .
+
 stl:Weighing a owl:Class ;
     rdfs:label "Weighing"@en,
         "称量作业"@zh ;
@@ -1647,6 +2016,48 @@ stl:Weighing a owl:Class ;
         "在指定衡器上对一个批或一件实物完成称量并留下读数的作业。"@zh ;
     skos:prefLabel "Weighing"@en,
         "称量作业"@zh .
+
+stl:WeldMethodCode a rdfs:Datatype ;
+    rdfs:label "Tube seam welding method code"@en,
+        "管体焊接方法代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Datatype of the primary notations identifying tube seam welding methods."@en,
+        "管体焊接方法方案中主记号所用的字面量类型。"@zh ;
+    skos:prefLabel "Tube seam welding method code"@en,
+        "管体焊接方法代码"@zh .
+
+stl:WeldMethodSchemeShape a sh:PropertyShape ;
+    rdfs:comment "管体焊接作业的每个方法取值都应属于管体焊接方法代码表。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:weldMethod .
+
+stl:WeldedPipe a owl:Class ;
+    rdfs:label "Welded steel pipe"@en,
+        "焊接钢管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:SteelTube ;
+    skos:altLabel "welded steel tube"@en,
+        "焊管"@zh ;
+    skos:definition "A steel tube made by forming plate or strip and welding its edges together, leaving a manufacturing seam in the wall."@en,
+        "由钢板或钢带成形并焊合边缘制得的钢管，其管壁含有闭合管体的制造焊缝。"@zh ;
+    skos:prefLabel "Welded steel pipe"@en,
+        "焊接钢管"@zh .
+
+stl:WireRod a owl:Class ;
+    rdfs:label "Wire rod"@en,
+        "线材"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:altLabel "盘条"@zh ;
+    skos:definition "A hot-rolled long product of small solid section collected in successive loops, often as stock for wire drawing."@en,
+        "以较小的实心断面热轧成长度连续的长材并成圈收集，常作为拉丝等后续加工的原料。"@zh ;
+    skos:prefLabel "Wire rod"@en,
+        "线材"@zh .
 
 stl:WorkCenter a owl:Class ;
     rdfs:label "Work center"@en,
@@ -2289,6 +2700,79 @@ stl:coatingMass a owl:DatatypeProperty ;
         "锆"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/chemical-element> .
 
+<https://w3id.org/ontology-platform/steel/code/coating-type/EG> a skos:Concept ;
+    rdfs:label "Electrodeposited zinc coating"@en,
+        "电镀锌层"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "EG"@en,
+        "EG"@zh ;
+    skos:definition "A zinc layer deposited on a steel substrate by electroplating."@en,
+        "利用电解沉积在钢基板表面形成的锌层。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    skos:notation "EG"^^stl:CoatingTypeCode ;
+    skos:prefLabel "Electrodeposited zinc coating"@en,
+        "电镀锌层"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/coating-type> .
+
+<https://w3id.org/ontology-platform/steel/code/coating-type/GA> a skos:Concept ;
+    rdfs:label "Galvannealed coating"@en,
+        "锌铁合金镀层"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "GA"@en,
+        "GA"@zh ;
+    skos:definition "A zinc-iron coating formed by alloying a hot-dip zinc deposit with iron from the substrate."@en,
+        "热镀锌后通过合金化处理，使锌层与基板中的铁形成锌铁合金镀层。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    skos:notation "GA"^^stl:CoatingTypeCode ;
+    skos:prefLabel "Galvannealed coating"@en,
+        "锌铁合金镀层"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/coating-type> .
+
+<https://w3id.org/ontology-platform/steel/code/coating-type/GI> a skos:Concept ;
+    rdfs:label "Zinc coating"@en,
+        "纯锌镀层"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "GI"@en,
+        "GI"@zh ;
+    skos:definition "A predominantly zinc layer left by hot dipping, distinct from a subsequently alloyed zinc-iron layer."@en,
+        "带钢热浸锌后形成的以锌为主的镀层，可与再经合金化处理的锌铁镀层区分。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    skos:notation "GI"^^stl:CoatingTypeCode ;
+    skos:prefLabel "Zinc coating"@en,
+        "纯锌镀层"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/coating-type> .
+
+<https://w3id.org/ontology-platform/steel/code/coating-type/ORGANIC> a skos:Concept ;
+    rdfs:label "Organic coating"@en,
+        "有机涂层"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "A film formed from an organic coating material on steel or on an underlying metallic layer."@en,
+        "由有机涂料在钢基板或其金属镀层表面形成的膜层。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    skos:notation "ORGANIC"^^stl:CoatingTypeCode ;
+    skos:prefLabel "Organic coating"@en,
+        "有机涂层"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/coating-type> .
+
+<https://w3id.org/ontology-platform/steel/code/coating-type/ZM> a skos:Concept ;
+    rdfs:label "Zinc-aluminium-magnesium coating"@en,
+        "锌铝镁镀层"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "ZM"@en,
+        "ZM"@zh ;
+    skos:definition "A hot-dip metallic layer based on zinc and alloyed with aluminium and magnesium."@en,
+        "以锌为基、铝和镁为合金组分的热浸金属镀层。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    skos:notation "ZM"^^stl:CoatingTypeCode ;
+    skos:prefLabel "Zinc-aluminium-magnesium coating"@en,
+        "锌铝镁镀层"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/coating-type> .
+
 <https://w3id.org/ontology-platform/steel/code/contribution-evidence/ESTIMATED> a skos:Concept ;
     rdfs:label "estimated share"@en,
         "估算份额"@zh ;
@@ -2326,6 +2810,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:scopeNote "份额可以留空；已知有两个来源不足以支持均分。"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/contribution-evidence> .
 
+<https://w3id.org/ontology-platform/steel/code/defect-type/BARESPOT> a skos:Concept ;
+    rdfs:label "Bare spot"@en,
+        "漏镀"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/defect-type/FLAT> ;
+    skos:definition "Local exposure of the substrate where coating coverage is required."@en,
+        "要求镀层覆盖的表面因局部缺镀而露出基板的缺陷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
+    skos:notation "BARESPOT"^^stl:DefectTypeCode ;
+    skos:prefLabel "Bare spot"@en,
+        "漏镀"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/defect-type/CAST> a skos:Concept ;
     rdfs:label "Cast semiproduct defects"@en,
         "铸坯缺陷"@zh ;
@@ -2337,6 +2834,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Cast semiproduct defects"@en,
         "铸坯缺陷"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
+
+<https://w3id.org/ontology-platform/steel/code/defect-type/COATLOW> a skos:Concept ;
+    rdfs:label "Low coating mass"@en,
+        "镀层质量不足"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/defect-type/FLAT> ;
+    skos:definition "A coating mass per unit area below the applicable requirement on its specified single-face or combined-face basis."@en,
+        "按约定的单面或双面合计口径，单位面积镀层质量低于适用要求的缺陷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
+    skos:notation "COATLOW"^^stl:DefectTypeCode ;
+    skos:prefLabel "Low coating mass"@en,
+        "镀层质量不足"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/defect-type/EDGECRACK> a skos:Concept ;
     rdfs:label "edge crack"@en,
@@ -2598,6 +3108,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Balling unit"@en,
         "造球机"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/BAR> a skos:Concept ;
+    rdfs:label "Bar mill"@en,
+        "棒材轧机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "A mill with roll passes that shape stock into solid bar sections."@en,
+        "使用适配棒材断面的轧辊孔型将坯料沿长度轧制成棒材的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "BAR"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Bar mill"@en,
+        "棒材轧机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/BCC> a skos:Concept ;
     rdfs:label "Square billet caster"@en,
         "方坯连铸机"@zh ;
@@ -2627,7 +3150,7 @@ stl:coatingMass a owl:DatatypeProperty ;
 <https://w3id.org/ontology-platform/steel/code/equipment-type/BOF> a skos:Concept ;
     rdfs:label "Basic oxygen furnace"@en,
         "氧气转炉"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-6393-2025> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking-codes> ;
     skos:definition "A tilting primary steelmaking furnace fitted to blow oxygen into or onto the bath."@en,
         "使用氧气吹炼金属熔池并可倾动出钢的炼钢炉座。"@zh ;
@@ -2635,6 +3158,23 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "BOF"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Basic oxygen furnace"@en,
         "氧气转炉"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/CAL> a skos:Concept ;
+    rdfs:label "Continuous annealing line"@en,
+        "连续退火机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "CAL"@en,
+        "CAL"@zh,
+        "连退机组"@zh ;
+    skos:definition "A line that anneals moving strip as it passes through successive temperature-controlled zones."@en,
+        "使展开的钢带连续通过各温控区，在运行中完成退火的机组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "CAL"^^stl:EquipmentTypeCode,
+        "CA"^^stl:LineSegmentCode ;
+    skos:prefLabel "Continuous annealing line"@en,
+        "连续退火机组"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/CASOB> a skos:Concept ;
@@ -2667,6 +3207,22 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Continuous slab caster"@en,
         "板坯连铸机"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/CGL> a skos:Concept ;
+    rdfs:label "Continuous hot-dip galvanizing line"@en,
+        "连续热镀锌机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "CGL"@en,
+        "CGL"@zh ;
+    skos:definition "A line that passes moving strip through a molten zinc or zinc-alloy bath and controls the deposited coating."@en,
+        "使带钢连续通过熔融锌或锌合金镀浴，并控制带出镀层的机组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "CGL"^^stl:EquipmentTypeCode,
+        "CG"^^stl:LineSegmentCode ;
+    skos:prefLabel "Continuous hot-dip galvanizing line"@en,
+        "连续热镀锌机组"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/COKOV> a skos:Concept ;
     rdfs:label "Coke oven"@en,
         "焦炉"@zh ;
@@ -2678,6 +3234,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "COKOV"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Coke oven"@en,
         "焦炉"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/CONTTUBE> a skos:Concept ;
+    rdfs:label "Continuous tube rolling mill"@en,
+        "连轧管机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "A tube mill with tandem stands that successively reduce the wall and elongate the shell."@en,
+        "使毛管连续通过串列轧机机架，逐架减壁延伸的轧管设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "CONTTUBE"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Continuous tube rolling mill"@en,
+        "连轧管机"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/CRANE> a skos:Concept ;
@@ -2706,6 +3275,43 @@ stl:coatingMass a owl:DatatypeProperty ;
         "电弧炉"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/ERW> a skos:Concept ;
+    rdfs:label "Electric resistance welded tube line"@en,
+        "电阻焊管机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/equipment-type/WELDLINE> ;
+    skos:definition "A pipe line using electrical resistance heat at the edges and squeeze rolls to close the seam."@en,
+        "以电阻热加热管边并以挤压辊使接缝闭合的焊管机组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "ERW"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Electric resistance welded tube line"@en,
+        "电阻焊管机组"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/FINLINE> a skos:Concept ;
+    rdfs:label "Finishing line"@en,
+        "精整线"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "组合多道精整工位、对成形钢材连续或依次进行整理的生产线。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "FINLINE"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Finishing line"@en,
+        "精整线"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/GRIND> a skos:Concept ;
+    rdfs:label "Conditioning grinder"@en,
+        "修磨机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "装有磨具并用于去除钢材表层金属的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "GRIND"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Conditioning grinder"@en,
+        "修磨机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/HMDES> a skos:Concept ;
     rdfs:label "Hot metal desulfurization station"@en,
         "铁水脱硫站"@zh ;
@@ -2731,6 +3337,35 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "HMLADLE"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Hot metal ladle"@en,
         "铁水罐"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/HSM> a skos:Concept ;
+    rdfs:label "Hot strip mill"@en,
+        "热连轧机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "HSM"@en,
+        "HSM"@zh,
+        "热连轧"@zh ;
+    skos:definition "A rolling line with successive stands that reduce hot stock to strip for cooling and coiling."@en,
+        "通过连续布置的轧机机架把热坯轧成带钢，出口可配冷却和卷取设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "HSM"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Hot strip mill"@en,
+        "热连轧机组"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/HTFURN> a skos:Concept ;
+    rdfs:label "Heat treatment furnace"@en,
+        "热处理炉"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A batch or continuous furnace that controls the thermal conditions under which solid steel is heat treated."@en,
+        "能控制炉内温度历程，供固态钢材进行热处理的炉子，包括间歇式和连续式炉。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "HTFURN"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Heat treatment furnace"@en,
+        "热处理炉"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/INDUR> a skos:Concept ;
@@ -2777,7 +3412,7 @@ stl:coatingMass a owl:DatatypeProperty ;
 <https://w3id.org/ontology-platform/steel/code/equipment-type/LF> a skos:Concept ;
     rdfs:label "Ladle furnace"@en,
         "钢包精炼炉"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-6394-2025> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking-codes> ;
     skos:definition "A secondary treatment station with electrodes above the ladle for reheating and refining the bath."@en,
         "在钢包上方配置电极，可对包内钢液补热并进行精炼的工位。"@zh ;
@@ -2802,6 +3437,49 @@ stl:coatingMass a owl:DatatypeProperty ;
         "包装机组"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/PIERCER> a skos:Concept ;
+    rdfs:label "Tube billet piercer"@en,
+        "穿孔机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Equipment that opens an axial bore in a solid tube billet to produce a shell."@en,
+        "在实心管坯内开出轴向孔并产出毛管的制管设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "PIERCER"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Tube billet piercer"@en,
+        "穿孔机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/PLATE> a skos:Concept ;
+    rdfs:label "Plate mill"@en,
+        "中厚板轧机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "A mill that reduces or spreads individual pieces of stock to produce discrete plates."@en,
+        "逐块轧制坯料，通过减薄或展宽轧出按张流转的中厚钢板。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "PLATE"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Plate mill"@en,
+        "中厚板轧机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/PLTCM> a skos:Concept ;
+    rdfs:label "Pickling line and tandem cold mill"@en,
+        "酸洗冷连轧机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "PLTCM"@en,
+        "PLTCM"@zh,
+        "酸轧机组"@zh ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/equipment-type/COLDMILL> ;
+    skos:definition "A coupled line feeding descaled strip from the pickling section directly into successive cold reduction stands."@en,
+        "将酸洗线与多机架冷连轧机连接，使带钢除鳞后连续进入减薄机架。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "PLTCM"^^stl:EquipmentTypeCode,
+        "PL"^^stl:LineSegmentCode ;
+    skos:prefLabel "Pickling line and tandem cold mill"@en,
+        "酸洗冷连轧机组"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/RCC> a skos:Concept ;
     rdfs:label "Round billet caster"@en,
         "圆坯连铸机"@zh ;
@@ -2814,6 +3492,35 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "RCC"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Round billet caster"@en,
         "圆坯连铸机"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/RCL> a skos:Concept ;
+    rdfs:label "Recoiling line"@en,
+        "重卷机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "RCL"@en,
+        "RCL"@zh ;
+    skos:definition "A line that unwinds existing coils and rewinds the strip for a subsequent process or delivery."@en,
+        "将已有钢卷开卷并按后续加工或交货需要重新卷取的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "RCL"^^stl:EquipmentTypeCode,
+        "RC"^^stl:LineSegmentCode ;
+    skos:prefLabel "Recoiling line"@en,
+        "重卷机组"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/REHEATFURN> a skos:Concept ;
+    rdfs:label "Stock reheating furnace"@en,
+        "坯料加热炉"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "A furnace that heats steel stock or ingots for delivery to a rolling mill."@en,
+        "在轧制前加热钢坯或钢锭，使装入的钢料以所需热状态出炉。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "REHEATFURN"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Stock reheating furnace"@en,
+        "坯料加热炉"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/RH> a skos:Concept ;
     rdfs:label "Vacuum circulation degasser"@en,
@@ -2828,6 +3535,19 @@ stl:coatingMass a owl:DatatypeProperty ;
         "真空循环脱气装置"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/SAW> a skos:Concept ;
+    rdfs:label "Submerged arc welded pipe line"@en,
+        "埋弧焊管机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/equipment-type/WELDLINE> ;
+    skos:definition "A pipe line equipped to feed wire and flux for submerged arc welding of the pipe seam."@en,
+        "配有焊丝送进和焊剂供给设备、以埋弧焊接合管缝的焊管机组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "SAW"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Submerged arc welded pipe line"@en,
+        "埋弧焊管机组"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/SCALE> a skos:Concept ;
     rdfs:label "Weighing instrument"@en,
         "衡器"@zh ;
@@ -2841,6 +3561,31 @@ stl:coatingMass a owl:DatatypeProperty ;
         "衡器"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/SECT> a skos:Concept ;
+    rdfs:label "Section mill"@en,
+        "型钢轧机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "A mill that progressively develops a defined section profile using shaped rolls."@en,
+        "利用成形轧辊将坯料逐道轧出型钢预定截面轮廓的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "SECT"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Section mill"@en,
+        "型钢轧机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/SHR> a skos:Concept ;
+    rdfs:label "Shear"@en,
+        "剪切机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "利用剪刃的相对运动横断、分条或修剪钢材的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "SHR"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Shear"@en,
+        "剪切机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/SINT> a skos:Concept ;
     rdfs:label "Sintering machine"@en,
         "烧结机"@zh ;
@@ -2852,6 +3597,31 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "SINT"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Sintering machine"@en,
         "烧结机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/SIZER> a skos:Concept ;
+    rdfs:label "Tube sizing mill"@en,
+        "钢管定径机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "A mill that controls the outside dimensions of a tube by passing it through sizing grooves."@en,
+        "用定径孔型调整管体外部截面尺寸的轧机。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "SIZER"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Tube sizing mill"@en,
+        "钢管定径机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/STR> a skos:Concept ;
+    rdfs:label "Straightening machine"@en,
+        "矫直机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "用矫直辊或压力机构对钢材施加校正变形的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "STR"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Straightening machine"@en,
+        "矫直机"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/TUNDISH> a skos:Concept ;
@@ -2892,6 +3662,113 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Vacuum oxygen decarburization unit"@en,
         "真空吹氧脱碳装置"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/WRM> a skos:Concept ;
+    rdfs:label "Wire rod mill"@en,
+        "线材轧机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "WRM"@en,
+        "WRM"@zh ;
+    skos:definition "A mill that reduces stock in successive passes and delivers small-section wire rod for collection in coils."@en,
+        "以连续道次将坯料轧成小断面线材，并向成圈收集设备送出线材。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "WRM"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Wire rod mill"@en,
+        "线材轧机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/AGE> a skos:Concept ;
+    rdfs:label "Ageing treatment"@en,
+        "时效处理"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A treatment that allows time for solute redistribution or precipitation at ambient or elevated temperature to change the properties of the steel."@en,
+        "使钢在室温或升高的温度下停留，利用随时间发生的溶质重新分布或析出调整性能的方法。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "AGE"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Ageing treatment"@en,
+        "时效处理"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/ANNEAL> a skos:Concept ;
+    rdfs:label "Annealing"@en,
+        "退火"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A thermal cycle of heating, holding and controlled cooling to soften steel, relieve residual stress or prepare its microstructure for further working."@en,
+        "通过加热、保温和受控冷却使钢软化、降低残余应力或取得后续加工所需组织的方法。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "ANNEAL"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Annealing"@en,
+        "退火"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/NORMALIZE> a skos:Concept ;
+    rdfs:label "Normalizing"@en,
+        "正火"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A treatment in which austenitized steel cools in air and develops its microstructure as the austenite transforms."@en,
+        "使钢奥氏体化后在空气中冷却，利用冷却时的转变调整组织。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "NORMALIZE"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Normalizing"@en,
+        "正火"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/QT> a skos:Concept ;
+    rdfs:label "Quenching and high-temperature tempering"@en,
+        "调质"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:altLabel "Q&T"@en ;
+    skos:definition "A combined treatment in which high-temperature tempering follows quench hardening to obtain a balance of strength and toughness."@en,
+        "先将钢淬硬，再作高温回火以获得所需强度和韧性配合的复合热处理。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "QT"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Quenching and high-temperature tempering"@en,
+        "调质"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/QUENCH> a skos:Concept ;
+    rdfs:label "Quench hardening"@en,
+        "淬火"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A treatment that cools austenitized steel fast enough to develop the intended hardened microstructure."@en,
+        "在钢奥氏体化后，以足以形成所需硬化组织的速度使工件冷却的方法。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "QUENCH"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Quench hardening"@en,
+        "淬火"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/SOLUTION> a skos:Concept ;
+    rdfs:label "Solution treatment"@en,
+        "固溶处理"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A treatment that dissolves soluble phases into the matrix at temperature and cools the workpiece at a rate that retains the intended solid solution."@en,
+        "通过加热使可溶相进入基体，再以能保留所需固溶状态的速度冷却工件的方法。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "SOLUTION"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Solution treatment"@en,
+        "固溶处理"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process/TEMPER> a skos:Concept ;
+    rdfs:label "Tempering"@en,
+        "回火"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A treatment that reheats hardened steel below the onset of austenite formation to adjust its hardness, strength and toughness."@en,
+        "在低于奥氏体开始形成的温度下重新加热淬硬钢，调整其硬度、强度和韧性的方法。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:notation "TEMPER"^^stl:HeatTreatmentProcessCode ;
+    skos:prefLabel "Tempering"@en,
+        "回火"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
 
 <https://w3id.org/ontology-platform/steel/code/inspection-document-type/T21> a skos:Concept ;
     rdfs:label "declaration of compliance with the order"@en,
@@ -3556,6 +4433,32 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Alloy addition"@en,
         "合金加入"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/ANNEAL> a skos:Concept ;
+    rdfs:label "Annealing"@en,
+        "退火"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/HEATTREAT> ;
+    skos:definition "Applying a controlled thermal cycle to change the microstructure or relieve work hardening."@en,
+        "用受控的加热和冷却循环调整钢材组织或缓解加工硬化。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "ANNEAL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Annealing"@en,
+        "退火"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/BARROLL> a skos:Concept ;
+    rdfs:label "Hot bar rolling"@en,
+        "棒材热轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> ;
+    skos:definition "Hot rolling stock through passes that develop a specified bar section."@en,
+        "把热坯逐道轧成规定棒材断面。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "BARROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Hot bar rolling"@en,
+        "棒材热轧"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/process-type/BFCHARGE> a skos:Concept ;
     rdfs:label "Blast furnace charging"@en,
         "高炉装料"@zh ;
@@ -3598,7 +4501,7 @@ stl:coatingMass a owl:DatatypeProperty ;
 <https://w3id.org/ontology-platform/steel/code/process-type/BOF> a skos:Concept ;
     rdfs:label "Basic oxygen steelmaking"@en,
         "氧气转炉炼钢"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-6393-2025> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking-codes> ;
     skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/STEELMAKE> ;
     skos:definition "A primary steelmaking segment in which a converter heat is blown with oxygen and tapped."@en,
@@ -3607,6 +4510,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "BOF"^^stl:ProcessTypeCode ;
     skos:prefLabel "Basic oxygen steelmaking"@en,
         "氧气转炉炼钢"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/BREAKDOWN> a skos:Concept ;
+    rdfs:label "Breakdown rolling"@en,
+        "初轧开坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> ;
+    skos:definition "Hot rolling ingots or large semiproducts into stock for further forming."@en,
+        "将钢锭或大断面钢坯热轧成后续成形工序所用的坯件。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "BREAKDOWN"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Breakdown rolling"@en,
+        "初轧开坯"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/process-type/CC> a skos:Concept ;
     rdfs:label "Continuous casting"@en,
@@ -3632,6 +4548,32 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Steel furnace charging"@en,
         "炼钢装料"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/COILJOIN> a skos:Concept ;
+    rdfs:label "Coil joining"@en,
+        "合卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "Joining strip from several coils into one output with multiple sources."@en,
+        "把多卷的带钢接续为一个具有多个来源的产出卷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "COILJOIN"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Coil joining"@en,
+        "合卷"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/COILSPLIT> a skos:Concept ;
+    rdfs:label "Coil splitting"@en,
+        "分卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "Producing multiple separately tracked coils from one parent coil."@en,
+        "以一卷为母卷取得多个具有各自身份的产出卷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "COILSPLIT"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Coil splitting"@en,
+        "分卷"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/process-type/COKING> a skos:Concept ;
     rdfs:label "Coking"@en,
@@ -3671,6 +4613,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Electric arc steelmaking"@en,
         "电弧炉炼钢"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/GALV> a skos:Concept ;
+    rdfs:label "Galvanizing"@en,
+        "镀锌"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/COAT> ;
+    skos:definition "Applying zinc or zinc alloy as a surface coating on steel."@en,
+        "在钢材表面形成锌或锌合金镀层。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "GALV"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Galvanizing"@en,
+        "镀锌"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/process-type/HMPT> a skos:Concept ;
     rdfs:label "Hot metal pretreatment"@en,
         "铁水预处理"@zh ;
@@ -3696,16 +4651,28 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Ingot casting"@en,
         "模铸"@zh .
 
-<https://w3id.org/ontology-platform/steel/code/process-type/INSPECT> a skos:Concept ;
-    rdfs:label "Inspection"@en,
-        "检验"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Work that obtains evidence of material quality through examination or testing."@en,
-        "通过检查或试验取得物料质量证据的工序类型。"@zh ;
+<https://w3id.org/ontology-platform/steel/code/process-type/INLINETEST> a skos:Concept ;
+    rdfs:label "In-line inspection"@en,
+        "在线检验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/INSPECT> ;
+    skos:definition "在材料通过产线期间采集和评定质量证据的工序段。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
-    skos:notation "INSPECT"^^stl:ProcessTypeCode ;
-    skos:prefLabel "Inspection"@en,
-        "检验"@zh ;
+    skos:notation "INLINETEST"^^stl:ProcessTypeCode ;
+    skos:prefLabel "In-line inspection"@en,
+        "在线检验"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/MARK> a skos:Concept ;
+    rdfs:label "Marking"@en,
+        "标记"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "在实物或所附标签上施加身份或位置标记的工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "MARK"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Marking"@en,
+        "标记"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
 <https://w3id.org/ontology-platform/steel/code/process-type/MOVE> a skos:Concept ;
@@ -3745,6 +4712,45 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Pelletizing"@en,
         "球团生产"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/PICKLECOLD> a skos:Concept ;
+    rdfs:label "Coupled pickling and cold rolling"@en,
+        "酸洗冷连轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/COLDROLL> ;
+    skos:definition "Descaling and reducing strip in coupled pickling and cold rolling sections."@en,
+        "使带钢在相连的酸洗与冷轧段连续完成除鳞和减薄。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "PICKLECOLD"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Coupled pickling and cold rolling"@en,
+        "酸洗冷连轧"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/PLATEROLL> a skos:Concept ;
+    rdfs:label "Plate rolling"@en,
+        "中厚板轧制"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> ;
+    skos:definition "Hot rolling stock into individual plates through spreading or reduction passes."@en,
+        "将热坯轧成可逐张追踪的中厚板，可包括展宽与减薄道次。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "PLATEROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Plate rolling"@en,
+        "中厚板轧制"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/RECOIL> a skos:Concept ;
+    rdfs:label "Recoiling"@en,
+        "重卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "Unwinding and rewinding strip to form an identifiable output coil."@en,
+        "将已有钢卷展开后重新卷绕，形成可识别的出口卷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "RECOIL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Recoiling"@en,
+        "重卷"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
 <https://w3id.org/ontology-platform/steel/code/process-type/REFINE> a skos:Concept ;
     rdfs:label "Secondary refining"@en,
         "炉外精炼"@zh ;
@@ -3757,6 +4763,57 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "REFINE"^^stl:ProcessTypeCode ;
     skos:prefLabel "Secondary refining"@en,
         "炉外精炼"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/REHEAT> a skos:Concept ;
+    rdfs:label "Stock reheating"@en,
+        "坯料加热"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "Heating stock or ingots to prepare them for a forming step."@en,
+        "将坯或锭在变形加工前加热至可加工状态。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "REHEAT"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Stock reheating"@en,
+        "坯料加热"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/RODROLL> a skos:Concept ;
+    rdfs:label "Wire rod rolling"@en,
+        "线材轧制"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> ;
+    skos:definition "Hot rolling stock into small-section rod for collection in loops."@en,
+        "将热坯连续轧成小断面线材并以盘条形态收集。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "RODROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Wire rod rolling"@en,
+        "线材轧制"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/SECTROLL> a skos:Concept ;
+    rdfs:label "Hot section rolling"@en,
+        "型钢热轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> ;
+    skos:definition "Hot rolling stock through shaped rolls to form a specified section profile."@en,
+        "以成形轧辊将热坯轧成规定轮廓的型钢。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "SECTROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Hot section rolling"@en,
+        "型钢热轧"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/SHEAR> a skos:Concept ;
+    rdfs:label "Shearing"@en,
+        "剪切"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "通过剪刃分离材料以形成切断件、条材或修剪边部的工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "SHEAR"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Shearing"@en,
+        "剪切"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
 <https://w3id.org/ontology-platform/steel/code/process-type/SINTER> a skos:Concept ;
     rdfs:label "Sintering"@en,
@@ -3784,6 +4841,78 @@ stl:coatingMass a owl:DatatypeProperty ;
         "出钢"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/STRAIGHTEN> a skos:Concept ;
+    rdfs:label "Straightening"@en,
+        "矫直"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "将钢材的弯曲、扭转或不平校正至要求形状的工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "STRAIGHTEN"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Straightening"@en,
+        "矫直"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/SURFCOND> a skos:Concept ;
+    rdfs:label "Surface conditioning"@en,
+        "表面修整"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing-codes> ;
+    skos:definition "通过去除金属对钢材表面实施修磨、扒皮等处理的工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "SURFCOND"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Surface conditioning"@en,
+        "表面修整"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/TUBEPIERCE> a skos:Concept ;
+    rdfs:label "Tube billet piercing"@en,
+        "管坯穿孔"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "Forms a hollow shell by opening a bore along a solid billet."@en,
+        "以实心管坯为投入、穿出轴向内孔并形成毛管的工序。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "TUBEPIERCE"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Tube billet piercing"@en,
+        "管坯穿孔"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/TUBEROLL> a skos:Concept ;
+    rdfs:label "Tube rolling"@en,
+        "轧管"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Elongates hollow stock by rolling and adjusts the wall thickness."@en,
+        "以空心管料为投入，通过轧制延伸管身并调整管壁厚度。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "TUBEROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Tube rolling"@en,
+        "轧管"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/TUBESIZE> a skos:Concept ;
+    rdfs:label "Tube sizing and reducing"@en,
+        "钢管定径与减径"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Sizes or reduces the outside diameter of tubular stock."@en,
+        "按所需外径对管体截面进行定径或减径的工序。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "TUBESIZE"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Tube sizing and reducing"@en,
+        "钢管定径与减径"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/TUBEWELD> a skos:Concept ;
+    rdfs:label "Tube seam welding"@en,
+        "管体焊接"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "Joins the adjoining edges of formed flat stock to turn an open blank into welded pipe."@en,
+        "沿成形板带的相邻边缘施焊，使开口管坯成为闭合的焊管。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "TUBEWELD"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Tube seam welding"@en,
+        "管体焊接"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/product-form/BAR> a skos:Concept ;
     rdfs:label "Bar"@en,
         "棒材"@zh ;
@@ -3797,42 +4926,33 @@ stl:coatingMass a owl:DatatypeProperty ;
         "棒材"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
-<https://w3id.org/ontology-platform/steel/code/product-form/BEAMBLANK> a skos:Concept ;
-    rdfs:label "Beam blank"@en,
-        "异型坯"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "A near-net structural blank with flange and web regions for subsequent section rolling."@en,
-        "断面预先形成翼缘区和腹板区以供型钢轧制的坯料。"@zh ;
+<https://w3id.org/ontology-platform/steel/code/product-form/COATEDCOIL> a skos:Concept ;
+    rdfs:label "Coated coil"@en,
+        "涂镀卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/product-form/COIL> ;
+    skos:definition "Coiled strip supplied with a metallic or organic surface layer."@en,
+        "以卷形交接、表面带有金属镀层或有机涂层的带钢。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "BEAMBLANK"^^stl:ProductFormCode ;
-    skos:prefLabel "Beam blank"@en,
-        "异型坯"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+    skos:notation "COATEDCOIL"^^stl:ProductFormCode ;
+    skos:prefLabel "Coated coil"@en,
+        "涂镀卷"@zh .
 
-<https://w3id.org/ontology-platform/steel/code/product-form/BLOOM> a skos:Concept ;
-    rdfs:label "Bloom"@en,
-        "大方坯"@zh ;
+<https://w3id.org/ontology-platform/steel/code/product-form/CRC> a skos:Concept ;
+    rdfs:label "Cold-rolled coil"@en,
+        "冷轧卷"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting-codes> ;
-    skos:definition "A large square or rectangular semiproduct supplied for breakdown or rolling."@en,
-        "以方形或矩形的大断面坯料形态交接，供后续开坯或轧制。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "CRC"@en,
+        "CRC"@zh ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/product-form/COIL> ;
+    skos:definition "Cold-reduced steel strip supplied in coiled form."@en,
+        "以冷轧减薄的带钢卷形交接的实物形态。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "BLOOM"^^stl:ProductFormCode ;
-    skos:prefLabel "Bloom"@en,
-        "大方坯"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
-
-<https://w3id.org/ontology-platform/steel/code/product-form/COIL> a skos:Concept ;
-    rdfs:label "Steel coil"@en,
-        "钢卷"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Flat steel wound along its length into a single handling piece."@en,
-        "将连续扁平钢材沿长度方向缠绕成可整体吊运的一卷。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "COIL"^^stl:ProductFormCode ;
-    skos:prefLabel "Steel coil"@en,
-        "钢卷"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+    skos:notation "CRC"^^stl:ProductFormCode ;
+    skos:prefLabel "Cold-rolled coil"@en,
+        "冷轧卷"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/HBI> a skos:Concept ;
     rdfs:label "Hot briquetted iron"@en,
@@ -3847,17 +4967,20 @@ stl:coatingMass a owl:DatatypeProperty ;
         "热压块铁"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
-<https://w3id.org/ontology-platform/steel/code/product-form/INGOT> a skos:Concept ;
-    rdfs:label "Steel ingot"@en,
-        "钢锭"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "A discrete solid mass cast in an ingot mould or remelting mould for subsequent working."@en,
-        "在单个锭模或重熔结晶器内凝固成形、供后续加工的整块金属。"@zh ;
+<https://w3id.org/ontology-platform/steel/code/product-form/HRC> a skos:Concept ;
+    rdfs:label "Hot-rolled coil"@en,
+        "热轧卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "HRC"@en,
+        "HRC"@zh ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/product-form/COIL> ;
+    skos:definition "Coiled strip in the form obtained by winding the output of hot rolling."@en,
+        "以热轧后卷取的带钢卷形交接的实物形态。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "INGOT"^^stl:ProductFormCode ;
-    skos:prefLabel "Steel ingot"@en,
-        "钢锭"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+    skos:notation "HRC"^^stl:ProductFormCode ;
+    skos:prefLabel "Hot-rolled coil"@en,
+        "热轧卷"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/PIG> a skos:Concept ;
     rdfs:label "Cast iron pig"@en,
@@ -3884,30 +5007,18 @@ stl:coatingMass a owl:DatatypeProperty ;
         "中厚钢板"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
-<https://w3id.org/ontology-platform/steel/code/product-form/RECTBILLET> a skos:Concept ;
-    rdfs:label "Rectangular billet"@en,
-        "矩形坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Semi-finished stock ordered as a rectangular billet with distinct broad and narrow faces."@en,
-        "以长边和短边分别定尺且在产品规格中归作矩形坯的半成品。"@zh ;
+<https://w3id.org/ontology-platform/steel/code/product-form/SEAMLESS> a skos:Concept ;
+    rdfs:label "Seamless tube"@en,
+        "无缝管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/product-form/TUBE> ;
+    skos:definition "Tubular product form with a circumferentially continuous wall formed from solid stock."@en,
+        "管壁由整块钢坯形成、周向连续的管材形态。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "RECTBILLET"^^stl:ProductFormCode ;
-    skos:prefLabel "Rectangular billet"@en,
-        "矩形坯"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
-
-<https://w3id.org/ontology-platform/steel/code/product-form/ROUNDBIL> a skos:Concept ;
-    rdfs:label "Round billet"@en,
-        "圆坯"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Solid round feedstock specified by diameter for processing such as piercing or forging."@en,
-        "以公称直径描述断面的实心圆形半成品，可供轧管或锻造。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "ROUNDBIL"^^stl:ProductFormCode ;
-    skos:prefLabel "Round billet"@en,
-        "圆坯"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+    skos:notation "SEAMLESS"^^stl:ProductFormCode ;
+    skos:prefLabel "Seamless tube"@en,
+        "无缝管"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/SECTION> a skos:Concept ;
     rdfs:label "Section"@en,
@@ -3934,44 +5045,6 @@ stl:coatingMass a owl:DatatypeProperty ;
         "钢薄板"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
-<https://w3id.org/ontology-platform/steel/code/product-form/SHELL> a skos:Concept ;
-    rdfs:label "Pierced shell"@en,
-        "毛管"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "A hollow intermediate after piercing and before elongation or sizing."@en,
-        "实心坯穿孔后、尚待延伸或定径的空心中间件。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "SHELL"^^stl:ProductFormCode ;
-    skos:prefLabel "Pierced shell"@en,
-        "毛管"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
-
-<https://w3id.org/ontology-platform/steel/code/product-form/SLAB> a skos:Concept ;
-    rdfs:label "Slab"@en,
-        "板坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2012-2014> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "A wide flat semi-finished section suitable for rolling into plate or strip."@en,
-        "断面宽而扁、通常供轧板或轧带的半成品坯。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "SLAB"^^stl:ProductFormCode ;
-    skos:prefLabel "Slab"@en,
-        "板坯"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
-
-<https://w3id.org/ontology-platform/steel/code/product-form/SQBILLET> a skos:Concept ;
-    rdfs:label "Square billet"@en,
-        "方坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Solid semi-finished stock with nominally equal perpendicular sides."@en,
-        "供后续成形的实心半成品，横截面的两边名义上相等且成直角。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "SQBILLET"^^stl:ProductFormCode ;
-    skos:prefLabel "Square billet"@en,
-        "方坯"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
-
 <https://w3id.org/ontology-platform/steel/code/product-form/STRIP> a skos:Concept ;
     rdfs:label "Steel strip"@en,
         "钢带"@zh ;
@@ -3984,18 +5057,18 @@ stl:coatingMass a owl:DatatypeProperty ;
         "钢带"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
-<https://w3id.org/ontology-platform/steel/code/product-form/TUBE> a skos:Concept ;
-    rdfs:label "Tube or pipe"@en,
-        "管材"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-17395-2024> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Steel stock with a closed hollow section specified by outside dimensions and wall thickness."@en,
-        "沿长度具有封闭空腔并以外形和壁厚表征的钢材。"@zh ;
+<https://w3id.org/ontology-platform/steel/code/product-form/WELDED> a skos:Concept ;
+    rdfs:label "Welded pipe"@en,
+        "焊管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/product-form/TUBE> ;
+    skos:definition "Tubular product form closed by welding the edges of formed plate or strip."@en,
+        "由板带成形、边缘经焊接闭合的管材形态。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:notation "TUBE"^^stl:ProductFormCode ;
-    skos:prefLabel "Tube or pipe"@en,
-        "管材"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+    skos:notation "WELDED"^^stl:ProductFormCode ;
+    skos:prefLabel "Welded pipe"@en,
+        "焊管"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/WIREROD> a skos:Concept ;
     rdfs:label "Wire rod"@en,
@@ -4110,7 +5183,7 @@ stl:coatingMass a owl:DatatypeProperty ;
 <https://w3id.org/ontology-platform/steel/code/refining-method/LF> a skos:Concept ;
     rdfs:label "Ladle furnace refining"@en,
         "钢包炉精炼"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-6394-2025> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking-codes> ;
     skos:definition "Ladle treatment using a furnace station with arc reheating and facilities for stirring, slag treatment or alloy additions."@en,
         "在钢包炉工位利用电弧补热能力，配合搅拌、造渣或加合金处理钢液的方法。"@zh ;
@@ -4758,6 +5831,58 @@ stl:coatingMass a owl:DatatypeProperty ;
         "水路运输"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/transport-mode> .
 
+<https://w3id.org/ontology-platform/steel/code/weld-method/HFW> a skos:Concept ;
+    rdfs:label "High-frequency welding"@en,
+        "高频焊"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/weld-method/ERW> ;
+    skos:definition "A resistance welding method using high-frequency current to concentrate heat at the edges before they are squeezed together."@en,
+        "以高频电流集中加热待接合的管边，随后挤压焊合的电阻焊方法。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    skos:notation "HFW"^^stl:WeldMethodCode ;
+    skos:prefLabel "High-frequency welding"@en,
+        "高频焊"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/weld-method/LSAW> a skos:Concept ;
+    rdfs:label "Longitudinal submerged arc welding"@en,
+        "直缝埋弧焊"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:altLabel "SAWL"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/weld-method/SAW> ;
+    skos:definition "Applies submerged arc welding along a seam parallel to the pipe axis."@en,
+        "沿管体轴向对已成形的管边进行埋弧焊接。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    skos:notation "LSAW"^^stl:WeldMethodCode ;
+    skos:prefLabel "Longitudinal submerged arc welding"@en,
+        "直缝埋弧焊"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/weld-method/SSAW> a skos:Concept ;
+    rdfs:label "Helical submerged arc welding"@en,
+        "螺旋缝埋弧焊"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:altLabel "SAWH"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/weld-method/SAW> ;
+    skos:definition "Applies submerged arc welding along the helical seam of spiral-formed strip."@en,
+        "对带钢螺旋成形后形成的螺旋接缝进行埋弧焊接。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    skos:notation "SSAW"^^stl:WeldMethodCode ;
+    skos:prefLabel "Helical submerged arc welding"@en,
+        "螺旋缝埋弧焊"@zh .
+
+stl:coilingTemperature a owl:DatatypeProperty ;
+    rdfs:label "Hot strip coiling temperature"@en,
+        "热轧卷取温度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:HotRolling ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The temperature of hot-rolled strip as it reaches the coiler after runout cooling."@en,
+        "热轧带钢经轧后冷却、进入卷取机时记录的带钢温度。"@zh ;
+    skos:prefLabel "Hot strip coiling temperature"@en,
+        "热轧卷取温度"@zh ;
+    stl:quantityKind quantitykind:CelsiusTemperature ;
+    stl:unit unit:DEG_C .
+
 stl:cokeReactivityIndex a owl:DatatypeProperty ;
     rdfs:label "Coke reactivity index"@en,
         "焦炭反应性指数"@zh ;
@@ -4955,19 +6080,6 @@ stl:deliveryOrderLine a owl:ObjectProperty ;
     skos:prefLabel "Delivered order item"@en,
         "交货对应订单行"@zh .
 
-stl:derivedFrom a owl:ObjectProperty ;
-    rdfs:label "Derived from"@en,
-        "直接来源物料"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Material ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:range stl:Material ;
-    rdfs:subPropertyOf prov:wasDerivedFrom ;
-    skos:definition "Identifies one immediate source lot or piece from which the current material was split, combined or transformed."@en,
-        "指向经一步分取、合并或加工形成当前物料的直接来源批或件。"@zh ;
-    skos:prefLabel "Derived from"@en,
-        "直接来源物料"@zh .
-
 stl:destination a owl:ObjectProperty ;
     rdfs:label "Planned destination"@en,
         "计划目的地"@zh ;
@@ -5108,6 +6220,20 @@ stl:fieldMagnification a owl:DatatypeProperty ;
     stl:quantityKind quantitykind:DimensionlessRatio ;
     stl:unit unit:UNITLESS .
 
+stl:finishRollingTemperature a owl:DatatypeProperty ;
+    rdfs:label "Finish rolling temperature"@en,
+        "终轧温度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:HotRolling ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The temperature of the rolled steel at the exit of its final hot rolling pass."@en,
+        "轧件通过热轧最后一道变形道次时在出口记录的料温。"@zh ;
+    skos:prefLabel "Finish rolling temperature"@en,
+        "终轧温度"@zh ;
+    stl:quantityKind quantitykind:CelsiusTemperature ;
+    stl:unit unit:DEG_C .
+
 stl:forOrderLine a owl:ObjectProperty ;
     rdfs:label "For order line"@en,
         "服务订单行"@zh ;
@@ -5180,16 +6306,20 @@ stl:hardnessRecordValue a owl:DatatypeProperty ;
     skos:prefLabel "Reported hardness notation"@en,
         "硬度报告记号"@zh .
 
-stl:hasPart a owl:ObjectProperty ;
-    rdfs:label "Has part"@en,
-        "包含组成部分"@zh ;
+stl:heatTreatmentTemperature a owl:DatatypeProperty ;
+    rdfs:label "Heat treatment temperature"@en,
+        "热处理温度"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    owl:inverseOf stl:partOf ;
-    skos:definition "Identifies a constituent belonging to the stated whole."@en,
-        "列出在所述组成关系中属于当前整体的一个部分。"@zh ;
-    skos:prefLabel "Has part"@en,
-        "包含组成部分"@zh .
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:HeatTreatment stl:HeatTreatmentHold ) ] ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The holding temperature of the workpiece reported for a treatment run, in degrees Celsius. For a cycle with several holds the value is recorded on the corresponding hold."@en,
+        "热处理实绩中记录的工件保温温度，以摄氏度计，多段保温可按阶段分别记录。"@zh ;
+    skos:prefLabel "Heat treatment temperature"@en,
+        "热处理温度"@zh ;
+    stl:quantityKind quantitykind:CelsiusTemperature ;
+    stl:unit unit:DEG_C .
 
 stl:impactEnergy a owl:DatatypeProperty ;
     rdfs:label "Impact energy"@en,
@@ -5304,16 +6434,17 @@ stl:intervalSource a owl:ObjectProperty ;
         "区段来源件"@zh .
 
 stl:isTransitionSlab a owl:DatatypeProperty ;
-    rdfs:label "Marked as transition slab"@en,
-        "明确标为过渡坯"@zh ;
+    rdfs:label "Marked as heat-transition piece"@en,
+        "明确标为交接坯"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range xsd:boolean ;
-    skos:definition "Records an explicit designation of a slab as a heat-transition piece independently of its position at either end of a heat."@en,
-        "记录生产资料是否将这件板坯明确标为换炉过渡坯，首尾顺位本身不作此标记。"@zh ;
-    skos:prefLabel "Marked as transition slab"@en,
-        "明确标为过渡坯"@zh .
+    skos:definition "Records an explicit designation of a piece as a heat-transition piece independently of its position at either end of a heat."@en,
+        "记录生产资料是否将该坯件明确标为前后炉次交接处的坯件，首尾顺位本身不作此标记。"@zh ;
+    skos:prefLabel "Marked as heat-transition piece"@en,
+        "明确标为交接坯"@zh .
 
 stl:issuedOn a owl:DatatypeProperty ;
     rdfs:label "Issue date"@en,
@@ -5489,7 +6620,8 @@ stl:nextGrade a owl:ObjectProperty ;
     rdfs:label "Following steel grade"@en,
         "过渡后钢种"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range stl:SteelGrade ;
     skos:definition "Identifies the internal grade of the incoming heat at a transition between steel grades."@en,
@@ -5644,27 +6776,29 @@ stl:plannedLoadPosition a owl:ObjectProperty ;
         "计划装载位置"@zh .
 
 stl:positionInHeat a owl:DatatypeProperty ;
-    rdfs:label "Slab position within heat"@en,
+    rdfs:label "Piece position within heat"@en,
         "炉内出坯次序"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range xsd:positiveInteger ;
-    skos:definition "Records the original casting position on a strand within a heat, retained by pieces recut from the original slab."@en,
-        "标明板坯在同炉同流中的实际出坯次序，再次分切所得坯沿用原坯的次序。"@zh ;
-    skos:prefLabel "Slab position within heat"@en,
+    skos:definition "Records the original casting position on a strand within a heat, retained by pieces recut from the original piece."@en,
+        "标明坯件在同炉同流中的实际出坯次序，再次分切所得坯沿用原坯的次序。"@zh ;
+    skos:prefLabel "Piece position within heat"@en,
         "炉内出坯次序"@zh .
 
 stl:positionInSequence a owl:DatatypeProperty ;
-    rdfs:label "Slab position within casting sequence"@en,
+    rdfs:label "Piece position within casting sequence"@en,
         "浇次内出坯次序"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range xsd:positiveInteger ;
-    skos:definition "Records the casting position of a slab on one strand counted across the full casting sequence."@en,
-        "标明板坯在同一流的整个浇次内按实际出坯先后所处的位置。"@zh ;
-    skos:prefLabel "Slab position within casting sequence"@en,
+    skos:definition "Records the casting position of a piece on one strand counted across the full casting sequence."@en,
+        "标明坯件在同一流的整个浇次内按实际出坯先后所处的位置。"@zh ;
+    skos:prefLabel "Piece position within casting sequence"@en,
         "浇次内出坯次序"@zh .
 
 stl:positionOnUnit a owl:ObjectProperty ;
@@ -5695,7 +6829,8 @@ stl:previousGrade a owl:ObjectProperty ;
     rdfs:label "Preceding steel grade"@en,
         "过渡前钢种"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range stl:SteelGrade ;
     skos:definition "Identifies the internal grade of the outgoing heat at a transition between steel grades."@en,
@@ -5822,6 +6957,34 @@ stl:receivedShipment a owl:ObjectProperty ;
         "指明收货凭证确认收到的发运单。"@zh ;
     skos:prefLabel "Shipment acknowledged"@en,
         "签收发运单"@zh .
+
+stl:reductionRatio a owl:DatatypeProperty ;
+    rdfs:label "Thickness reduction ratio"@en,
+        "压下率"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Rolling ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The difference between entry and exit thickness for a pass or group of passes, expressed as a percentage of entry thickness."@en,
+        "一道或一组轧制道次中，入口厚度减去出口厚度所得差值占该段入口厚度的百分比。"@zh ;
+    skos:prefLabel "Thickness reduction ratio"@en,
+        "压下率"@zh ;
+    stl:quantityKind quantitykind:DimensionlessRatio ;
+    stl:unit unit:PERCENT .
+
+stl:reheatingDischargeTemperature a owl:DatatypeProperty ;
+    rdfs:label "Reheating furnace discharge temperature"@en,
+        "加热炉出炉温度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Reheating ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The temperature of the stock as it leaves the reheating furnace."@en,
+        "坯料离开加热炉时的实际料温，炉膛气氛温度另行记录。"@zh ;
+    skos:prefLabel "Reheating furnace discharge temperature"@en,
+        "加热炉出炉温度"@zh ;
+    stl:quantityKind quantitykind:CelsiusTemperature ;
+    stl:unit unit:DEG_C .
 
 stl:requiredProperty a owl:ObjectProperty ;
     rdfs:label "Required property"@en,
@@ -6352,15 +7515,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "弹簧钢"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=42BA7D06A4F0E936E06397BE0A0ACDC9> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-12603-2005> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 12603-2005" ;
-    dcterms:issued "2005"^^xsd:gYear ;
-    dcterms:title "Classifications and designations for metal heat treatment"@en,
-        "金属热处理工艺分类及代号"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D779D6D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7283,6 +8437,22 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=9F00800245E11BB1E05397BE0A0A3358> .
 
+<https://w3id.org/ontology-platform/steel/std/ybt-6393-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "YB/T 6393-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:title "转炉生产智能控制系统技术要求"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181471D0E06397BE0A0A1FF9> .
+
+<https://w3id.org/ontology-platform/steel/std/ybt-6394-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "YB/T 6394-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:title "钢包精炼（LF）智能控制系统技术要求"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181571D0E06397BE0A0A1FF9> .
+
 <https://w3id.org/ontology-platform/steel/std/ybt-6395-2025> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "YB/T 6395-2025" ;
@@ -7391,11 +8561,12 @@ stl:strandNumber a owl:DatatypeProperty ;
     rdfs:label "Strand number"@en,
         "流号"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range xsd:positiveInteger ;
-    skos:definition "Identifies the numbered strand of the caster from which the slab originated."@en,
-        "标识该板坯所属铸流在铸机各流中的编号。"@zh ;
+    skos:definition "Identifies the numbered strand of the caster from which the piece originated."@en,
+        "标识该坯件所属铸流在铸机各流中的编号。"@zh ;
     skos:prefLabel "Strand number"@en,
         "流号"@zh .
 
@@ -7506,19 +8677,6 @@ stl:testedSample a owl:ObjectProperty ;
     skos:prefLabel "Tested sample"@en,
         "受检样品"@zh .
 
-stl:thickness a owl:DatatypeProperty ;
-    rdfs:label "Thickness"@en,
-        "厚度"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-709-2019> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:range xsd:decimal ;
-    skos:definition "The measured or specified distance between opposite faces in the thickness direction, expressed in millimetres."@en,
-        "沿材料两相对表面之间的厚度方向量得或规定的距离，以毫米计。"@zh ;
-    skos:prefLabel "Thickness"@en,
-        "厚度"@zh ;
-    stl:quantityKind quantitykind:Length ;
-    stl:unit unit:MilliM .
-
 stl:tier a owl:DatatypeProperty ;
     rdfs:label "Storage tier"@en,
         "库位层"@zh ;
@@ -7530,6 +8688,19 @@ stl:tier a owl:DatatypeProperty ;
         "记录库位所在的堆放层序号。"@zh ;
     skos:prefLabel "Storage tier"@en,
         "库位层"@zh .
+
+stl:treatedLoad a owl:ObjectProperty ;
+    rdfs:label "Treated furnace load"@en,
+        "实际处理的装炉批"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:HeatTreatment ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment> ;
+    rdfs:range stl:HeatTreatmentLoad ;
+    rdfs:subPropertyOf prov:used ;
+    skos:definition "Identifies a furnace load actually processed in a heat treatment run so that the pieces in that charge can be retrieved."@en,
+        "指明一次热处理作业实际加工了哪个装炉批，以便从作业查到各装炉实物件。"@zh ;
+    skos:prefLabel "Treated furnace load"@en,
+        "实际处理的装炉批"@zh .
 
 stl:triggeredBy a owl:ObjectProperty ;
     rdfs:label "Triggered by shipment"@en,
@@ -7629,16 +8800,39 @@ stl:AcceptanceCriterion a owl:Class ;
     skos:prefLabel "Acceptance criterion"@en,
         "验收判据"@zh .
 
-stl:Billet a owl:Class ;
-    rdfs:label "Billet"@en,
-        "小钢坯"@zh ;
+stl:BeamBlank a owl:Class ;
+    rdfs:label "Beam blank"@en,
+        "异型坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/en-10079-2007> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:altLabel "梁坯"@zh ;
+    skos:definition "A steel semiproduct with a web and flange preform in its cross-section for subsequent rolling into a beam."@en,
+        "截面已具梁腹和翼缘雏形、供进一步轧成梁材的钢坯。"@zh ;
+    skos:prefLabel "Beam blank"@en,
+        "异型坯"@zh .
+
+stl:Bloom a owl:Class ;
+    rdfs:label "Bloom"@en,
+        "大方坯"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:definition "A relatively small solid steel semiproduct supplied as feedstock for bars, rods or other wrought products, with its section identified separately."@en,
-        "以较小实心断面交接、供轧棒线材或进一步成形的钢坯，断面形状另行记录。"@zh ;
-    skos:prefLabel "Billet"@en,
-        "小钢坯"@zh .
+    skos:definition "A square or rectangular semiproduct supplied as large-section stock for breakdown or direct working into heavy sections."@en,
+        "作为大断面坯料交接的方形或矩形钢坯，可供开坯或直接轧制重型断面产品。"@zh ;
+    skos:prefLabel "Bloom"@en,
+        "大方坯"@zh .
+
+stl:BreakdownRolledStock a owl:Class ;
+    rdfs:label "Breakdown-rolled stock"@en,
+        "初轧坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "An individually identified piece of stock produced by breakdown rolling, which may also be classified by its section as a slab, bloom or billet."@en,
+        "钢锭或大断面坯经过开坯轧制后单独编号的坯件，可按其实际断面同时标注为板坯、大方坯或小钢坯。"@zh ;
+    skos:prefLabel "Breakdown-rolled stock"@en,
+        "初轧坯"@zh .
 
 stl:BulkBlend a owl:Class ;
     rdfs:label "Blended lot"@en,
@@ -7662,6 +8856,50 @@ stl:Charging a owl:Class ;
     skos:prefLabel "Steel furnace charging"@en,
         "炼钢装料"@zh .
 
+stl:CoatedCoil a owl:Class ;
+    rdfs:label "Coated coil"@en,
+        "涂镀钢卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coil ;
+    skos:definition "A coil of steel strip bearing a metallic coating, an organic coating or a combination of layers."@en,
+        "带钢表面带有金属镀层、有机涂层或两者组合，并以卷形按件跟踪的钢材。"@zh ;
+    skos:prefLabel "Coated coil"@en,
+        "涂镀钢卷"@zh .
+
+stl:Coating a owl:Class ;
+    rdfs:label "Coating"@en,
+        "涂镀"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that applies one or more metallic or organic layers to steel to provide the specified surface protection or function."@en,
+        "在钢材表面施加一层或多层金属或有机材料，使表面获得规定的防护或使用性能。"@zh ;
+    skos:prefLabel "Coating"@en,
+        "涂镀"@zh .
+
+stl:ColdRolledCoil a owl:Class ;
+    rdfs:label "Cold-line coil"@en,
+        "冷轧段钢卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coil ;
+    skos:definition "A coil identified at the exit of cold rolling or a subsequent finishing operation, such as annealing, coating or recoiling."@en,
+        "在冷轧或其后续精整工序的出口按件登记的钢卷，常见产线包括退火线、涂镀线和重卷线。"@zh ;
+    skos:prefLabel "Cold-line coil"@en,
+        "冷轧段钢卷"@zh .
+
+stl:ColdRolling a owl:Class ;
+    rdfs:label "Cold rolling"@en,
+        "冷轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Rolling ;
+    skos:definition "Rolling that changes thickness or section in one or more passes below the recrystallization temperature of the steel."@en,
+        "在钢的再结晶温度以下通过一个或多个轧制道次改变厚度或断面。"@zh ;
+    skos:prefLabel "Cold rolling"@en,
+        "冷轧"@zh .
+
 stl:ContinuousCasting a owl:Class ;
     rdfs:label "Continuous casting"@en,
         "连铸执行"@zh ;
@@ -7672,18 +8910,6 @@ stl:ContinuousCasting a owl:Class ;
         "使钢水在结晶器中形成坯壳并连续引出铸流的一次生产作业。"@zh ;
     skos:prefLabel "Continuous casting"@en,
         "连铸执行"@zh .
-
-stl:ContinuouslyCastPiece a owl:Class ;
-    rdfs:label "Continuously cast piece"@en,
-        "连铸坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:definition "An individually tracked length cut from a continuously cast steel strand or recut from that length while it retains its as-cast form."@en,
-        "从钢的连续铸流切下、或将这类坯再次切分取得的独立铸态坯件。"@zh ;
-    skos:prefLabel "Continuously cast piece"@en,
-        "连铸坯"@zh ;
-    skos:scopeNote "连铸路线与坯形可同时标注，例如一件实物同时属于连铸坯与板坯。初轧所得坯件只按其坯形归类。"@zh .
 
 stl:CoredWireFeeding a owl:Class ;
     rdfs:label "Cored wire feeding"@en,
@@ -7802,6 +9028,28 @@ stl:LoadingPlan a owl:Class ;
     skos:prefLabel "Loading plan"@en,
         "装载计划"@zh .
 
+stl:LocalGrinding a owl:Class ;
+    rdfs:label "Local grinding"@en,
+        "局部修磨"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:SurfaceConditioning ;
+    skos:definition "An operation that uses an abrasive tool to remove metal from a designated area of a steel piece, where removal depth can be checked."@en,
+        "用磨具从钢材指定部位去除表层金属的作业，可按处理区域复核去除深度。"@zh ;
+    skos:prefLabel "Local grinding"@en,
+        "局部修磨"@zh .
+
+stl:MaterialAggregation a owl:Class ;
+    rdfs:label "Material aggregation"@en,
+        "实物聚合作业"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that assembles pieces into a handling unit while preserving their identities."@en,
+        "将成员装入可整体管理的物流单元且保留各成员身份的作业。"@zh ;
+    skos:prefLabel "Material aggregation"@en,
+        "实物聚合作业"@zh .
+
 stl:MaterialSublot a owl:Class ;
     rdfs:label "Material sublot"@en,
         "物料子批"@zh ;
@@ -7889,6 +9137,17 @@ stl:RatingRequirement a owl:Class ;
     skos:prefLabel "Rating acceptance requirement"@en,
         "级别验收要求"@zh .
 
+stl:Reheating a owl:Class ;
+    rdfs:label "Stock reheating"@en,
+        "坯料加热"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that heats stock or ingots in preparation for the next forming step."@en,
+        "在变形加工前将坯料或钢锭加热到可供下一道工序加工的温度。"@zh ;
+    skos:prefLabel "Stock reheating"@en,
+        "坯料加热"@zh .
+
 stl:RetainedSample a owl:Class ;
     rdfs:label "Retained sample"@en,
         "留样"@zh ;
@@ -7899,6 +9158,17 @@ stl:RetainedSample a owl:Class ;
         "为复核或争议检验保存至指定期限并可重新定位的样品。"@zh ;
     skos:prefLabel "Retained sample"@en,
         "留样"@zh .
+
+stl:RoundBillet a owl:Class ;
+    rdfs:label "Round billet"@en,
+        "圆坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-15574-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:Billet ;
+    skos:definition "A solid billet with a circular section specified by nominal diameter, suitable for piercing or other forming operations."@en,
+        "用公称直径描述圆形截面的实心坯料，可供穿孔或其他成形作业。"@zh ;
+    skos:prefLabel "Round billet"@en,
+        "圆坯"@zh .
 
 stl:Sampling a owl:Class ;
     rdfs:label "Sampling"@en,
@@ -7922,6 +9192,17 @@ stl:SamplingRequirement a owl:Class ;
         "规定取样单元、位置、方向或份数的检验要求。"@zh ;
     skos:prefLabel "Sampling requirement"@en,
         "取样要求"@zh .
+
+stl:SeamlessTube a owl:Class ;
+    rdfs:label "Seamless steel tube"@en,
+        "无缝钢管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:SteelTube ;
+    skos:definition "A steel tube made by forming a bore in stock and working the wall, with circumferential continuity and no seam joining edges to close the body."@en,
+        "由钢坯开孔并加工管壁制得的钢管，管壁沿周向连续，无闭合管体的制造焊缝。"@zh ;
+    skos:prefLabel "Seamless steel tube"@en,
+        "无缝钢管"@zh .
 
 stl:Sinter a owl:Class ;
     rdfs:label "Iron ore sinter lot"@en,
@@ -7966,6 +9247,17 @@ stl:ToolInstallation a owl:Class ;
         "将有标识的工装装到设备上并确定其使用起点的一次作业。"@zh ;
     skos:prefLabel "Tool installation"@en,
         "工装装配作业"@zh .
+
+stl:TubeBillet a owl:Class ;
+    rdfs:label "Solid tube billet"@en,
+        "制管用实心管坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "An individual solid steel billet intended for opening a bore in seamless tube making, identifiable by that use regardless of section or billet production route."@en,
+        "供无缝制管开孔的单件实心钢坯，按其制管用途识别，截面和制坯方式可另行记录。"@zh ;
+    skos:prefLabel "Solid tube billet"@en,
+        "制管用实心管坯"@zh .
 
 stl:WorkAssignment a owl:Class ;
     rdfs:label "Work assignment"@en,
@@ -8049,17 +9341,20 @@ stl:castOn a owl:ObjectProperty ;
     skos:prefLabel "Cast on"@en,
         "连浇铸机"@zh .
 
-<https://w3id.org/ontology-platform/steel/code/defect-type/FLAT> a skos:Concept ;
-    rdfs:label "Flat product defects"@en,
-        "板带缺陷"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Groups flaws identified by flat-stock features such as edges, coating coverage or flatness."@en,
-        "归集以板面、带边、镀层或板形为识别依据的缺陷。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
-    skos:notation "FLAT"^^stl:DefectTypeCode ;
-    skos:prefLabel "Flat product defects"@en,
-        "板带缺陷"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
+stl:coatingType a owl:ObjectProperty ;
+    rdfs:label "Coating type"@en,
+        "涂镀层类型"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:MaterialPiece stl:MaterialSpecification ) ] ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/coating-type> ;
+    skos:altLabel "镀层类型"@zh ;
+    skos:definition "Identifies a coating present on a material piece or specified as a requirement for a material."@en,
+        "给出实物件表面的实际涂镀层类别，或物料规格对涂镀层类别的要求。"@zh ;
+    skos:prefLabel "Coating type"@en,
+        "涂镀层类型"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/BF> a skos:Concept ;
     rdfs:label "Blast furnace"@en,
@@ -8073,6 +9368,19 @@ stl:castOn a owl:ObjectProperty ;
     skos:notation "BF"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Blast furnace"@en,
         "高炉"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/COLDMILL> a skos:Concept ;
+    rdfs:label "Cold rolling mill"@en,
+        "冷轧机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "A mill that reduces or shapes steel through rolls under cold-working conditions."@en,
+        "在冷加工条件下通过轧辊控制钢料减薄量或截面形状的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "COLDMILL"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Cold rolling mill"@en,
+        "冷轧机"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/material-category/DRI> a skos:Concept ;
@@ -8155,6 +9463,157 @@ stl:castOn a owl:ObjectProperty ;
         "超声检测"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ndt-method> .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/COAT> a skos:Concept ;
+    rdfs:label "Coating"@en,
+        "涂镀"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "Applying a metallic or organic layer to obtain the required surface properties."@en,
+        "在钢材表面施加金属镀层或有机涂层以获得所需的表面性能。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "COAT"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Coating"@en,
+        "涂镀"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/COLDROLL> a skos:Concept ;
+    rdfs:label "Cold rolling"@en,
+        "冷轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "Rolling steel below its recrystallization temperature."@en,
+        "在再结晶温度以下对钢料施加轧制变形。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "COLDROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Cold rolling"@en,
+        "冷轧"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/HEATTREAT> a skos:Concept ;
+    rdfs:label "Heat treatment"@en,
+        "热处理"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "A route segment specifying a thermal cycle to change the microstructure or properties of steel."@en,
+        "安排钢材按给定温度历程改变组织或性能的路线工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "HEATTREAT"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Heat treatment"@en,
+        "热处理"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/INSPECT> a skos:Concept ;
+    rdfs:label "Inspection"@en,
+        "检验"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Work that obtains evidence of material quality through examination or testing."@en,
+        "通过检查或试验取得物料质量证据的工序类型。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "INSPECT"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Inspection"@en,
+        "检验"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/BEAMBLANK> a skos:Concept ;
+    rdfs:label "Beam blank"@en,
+        "异型坯"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "A near-net structural blank with flange and web regions for subsequent section rolling."@en,
+        "断面预先形成翼缘区和腹板区以供型钢轧制的坯料。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "BEAMBLANK"^^stl:ProductFormCode ;
+    skos:prefLabel "Beam blank"@en,
+        "异型坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/BLOOM> a skos:Concept ;
+    rdfs:label "Bloom"@en,
+        "大方坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting-codes> ;
+    skos:definition "A large square or rectangular semiproduct supplied for breakdown or rolling."@en,
+        "以方形或矩形的大断面坯料形态交接，供后续开坯或轧制。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "BLOOM"^^stl:ProductFormCode ;
+    skos:prefLabel "Bloom"@en,
+        "大方坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/INGOT> a skos:Concept ;
+    rdfs:label "Steel ingot"@en,
+        "钢锭"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "A discrete solid mass cast in an ingot mould or remelting mould for subsequent working."@en,
+        "在单个锭模或重熔结晶器内凝固成形、供后续加工的整块金属。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "INGOT"^^stl:ProductFormCode ;
+    skos:prefLabel "Steel ingot"@en,
+        "钢锭"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/RECTBILLET> a skos:Concept ;
+    rdfs:label "Rectangular billet"@en,
+        "矩形坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Semi-finished stock ordered as a rectangular billet with distinct broad and narrow faces."@en,
+        "以长边和短边分别定尺且在产品规格中归作矩形坯的半成品。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "RECTBILLET"^^stl:ProductFormCode ;
+    skos:prefLabel "Rectangular billet"@en,
+        "矩形坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/SHELL> a skos:Concept ;
+    rdfs:label "Pierced shell"@en,
+        "毛管"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "A hollow intermediate after piercing and before elongation or sizing."@en,
+        "实心坯穿孔后、尚待延伸或定径的空心中间件。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "SHELL"^^stl:ProductFormCode ;
+    skos:prefLabel "Pierced shell"@en,
+        "毛管"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/SLAB> a skos:Concept ;
+    rdfs:label "Slab"@en,
+        "板坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2012-2014> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "A wide flat semi-finished section suitable for rolling into plate or strip."@en,
+        "断面宽而扁、通常供轧板或轧带的半成品坯。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "SLAB"^^stl:ProductFormCode ;
+    skos:prefLabel "Slab"@en,
+        "板坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/SQBILLET> a skos:Concept ;
+    rdfs:label "Square billet"@en,
+        "方坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Solid semi-finished stock with nominally equal perpendicular sides."@en,
+        "供后续成形的实心半成品，横截面的两边名义上相等且成直角。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "SQBILLET"^^stl:ProductFormCode ;
+    skos:prefLabel "Square billet"@en,
+        "方坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/weld-method/ERW> a skos:Concept ;
+    rdfs:label "Electric resistance welding"@en,
+        "电阻焊"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Heats the mating edges by electrical resistance and applies pressure to join them."@en,
+        "利用流经管边的电流所产生的电阻热加热接合面，再加压焊合。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    skos:notation "ERW"^^stl:WeldMethodCode ;
+    skos:prefLabel "Electric resistance welding"@en,
+        "电阻焊"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/weld-method> .
+
 stl:defectType a owl:ObjectProperty ;
     rdfs:label "Defect type"@en,
         "缺陷类型"@zh ;
@@ -8203,6 +9662,17 @@ stl:formationDimension a owl:ObjectProperty ;
         "指明该规则要求批内成员一致的特征，例如炉号、物料规格或交货状态。"@zh ;
     skos:prefLabel "Lot formation dimension"@en,
         "组批维度"@zh .
+
+stl:hasPart a owl:ObjectProperty ;
+    rdfs:label "Has part"@en,
+        "包含组成部分"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    owl:inverseOf stl:partOf ;
+    skos:definition "Identifies a constituent belonging to the stated whole."@en,
+        "列出在所述组成关系中属于当前整体的一个部分。"@zh ;
+    skos:prefLabel "Has part"@en,
+        "包含组成部分"@zh .
 
 stl:heatPositionInSequence a owl:DatatypeProperty ;
     rdfs:label "Heat position within casting sequence"@en,
@@ -8363,19 +9833,6 @@ stl:processedHeat a owl:ObjectProperty ;
     skos:prefLabel "Processed heat"@en,
         "处理炉次"@zh .
 
-stl:productForm a owl:ObjectProperty ;
-    rdfs:label "Physical product form"@en,
-        "实物产品形态"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-15574-2016> ;
-    rdfs:domain stl:MaterialPiece ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:range skos:Concept ;
-    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/product-form> ;
-    skos:definition "Identifies the physical product form associated with the current piece identity."@en,
-        "标识实物件在当前身份下的几何或交货形态。"@zh ;
-    skos:prefLabel "Physical product form"@en,
-        "实物产品形态"@zh .
-
 stl:sampleType a owl:ObjectProperty ;
     rdfs:label "Sample type"@en,
         "样品类型"@zh ;
@@ -8393,7 +9850,8 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:label "Strand piece number"@en,
         "流内序号"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range xsd:positiveInteger ;
     skos:definition "Records the piece number allocated within a numbering heat and strand, including a new number for each recut piece."@en,
@@ -8463,15 +9921,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "低合金高强度结构钢"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/search/stdPage?q=%E4%BD%8E%E5%90%88%E9%87%91%E9%AB%98%E5%BC%BA%E5%BA%A6%E7%BB%93%E6%9E%84%E9%92%A2> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-17395-2024> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 17395-2024" ;
-    dcterms:issued "2024"^^xsd:gYear ;
-    dcterms:title "Dimensions, shapes, masses and tolerances of steel tubes"@en,
-        "钢管尺寸、外形、重量及允许偏差"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=D0312C0534BD7B987D945321BAB7B778> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-17616-2013> a stl:StandardEdition ;
     dcterms:description "废止"@zh ;
@@ -8590,15 +10039,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "金属材料 布氏硬度试验 第1部分: 试验方法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=7DAB268C1B1B5265C36A2F1D1330E87D> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 2518-2019" ;
-    dcterms:issued "2019"^^xsd:gYear ;
-    dcterms:title "Continuously hot-dip zinc and zinc alloy coated steel sheet and strip"@en,
-        "连续热镀锌和锌合金镀层钢板及钢带"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=996A838ABFD28372E05397BE0A0AD949> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-2970-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -8859,6 +10299,19 @@ stl:testType a owl:ObjectProperty ;
     skos:prefLabel "Test type"@en,
         "试验类型"@zh .
 
+stl:thickness a owl:DatatypeProperty ;
+    rdfs:label "Thickness"@en,
+        "厚度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-709-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The measured or specified distance between opposite faces in the thickness direction, expressed in millimetres."@en,
+        "沿材料两相对表面之间的厚度方向量得或规定的距离，以毫米计。"@zh ;
+    skos:prefLabel "Thickness"@en,
+        "厚度"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:MilliM .
+
 stl:upperLimit a owl:DatatypeProperty ;
     rdfs:label "Maximum elemental content"@en,
         "成分上限"@zh ;
@@ -8872,6 +10325,17 @@ stl:upperLimit a owl:DatatypeProperty ;
         "成分上限"@zh ;
     stl:quantityKind quantitykind:MassFraction ;
     stl:unit unit:PERCENT .
+
+stl:Billet a owl:Class ;
+    rdfs:label "Billet"@en,
+        "小钢坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "A relatively small solid steel semiproduct supplied as feedstock for bars, rods or other wrought products, with its section identified separately."@en,
+        "以较小实心断面交接、供轧棒线材或进一步成形的钢坯，断面形状另行记录。"@zh ;
+    skos:prefLabel "Billet"@en,
+        "小钢坯"@zh .
 
 stl:ChemicalAnalysis a owl:Class ;
     rdfs:label "Chemical analysis"@en,
@@ -8963,6 +10427,18 @@ stl:HardnessTest a owl:Class ;
     skos:prefLabel "Hardness test"@en,
         "硬度试验"@zh .
 
+stl:HeatTreatmentHold a owl:Class ;
+    rdfs:label "Heat treatment hold"@en,
+        "热处理保温阶段"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "A stage of a heat treatment run during which the work is held within a temperature range. Each hold in a multistage cycle can be timed separately."@en,
+        "一次热处理中使工件在某一温度范围内持续停留的一段实际作业，每次独立保温可分别计时。"@zh ;
+    skos:prefLabel "Heat treatment hold"@en,
+        "热处理保温阶段"@zh ;
+    skos:scopeNote "用 partOf 指向热处理作业，保温时长由本阶段的 actualEndAt 与 actualStartAt 相减得到。"@zh .
+
 stl:ImpactRequirement a owl:Class ;
     rdfs:label "Impact requirement"@en,
         "冲击性能要求"@zh ;
@@ -8973,17 +10449,6 @@ stl:ImpactRequirement a owl:Class ;
         "为指定温度、试样尺寸和取向规定冲击吸收能量条件的条目。"@zh ;
     skos:prefLabel "Impact requirement"@en,
         "冲击性能要求"@zh .
-
-stl:Ingot a owl:Class ;
-    rdfs:label "Steel ingot"@en,
-        "钢锭"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:definition "A discrete body of solidified steel tracked as one ingot, with its production method identified by its generating operation."@en,
-        "钢液凝固成一个可单独交接的锭体，锭的具体生产方法由产出作业记录。"@zh ;
-    skos:prefLabel "Steel ingot"@en,
-        "钢锭"@zh .
 
 stl:IngotCasting a owl:Class ;
     rdfs:label "Ingot casting"@en,
@@ -9027,17 +10492,6 @@ stl:LotFormationRule a owl:Class ;
         "规定哪些组批维度必须一致，才能将实物归入同一检验批的规则。"@zh ;
     skos:prefLabel "Lot formation rule"@en,
         "组批规则"@zh .
-
-stl:MaterialTransformation a owl:Class ;
-    rdfs:label "Material transformation"@en,
-        "物料转换作业"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:subClassOf stl:Operation ;
-    skos:definition "An operation that consumes or changes input material and establishes distinct output material."@en,
-        "消耗或改变投入物料并产生可区分产出物料的一次作业。"@zh ;
-    skos:prefLabel "Material transformation"@en,
-        "物料转换作业"@zh .
 
 stl:MeasurementPoint a owl:Class ;
     rdfs:label "Measurement point"@en,
@@ -9099,6 +10553,17 @@ stl:StocktakeLine a owl:Class ;
     skos:scopeNote "Use partOf to identify the stocktake. Compare book and counted stock for the same material, location and cut-off."@en,
         "用 partOf 指向盘点作业，账面量与实盘量须对应同一物料、位置和截止时点。"@zh .
 
+stl:SurfaceConditioning a owl:Class ;
+    rdfs:label "Surface conditioning"@en,
+        "表面修整"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that removes surface metal to clean the surface or eliminate local flaws, including grinding and peeling."@en,
+        "从钢材表面去除材料以清理表层或消除局部缺陷的作业，包括修磨和扒皮。"@zh ;
+    skos:prefLabel "Surface conditioning"@en,
+        "表面修整"@zh .
+
 stl:TensileRequirement a owl:Class ;
     rdfs:label "Tensile requirement"@en,
         "拉伸性能要求"@zh ;
@@ -9131,6 +10596,17 @@ stl:TransportUnit a owl:Class ;
         "承载装运货物并可作为一次装运交接对象的运输设备。"@zh ;
     skos:prefLabel "Transport unit"@en,
         "运输载具"@zh .
+
+stl:TubeWelding a owl:Class ;
+    rdfs:label "Tube seam welding"@en,
+        "管体焊接"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:MaterialTransformation ;
+    skos:definition "An operation that closes a tube body by welding the adjoining edges of formed plate or strip along a longitudinal or helical seam."@en,
+        "将已成形板带的相邻边缘沿纵缝或螺旋缝焊合，使管体闭合的一次作业。"@zh ;
+    skos:prefLabel "Tube seam welding"@en,
+        "管体焊接"@zh .
 
 stl:WorkUnit a owl:Class ;
     rdfs:label "Work unit"@en,
@@ -9184,6 +10660,19 @@ stl:castingSpeed a owl:DatatypeProperty ;
         "球团设备"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/WELDLINE> a skos:Concept ;
+    rdfs:label "Welded pipe production line"@en,
+        "焊管机组"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "A production line combining plate or strip forming equipment with seam welding equipment to make pipe."@en,
+        "将板带成形和管体合缝焊接设备配套起来以生产焊管的机组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "WELDLINE"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Welded pipe production line"@en,
+        "焊管机组"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/process-type/STEELMAKE> a skos:Concept ;
     rdfs:label "Primary steelmaking"@en,
         "炼钢"@zh ;
@@ -9196,6 +10685,43 @@ stl:castingSpeed a owl:DatatypeProperty ;
     skos:notation "STEELMAKE"^^stl:ProcessTypeCode ;
     skos:prefLabel "Primary steelmaking"@en,
         "炼钢"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/ROUNDBIL> a skos:Concept ;
+    rdfs:label "Round billet"@en,
+        "圆坯"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Solid round feedstock specified by diameter for processing such as piercing or forging."@en,
+        "以公称直径描述断面的实心圆形半成品，可供轧管或锻造。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "ROUNDBIL"^^stl:ProductFormCode ;
+    skos:prefLabel "Round billet"@en,
+        "圆坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/TUBE> a skos:Concept ;
+    rdfs:label "Tube or pipe"@en,
+        "管材"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-17395-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Steel stock with a closed hollow section specified by outside dimensions and wall thickness."@en,
+        "沿长度具有封闭空腔并以外形和壁厚表征的钢材。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "TUBE"^^stl:ProductFormCode ;
+    skos:prefLabel "Tube or pipe"@en,
+        "管材"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/weld-method/SAW> a skos:Concept ;
+    rdfs:label "Submerged arc welding"@en,
+        "埋弧焊"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Fuses the pipe edges and electrode wire with an arc beneath a blanket of granular flux."@en,
+        "在颗粒焊剂覆盖下以电弧熔合管边和焊丝，形成管体焊缝。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    skos:notation "SAW"^^stl:WeldMethodCode ;
+    skos:prefLabel "Submerged arc welding"@en,
+        "埋弧焊"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/weld-method> .
 
 stl:coversPiece a owl:ObjectProperty ;
     rdfs:label "Covered piece"@en,
@@ -9219,6 +10745,19 @@ stl:createdAt a owl:DatatypeProperty ;
         "给出实物或单据以此身份成立的时间点。"@zh ;
     skos:prefLabel "Created at"@en,
         "创建时刻"@zh .
+
+stl:derivedFrom a owl:ObjectProperty ;
+    rdfs:label "Derived from"@en,
+        "直接来源物料"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Material ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:range stl:Material ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    skos:definition "Identifies one immediate source lot or piece from which the current material was split, combined or transformed."@en,
+        "指向经一步分取、合并或加工形成当前物料的直接来源批或件。"@zh ;
+    skos:prefLabel "Derived from"@en,
+        "直接来源物料"@zh .
 
 stl:equipmentType a owl:ObjectProperty ;
     rdfs:label "Equipment type"@en,
@@ -9260,6 +10799,20 @@ stl:grossMass a owl:DatatypeProperty ;
     stl:quantityKind quantitykind:Mass ;
     stl:unit unit:TONNE .
 
+stl:heatTreatmentMethod a owl:ObjectProperty ;
+    rdfs:label "Heat treatment method"@en,
+        "热处理方法"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-12603-2005> ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:HeatTreatment stl:HeatTreatmentLoad ) ] ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> ;
+    skos:definition "Identifies by process code a method applied in a heat treatment run or undergone by a furnace load."@en,
+        "用热处理工艺代码标明作业实际采用的方法，或装炉批所经历的方法。"@zh ;
+    skos:prefLabel "Heat treatment method"@en,
+        "热处理方法"@zh .
+
 stl:isConfirmed a owl:DatatypeProperty ;
     rdfs:label "Movement confirmed"@en,
         "移动已确认"@zh ;
@@ -9298,6 +10851,20 @@ stl:lowerLimit a owl:DatatypeProperty ;
         "成分下限"@zh ;
     stl:quantityKind quantitykind:MassFraction ;
     stl:unit unit:PERCENT .
+
+stl:maximumGrindingDepth a owl:DatatypeProperty ;
+    rdfs:label "Maximum grinding depth"@en,
+        "最大修磨深度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:LocalGrinding ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The greatest depth removed within the area of a local grinding operation, measured in millimetres from the original surface."@en,
+        "一次局部修磨在所处理区域内相对于原表面测得的最大去除深度，以毫米计。"@zh ;
+    skos:prefLabel "Maximum grinding depth"@en,
+        "最大修磨深度"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:MilliM .
 
 stl:measurementMethod a owl:ObjectProperty ;
     rdfs:label "Measurement method"@en,
@@ -9343,23 +10910,14 @@ stl:numberingHeat a owl:ObjectProperty ;
     rdfs:label "Numbering heat"@en,
         "编号炉次"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Slab ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:Slab stl:ContinuouslyCastPiece ) ] ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
     rdfs:range stl:Heat ;
-    skos:definition "Identifies the heat used to assign the slab identifier independently of which heats supplied the steel."@en,
-        "标识编制板坯件号所依据的炉次，实际供钢炉次由来源关系另记。"@zh ;
+    skos:definition "Identifies the heat used to assign the piece identifier independently of which heats supplied the steel."@en,
+        "标识编制坯件编号所依据的炉次，实际供钢炉次由来源关系另记。"@zh ;
     skos:prefLabel "Numbering heat"@en,
         "编号炉次"@zh .
-
-stl:partOf a owl:ObjectProperty ;
-    rdfs:label "Part of"@en,
-        "所属整体"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    skos:definition "Identifies the immediate whole containing a component, entry or suboperation, such as a package, order or parent operation."@en,
-        "指出物件、条目或子执行所直接隶属的整体，例如包装件、订单或上一级作业。"@zh ;
-    skos:prefLabel "Part of"@en,
-        "所属整体"@zh .
 
 stl:recordedAt a owl:DatatypeProperty ;
     rdfs:label "Recorded at"@en,
@@ -9417,6 +10975,15 @@ stl:shareBasis a owl:ObjectProperty ;
         "金属材料 力学性能试验术语"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D76CF8D3A7E05397BE0A0AB82A> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-12603-2005> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 12603-2005" ;
+    dcterms:issued "2005"^^xsd:gYear ;
+    dcterms:title "Classifications and designations for metal heat treatment"@en,
+        "金属热处理工艺分类及代号"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D779D6D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-13304-1-2008> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -9588,13 +11155,13 @@ stl:shareBasis a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F24A2FBB19E05397BE0A0AB44A> .
 
-<https://w3id.org/ontology-platform/steel/std/ybt-6394-2025> a stl:StandardEdition ;
+<https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
-    dcterms:identifier "YB/T 6394-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:title "钢包精炼（LF）智能控制系统技术要求"@zh ;
+    dcterms:identifier "YB/T 2011-2014" ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:title "连续铸钢方坯和矩形坯"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181571D0E06397BE0A0A1FF9> .
+    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F2185BBB19E05397BE0A0AB44A> .
 
 stl:tappedHotMetalMass a owl:DatatypeProperty ;
     rdfs:label "Tapped hot metal mass"@en,
@@ -9637,6 +11204,50 @@ stl:theoreticalMass a owl:DatatypeProperty ;
     stl:quantityKind quantitykind:Mass ;
     stl:unit unit:TONNE .
 
+stl:tubeOutsideDiameter a owl:DatatypeProperty ;
+    rdfs:label "Tube outside diameter"@en,
+        "管外径"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-17395-2024> ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:SteelTube stl:HollowShell ) ] ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The distance across the outside surfaces of a round tube or shell on a diameter of a given section, in millimetres."@en,
+        "圆形钢管或毛管在给定截面上沿直径方向两外表面间的距离，以毫米计。"@zh ;
+    skos:prefLabel "Tube outside diameter"@en,
+        "管外径"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:MilliM .
+
+stl:tubeWallThickness a owl:DatatypeProperty ;
+    rdfs:label "Tube wall thickness"@en,
+        "管壁厚度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-17395-2024> ;
+    rdfs:domain [ a owl:Class ;
+            owl:unionOf ( stl:SteelTube stl:HollowShell ) ] ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:range xsd:decimal ;
+    rdfs:subPropertyOf stl:thickness ;
+    skos:definition "The distance through the wall of a tube or shell from the inside surface to the outside at a given position, in millimetres."@en,
+        "钢管或毛管在给定位置沿壁厚方向从内表面到外表面的距离，以毫米计。"@zh ;
+    skos:prefLabel "Tube wall thickness"@en,
+        "管壁厚度"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:MilliM .
+
+stl:weldMethod a owl:ObjectProperty ;
+    rdfs:label "Tube seam welding method"@en,
+        "制管焊接方法"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:TubeWelding ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/weld-method> ;
+    skos:definition "Identifies the method actually used to join the tube edges in a seam welding operation."@en,
+        "从一次管体焊接作业指向实际用于接合管边的焊接方法代码。"@zh ;
+    skos:prefLabel "Tube seam welding method"@en,
+        "制管焊接方法"@zh .
+
 stl:CastSequence a owl:Class ;
     rdfs:label "Casting sequence"@en,
         "浇次"@zh ;
@@ -9672,6 +11283,42 @@ stl:CuttingPlan a owl:Class ;
         "在开切前指定拟切件的切序和目标长度的计划，实际完成的切割可引用它。"@zh ;
     skos:prefLabel "Cutting plan"@en,
         "切割计划"@zh .
+
+stl:HollowShell a owl:Class ;
+    rdfs:label "Hollow shell"@en,
+        "毛管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:altLabel "pierced shell"@en,
+        "穿孔毛管"@zh ;
+    skos:definition "An individually tracked hollow intermediate produced by piercing a solid billet and supplied for elongation, rolling or sizing."@en,
+        "实心管坯穿孔后得到的空心中间件，保留单件身份供后续延伸、轧管或定径作业引用。"@zh ;
+    skos:prefLabel "Hollow shell"@en,
+        "毛管"@zh .
+
+stl:HotRolling a owl:Class ;
+    rdfs:label "Hot rolling"@en,
+        "热轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Rolling ;
+    skos:altLabel "热轧执行"@zh ;
+    skos:definition "Rolling performed in the hot-working range of the steel to produce flat or long products."@en,
+        "在钢的热加工温度范围内轧制坯料，可产出板带、棒线材或型钢。"@zh ;
+    skos:prefLabel "Hot rolling"@en,
+        "热轧"@zh .
+
+stl:Ingot a owl:Class ;
+    rdfs:label "Steel ingot"@en,
+        "钢锭"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "A discrete body of solidified steel tracked as one ingot, with its production method identified by its generating operation."@en,
+        "钢液凝固成一个可单独交接的锭体，锭的具体生产方法由产出作业记录。"@zh ;
+    skos:prefLabel "Steel ingot"@en,
+        "钢锭"@zh .
 
 stl:InspectionRequirement a owl:Class ;
     rdfs:label "Inspection requirement"@en,
@@ -9755,6 +11402,17 @@ stl:Refining a owl:Class ;
     skos:prefLabel "Secondary refining"@en,
         "炉外精炼"@zh .
 
+stl:Rolling a owl:Class ;
+    rdfs:label "Rolling"@en,
+        "轧制"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that passes steel through rotating rolls to change its thickness or cross-sectional profile."@en,
+        "使钢料通过旋转轧辊的辊缝，在轧辊压力下改变厚度或断面轮廓的作业。"@zh ;
+    skos:prefLabel "Rolling"@en,
+        "轧制"@zh .
+
 stl:StorageLocation a owl:Class ;
     rdfs:label "Storage location"@en,
         "库位"@zh ;
@@ -9777,29 +11435,29 @@ stl:Tapping a owl:Class ;
     skos:prefLabel "Steel tapping"@en,
         "出钢"@zh .
 
-stl:actualEndAt a owl:DatatypeProperty ;
-    rdfs:label "Actual end"@en,
-        "实际结束时刻"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Event ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:range xsd:dateTime ;
-    skos:definition "Gives the observed completion instant of an actual occurrence."@en,
-        "记录一次作业或事件在现场实际结束的时点。"@zh ;
-    skos:prefLabel "Actual end"@en,
-        "实际结束时刻"@zh .
+<https://w3id.org/ontology-platform/steel/code/defect-type/FLAT> a skos:Concept ;
+    rdfs:label "Flat product defects"@en,
+        "板带缺陷"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Groups flaws identified by flat-stock features such as edges, coating coverage or flatness."@en,
+        "归集以板面、带边、镀层或板形为识别依据的缺陷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
+    skos:notation "FLAT"^^stl:DefectTypeCode ;
+    skos:prefLabel "Flat product defects"@en,
+        "板带缺陷"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
 
-stl:actualStartAt a owl:DatatypeProperty ;
-    rdfs:label "Actual start"@en,
-        "实际开始时刻"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Event ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:range xsd:dateTime ;
-    skos:definition "Gives the observed start instant of an actual occurrence."@en,
-        "记录一次作业或事件在现场真正开始的时点。"@zh ;
-    skos:prefLabel "Actual start"@en,
-        "实际开始时刻"@zh .
+<https://w3id.org/ontology-platform/steel/code/product-form/COIL> a skos:Concept ;
+    rdfs:label "Steel coil"@en,
+        "钢卷"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Flat steel wound along its length into a single handling piece."@en,
+        "将连续扁平钢材沿长度方向缠绕成可整体吊运的一卷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "COIL"^^stl:ProductFormCode ;
+    skos:prefLabel "Steel coil"@en,
+        "钢卷"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
 <https://w3id.org/ontology-platform/steel/code/test-type/HARDNESS> a skos:Concept ;
     rdfs:label "Hardness test"@en,
@@ -9837,6 +11495,16 @@ stl:contributionOutput a owl:ObjectProperty ;
     skos:prefLabel "Output receiving contribution"@en,
         "贡献对应产出"@zh .
 
+stl:partOf a owl:ObjectProperty ;
+    rdfs:label "Part of"@en,
+        "所属整体"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    skos:definition "Identifies the immediate whole containing a component, entry or suboperation, such as a package, order or parent operation."@en,
+        "指出物件、条目或子执行所直接隶属的整体，例如包装件、订单或上一级作业。"@zh ;
+    skos:prefLabel "Part of"@en,
+        "所属整体"@zh .
+
 stl:plannedEndAt a owl:DatatypeProperty ;
     rdfs:label "Planned end"@en,
         "计划结束时刻"@zh ;
@@ -9860,6 +11528,19 @@ stl:plannedStartAt a owl:DatatypeProperty ;
         "给出计划中预期开始作业的时间点。"@zh ;
     skos:prefLabel "Planned start"@en,
         "计划开始时刻"@zh .
+
+stl:productForm a owl:ObjectProperty ;
+    rdfs:label "Physical product form"@en,
+        "实物产品形态"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-15574-2016> ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:definition "Identifies the physical product form associated with the current piece identity."@en,
+        "标识实物件在当前身份下的几何或交货形态。"@zh ;
+    skos:prefLabel "Physical product form"@en,
+        "实物产品形态"@zh .
 
 stl:resultAt a owl:DatatypeProperty ;
     rdfs:label "Result available at"@en,
@@ -9909,6 +11590,20 @@ stl:sourceHeat a owl:ObjectProperty ;
     skos:prefLabel "Source heat"@en,
         "来源炉次"@zh .
 
+stl:startLength a owl:DatatypeProperty ;
+    rdfs:label "Start along source coil"@en,
+        "母卷区段起点"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Coil ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "Distance along the strip from the reference end of its single direct parent coil to the start of the interval taken for this coil."@en,
+        "以单一直接母卷约定的起算端为零，沿带钢量到子卷所取区段起点的距离。"@zh ;
+    skos:prefLabel "Start along source coil"@en,
+        "母卷区段起点"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:M .
+
 <https://w3id.org/ontology-platform/steel/std/en-10204-2004> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "EN 10204:2004" ;
@@ -9926,6 +11621,15 @@ stl:sourceHeat a owl:ObjectProperty ;
         "钢产品分类"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=A%2ByDVqPCFTs%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-17395-2024> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 17395-2024" ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:title "Dimensions, shapes, masses and tolerances of steel tubes"@en,
+        "钢管尺寸、外形、重量及允许偏差"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=D0312C0534BD7B987D945321BAB7B778> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-20565-2022> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -9955,13 +11659,14 @@ stl:sourceHeat a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=3B46A026CCD6469CE06397BE0A0AEEB8> .
 
-<https://w3id.org/ontology-platform/steel/std/ybt-2011-2014> a stl:StandardEdition ;
+<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
-    dcterms:identifier "YB/T 2011-2014" ;
-    dcterms:issued "2014"^^xsd:gYear ;
-    dcterms:title "连续铸钢方坯和矩形坯"@zh ;
+    dcterms:identifier "GB/T 2518-2019" ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:title "Continuously hot-dip zinc and zinc alloy coated steel sheet and strip"@en,
+        "连续热镀锌和锌合金镀层钢板及钢带"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F2185BBB19E05397BE0A0AB44A> .
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=996A838ABFD28372E05397BE0A0AD949> .
 
 <https://w3id.org/ontology-platform/steel/std/ybt-421-2014> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -9986,14 +11691,6 @@ stl:sourceHeat a owl:ObjectProperty ;
     dcterms:title "电弧炉短流程炼钢生产通用要求"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=40C8E02241A14CBBE06397BE0A0A2F5A> .
-
-<https://w3id.org/ontology-platform/steel/std/ybt-6393-2025> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "YB/T 6393-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:title "转炉生产智能控制系统技术要求"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailedCNF?id=4727BFE4181471D0E06397BE0A0A1FF9> .
 
 stl:BlastFurnaceTapping a owl:Class ;
     rdfs:label "Blast furnace tapping"@en,
@@ -10029,6 +11726,29 @@ stl:EquipmentHierarchyNode a owl:Class ;
         "在制造设备层级中按生产职责划定边界的功能节点，可用于定位作业或归集下属资源。"@zh ;
     skos:prefLabel "Equipment hierarchy node"@en,
         "设备层级节点"@zh .
+
+stl:HeatTreatment a owl:Class ;
+    rdfs:label "Heat treatment"@en,
+        "热处理作业"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that subjects solid steel to a controlled thermal cycle to obtain the intended microstructure or properties."@en,
+        "使固态钢材经历受控的温度历程，以获得所需组织或性能的一次实际作业。"@zh ;
+    skos:prefLabel "Heat treatment"@en,
+        "热处理作业"@zh .
+
+stl:HeatTreatmentLoad a owl:Class ;
+    rdfs:label "Heat treatment furnace load"@en,
+        "热处理装炉批"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment> ;
+    rdfs:subClassOf stl:MaterialLot ;
+    skos:definition "A material lot comprising the individually identifiable pieces charged together into one heat treatment furnace on one occasion."@en,
+        "一次装入同一台热处理炉、按该次装炉共同追踪的一批实物件，各件保留各自的身份。"@zh ;
+    skos:prefLabel "Heat treatment furnace load"@en,
+        "热处理装炉批"@zh ;
+    skos:scopeNote "用 hasPart 列出装炉实物件，也可从实物件用 partOf 指回装炉批。"@zh .
 
 stl:LotAllocation a owl:Class ;
     rdfs:label "Lot allocation"@en,
@@ -10074,6 +11794,41 @@ stl:SourceInterval a owl:Class ;
     skos:prefLabel "Source interval"@en,
         "来源区段"@zh .
 
+stl:SteelTube a owl:Class ;
+    rdfs:label "Steel tube"@en,
+        "钢管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individual steel product with a closed hollow section along its length, whose dimensions and material history can be traced by piece."@en,
+        "沿长度方向具有封闭中空截面、可按件追踪尺寸和来源的钢管材。"@zh ;
+    skos:prefLabel "Steel tube"@en,
+        "钢管"@zh .
+
+stl:actualEndAt a owl:DatatypeProperty ;
+    rdfs:label "Actual end"@en,
+        "实际结束时刻"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Event ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:range xsd:dateTime ;
+    skos:definition "Gives the observed completion instant of an actual occurrence."@en,
+        "记录一次作业或事件在现场实际结束的时点。"@zh ;
+    skos:prefLabel "Actual end"@en,
+        "实际结束时刻"@zh .
+
+stl:actualStartAt a owl:DatatypeProperty ;
+    rdfs:label "Actual start"@en,
+        "实际开始时刻"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Event ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:range xsd:dateTime ;
+    skos:definition "Gives the observed start instant of an actual occurrence."@en,
+        "记录一次作业或事件在现场真正开始的时点。"@zh ;
+    skos:prefLabel "Actual start"@en,
+        "实际开始时刻"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/CASTER> a skos:Concept ;
     rdfs:label "Continuous caster"@en,
         "连铸机"@zh ;
@@ -10086,6 +11841,20 @@ stl:SourceInterval a owl:Class ;
     skos:prefLabel "Continuous caster"@en,
         "连铸机"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+stl:endLength a owl:DatatypeProperty ;
+    rdfs:label "End along source coil"@en,
+        "母卷区段终点"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Coil ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "Distance to the end of the interval taken for this coil, measured along the same parent strip from the same origin as the start."@en,
+        "以母卷区段起点所用的同一母卷和零点为基准，沿带钢量到该区段终点的距离。"@zh ;
+    skos:prefLabel "End along source coil"@en,
+        "母卷区段终点"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:M .
 
 stl:measurementItem a owl:ObjectProperty ;
     rdfs:label "Measured item"@en,
@@ -10144,15 +11913,6 @@ stl:measurementItem a owl:ObjectProperty ;
         "金属材料 洛氏硬度试验 第1部分: 试验方法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3SDoo8yHFRo%3D&mode=p> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 7232-2023" ;
-    dcterms:issued "2023"^^xsd:gYear ;
-    dcterms:title "Metal heat treatment—Terminology"@en,
-        "金属热处理 术语"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=027A6096AEE6643EE06397BE0A0A0867> .
 
 <https://w3id.org/ontology-platform/steel/std/isots-6084-2022> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -10215,6 +11975,19 @@ stl:Steelmaking a owl:Class ;
     skos:prefLabel "Steelmaking operation"@en,
         "炼钢执行"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> a skos:Concept ;
+    rdfs:label "Hot rolling"@en,
+        "热轧"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:definition "Rolling steel in its hot-working range to alter thickness or section."@en,
+        "在热加工温区用轧辊改变钢料厚度或断面。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "HOTROLL"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Hot rolling"@en,
+        "热轧"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
 stl:occurredAt a owl:DatatypeProperty ;
     rdfs:label "Occurred at"@en,
         "发生时刻"@zh ;
@@ -10254,16 +12027,16 @@ stl:occurredAt a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.iso.org/standard/80050.html> .
 
-stl:SemiFinishedProduct a owl:Class ;
-    rdfs:label "Semi-finished product"@en,
-        "半成品"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:subClassOf stl:MaterialPiece ;
-    skos:definition "An individually identified intermediate product intended for further processing along its production route."@en,
-        "已具有独立件号、仍需按既定生产路线继续加工的中间产品。"@zh ;
-    skos:prefLabel "Semi-finished product"@en,
-        "半成品"@zh .
+stl:MaterialTransformation a owl:Class ;
+    rdfs:label "Material transformation"@en,
+        "物料转换作业"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that consumes or changes input material and establishes distinct output material."@en,
+        "消耗或改变投入物料并产生可区分产出物料的一次作业。"@zh ;
+    skos:prefLabel "Material transformation"@en,
+        "物料转换作业"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/measurement-method> a skos:ConceptScheme ;
     rdfs:label "measurement acquisition method"@en,
@@ -10359,6 +12132,17 @@ stl:SteelGrade a owl:Class ;
     skos:prefLabel "Lot formation dimension"@en,
         "组批维度"@zh .
 
+stl:Coil a owl:Class ;
+    rdfs:label "Steel coil"@en,
+        "钢卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individually tracked length of flat steel strip wound for handling as a unit, at the hot mill, cold mill or a later operation."@en,
+        "将一段带钢沿长度方向卷绕成可整体吊运、按件跟踪的实物，卷形可出现在热轧、冷轧及后续作业中。"@zh ;
+    skos:prefLabel "Steel coil"@en,
+        "钢卷"@zh .
+
 stl:Location a owl:Class ;
     rdfs:label "Location"@en,
         "位置"@zh ;
@@ -10401,17 +12185,6 @@ stl:SalesOrderLine a owl:Class ;
         "销售订单中能独立约定规格并承接实物分配的一项。"@zh ;
     skos:prefLabel "Sales order line"@en,
         "订单行"@zh .
-
-stl:Slab a owl:Class ;
-    rdfs:label "Slab"@en,
-        "板坯"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:definition "A separately tracked, wide, flat rectangular semiproduct for working into plate or strip, obtained by cutting a strand or by primary working."@en,
-        "具有宽扁矩形截面、通常供轧板或轧带的独立坯件，可来自铸流分切或开坯。"@zh ;
-    skos:prefLabel "Slab"@en,
-        "板坯"@zh .
 
 stl:SourceContribution a owl:Class ;
     rdfs:label "Source contribution"@en,
@@ -10521,14 +12294,27 @@ stl:SourceContribution a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://webstore.iec.ch/en/publication/6675> .
 
-<https://w3id.org/ontology-platform/steel/std/iso-6929-2013> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "ISO 6929:2013" ;
-    dcterms:issued "2013"^^xsd:gYear ;
-    dcterms:title "Steel products — Vocabulary"@en,
-        "钢产品 词汇"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://www.iso.org/standard/52949.html> .
+stl:SemiFinishedProduct a owl:Class ;
+    rdfs:label "Semi-finished product"@en,
+        "半成品"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individually identified intermediate product intended for further processing along its production route."@en,
+        "已具有独立件号、仍需按既定生产路线继续加工的中间产品。"@zh ;
+    skos:prefLabel "Semi-finished product"@en,
+        "半成品"@zh .
+
+stl:Slab a owl:Class ;
+    rdfs:label "Slab"@en,
+        "板坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "A separately tracked, wide, flat rectangular semiproduct for working into plate or strip, obtained by cutting a strand or by primary working."@en,
+        "具有宽扁矩形截面、通常供轧板或轧带的独立坯件，可来自铸流分切或开坯。"@zh ;
+    skos:prefLabel "Slab"@en,
+        "板坯"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/personnel-role> a skos:ConceptScheme ;
     rdfs:label "Personnel role"@en,
@@ -10540,16 +12326,27 @@ stl:SourceContribution a owl:Class ;
     skos:prefLabel "Personnel role"@en,
         "人员角色"@zh .
 
-stl:MaterialSpecification a owl:Class ;
-    rdfs:label "Material specification"@en,
-        "物料规格"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:subClassOf stl:ManufacturingObject ;
-    skos:definition "A reusable specification stating the characteristics required of material for ordering or use, such as grade, dimensions and acceptance conditions."@en,
-        "说明一类可订购或领用物料应具备哪些特征的规格，可归集牌号、尺寸及验收要求。"@zh ;
-    skos:prefLabel "Material specification"@en,
-        "物料规格"@zh .
+<https://w3id.org/ontology-platform/steel/code/weld-method> a skos:ConceptScheme ;
+    rdfs:label "Tube seam welding methods"@en,
+        "管体焊接方法"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/tubemaking-codes> ;
+    skos:definition "Classifies methods of joining tube edges by welding process, with seam orientation distinguishing variants of a process."@en,
+        "按管边的接合工艺划分制管焊接方法，部分方法再按制造焊缝的走向细分。"@zh ;
+    skos:prefLabel "Tube seam welding methods"@en,
+        "管体焊接方法"@zh .
+
+stl:ContinuouslyCastPiece a owl:Class ;
+    rdfs:label "Continuously cast piece"@en,
+        "连铸坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "An individually tracked length cut from a continuously cast steel strand or recut from that length while it retains its as-cast form."@en,
+        "从钢的连续铸流切下、或将这类坯再次切分取得的独立铸态坯件。"@zh ;
+    skos:prefLabel "Continuously cast piece"@en,
+        "连铸坯"@zh ;
+    skos:scopeNote "连铸路线与坯形可同时标注，例如一件实物同时属于连铸坯与板坯。初轧所得坯件只按其坯形归类。"@zh .
 
 stl:MechanicalTest a owl:Class ;
     rdfs:label "Mechanical test"@en,
@@ -10581,18 +12378,6 @@ stl:MechanicalTest a owl:Class ;
         "区分影响实物承载关系、落位或出厂事实的已发生动作。"@zh ;
     skos:prefLabel "movement event type"@en,
         "移动事件类型"@zh .
-
-<https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> a skos:Concept ;
-    rdfs:label "Material transformation"@en,
-        "物料转换"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Work that consumes or alters input material to produce separately identifiable output material."@en,
-        "以一项或多项物料为投入，产生可独立识别的新物料的作业类型。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
-    skos:notation "TRANSFORM"^^stl:ProcessTypeCode ;
-    skos:prefLabel "Material transformation"@en,
-        "物料转换"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
 <https://w3id.org/ontology-platform/steel/code/rating-comparison> a skos:ConceptScheme ;
     rdfs:label "Rating comparison operator"@en,
@@ -10668,6 +12453,17 @@ stl:ManufacturingObject a owl:Class ;
     skos:prefLabel "Manufacturing object"@en,
         "制造业务对象"@zh .
 
+stl:MaterialSpecification a owl:Class ;
+    rdfs:label "Material specification"@en,
+        "物料规格"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:subClassOf stl:ManufacturingObject ;
+    skos:definition "A reusable specification stating the characteristics required of material for ordering or use, such as grade, dimensions and acceptance conditions."@en,
+        "说明一类可订购或领用物料应具备哪些特征的规格，可归集牌号、尺寸及验收要求。"@zh ;
+    skos:prefLabel "Material specification"@en,
+        "物料规格"@zh .
+
 stl:Sample a owl:Class ;
     rdfs:label "Sample"@en,
         "样品"@zh ;
@@ -10706,6 +12502,17 @@ stl:QualityDisposition a owl:Class ;
     skos:scopeNote "Downgrading, reassignment and concession retain their own conditions and refer to the same material identity before and after the action."@en,
         "降级、改判和让步接收各自保留适用条件，处置前后沿用同一实物身份。"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/coating-type> a skos:ConceptScheme ;
+    rdfs:label "Coating type"@en,
+        "涂镀层类型"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling-codes> ;
+    skos:altLabel "镀层类型"@zh ;
+    skos:definition "Classifies surface layers on steel by coating material and, where it distinguishes the type, by the deposition method."@en,
+        "按覆层材料区分钢材表面的金属镀层和有机涂层，并在需要时区分热浸、电沉积等成层方式。"@zh ;
+    skos:prefLabel "Coating type"@en,
+        "涂镀层类型"@zh .
+
 stl:Material a owl:Class ;
     rdfs:label "Material"@en,
         "物料"@zh ;
@@ -10729,6 +12536,18 @@ stl:Event a owl:Class ;
     skos:prefLabel "Event"@en,
         "事件"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> a skos:Concept ;
+    rdfs:label "Material transformation"@en,
+        "物料转换"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Work that consumes or alters input material to produce separately identifiable output material."@en,
+        "以一项或多项物料为投入，产生可独立识别的新物料的作业类型。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "TRANSFORM"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Material transformation"@en,
+        "物料转换"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
 <https://w3id.org/ontology-platform/steel/code/refining-method> a skos:ConceptScheme ;
     rdfs:label "Secondary refining method"@en,
         "炉外精炼方法"@zh ;
@@ -10749,16 +12568,6 @@ stl:Event a owl:Class ;
     skos:prefLabel "Steel end-use class"@en,
         "钢的主要用途类别"@zh ;
     skos:scopeNote "用途代码用于按选材目的检索，同一钢种可有多种用途。"@zh .
-
-<https://w3id.org/ontology-platform/steel/code/defect-type> a skos:ConceptScheme ;
-    rdfs:label "defect type"@en,
-        "缺陷类型"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Classifies observed flaws and groups product-specific defects by the form of material inspected."@en,
-        "按观察到的异常给缺陷分类，产品分组用于归集依赖产品形态的缺陷。"@zh ;
-    skos:prefLabel "defect type"@en,
-        "缺陷类型"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/delivery-condition> a skos:ConceptScheme ;
     rdfs:label "Delivery condition"@en,
@@ -10813,6 +12622,36 @@ stl:Observation a owl:Class ;
     skos:prefLabel "quality disposition type"@en,
         "质量处置类型"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/heat-treatment-process> a skos:ConceptScheme ;
+    rdfs:label "Heat treatment process"@en,
+        "热处理工艺"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-12603-2005> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/heattreatment-codes> ;
+    skos:definition "Classifies heat treatment methods by the thermal cycle applied to the steel and its metallurgical purpose, for use on loads and runs."@en,
+        "按对钢材施加的热循环及其冶金目的区分热处理方法，供装炉批和作业引用。"@zh ;
+    skos:prefLabel "Heat treatment process"@en,
+        "热处理工艺"@zh ;
+    skos:scopeNote "主代码采用本方案的英文助记码。"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 7232-2023" ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:title "Metal heat treatment—Terminology"@en,
+        "金属热处理 术语"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=027A6096AEE6643EE06397BE0A0A0867> .
+
+<https://w3id.org/ontology-platform/steel/code/defect-type> a skos:ConceptScheme ;
+    rdfs:label "defect type"@en,
+        "缺陷类型"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Classifies observed flaws and groups product-specific defects by the form of material inspected."@en,
+        "按观察到的异常给缺陷分类，产品分组用于归集依赖产品形态的缺陷。"@zh ;
+    skos:prefLabel "defect type"@en,
+        "缺陷类型"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/ndt-method> a skos:ConceptScheme ;
     rdfs:label "Nondestructive testing method"@en,
         "无损检测方法"@zh ;
@@ -10852,17 +12691,6 @@ stl:Observation a owl:Class ;
     skos:prefLabel "Test type"@en,
         "试验类型"@zh .
 
-stl:MaterialPiece a owl:Class ;
-    rdfs:label "Material piece"@en,
-        "实物件"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:subClassOf stl:Material ;
-    skos:definition "An item that can be weighed or moved under a single identity throughout its life."@en,
-        "具有单件身份、能够称量或搬运并一直沿用其编号的物料实体。"@zh ;
-    skos:prefLabel "Material piece"@en,
-        "实物件"@zh .
-
 <https://w3id.org/ontology-platform/steel/code/measurement-item> a skos:ConceptScheme ;
     rdfs:label "measurement item"@en,
         "测量项"@zh ;
@@ -10893,6 +12721,15 @@ stl:MaterialLot a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://webstore.iec.ch/en/publication/75127> .
 
+<https://w3id.org/ontology-platform/steel/std/iso-6929-2013> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "ISO 6929:2013" ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:title "Steel products — Vocabulary"@en,
+        "钢产品 词汇"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://www.iso.org/standard/52949.html> .
+
 <https://w3id.org/ontology-platform/steel/code/material-category> a skos:ConceptScheme ;
     rdfs:label "Material category"@en,
         "物料类别"@zh ;
@@ -10903,27 +12740,16 @@ stl:MaterialLot a owl:Class ;
     skos:prefLabel "Material category"@en,
         "物料类别"@zh .
 
-stl:Operation a owl:Class ;
-    rdfs:label "Operation"@en,
-        "工序执行"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:subClassOf prov:Activity,
-        stl:Event ;
-    skos:definition "A particular execution of a shop-floor step to which its equipment and material flows can be attributed."@en,
-        "现场某项工序的一次实施，投入、产出和执行设备均可归到本次作业。"@zh ;
-    skos:prefLabel "Operation"@en,
-        "工序执行"@zh .
-
-<https://w3id.org/ontology-platform/steel/code/process-type> a skos:ConceptScheme ;
-    rdfs:label "Process type"@en,
-        "工序类型"@zh ;
+stl:MaterialPiece a owl:Class ;
+    rdfs:label "Material piece"@en,
+        "实物件"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Identifies the transformation or service that a route segment calls for."@en,
-        "按一次生产作业对投入所做的事区分路线中的工序段。"@zh ;
-    skos:prefLabel "Process type"@en,
-        "工序类型"@zh .
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:subClassOf stl:Material ;
+    skos:definition "An item that can be weighed or moved under a single identity throughout its life."@en,
+        "具有单件身份、能够称量或搬运并一直沿用其编号的物料实体。"@zh ;
+    skos:prefLabel "Material piece"@en,
+        "实物件"@zh .
 
 stl:ManufacturingRecord a owl:Class ;
     rdfs:label "Manufacturing record"@en,
@@ -10946,15 +12772,17 @@ stl:ManufacturingRecord a owl:Class ;
     skos:prefLabel "Product form"@en,
         "产品形态"@zh .
 
-<https://w3id.org/ontology-platform/steel/code/equipment-type> a skos:ConceptScheme ;
-    rdfs:label "Equipment type"@en,
-        "设备类型"@zh ;
+stl:Operation a owl:Class ;
+    rdfs:label "Operation"@en,
+        "工序执行"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Classifies equipment by its role in production, inspection or handling independently of the identity of each asset."@en,
-        "按设备在作业中承担的功能对生产、检验和搬运设备分组，设备编号用于识别其中的具体一台。"@zh ;
-    skos:prefLabel "Equipment type"@en,
-        "设备类型"@zh .
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:subClassOf prov:Activity,
+        stl:Event ;
+    skos:definition "A particular execution of a shop-floor step to which its equipment and material flows can be attributed."@en,
+        "现场某项工序的一次实施，投入、产出和执行设备均可归到本次作业。"@zh ;
+    skos:prefLabel "Operation"@en,
+        "工序执行"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/chemical-element> a skos:ConceptScheme ;
     rdfs:label "chemical element analyte"@en,
@@ -10965,6 +12793,26 @@ stl:ManufacturingRecord a owl:Class ;
         "确定成分质量分数对应的元素，必要时区分同一元素的测定形态。"@zh ;
     skos:prefLabel "chemical element analyte"@en,
         "化学元素分析项"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type> a skos:ConceptScheme ;
+    rdfs:label "Process type"@en,
+        "工序类型"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Identifies the transformation or service that a route segment calls for."@en,
+        "按一次生产作业对投入所做的事区分路线中的工序段。"@zh ;
+    skos:prefLabel "Process type"@en,
+        "工序类型"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type> a skos:ConceptScheme ;
+    rdfs:label "Equipment type"@en,
+        "设备类型"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Classifies equipment by its role in production, inspection or handling independently of the identity of each asset."@en,
+        "按设备在作业中承担的功能对生产、检验和搬运设备分组，设备编号用于识别其中的具体一台。"@zh ;
+    skos:prefLabel "Equipment type"@en,
+        "设备类型"@zh .
 
 stl:StandardEdition a owl:Class ;
     rdfs:label "Standard edition"@en,
