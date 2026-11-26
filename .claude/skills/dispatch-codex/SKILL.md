@@ -28,10 +28,10 @@ Claude 在理解卡里逐项写明执行者、理由和 Codex 强度，由用户
 不许碰：<特别指出共享文件、生成文件或其他会话负责的路径>，以及允许范围以外的一切文件。
 
 ## 命令限制
-禁止任何 git 写操作，包括暂存、提交、推送、切换分支、暂存工作区改动和重置。
+禁止任何 git 写操作，包括 git add、提交、推送、切换分支、git stash 和重置。
 测试：<二选一。① 不运行 docker 和任何经 ./dev.ps1 执行的命令，测试由 Claude 执行。② 运行这条容器测试并回报退出码和汇总行原文：./dev.ps1 test-api tests/<文件>.py；选 ② 时原样附上第 3 节那句申请提权的话>
 除上面写明的测试命令外，不运行 docker 和其他 ./dev.ps1 命令（尤其是 up、down、reset、ci）。
-本任务另禁：<命令或“无”>
+本任务另禁：<命令或"无">
 可运行的检查：<命令及适用范围>
 
 ## 具体要求
@@ -49,13 +49,15 @@ Claude 在理解卡里逐项写明执行者、理由和 Codex 强度，由用户
 1. 用 `desktop-dispatch:send` 将完整任务单、目标 worktree 的绝对路径和强度交给 Codex。机械改写用 `medium`，按复审意见小修用 `low`，在已定规格内需要做实现设计的用 `high`。
 2. 用 `desktop-dispatch:wait` 在后台等待，任务结束时会唤醒会话。等待期间先做不依赖这次交付的事。
 3. 需要查进展时用 `desktop-dispatch:status`。运行中也可能显示 `interrupted`，先看目标 worktree 里本次改动的文件是否仍在更新。若仍在更新，继续等待，避免重复派发。
-4. 让 Codex 自己跑容器测试可以省 Claude 的额度：把项目目录和具体测试命令写进任务正文，需要改代码时派发参数用 `access: "workspace-write"`，并原样写上这句话："如果默认沙箱拦住了 Docker，请用你自己的 exec_command 重新提交同一条命令，设置 sandbox_permissions: "require_escalated"，并在 justification 中写明要连接哪个 Docker 上下文、跑哪些测试。审批通过后，在原任务继续执行，回报退出码和测试结果。"提权要用户本人在 Codex 桌面端批准；用户不在线时任务会停在等审批（`wait` 报 `stalled`），这时测试改由 Claude 跑。
+4. 让 Codex 自己跑容器测试可以省 Claude 的额度：把项目目录和具体测试命令写进任务正文，需要改代码时派发参数用 `access: "workspace-write"`，并把下面这句话原样写进任务正文。提权要用户本人在 Codex 桌面端批准；用户不在线时任务会停在等审批（`wait` 报 `stalled`），这时测试改由 Claude 跑。
+
+   > 如果默认沙箱拦住了 Docker，请用你自己的 exec_command 重新提交同一条命令，设置 sandbox_permissions: "require_escalated"，并在 justification 中写明要连接哪个 Docker 上下文、跑哪些测试。审批通过后，在原任务继续执行，回报退出码和测试结果。
 
 ## 4 Claude 验收与提交
 
 - [ ] 对照任务单读完完整 diff，包括未跟踪的新文件全文。核对改动归属和路径，确认 Codex 只改了允许的文件，再逐项核实报告中的验收结论。
 - [ ] Codex 自己跑过的测试，核对它回报的命令、退出码和汇总行原文；对不上或没有原文的，由 Claude 重跑。没有实际运行过的不写"已验证"。
 - [ ] 重点查三处：测试断言是否被放宽、是否为改一处而改了生成逻辑、关键条件是否用了隐晦写法。
-- [ ] 将验收标准、diff 路径和 PR 号或分支名交给 `reviewer` 复审，同时由 Claude 按 [verify](../verify/SKILL.md) 运行受影响的测试。测试失败时把命令和失败输出原文交回 Codex 修复，Claude 再跑受影响的测试。按复审意见修过的部分交给第二轮复审。
+- [ ] 将验收标准、diff 路径和 PR 号或分支名交给 `reviewer` 复审；Codex 没跑或结果对不上的受影响测试，同时由 Claude 按 [verify](../verify/SKILL.md) 运行，PR 描述里注明哪些结果是 Codex 跑的。测试失败时把命令和失败输出原文交回 Codex 修复，Claude 再跑受影响的测试。按复审意见修过的部分交给第二轮复审。
 - [ ] 有界面改动时，Claude 按[界面规范第 12 节](../../../docs/ui-guidelines.md#12-走查清单)逐条走查，深色、浅色主题各截一张图并附在 PR 中。
 - [ ] 受影响的测试通过、复审没有必须修的项后，由 Claude 提交。提交信息注明哪些部分由 Codex 完成。
