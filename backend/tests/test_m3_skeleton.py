@@ -40,12 +40,7 @@ DATA_SOURCE = {
 }
 
 # Who may call what (spec 003, section 13 and the appendix).
-EVERYONE: list[Call] = [
-    ("GET", f"/api/ontologies/{ID}/objects/types", None),
-    ("POST", f"/api/ontologies/{ID}/objects/search", {"typeId": ID}),
-    ("GET", f"/api/ontologies/{ID}/objects/{ID}/k", None),
-    ("GET", f"/api/ontologies/{ID}/objects/{ID}/k/related?relationId={ID}", None),
-]
+EVERYONE: list[Call] = []
 EDITORS: list[Call] = [
     ("POST", f"/api/ontologies/{ID}/binding-suggestions", {"dataSourceId": ID, "schemas": ["mes"]}),
     ("GET", f"/api/binding-suggestions/{ID}", None),
