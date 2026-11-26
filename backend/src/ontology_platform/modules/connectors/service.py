@@ -17,7 +17,7 @@ from sqlalchemy import tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import not_implemented
-from ontology_platform.modules.connectors import schemas
+from ontology_platform.modules.connectors import connection, schemas
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
 from ontology_platform.modules.connectors.statements import Rows, SelectQuery, TableRef, Value
 from ontology_platform.modules.identity.service import Principal
@@ -138,7 +138,7 @@ async def select(db: AsyncSession, query: SelectQuery) -> Rows:
     Raises the `connectors.errors` exceptions: SourceDisabledError, SourceUnavailableError,
     SourceBusyError, QueryTimeoutError, SourceMismatchError, InvalidValueError.
     """
-    raise not_implemented("Reading from data sources")
+    return await connection.run_select(db, query)
 
 
 async def sample_values(
@@ -149,7 +149,7 @@ async def sample_values(
 ) -> dict[str, tuple[Value, ...]]:
     """A few distinct values per column, only for data sources that allow samples. Raises the
     same exceptions as `select`, and SourceDisabledError while samples are switched off."""
-    raise not_implemented("Reading sample values")
+    return await connection.run_samples(db, data_source_id, table, columns)
 
 
 # ---------- HTTP operations ----------
