@@ -29,7 +29,7 @@ export type ElementStatusFilter = NonNullable<
   NonNullable<operations['list_elements_api_ontologies__id__elements_get']['parameters']['query']>['status']
 >;
 
-export const ELEMENT_KINDS: readonly ElementKind[] = ['entity_type', 'relation_type', 'property', 'constraint', 'axiom'];
+export const ELEMENT_KINDS: readonly ElementKind[] = ['entity_type', 'relation_type', 'property', 'constraint', 'metric', 'axiom'];
 export const DATATYPES: readonly Datatype[] = ['string', 'integer', 'decimal', 'boolean', 'date', 'dateTime'];
 
 export const ontologyKeys = {

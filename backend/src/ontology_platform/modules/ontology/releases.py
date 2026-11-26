@@ -9,13 +9,14 @@ from collections.abc import Sequence
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import func, select
+from sqlalchemy import cast, func, select
+from sqlalchemy.dialects.postgresql import JSONPATH
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import defer
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import binding_rules, rules, schemas
+from ontology_platform.modules.ontology import binding_rules, metric_rules, rules, schemas
 from ontology_platform.modules.ontology.models import (
     BINDING_KINDS,
     DATATYPES,
@@ -64,21 +65,23 @@ def release_problems(elements: Sequence[Element]) -> list[schemas.ReleaseProblem
     for element in active_elements:
         if element.kind == "axiom":
             continue  # checked when merged; kept as written
-        if element.kind == "metric":
-            if not active(element.subject_id, "entity_type"):
-                report("release.invalid_domain", element, "The subject type is missing or inactive")
-            continue
         if element.kind in BINDING_KINDS:
             # Bindings have no names; the rules they were merged under must still hold.
             for problem in binding_rules.node_problems(nodes[str(element.id)], nodes):
                 report("release.invalid_binding", element, problem.message)
             continue
-        imported = element.iri is not None
+        imported = element.iri is not None and element.kind != "metric"
         naming = rules.local_name_problem(element.kind, element.local_name or "", imported=imported)
         if naming:
             report("release.invalid_local_name", element, naming)
         if rules.is_blank(element.label_zh) and not imported:
             report("release.missing_label", element, "labelZh is empty")
+        if element.kind == "metric":
+            if not active(element.subject_id, "entity_type"):
+                report("release.invalid_domain", element, "The subject type is missing or inactive")
+            elif not metric_rules.valid_stored(element.metric, element.subject_id, by_id):
+                report(metric_rules.INVALID, element, "The metric definition is invalid")
+            continue
         if element.kind == "entity_type":
             if element.parent_id is not None and not active(element.parent_id, "entity_type"):
                 report("release.invalid_parent", element, "The parent type is missing or inactive")
@@ -138,6 +141,39 @@ def _release_out(release: Release, active_release_id: UUID | None) -> schemas.Re
 
 def _without_content() -> tuple[Any, ...]:
     return (defer(Release.snapshot), defer(Release.turtle))
+
+
+class MetricElement(schemas.ElementCopy):
+    local_name: str
+    label_zh: str
+    subject_id: UUID
+    metric: schemas.MetricDefinition
+
+
+async def metric_elements(
+    db: AsyncSession, ontology_id: UUID, *, release_id: UUID | None = None
+) -> tuple[schemas.ReleaseRef, tuple[MetricElement, ...]]:
+    """Read the active release, or the immutable release already selected by a caller."""
+    metrics = func.jsonb_path_query_array(
+        Release.snapshot, cast('$[*] ? (@.kind == "metric")', JSONPATH)
+    )
+    statement = select(Release.id, Release.version, metrics).where(
+        Release.ontology_id == ontology_id
+    )
+    if release_id is None:
+        statement = statement.join(Ontology, Ontology.active_release_id == Release.id)
+    else:
+        statement = statement.where(Release.id == release_id)
+    row = (await db.execute(statement)).one_or_none()
+    if row is None:
+        if release_id is not None:
+            raise AppError(404, "release.not_found", "Release not found.")
+        await _ontology_or_404(db, ontology_id)
+        raise AppError(409, "query.no_release", "The ontology has no active release.")
+    selected, version, rows = row
+    return schemas.ReleaseRef(id=selected, version=version), tuple(
+        MetricElement.model_validate(element) for element in rows
+    )
 
 
 async def _release_or_404(db: AsyncSession, release_id: UUID, *, content: bool = False) -> Release:

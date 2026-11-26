@@ -175,6 +175,145 @@ async function openCreateForm(user: ReturnType<typeof userEvent.setup>, kind: st
   return screen.findByRole('dialog', { name: title });
 }
 
+const hotShare = elementFixture({
+  id: 'el-hot-share', kind: 'metric', localName: 'hotShare', labelZh: '高温占比', labelEn: 'Hot share',
+  subjectId: moltenSteel.id, unit: '%', revision: 4,
+  metric: {
+    aggregate: 'ratio', propertyId: null, filters: [{ propertyId: temperature.id, op: 'notNull' }],
+    numerator: [{ propertyId: temperature.id, op: 'ge', value: '1580' }], decimals: 3, percent: true,
+  },
+});
+
+describe('manual metric elements', () => {
+  it('creates a ratio from subject properties and requires a numerator before submitting for review', async () => {
+    const user = userEvent.setup();
+    const api = editingServer({ reviewMode: 'separate' });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    const form = within(await openCreateForm(user, '指标', '新建指标'));
+    await user.type(form.getByRole('textbox', { name: '中文名称' }), '高温占比');
+    await user.type(form.getByRole('textbox', { name: '英文名称' }), 'Hot share');
+    await user.selectOptions(form.getByRole('combobox', { name: '主体类型' }), moltenSteel.id);
+    await user.selectOptions(form.getByRole('combobox', { name: '聚合方式' }), 'ratio');
+    await user.click(form.getByRole('button', { name: '提交审核' }));
+    expect(form.getByText('请至少添加一个分子条件。')).toBeInTheDocument();
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+    const filter = within(form.getByRole('group', { name: '总体筛选' }));
+    await user.click(filter.getByRole('button', { name: '添加筛选' }));
+    await user.selectOptions(filter.getByRole('combobox', { name: '选择运算符' }), 'notNull');
+    await user.click(filter.getByRole('button', { name: '应用筛选' }));
+    const numerator = within(form.getByRole('group', { name: '分子条件' }));
+    await user.click(numerator.getByRole('button', { name: '添加筛选' }));
+    await user.selectOptions(numerator.getByRole('combobox', { name: '选择运算符' }), 'ge');
+    await user.type(numerator.getByRole('textbox', { name: '筛选值' }), '1580');
+    await user.click(numerator.getByRole('button', { name: '应用筛选' }));
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+    await user.click(filter.getByRole('button', { name: '添加筛选' }));
+    await user.click(form.getByRole('button', { name: '提交审核' }));
+    expect(form.getByText('请先应用或取消正在填写的筛选条件。')).toBeInTheDocument();
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+    await user.click(filter.getByRole('button', { name: '取消' }));
+    await user.click(form.getByRole('checkbox', { name: '显示为百分数' }));
+    await user.type(form.getByRole('textbox', { name: '单位' }), '%');
+    await user.click(form.getByRole('button', { name: '提交审核' }));
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect(api.calls('POST', EDITS)[0]?.body).toEqual({
+      apply: false, items: [{ op: 'create', kind: 'metric', tempRef: 'new:1', fields: {
+        labelZh: '高温占比', labelEn: 'Hot share', localName: 'hotShare', definitionZh: null, definitionEn: null,
+        unit: '%', subjectRef: moltenSteel.id, metric: {
+          aggregate: 'ratio', propertyRef: null, decimals: 2, percent: true,
+          filters: [{ propertyRef: temperature.id, op: 'notNull' }],
+          numerator: [{ propertyRef: temperature.id, op: 'ge', value: '1580' }],
+        },
+      } }],
+    });
+  });
+
+  it('filters the list by metric, displays its definition and edits stored references as a revision-checked proposal', async () => {
+    const user = userEvent.setup();
+    const date = elementFixture({ id: 'el-date', kind: 'property', datatype: 'date', domainId: moltenSteel.id, labelZh: '生产日期' });
+    const grade = elementFixture({ id: 'el-grade', kind: 'property', datatype: 'string', domainId: moltenSteel.id, labelZh: '钢种' });
+    const capacity = elementFixture({ id: 'el-capacity', kind: 'property', datatype: 'integer', domainId: ladle.id, labelZh: '容量' });
+    const api = editingServer({ reviewMode: 'separate', elements: [...initialElements(), date, grade, capacity, hotShare] });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    await user.click(await screen.findByRole('radio', { name: '指标' }));
+    const table = within(await screen.findByRole('table', { name: '本体元素' }));
+    await waitFor(() => expect(table.getAllByRole('row')).toHaveLength(2));
+    expect(api.requests.some((request) => request.query.get('kind') === 'metric')).toBe(true);
+    const sheet = within(await openElement(user, '高温占比'));
+    expect(await sheet.findByText('温度 大于或等于 1580')).toBeInTheDocument();
+    expect(sheet.getByText('温度 不为空')).toBeInTheDocument();
+    expect(sheet.getByText('钢水')).toBeInTheDocument();
+    await user.click(sheet.getByRole('button', { name: '编辑' }));
+    const form = within(await screen.findByRole('dialog', { name: '编辑“高温占比”' }));
+    const aggregate = await form.findByRole('combobox', { name: '聚合方式' });
+    expect(aggregate).toHaveValue('ratio');
+    expect(form.getByRole('checkbox', { name: '显示为百分数' })).toBeChecked();
+    await user.selectOptions(aggregate, 'min');
+    const property = form.getByRole('combobox', { name: '聚合属性' });
+    expect(within(property).getByRole('option', { name: '生产日期' })).toBeInTheDocument();
+    await user.selectOptions(aggregate, 'sum');
+    for (const name of ['生产日期', '钢种', '容量']) {
+      expect(within(property).queryByRole('option', { name })).not.toBeInTheDocument();
+    }
+    await user.selectOptions(property, temperature.id);
+    await user.click(form.getByRole('button', { name: '提交审核' }));
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect(api.calls('POST', EDITS)[0]?.body).toEqual({
+      apply: false, items: [{ op: 'update', kind: 'metric', targetElementId: hotShare.id, targetRevision: 4, fields: {
+        metric: { aggregate: 'sum', propertyRef: temperature.id, filters: [{ propertyRef: temperature.id, op: 'notNull' }],
+          numerator: [], decimals: 3, percent: false },
+      } }],
+    });
+  });
+
+  it('submits a confirmed metric deletion for review', async () => {
+    const user = userEvent.setup();
+    const api = editingServer({ reviewMode: 'separate', elements: [...initialElements(), hotShare] });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    const sheet = within(await openElement(user, '高温占比'));
+    await user.click(sheet.getByRole('button', { name: '删除' }));
+    const confirm = within(await screen.findByRole('dialog', { name: '删除“高温占比”？' }));
+    await confirm.findByText('没有其他元素引用它，只删除它本身。');
+    await user.click(confirm.getByRole('button', { name: '提交审核' }));
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect(api.calls('POST', EDITS)[0]?.body).toEqual({
+      apply: false, items: [{ op: 'delete', kind: 'metric', targetElementId: hotShare.id, targetRevision: 4 }],
+    });
+  });
+
+  it('requires replacement of filters from the old subject before proposing a subject change', async () => {
+    const user = userEvent.setup();
+    const capacity = elementFixture({ id: 'el-capacity', kind: 'property', labelZh: '容量', domainId: ladle.id, datatype: 'integer' });
+    const api = editingServer({ reviewMode: 'separate', elements: [...initialElements(), hotShare, capacity] });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    const sheet = within(await openElement(user, '高温占比'));
+    await user.click(sheet.getByRole('button', { name: '编辑' }));
+    const form = within(await screen.findByRole('dialog', { name: '编辑“高温占比”' }));
+    await user.selectOptions(await form.findByRole('combobox', { name: '主体类型' }), ladle.id);
+    const submit = form.getByRole('button', { name: '提交审核' });
+    await user.click(submit);
+    const filters = within(form.getByRole('group', { name: '总体筛选' }));
+    const numerator = within(form.getByRole('group', { name: '分子条件' }));
+    for (const group of [filters, numerator]) {
+      expect(group.getByText('部分条件不适用于当前主体，请移除后重新选择。')).toBeInTheDocument();
+      await user.click(group.getByRole('button', { name: /移除筛选：温度/ }));
+    }
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+    await user.click(numerator.getByRole('button', { name: '添加筛选' }));
+    const property = numerator.getByRole('combobox', { name: '选择属性' });
+    expect(property).toHaveValue(capacity.id);
+    expect(within(property).queryByRole('option', { name: '温度' })).not.toBeInTheDocument();
+    await user.selectOptions(numerator.getByRole('combobox', { name: '选择运算符' }), 'notNull');
+    await user.click(numerator.getByRole('button', { name: '应用筛选' }));
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+    await user.click(submit);
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect(api.calls('POST', EDITS)[0]?.body).toMatchObject({
+      items: [{ fields: { subjectRef: ladle.id, metric: { filters: [], numerator: [{ propertyRef: capacity.id, op: 'notNull' }] } } }],
+    });
+  });
+});
+
 describe('creating elements by hand', () => {
   it('validates on blur and on save, suggests the local name and saves at once for a reviewer in single mode', async () => {
     const user = userEvent.setup();

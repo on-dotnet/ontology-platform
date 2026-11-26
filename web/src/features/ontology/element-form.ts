@@ -11,9 +11,11 @@ import {
   type Synonym,
 } from '@/features/ontologies/api';
 
+import { metricFields, type Metric } from './metric-definition';
+
 /** The kinds made and changed with the element form; axioms are edited as Turtle (expert mode). */
-export type FormKind = Extract<ElementKind, 'entity_type' | 'relation_type' | 'property' | 'constraint'>;
-export const FORM_KINDS: readonly FormKind[] = ['entity_type', 'relation_type', 'property', 'constraint'];
+export type FormKind = Extract<ElementKind, 'entity_type' | 'relation_type' | 'property' | 'constraint' | 'metric'>;
+export const FORM_KINDS: readonly FormKind[] = ['entity_type', 'relation_type', 'property', 'constraint', 'metric'];
 
 export function isFormKind(kind: ElementKind): kind is FormKind {
   return (FORM_KINDS as readonly ElementKind[]).includes(kind);
@@ -67,6 +69,8 @@ export interface ElementForm {
   required: boolean;
   multiple: boolean;
   rules: RuleForm[];
+  subjectRef: string;
+  metric: Metric;
   /**
    * The stored synonyms and how the form wrote them. A language whose text is left alone keeps its
    * list as stored: a synonym may itself contain a separator, such as "Steel, molten".
@@ -80,7 +84,7 @@ export interface SynonymSource {
   en: string;
 }
 
-export type FormField = Exclude<keyof ElementForm, 'rules' | 'synonymSource'>;
+export type FormField = Exclude<keyof ElementForm, 'rules' | 'metric' | 'synonymSource'>;
 
 /** Error key of a rule's field. */
 export function ruleErrorKey(rule: Pick<RuleForm, 'key'>, field: RuleField): string {
@@ -230,6 +234,7 @@ export function ruleToForm(rule: ConstraintRule): RuleForm {
 
 /** Form values of an element, or of a new element of `kind` (a constraint starts with one rule). */
 export function toElementForm(element: Element | undefined, kind: FormKind, separator: string): ElementForm {
+  const metric: Metric = element?.metric ?? { aggregate: 'count', propertyId: null, filters: [], numerator: [], decimals: 2, percent: false };
   if (!element) {
     return {
       localName: '',
@@ -248,6 +253,8 @@ export function toElementForm(element: Element | undefined, kind: FormKind, sepa
       required: false,
       multiple: false,
       rules: kind === 'constraint' ? [emptyRule()] : [],
+      subjectRef: '',
+      metric,
       synonymSource: null,
     };
   }
@@ -270,6 +277,8 @@ export function toElementForm(element: Element | undefined, kind: FormKind, sepa
     required: element.required,
     multiple: element.multiple,
     rules: (element.rules ?? []).map(ruleToForm),
+    subjectRef: element.subjectId ?? '',
+    metric,
     synonymSource: { synonyms: element.synonyms, zh: synonymsZh, en: synonymsEn },
   };
 }
@@ -284,6 +293,7 @@ const KIND_FIELDS: Record<FormKind, readonly FormField[]> = {
   property: [...NAME_FIELDS, ...SYNONYM_FIELDS, 'domainRef', 'datatype', 'unit', 'required', 'multiple'],
   // A constraint's names label the SHACL shape; synonyms do not apply to a shape.
   constraint: [...NAME_FIELDS, 'domainRef'],
+  metric: [...NAME_FIELDS, 'subjectRef', 'unit'],
 };
 
 export function formFields(kind: FormKind): ReadonlySet<FormField> {
@@ -317,6 +327,8 @@ export function isRequired(field: FormField, mode: FormMode): boolean {
       return mode.kind === 'constraint' || !mode.imported;
     case 'rangeRef':
       return mode.kind === 'relation_type' && !mode.imported;
+    case 'subjectRef':
+      return mode.kind === 'metric';
     case 'datatype':
       return mode.kind === 'property' && !mode.imported;
     default:
@@ -601,7 +613,7 @@ function allFields(mode: FormMode, form: ElementForm, pathDatatype: (ref: string
   fields.labelEn = textOrNull(form.labelEn);
   fields.definitionZh = textOrNull(form.definitionZh);
   fields.definitionEn = textOrNull(form.definitionEn);
-  if (mode.kind !== 'constraint') fields.synonyms = [...synonymsOf(form, 'zh'), ...synonymsOf(form, 'en')];
+  if (mode.kind !== 'constraint' && mode.kind !== 'metric') fields.synonyms = [...synonymsOf(form, 'zh'), ...synonymsOf(form, 'en')];
   switch (mode.kind) {
     case 'entity_type':
       fields.parentRef = form.parentRef || null;
@@ -623,6 +635,16 @@ function allFields(mode: FormMode, form: ElementForm, pathDatatype: (ref: string
     case 'constraint':
       fields.domainRef = form.domainRef || null;
       fields.rules = form.rules.map((rule) => ruleFromForm(rule, pathDatatype));
+      break;
+    case 'metric':
+      fields.subjectRef = form.subjectRef || null;
+      fields.metric = metricFields({
+        ...form.metric,
+        propertyId: ['count', 'ratio'].includes(form.metric.aggregate) ? null : form.metric.propertyId,
+        numerator: form.metric.aggregate === 'ratio' ? form.metric.numerator : [],
+        percent: form.metric.aggregate === 'ratio' && form.metric.percent,
+      });
+      fields.unit = textOrNull(form.unit);
       break;
   }
   return fields;

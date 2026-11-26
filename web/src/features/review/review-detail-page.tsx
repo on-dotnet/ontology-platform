@@ -336,8 +336,9 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                     <ChangeItemCard
                       item={item}
                       changeSetId={changeSet.id}
+                      merged={changeSet.status === 'merged'}
                       context={context}
-                      isAi={isAi}
+                      source={changeSet.source}
                       selected={isAi && (wide ? item.id === selected?.id : item.id === selectedId)}
                       onSelect={() => setSelectedId((current) => (!wide && current === item.id ? null : item.id))}
                       evidencePanelId={wide ? undefined : evidencePanelId}

@@ -9,7 +9,15 @@ from datetime import datetime
 from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
-from pydantic import ConfigDict, Field, StringConstraints, field_validator, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    StringConstraints,
+    ValidationError,
+    ValidatorFunctionWrapHandler,
+    field_validator,
+    model_validator,
+)
 
 from ontology_platform.errors import AppError, Problem
 from ontology_platform.modules.ontology.models import (
@@ -258,6 +266,14 @@ class ElementFields(CamelModel):
     subject_ref: Ref | None = None
     binding: Binding | None = None
     metric: MetricDefinitionFields | None = None
+
+    @field_validator("metric", mode="wrap")
+    @classmethod
+    def validate_metric(cls, value: object, handler: ValidatorFunctionWrapHandler) -> object:
+        try:
+            return handler(value)
+        except ValidationError:
+            raise AppError(422, "metric.invalid", "The metric definition is invalid.") from None
 
 
 CatalogFact = Literal["table", "column", "primary_key", "foreign_key", "sample"]
@@ -639,13 +655,6 @@ class EditItem(CamelModel):
     target_revision: int | None = Field(default=None, ge=1)
     temp_ref: Ref | None = None
     fields: ElementFields = Field(default_factory=ElementFields)
-
-    @field_validator("kind")
-    @classmethod
-    def writable_kind(cls, kind: Kind) -> Kind:
-        if kind == "metric":
-            raise AppError(422, "changeset.invalid_item", "Metric changes are not supported yet.")
-        return kind
 
     @model_validator(mode="after")
     def check_target(self) -> Self:

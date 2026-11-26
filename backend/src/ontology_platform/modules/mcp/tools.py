@@ -2,7 +2,7 @@
 transport. The read tools read the release in effect; the one tool that writes, propose_changes
 (9.4), only ever makes a change set waiting for review, through `ontology.assistant.propose`.
 
-Ontology tools read `ontology.bindings.released_ontology`, which has no bindings, so their
+Ontology tools read semantic elements and metrics from the same immutable release. Their
 results never name a table or a column. Object tools hand over to the query service and return
 exactly what `/api` returns. Every call is audited as `mcp.tool_called`: the tool, the token,
 the ontology and the result code, never the arguments (they hold filter values).
@@ -15,6 +15,7 @@ import json
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from itertools import chain
 from typing import Annotated, Any, Literal, cast
 from uuid import UUID
 
@@ -167,11 +168,16 @@ async def _released(ctx: Context, reference: str) -> bindings.ReleasedOntology:
 
 
 def _element(
-    released: bindings.ReleasedOntology, reference: str, kinds: Iterable[str], *, iri: bool = True
+    released: bindings.ReleasedOntology,
+    reference: str,
+    kinds: Iterable[str],
+    *,
+    iri: bool = True,
+    metrics: Sequence[releases.MetricElement] = (),
 ) -> ElementCopy | None:
     """An element of one of `kinds` by id, IRI or local name."""
     wanted = set(kinds)
-    candidates = [element for element in released.elements if element.kind in wanted]
+    candidates = [e for e in chain(released.elements, metrics) if e.kind in wanted]
     for matches in (
         lambda e: str(e.id) == reference,
         lambda e: iri and e.iri == reference,
@@ -217,6 +223,16 @@ def _brief(element: ElementCopy, by_id: Mapping[UUID, ElementCopy]) -> dict[str,
 
 def _release(released: bindings.ReleasedOntology) -> dict[str, Any]:
     return {"id": str(released.release_id), "version": released.version}
+
+
+async def _metrics(
+    ctx: Context, released: bindings.ReleasedOntology
+) -> tuple[releases.MetricElement, ...]:
+    # Reading the active release a second time could mix snapshots during activation.
+    _, metrics = await releases.metric_elements(
+        ctx.db, released.ontology_id, release_id=released.release_id
+    )
+    return metrics
 
 
 def _order(element: ElementCopy) -> tuple[int, str, str]:
@@ -288,10 +304,11 @@ async def search_elements(ctx: Context, arguments: SearchElementsArguments) -> d
             raise AppError(422, "query.invalid_cursor", "The cursor does not match the request.")
         if release_id != str(released.release_id):
             raise AppError(409, "query.release_changed", "The active release has changed.")
+    metrics = await _metrics(ctx, released) if "metric" in kinds else ()
     found = sorted(
         (
             element
-            for element in released.elements
+            for element in chain(released.elements, metrics)
             if element.kind in kinds and (not needle or _matches(element, needle))
         ),
         key=_order,
@@ -334,13 +351,20 @@ def _of(
 
 async def get_element(ctx: Context, arguments: GetElementArguments) -> dict[str, Any]:
     released = await _released(ctx, arguments.ontology)
+    metrics = await _metrics(ctx, released)
     if arguments.iri is not None:
         found = next(
-            (e for e in released.elements if e.kind in ELEMENT_KINDS and e.iri == arguments.iri),
+            (
+                e
+                for e in chain(released.elements, metrics)
+                if e.kind in ELEMENT_KINDS and e.iri == arguments.iri
+            ),
             None,
         )
     else:
-        found = _element(released, cast(str, arguments.id), ELEMENT_KINDS, iri=False)
+        found = _element(
+            released, cast(str, arguments.id), ELEMENT_KINDS, iri=False, metrics=metrics
+        )
     if found is None:
         raise _element_not_found()
     elements = released.elements
@@ -353,6 +377,8 @@ async def get_element(ctx: Context, arguments: GetElementArguments) -> dict[str,
     }
     if found.kind == "constraint":
         info["rules"] = [rule.model_dump(mode="json", by_alias=True) for rule in found.rules or []]
+    if isinstance(found, releases.MetricElement):
+        info["metric"] = _dump(found.metric)
     if found.kind == "entity_type":
         lineage = _lineage(found, by_id)
         info["properties"] = [
@@ -679,7 +705,7 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "search_elements",
             "Search ontology elements",
-            "Find object types, properties, relations and constraints by name, synonym, "
+            "Find object types, properties, relations, constraints and metrics by name, synonym, "
             "definition or local name. Use it to look up terms. " + _RELEASE,
             "ontology:read",
             SearchElementsArguments,

@@ -20,6 +20,7 @@ from http import HTTPStatus
 from typing import Any, Literal, cast
 from uuid import UUID, uuid4
 
+from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +28,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.identity import service as identity
-from ontology_platform.modules.ontology import binding_rules, mergeplan, rules, schemas
+from ontology_platform.modules.ontology import (
+    binding_rules,
+    mergeplan,
+    metric_rules,
+    rules,
+    schemas,
+)
 from ontology_platform.modules.ontology.axiom_rules import axiom_problem
 from ontology_platform.modules.ontology.models import (
     BINDING_KINDS,
@@ -162,7 +169,7 @@ async def _ontology_or_404(
 
 
 async def _elements(
-    db: AsyncSession, ontology_id: UUID, *, all_kinds: bool = False
+    db: AsyncSession, ontology_id: UUID, *, all_kinds: bool = False, include_metrics: bool = False
 ) -> list[Element]:
     """The ontology's elements, semantic kinds only unless `all_kinds`.
 
@@ -172,7 +179,8 @@ async def _elements(
     """
     statement = select(Element).where(Element.ontology_id == ontology_id)
     if not all_kinds:
-        statement = statement.where(Element.kind.in_(SEMANTIC_KINDS))
+        kinds = (*SEMANTIC_KINDS, "metric") if include_metrics else SEMANTIC_KINDS
+        statement = statement.where(Element.kind.in_(kinds))
     return sorted((await db.scalars(statement)).all(), key=_kind_order)
 
 
@@ -359,13 +367,19 @@ async def create_change_set(
             raise InvalidProposalError(f"Item {position}: the temp_ref is used twice.")
         created_kinds[item.temp_ref] = item.kind
     for position, item in enumerate(items, start=1):
-        problem = _proposal_problem(item, elements, created_kinds)
+        problem = _proposal_problem(item, elements, created_kinds, manual=source == "manual")
+        if problem and item.kind == "metric" and source == "manual":
+            raise AppError(422, metric_rules.INVALID, f"Item {position}: {problem}.")
         if problem and item.kind in BINDING_KINDS:
             # The binding error codes cover bad references too (spec 003 appendix).
             raise InvalidBindingError(binding_rules.INVALID, f"Item {position}: {problem}.")
         if problem:
             raise InvalidProposalError(f"Item {position}: {problem}.")
     await _check_matches(db, ontology_id, items, elements, created_kinds)
+    if any(item.kind == "metric" and item.op != "delete" for item in items):
+        proposed = [_proposed(item) for item in items]
+        for index, problem in metric_rules.proposal_problems(elements, proposed):
+            raise AppError(422, metric_rules.INVALID, f"Item {index + 1}: {problem}.")
     if any(item.kind in BINDING_KINDS for item in items):
         found = await binding_rules.proposal_problems(
             db, elements.values(), [_proposed(item) for item in items]
@@ -521,6 +535,10 @@ def item_references(
         found.append((f"rules[{index}].pathRef", rule.path_ref, rules.RULE_PATH_KINDS))
         if rule.class_ref is not None:
             found.append((f"rules[{index}].classRef", rule.class_ref, ("entity_type",)))
+    if fields.metric is not None:
+        found.extend(
+            ("propertyRef", ref, ("property",)) for ref in metric_rules.property_refs(fields.metric)
+        )
     return found
 
 
@@ -528,9 +546,11 @@ def _proposal_problem(
     item: schemas.ProposedItem,
     elements: dict[UUID, Element],
     created_kinds: dict[str, Kind],
+    *,
+    manual: bool = False,
 ) -> str | None:
-    if item.kind == "metric":
-        return "metric changes are not supported yet"
+    if item.kind == "metric" and not manual:
+        return "metric changes require a manual edit"
     if item.op == "create":
         if item.target_element_id is not None:
             return "a create item has no target element"
@@ -831,8 +851,9 @@ async def list_elements(
     """Elements of one status (active by default), optionally of one kind and matching `q` in
     names, labels, synonyms, the IRI or an axiom's text."""
     ontology = await _ontology_or_404(db, ontology_id)
-    all_kinds = kind is not None and kind not in SEMANTIC_KINDS
-    elements = await _elements(db, ontology_id, all_kinds=all_kinds)
+    elements = await _elements(
+        db, ontology_id, all_kinds=kind in BINDING_KINDS, include_metrics=kind in (None, "metric")
+    )
     if status != "all":
         elements = [element for element in elements if element.status == status]
     if kind is not None:
@@ -1034,19 +1055,6 @@ def stored_rule_fields(rule: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
-def _metric_fields(definition: dict[str, Any]) -> dict[str, Any]:
-    def refs(row: dict[str, Any]) -> dict[str, Any]:
-        return {
-            ("propertyRef" if key == "propertyId" else key): value for key, value in row.items()
-        }
-
-    fields = refs(definition)
-    for key in ("filters", "numerator"):
-        if key in fields:
-            fields[key] = [refs(condition) for condition in fields[key]]
-    return fields
-
-
 def _before(element: Element) -> schemas.ElementFields:
     """The element's current values as item fields, with only the keys its kind uses."""
     if element.kind == "axiom":
@@ -1077,7 +1085,7 @@ def _before(element: Element) -> schemas.ElementFields:
     elif element.kind == "metric":
         data["subject_ref"] = _ref(element.subject_id)
         data["unit"] = element.unit
-        data["metric"] = _metric_fields(element.metric or {})
+        data["metric"] = metric_rules.as_fields(element.metric or {})
     else:
         data["domain_ref"] = _ref(element.domain_id)
         if element.kind == "relation_type":
@@ -1136,7 +1144,6 @@ def _plan_items(items: Sequence[ChangeItem], links: "_Links") -> list[mergeplan.
             matched_by=links.matched_by.get(item.id, ()),
         )
         for item in items
-        if item.kind != "metric"
     ]
 
 
@@ -1170,10 +1177,16 @@ def _merged_into(other: ChangeItem, change_set: ChangeSet) -> UUID | None:
 
 
 async def _links(db: AsyncSession, change_set: ChangeSet, items: Sequence[ChangeItem]) -> _Links:
+    # A metric cannot be either side of an alignment record.
+    items = [item for item in items if item.kind != "metric"]
     ids = [item.id for item in items]
     wanted = {item.match_item_id for item in items if item.match_item_id}
     others: dict[UUID, tuple[ChangeItem, ChangeSet]] = {}
-    joined = select(ChangeItem, ChangeSet).join(ChangeSet, ChangeSet.id == ChangeItem.change_set_id)
+    joined = (
+        select(ChangeItem, ChangeSet)
+        .join(ChangeSet, ChangeSet.id == ChangeItem.change_set_id)
+        .where(ChangeItem.kind != "metric")
+    )
     if wanted:
         rows = await db.execute(joined.where(ChangeItem.id.in_(wanted)))
         others = {item.id: (item, owner) for item, owner in rows}
@@ -1235,7 +1248,8 @@ def _plan(
     """Only what the extraction proposes is planned; other sources say exactly what they do."""
     if change_set.source != "ai_extraction":
         return _NO_PLAN
-    plan_items = _plan_items(items, links)
+    # Historical extraction metrics cannot be applied or aligned. Manual metrics use no AI plan.
+    plan_items = _plan_items([item for item in items if item.kind != "metric"], links)
     plan_elements = _plan_elements(elements, ontology.base_iri)
     resolutions = mergeplan.plan_merge(plan_items, plan_elements, base_iri=ontology.base_iri)
     return _Plan(
@@ -1410,6 +1424,26 @@ async def _matches_out(
     return out
 
 
+def _review_fields(kind: str, raw: object) -> schemas.ElementFields:
+    if kind != "metric":
+        return schemas.ElementFields.model_validate(raw)
+    try:
+        return schemas.ElementFields.model_validate(raw)
+    except AppError as exc:
+        if exc.code != metric_rules.INVALID:
+            raise
+    except ValidationError:
+        return schemas.ElementFields(metric=None)
+    # Preserve the reviewer's access to other items and their resolution token in a legacy set.
+    # An explicit null denotes the unreadable definition in this view only.
+    if isinstance(raw, dict):
+        try:
+            return schemas.ElementFields.model_validate({**raw, "metric": None})
+        except ValidationError:
+            pass
+    return schemas.ElementFields(metric=None)
+
+
 async def _items_out(
     db: AsyncSession,
     change_set: ChangeSet,
@@ -1427,7 +1461,7 @@ async def _items_out(
     out: list[schemas.ChangeItem] = []
     for item in items:
         target = targets.get(item.target_element_id) if item.target_element_id else None
-        edited = None if item.edited is None else schemas.ElementFields.model_validate(item.edited)
+        edited = None if item.edited is None else _review_fields(item.kind, item.edited)
         out.append(
             schemas.ChangeItem.model_validate(
                 {
@@ -1437,7 +1471,7 @@ async def _items_out(
                     "kind": item.kind,
                     "target_element_id": item.target_element_id,
                     "temp_ref": item.temp_ref,
-                    "proposed": schemas.ElementFields.model_validate(item.proposed),
+                    "proposed": _review_fields(item.kind, item.proposed),
                     "edited": edited,
                     "before": _before(target) if target else None,
                     "decision": item.decision,
@@ -1640,7 +1674,7 @@ async def _edit_problems(
             created_kinds,
             own_ref=item.temp_ref,
             own_id=own_id,
-            require_active=True,
+            require_active=kind != "metric",
             kinds=kinds,
         )
         if problem:
@@ -1681,6 +1715,21 @@ async def _edit_problems(
             fields,
         )
         problems.extend(problem.message for problem in found)
+    if kind == "metric" and not problems and item.op != "delete":
+        relevant = [s for s in siblings if s.id == item.id or s.decision != "rejected"]
+        index = next(i for i, s in enumerate(relevant) if s.id == item.id)
+        proposals = [
+            binding_rules.Proposed(
+                op=s.op,
+                kind=s.kind,
+                target_id=s.target_element_id,
+                temp_ref=s.temp_ref,
+                fields=fields if s.id == item.id else rules.effective_fields(s.proposed, s.edited),
+            )
+            for s in relevant
+        ]
+        issues = metric_rules.proposal_problems(elements, proposals, only=index)
+        problems.extend(message for _, message in issues)
     return problems
 
 
@@ -1712,8 +1761,8 @@ async def update_item(
     if item is None:
         raise _change_set_not_found()
     if "edited" in given:
-        if item.kind == "metric":
-            raise InvalidProposalError("Metric changes are not supported yet.")
+        if item.kind == "metric" and change_set.source != "manual":
+            raise InvalidProposalError("Metric changes require a manual edit.")
         if patch.edited is None:
             item.edited = None
         else:
@@ -1721,7 +1770,8 @@ async def update_item(
             fields = rules.effective_fields(item.proposed, edited)
             problems = await _edit_problems(db, change_set, item, fields)
             if problems:
-                raise AppError(422, "changeset.invalid_edit", "; ".join(problems) + ".")
+                code = metric_rules.INVALID if item.kind == "metric" else "changeset.invalid_edit"
+                raise AppError(422, code, "; ".join(problems) + ".")
             item.edited = edited
     if "match_decision" in given:
         if patch.match_decision is not None and not await _has_match(db, item):

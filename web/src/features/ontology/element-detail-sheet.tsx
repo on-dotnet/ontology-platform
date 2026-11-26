@@ -33,6 +33,7 @@ import { isFormKind } from './element-form';
 import { ElementFormDialog } from './element-form-dialog';
 import { DeleteElementDialog, ReferencedBy } from './element-impact';
 import { kindTone } from './element-list';
+import { MetricDefinition, metricFields } from './metric-definition';
 
 interface ElementDetailSheetProps {
   ontologyId: string;
@@ -214,7 +215,7 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
             )}
           </Section>
 
-          <Section title={t('ontologyPage.detail.synonyms')}>
+          {element.kind !== 'metric' && <Section title={t('ontologyPage.detail.synonyms')}>
             {element.synonyms.length > 0 ? (
               <ul className="flex flex-wrap gap-1.5">
                 {element.synonyms.map((synonym) => (
@@ -227,9 +228,25 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
             ) : (
               <p className="text-sm text-muted-foreground">{t('ontologyPage.detail.noSynonyms')}</p>
             )}
-          </Section>
+          </Section>}
 
-          {element.kind === 'constraint' ? (
+          {element.kind === 'metric' ? (
+            <Section title={t('ontologyMetric.definition')}>
+              <QueryState query={related} loading={<Skeleton className="h-24 rounded-lg" />}>
+                {(all) => {
+                  const byId = new Map(all.map((item) => [item.id, item]));
+                  return <MetricDefinition
+                    fields={{ subjectRef: element.subjectId, metric: element.metric && metricFields(element.metric), unit: element.unit }}
+                    nameOf={(ref) => {
+                      const item = byId.get(ref);
+                      return item && elementName(item, language);
+                    }}
+                    linkTo={(ref) => <RefLink id={ref} byId={byId} language={language} onSelect={onSelect} />}
+                  />;
+                }}
+              </QueryState>
+            </Section>
+          ) : element.kind === 'constraint' ? (
             <Section title={t('ontologyPage.detail.rules')}>
               <QueryState query={related} loading={<Skeleton className="h-24 rounded-lg" />}>
                 {(all) => <ConstraintSection element={element} all={all} onSelect={onSelect} language={language} />}
@@ -246,14 +263,16 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
           {element.kind === 'entity_type' ? <BindingSection ontologyId={ontologyId} type={element} all={related.data} /> : null}
 
           <Section title={t('ontologyPage.impact.title')}>
-            <ReferencedBy ontologyId={ontologyId} element={element} all={related.data} onSelect={onSelect} />
+            <QueryState query={related} loading={<Skeleton className="h-16 rounded-lg" />}>
+              {(all) => <ReferencedBy ontologyId={ontologyId} element={element} all={all} onSelect={onSelect} />}
+            </QueryState>
           </Section>
 
-          <Section title={t('ontologyPage.detail.relatedAxioms')}>
+          {element.kind !== 'metric' && <Section title={t('ontologyPage.detail.relatedAxioms')}>
             <QueryState query={related} loading={<Skeleton className="h-16 rounded-lg" />}>
               {(all) => <RelatedAxioms element={element} all={all} onSelect={onSelect} />}
             </QueryState>
-          </Section>
+          </Section>}
         </>
       )}
 

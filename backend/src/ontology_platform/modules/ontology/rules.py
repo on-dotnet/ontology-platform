@@ -157,7 +157,9 @@ def field_problems(
             if is_blank(fields.turtle):
                 problems.append("turtle is required")
             return problems
-        imported = fields.iri is not None
+        imported = fields.iri is not None and kind != "metric"
+        if kind == "metric" and fields.iri is not None:
+            problems.append("iri is set by imports only")
         if fields.local_name is None:
             problems.append("localName is required")
         else:
@@ -175,6 +177,8 @@ def field_problems(
             problems.append("datatype is required")
         if kind == "constraint" and fields.rules is None:
             problems.append("rules is required")
+        if kind == "metric" and fields.metric is None:
+            problems.append("metric is required")
         return problems
 
     if "local_name" in given and fields.local_name != target_local_name:
@@ -183,7 +187,8 @@ def field_problems(
         problems.append("iri cannot change")
     if kind == "axiom" and "turtle" in given and is_blank(fields.turtle):
         problems.append("turtle is required")
-    if "label_zh" in given and is_blank(fields.label_zh) and not target_imported:
+    label_required = not target_imported or kind == "metric"
+    if "label_zh" in given and is_blank(fields.label_zh) and label_required:
         problems.append("labelZh is required")
     problems.extend(
         f"{wire_name(name)} is required"
@@ -197,6 +202,8 @@ def field_problems(
         problems.append("datatype is required")
     if kind == "constraint" and "rules" in given and fields.rules is None:
         problems.append("rules is required")
+    if kind == "metric" and "metric" in given and fields.metric is None:
+        problems.append("metric is required")
     return problems
 
 
