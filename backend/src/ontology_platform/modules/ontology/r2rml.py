@@ -6,7 +6,7 @@ from typing import Any
 from uuid import UUID
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
-from rdflib.namespace import RDF
+from rdflib.namespace import RDF, XSD
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -58,6 +58,9 @@ def export_r2rml(snapshot: Sequence[Mapping[str, Any]]) -> str:
     # binding_rules.node_problems, which requires every binding's subject and both ends of a
     # relation binding to be active. Loosening those rules must revisit this function.
     iris = {row["id"]: URIRef(row["iri"]) for row in snapshot if row.get("iri")}
+    datatypes = {
+        row["id"]: row.get("datatype") for row in snapshot if row["kind"] == "property"
+    }
     classes = {
         row["id"]: iris[row["subjectId"]] for row in snapshot if row["kind"] == "type_binding"
     }
@@ -78,6 +81,9 @@ def export_r2rml(snapshot: Sequence[Mapping[str, Any]]) -> str:
         elif kind == "property_binding":
             obj = _object_map(graph, _map_iri(row["parentId"]), iris[row["subjectId"]])
             graph.add((obj, RR.column, Literal(_identifier(row["binding"]["column"]))))
+            datatype = datatypes[row["subjectId"]]
+            if datatype:
+                graph.add((obj, RR.datatype, XSD[datatype]))
         elif kind == "relation_binding":
             source, target = row["domainId"], row["rangeId"]
             predicate = iris[row["subjectId"]]
@@ -106,8 +112,8 @@ def export_r2rml(snapshot: Sequence[Mapping[str, Any]]) -> str:
                     graph.add((condition, RR.child, Literal(_identifier(child))))
                     graph.add((condition, RR.parent, Literal(_identifier(parent))))
 
-    writer = TurtleWriter(graph, {"rr": str(RR)})
-    return f"@prefix rr: <{RR}> .\n\n{writer.fragment()}\n"
+    writer = TurtleWriter(graph, {"rr": str(RR), "xsd": str(XSD)})
+    return f"@prefix rr: <{RR}> .\n@prefix xsd: <{XSD}> .\n\n{writer.fragment()}\n"
 
 
 async def export_release(db: AsyncSession, release_id: UUID) -> tuple[str, str]:

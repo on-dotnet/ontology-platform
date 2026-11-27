@@ -150,6 +150,43 @@ describe('releases page', () => {
     await waitFor(() => expect(downloads.names).toEqual(['steel-v1.ttl']));
   });
 
+  it('exports an R2RML mapping for a bound release with the release filename', async () => {
+    const user = userEvent.setup();
+    const downloads = captureDownloads();
+    const api = releasesServer({
+      extra: {
+        'GET /api/ontologies/:id/releases': () => [releaseFixture({ id: 'rel-one', bindingCount: 2 })],
+        'GET /api/releases/:id/r2rml': () => new Response('@prefix rr: <http://www.w3.org/ns/r2rml#> .\n', { headers: { 'Content-Type': 'text/turtle' } }),
+      },
+      user: userWithRole('editor'),
+    });
+    renderApp('/releases?ontology=onto-steel');
+
+    await screen.findByRole('table', { name: '版本列表' });
+    await user.click(within(row('v1')).getByRole('button', { name: '导出 v1 的 R2RML 映射' }));
+    await waitFor(() => expect(downloads.names).toEqual(['steel-v1-r2rml.ttl']));
+    expect(api.calls('GET', '/api/releases/rel-one/r2rml')).toHaveLength(1);
+  });
+
+  it('hides R2RML export from viewers even when a release has bindings', async () => {
+    releasesServer({
+      user: userWithRole('viewer'),
+      extra: { 'GET /api/ontologies/:id/releases': () => [releaseFixture({ bindingCount: 2 })] },
+    });
+    renderApp('/releases?ontology=onto-steel');
+
+    await screen.findByRole('table', { name: '版本列表' });
+    expect(within(row('v1')).queryByRole('button', { name: '导出 v1 的 R2RML 映射' })).not.toBeInTheDocument();
+  });
+
+  it('hides R2RML export for a release without bindings', async () => {
+    releasesServer();
+    renderApp('/releases?ontology=onto-steel');
+
+    await screen.findByRole('table', { name: '版本列表' });
+    expect(within(row('v1')).queryByRole('button', { name: '导出 v1 的 R2RML 映射' })).not.toBeInTheDocument();
+  });
+
   it('hides publishing and activation from viewers but keeps export', async () => {
     releasesServer({ user: userWithRole('viewer') });
     renderApp('/releases?ontology=onto-steel');

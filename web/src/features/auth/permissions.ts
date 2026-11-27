@@ -11,6 +11,8 @@ const DATA_SOURCE_ADMIN_ROLES: readonly Role[] = ['admin'];
  * and give an access token the `changes:propose` scope (spec 003, section 13).
  */
 const CATALOG_ROLES: readonly Role[] = ['admin', 'editor', 'reviewer'];
+/** Backend `Creator`: mappings expose table and column names. */
+const MAPPING_EXPORT_ROLES: readonly Role[] = ['admin', 'editor', 'reviewer'];
 
 export interface Permissions {
   canUpload: boolean;
@@ -19,6 +21,7 @@ export interface Permissions {
   canBrowseCatalog: boolean;
   canEditBindings: boolean;
   canProposeViaMcp: boolean;
+  canExportMappings: boolean;
 }
 
 export function permissionsFor(role: Role | undefined): Permissions {
@@ -30,6 +33,7 @@ export function permissionsFor(role: Role | undefined): Permissions {
     canBrowseCatalog: has(CATALOG_ROLES),
     canEditBindings: has(CATALOG_ROLES),
     canProposeViaMcp: has(CATALOG_ROLES),
+    canExportMappings: has(MAPPING_EXPORT_ROLES),
   };
 }
 
