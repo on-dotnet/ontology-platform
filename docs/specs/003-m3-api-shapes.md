@@ -46,9 +46,11 @@ type DataSourceCreate = {
   name: string; kind: DataSourceKind; host: string; port: number; database: string; username: string;
   password: string; sslMode?: SslMode; schemas?: string[]; allowSamples?: boolean;
 };
-// 修改：只带要改的字段；不带 password 表示不改口令
+// 修改：只带要改的字段。连接目标（host、port、username、sslMode）不变时，不带 password 表示不改口令；
+// 目标变了必须带新口令，否则 422 datasource.password_required
 type DataSourcePatch = Partial<Omit<DataSourceCreate, 'kind'>> & { revision: number };
-// 用未保存的参数测试；编辑时不带 password 而带 dataSourceId，表示沿用已保存的口令
+// 用未保存的参数测试。编辑时不带 password 而带 dataSourceId，只在连接目标不变时沿用已保存的口令
+// （host 比较忽略大小写和首尾空白）；目标变了返回 422 datasource.password_required，不会去连接
 type ConnectionTestRequest = Omit<DataSourceCreate, 'name' | 'password' | 'allowSamples'> & { password?: string; dataSourceId?: string };
 type ConnectionTest = {
   ok: boolean; code: string | null;
@@ -270,6 +272,7 @@ type ElementInfo = ElementBrief & {
 | `datasource.archived` | 409 | 对已归档的数据源做修改、测试、读取目录或发起 AI 绑定建议 |
 | `datasource.platform_database` | 422 | 不能把平台自己的数据库作为数据源 |
 | `datasource.credential_unreadable` | 409 | 保存的口令无法解密，需要重新填写 |
+| `datasource.password_required` | 422 | 修改或测试时改了连接目标（主机、端口、用户名、SSL 模式），却没有带新口令 |
 | `datasource.connect_failed` | 200（`ConnectionTest.code`）/ 502 | 连不上：附 `reason`，取值 `unreachable`、`auth_failed`、`database_missing`、`ssl`、`timeout` |
 | `catalog.not_ready` | 409 | 还没有读取过目录 |
 | `catalog.too_large` | 无（目录任务的失败码，出现在 `DataSource.catalog.errorCode`） | 表或列超过上限，请填写模式范围 |

@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api, unwrap } from '@/api/client';
+import { isApiError } from '@/api/errors';
 import type { components } from '@/api/schema';
 import { InfoTip } from '@/components/feedback/hint-tip';
 import { InlineNotice } from '@/components/feedback/inline-notice';
@@ -18,7 +19,7 @@ import { usePagination } from '@/lib/pagination';
 import type { DataSource } from './api';
 import { ConnectionTestResult } from './connection-test-result';
 import {
-  createRequest, initialForm, patchRequest, schemaName, sslModes, testRequest, validationErrors,
+  connectionTargetChanged, createRequest, initialForm, patchRequest, schemaName, sslModes, testRequest, validationErrors,
   type Operation, type SourceForm, type TextField,
 } from './data-source-form';
 
@@ -44,12 +45,14 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
   const [initial] = useState(source);
   const needsNewPassword = repairPassword || initial?.lastTest?.code === 'datasource.credential_unreadable'
     || initial?.catalog?.errorCode === 'datasource.credential_unreadable';
-  const passwordRequired = !initial || needsNewPassword;
   const [form, setForm] = useState(() => initialForm(initial));
   const [touched, setTouched] = useState<Partial<Record<TextField, boolean>>>({});
   const [attempted, setAttempted] = useState<Operation | null>(null);
   const [pending, setPending] = useState<Operation | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const passwordError = isApiError(error) && error.code === 'datasource.password_required';
+  const targetChanged = connectionTargetChanged(form, initial);
+  const passwordRequired = !initial || needsNewPassword || targetChanged || passwordError;
   const [result, setResult] = useState<components['schemas']['ConnectionTest'] | null>(null);
   const visibleSchemas = (result?.ok && result.schemas) || [];
   const schemaPage = usePagination(visibleSchemas.length, visibleSchemas.length ? 'visible' : '');
@@ -62,7 +65,7 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
 
   function change<K extends keyof SourceForm>(field: K, value: SourceForm[K]) {
     setForm((current) => ({ ...current, [field]: value }));
-    setError(null);
+    if (!passwordError || ['password', 'host', 'port', 'username', 'sslMode'].includes(field)) setError(null);
     if (field !== 'schemas' && (!initial || (field !== 'name' && field !== 'allowSamples'))) setResult(null);
   }
 
@@ -79,7 +82,6 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
   async function run(operation: Operation) {
     if (controller.current) return;
     setAttempted(operation);
-    setError(null);
     if (operation === 'test' || initial) setResult(null);
     const errors = validationErrors(form, passwordRequired, operation);
     const [invalidField] = Object.keys(errors);
@@ -89,6 +91,7 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
       return;
     }
 
+    setError(null);
     const request = new AbortController();
     const { signal } = request;
     controller.current = request;
@@ -126,6 +129,10 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
     const required = field !== 'password' || passwordRequired;
     const attemptedField = attempted === 'save' || (attempted === 'test' && field !== 'name');
     const problem = (touched[field] || attemptedField) && errors[field];
+    const invalid = Boolean(problem) || (field === 'password' && passwordError);
+    const description = field === 'password' && (targetChanged || passwordError)
+      ? t('datasources.form.targetPassword')
+      : problem && t(`datasources.form.${problem}`, { field: label });
     const inputId = `${id}-${field}`;
     return (
       <div className="min-w-0 space-y-1">
@@ -138,16 +145,16 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
           onChange={(event) => change(field, event.target.value)}
           onBlur={() => setTouched((current) => ({ ...current, [field]: true }))}
           required={required}
-          aria-invalid={problem ? true : undefined}
-          aria-describedby={problem ? `${inputId}-error` : undefined}
+          aria-invalid={invalid || undefined}
+          aria-describedby={description ? `${inputId}-description` : undefined}
           {...(field === 'port' ? { min: 1, max: 65535, step: 1 } : { maxLength: maxLengths[field] })}
           ref={field === 'password' && needsNewPassword ? focusPassword : undefined}
           autoComplete={field === 'password' ? 'new-password' : 'off'}
-          placeholder={field === 'password' && initial?.hasCredential && !needsNewPassword ? t('datasources.form.savedPassword') : undefined}
+          placeholder={field === 'password' && initial?.hasCredential && !passwordRequired ? t('datasources.form.savedPassword') : undefined}
         />
-        {problem && (
-          <p className="text-sm text-error-strong" id={`${inputId}-error`}>
-            {t(`datasources.form.${problem}`, { field: label })}
+        {description && (
+          <p className={invalid ? 'text-sm text-error-strong' : 'text-sm text-muted-foreground'} id={`${inputId}-description`}>
+            {description}
           </p>
         )}
       </div>
@@ -164,7 +171,7 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
         <DialogDescription>{t('datasources.form.description')}</DialogDescription>
         <form ref={formRef} noValidate onSubmit={save} className="mt-4 space-y-4">
           {showSummary && <InlineNotice tone="error">{t('datasources.form.validationSummary')}</InlineNotice>}
-          {error !== null && <InlineNotice tone="error">{message(error)}</InlineNotice>}
+          {error !== null && !passwordError && <InlineNotice tone="error">{message(error)}</InlineNotice>}
           <fieldset className="grid min-w-0 gap-4 sm:grid-cols-2" disabled={pending !== null}>
             {input('name')}
             <div className="space-y-1">

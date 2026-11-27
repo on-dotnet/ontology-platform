@@ -336,6 +336,18 @@ async def create_data_source(
     return await _commit_source(db, row, actor)
 
 
+def _check_credential_target(
+    row: DataSource, body: schemas.DataSourcePatch | schemas.ConnectionTestRequest
+) -> None:
+    if (
+        (body.host is not None and body.host.strip().lower() != row.host.strip().lower())
+        or (body.port is not None and body.port != row.port)
+        or (body.username is not None and body.username != row.username)
+        or (body.ssl_mode is not None and body.ssl_mode != row.ssl_mode)
+    ):
+        raise AppError(422, "datasource.password_required", "Re-enter the password.")
+
+
 async def update_data_source(
     db: AsyncSession,
     data_source_id: UUID,
@@ -354,6 +366,10 @@ async def update_data_source(
         await _check_address(
             db, body.host or row.host, body.port or row.port, body.database or row.database
         )
+    if body.password is None:
+        _check_credential_target(row, body)
+        # Keep the exact host passed to the driver when reusing a credential.
+        changes.pop("host", None)
     for key, value in changes.items():
         setattr(row, key, value)
     now = datetime.now(UTC)
@@ -445,14 +461,17 @@ async def check_connection(
 ) -> schemas.ConnectionTest:
     """Test settings that are not saved yet (admins only: it connects to any address)."""
     password = body.password
+    host = body.host
     if password is None:
         if body.data_source_id is None:
             raise AppError(422, "validation.failed", "A password or data source is required.")
         row = await _active_source(db, body.data_source_id, lock=False)
+        _check_credential_target(row, body)
+        host = row.host
         password = _saved_params(row).password
     target = body.data_source_id if body.password is None else None
     params = connection.ConnectionParams(
-        host=body.host,
+        host=host,
         port=body.port,
         database=body.database,
         username=body.username,

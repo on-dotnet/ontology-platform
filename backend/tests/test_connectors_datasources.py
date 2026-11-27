@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
 from ontology_platform.modules.audit.models import AuditEvent
-from ontology_platform.modules.connectors import service
+from ontology_platform.modules.connectors import connection, service
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
 from ontology_platform.modules.identity.models import Role, User
 from support import ADMIN_USERNAME, PROBLEM_JSON, csrf_headers
@@ -248,13 +248,15 @@ async def test_update_and_no_op_audit_only_actual_changes(
     assert unchanged.status_code == 200
     assert unchanged.json() == source
 
-    updated = await _patch(
+    rejected = await _patch(
         client, source, allowSamples=True, sslMode="require", schemas=["mes"], port=5432
     )
+    _problem(rejected, 422, "datasource.password_required")
+    updated = await _patch(client, source, allowSamples=True, schemas=["mes"], port=5432)
     assert updated.status_code == 200
     data = updated.json()
     assert data["allowSamples"] is True
-    assert data["connection"] == {**source["connection"], "sslMode": "require", "schemas": ["mes"]}
+    assert data["connection"] == {**source["connection"], "schemas": ["mes"]}
     assert data["revision"] == source["revision"] + 1
     assert datetime.fromisoformat(data["updatedAt"]) > datetime.fromisoformat(source["updatedAt"])
     assert data["credentialUpdatedAt"] == source["credentialUpdatedAt"]
@@ -281,7 +283,7 @@ async def test_update_and_no_op_audit_only_actual_changes(
         assert (event.target_type, event.target_id) == ("data_source", source["id"])
         assert event.actor_id == row.created_by
     assert no_op.detail == {"fields": [], "passwordChanged": False}
-    assert sorted(edit.detail["fields"]) == ["allowSamples", "schemas", "sslMode"]
+    assert sorted(edit.detail["fields"]) == ["allowSamples", "schemas"]
     assert edit.detail == {"fields": edit.detail["fields"], "passwordChanged": False}
     assert rotate.detail == {"fields": [], "passwordChanged": True}
     await _assert_audit_omits(db, original, replacement)
@@ -312,6 +314,9 @@ async def test_patch_invalidates_only_affected_connection_results(
     await db.commit()
 
     response = await _patch(client, source, **{field: value})
+    if field in {"host", "port", "username"}:
+        _problem(response, 422, "datasource.password_required")
+        response = await _patch(client, source, password="test-only-new", **{field: value})
     assert response.status_code == 200
     row = await _stored(db, source)
     result = response.json()
@@ -333,6 +338,34 @@ async def test_patch_invalidates_only_affected_connection_results(
         assert row.last_test_ok is None
         assert row.last_test_code is None
         assert row.last_test_warnings == []
+
+
+async def test_patch_port_without_password_leaves_every_column_unchanged(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    source = await _create(client, password="test-only-original")
+    snapshot = select(DataSource.__table__).where(DataSource.id == UUID(source["id"]))
+    before = (await db.execute(snapshot)).mappings().one()
+
+    response = await _patch(client, source, port=5433)
+
+    _problem(response, 422, "datasource.password_required")
+    assert (await db.execute(snapshot)).mappings().one() == before
+    assert [event.action for event in await _events(db)] == ["datasource.created"]
+
+
+@pytest.mark.parametrize(
+    ("field", "value"), [("host", " STEEL-MES.EXAMPLE "), ("schemas", ["mes"])]
+)
+async def test_patch_with_same_target_keeps_the_credential(
+    client: AsyncClient, db: AsyncSession, field: str, value: object
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    source = await _create(client, password="test-only-original")
+    response = await _patch(client, source, **{field: value})
+    assert response.status_code == 200
+    assert response.json()["credentialUpdatedAt"] == source["credentialUpdatedAt"]
 
 
 @pytest.mark.parametrize(
@@ -650,6 +683,38 @@ async def test_failed_saved_connection_returns_reason_and_records_safe_result(
     await _assert_audit_omits(db, marker)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("host", "other.example"),
+        ("port", 5433),
+        ("username", "Steel_Reader"),
+        ("sslMode", "require"),
+    ],
+)
+async def test_unsaved_test_requires_password_before_connecting_to_a_changed_target(
+    client: AsyncClient,
+    db: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    value: object,
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    source = await _create(client, password="test-only-original")
+
+    def unexpected_connection(*_args: object) -> None:
+        pytest.fail("A changed target reached the connector without a new password")
+
+    monkeypatch.setattr(connection, "test_connection", unexpected_connection)
+    response = await client.post(
+        f"{SOURCES}/test",
+        json={**_settings(), "dataSourceId": source["id"], field: value},
+        headers=csrf_headers(client),
+    )
+    _problem(response, 422, "datasource.password_required")
+    assert [event.action for event in await _events(db)] == ["datasource.created"]
+
+
 async def test_unsaved_tests_use_submitted_settings_and_only_borrow_the_password(
     client: AsyncClient, db: AsyncSession, external_source: ExternalSource
 ) -> None:
@@ -660,9 +725,13 @@ async def test_unsaved_tests_use_submitted_settings_and_only_borrow_the_password
     without_password = {key: value for key, value in params.items() if key != "password"}
     missing = await client.post(url, json=without_password, headers=headers)
     _problem(missing, 422, "validation.failed")
-    # Only the submitted address and username can work, even when borrowing a saved password.
-    source = await _create(client, password=external_source.reader_password)
-    with_id = {**without_password, "dataSourceId": source["id"]}
+    # The saved credential can be reused for another database on the same target.
+    source = await _create(client, **{**params, "database": "unused_test_database"})
+    with_id = {
+        **without_password,
+        "dataSourceId": source["id"],
+        "host": f" {params['host'].upper()} ",
+    }
     for body in (params, with_id):
         response = await client.post(url, json=body, headers=headers)
         assert response.status_code == 200

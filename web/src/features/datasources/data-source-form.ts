@@ -51,13 +51,28 @@ export function validationErrors(form: SourceForm, passwordRequired: boolean, op
   return errors;
 }
 
-function connectionFields(form: SourceForm) {
+function connectionTarget(form: SourceForm, source?: DataSource) {
   return {
     host: form.host.trim(),
     port: Number(form.port),
-    database: form.database.trim(),
-    username: form.username.trim(),
+    // An untouched PostgreSQL username can include significant surrounding spaces.
+    username: form.username === source?.connection?.username ? form.username : form.username.trim(),
     sslMode: form.sslMode,
+  };
+}
+
+export function connectionTargetChanged(form: SourceForm, source?: DataSource) {
+  const saved = source?.connection;
+  if (!saved) return false;
+  const target = connectionTarget(form, source);
+  return target.host.toLowerCase() !== saved.host.trim().toLowerCase()
+    || target.port !== saved.port || target.username !== saved.username || target.sslMode !== saved.sslMode;
+}
+
+function connectionFields(form: SourceForm, source?: DataSource) {
+  return {
+    ...connectionTarget(form, source),
+    database: form.database.trim(),
     schemas: form.schemas.map(schemaName).filter((name) => name.length > 0),
   };
 }
@@ -65,7 +80,7 @@ function connectionFields(form: SourceForm) {
 export function testRequest(form: SourceForm, source?: DataSource): TestRequest {
   return {
     kind: 'postgresql',
-    ...connectionFields(form),
+    ...connectionFields(form, source),
     ...(source && !form.password ? { dataSourceId: source.id } : { password: form.password }),
   };
 }
@@ -82,7 +97,7 @@ export function createRequest(form: SourceForm): Create {
 
 export function patchRequest(form: SourceForm, source: DataSource): Patch {
   const patch: Patch = { revision: source.revision };
-  const connection = connectionFields(form);
+  const connection = connectionFields(form, source);
   const previous = source.connection;
   const name = form.name.trim();
   if (form.name !== source.name && name !== source.name) patch.name = name;

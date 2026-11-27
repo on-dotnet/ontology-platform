@@ -282,6 +282,70 @@ describe('data source dialog', () => {
     });
   });
 
+  it('requires a password for a changed host before testing or saving', async () => {
+    const { form, user, api, source } = await openForm('edit', {
+      [`POST ${testPath}`]: () => success,
+      [`PATCH ${collection}/:id`]: () => makeSource({ revision: 4 }),
+    });
+    const host = form.getByRole('textbox', { name: '主机' });
+    const password = form.getByLabelText(/^口令/);
+    await user.clear(host);
+    await user.type(host, ' DB.EXAMPLE.TEST ');
+    expect(password).not.toBeRequired();
+    await user.clear(host);
+    await user.type(host, 'other.example.test');
+    expect(password).toBeRequired();
+    expect(password).not.toHaveAttribute('placeholder');
+    expect(password).toHaveAccessibleDescription(/请重新填写口令/);
+    await user.click(form.getByRole('button', { name: '测试连接' }));
+    expect(password).toHaveAttribute('aria-invalid', 'true');
+    expect(password).toHaveFocus();
+    await user.click(form.getByRole('button', { name: '保存数据源' }));
+    expect(api.calls('POST', testPath)).toHaveLength(0);
+    expect(api.calls('PATCH', `${collection}/${source.id}`)).toHaveLength(0);
+    await user.type(password, newPassword);
+    await user.click(form.getByRole('button', { name: '保存数据源' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(api.calls('PATCH', `${collection}/${source.id}`).map((r) => r.body))
+      .toEqual([{ host: 'other.example.test', password: newPassword, revision: source.revision }]);
+  });
+
+  it('restores the optional password when port, username or SSL mode is restored', async () => {
+    const { form, user } = await openForm('edit');
+    const password = form.getByLabelText(/^口令/);
+    const port = form.getByRole('spinbutton', { name: '端口' });
+    const username = form.getByRole('textbox', { name: '用户名' });
+    const sslMode = form.getByRole('combobox', { name: 'SSL 模式' });
+    await user.clear(port);
+    await user.type(port, '5433');
+    expect(password).toBeRequired();
+    await user.clear(port);
+    await user.type(port, '5432');
+    expect(password).not.toBeRequired();
+    await user.clear(username);
+    await user.type(username, 'Reader');
+    expect(password).toBeRequired();
+    await user.clear(username);
+    await user.type(username, 'reader');
+    expect(password).not.toBeRequired();
+    await user.selectOptions(sslMode, 'require');
+    expect(password).toBeRequired();
+    await user.selectOptions(sslMode, 'prefer');
+    expect(password).not.toBeRequired();
+  });
+
+  it.each(['测试连接', '保存数据源'])('shows a server password requirement on the field after %s', async (action) => {
+    const rejected = () => problemResponse(422, 'datasource.password_required');
+    const { form, user } = await openForm('edit', {
+      [`POST ${testPath}`]: rejected,
+      [`PATCH ${collection}/:id`]: rejected,
+    });
+    const password = form.getByLabelText(/^口令/);
+    await user.click(form.getByRole('button', { name: action }));
+    await waitFor(() => expect(password).toHaveAttribute('aria-invalid', 'true'));
+    expect(password).toHaveAccessibleDescription(/请重新填写口令/);
+  });
+
   it.each(['lastTest', 'catalog'] as const)('requires a replacement password when %s records an unreadable credential', async (origin) => {
     const code = 'datasource.credential_unreadable';
     const source = makeSource(origin === 'lastTest'

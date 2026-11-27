@@ -2106,8 +2106,8 @@ export interface components {
         };
         /**
          * ConnectionTestRequest
-         * @description Connection settings that are not saved yet. While editing, leave out `password` and give
-         *     `dataSourceId` to test with the stored one.
+         * @description Test unsaved settings. A dataSourceId can supply the saved password only for the same
+         *     host, port, username and SSL mode.
          */
         ConnectionTestRequest: {
             /**
@@ -2422,7 +2422,8 @@ export interface components {
         };
         /**
          * DataSourcePatch
-         * @description Only the given fields change; leaving out `password` keeps the stored one.
+         * @description Change only the given fields. A new password is required if the host, port, username
+         *     or SSL mode changes.
          */
         DataSourcePatch: {
             /** Name */
