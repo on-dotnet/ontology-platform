@@ -6,7 +6,7 @@
 # EXPECT <urn:synthetic:steel:hotmetal/B90> <https://w3id.org/ontology-platform/steel/HotMetalTapShape> MinCountConstraintComponent
 <urn:synthetic:steel:hotmetal/B90> a stl:HotMetal .
 
-# EXPECT <urn:synthetic:steel:blastfurnacetapping/T90> <https://w3id.org/ontology-platform/steel/TapBlastFurnaceShape> HasValueConstraintComponent
+# EXPECT <urn:synthetic:steel:blastfurnacetapping/T90> <https://w3id.org/ontology-platform/steel/TapBlastFurnaceShape> QualifiedMinCountConstraintComponent
 # EXPECT <urn:synthetic:steel:blastfurnacetapping/T90> <https://w3id.org/ontology-platform/steel/TappedHotMetalMassShape> MinInclusiveConstraintComponent
 <urn:synthetic:steel:blastfurnacetapping/T90> a stl:BlastFurnaceTapping ; stl:tappedHotMetalMass -0.5 .
 
@@ -89,10 +89,11 @@
 <urn:synthetic:steel:bundle/B92> a stl:Bundle ; stl:bundleCutLength 12.0 ;
     stl:bundleMassBasis <code/packing-form/BUNDLE> ; stl:bundlePieceCount "several" .
 
-# EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/SeamlessTubeStockShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/SeamlessTubeStockShape> SPARQLConstraintComponent
 # EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/TubeDimensionValueShape> MinExclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/TubeOutsideDiameterValueShape> MinExclusiveConstraintComponent
 <urn:synthetic:steel:seamlesstube/T90> a stl:SeamlessTube ; stl:derivedFrom <urn:synthetic:steel:plate/P90> ;
-    stl:tubeWallThickness 0.0 .
+    stl:tubeWallThickness 0.0 ; stl:tubeOutsideDiameter -1.0 .
 <urn:synthetic:steel:plate/P90> a stl:Plate .
 
 # EXPECT <urn:synthetic:steel:tubewelding/W90> <https://w3id.org/ontology-platform/steel/TubeWeldingMethodShape> MinCountConstraintComponent
@@ -100,7 +101,7 @@
 # EXPECT <https://w3id.org/ontology-platform/steel/code/equipment-type/ERW> <https://w3id.org/ontology-platform/steel/WeldMethodSchemeShape> HasValueConstraintComponent
 <urn:synthetic:steel:tubewelding/W91> a stl:TubeWelding ; stl:weldMethod <code/equipment-type/ERW> .
 
-# EXPECT <urn:synthetic:steel:heattreatmentload/L90> <https://w3id.org/ontology-platform/steel/HeatTreatmentLoadPieceShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:heattreatmentload/L90> <https://w3id.org/ontology-platform/steel/HeatTreatmentLoadPieceShape> SPARQLConstraintComponent
 # EXPECT <urn:synthetic:steel:heattreatmentload/L90> <https://w3id.org/ontology-platform/steel/HeatTreatmentLoadMethodShape> MinCountConstraintComponent
 <urn:synthetic:steel:heattreatmentload/L90> a stl:HeatTreatmentLoad ; stl:hasPart <urn:synthetic:steel:equipment/F90> .
 <urn:synthetic:steel:equipment/F90> a stl:Equipment .
@@ -111,7 +112,7 @@
 <urn:synthetic:steel:heattreatmenthold/H90> a stl:HeatTreatmentHold ;
     stl:actualStartAt "2026-11-19T15:30:00Z"^^xsd:dateTime ; stl:actualEndAt "2026-11-19T15:00:00Z"^^xsd:dateTime .
 
-# EXPECT <urn:synthetic:steel:coil/C90> <https://w3id.org/ontology-platform/steel/CoilSourceStockShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:coil/C90> <https://w3id.org/ontology-platform/steel/CoilSourceStockShape> SPARQLConstraintComponent
 # EXPECT <urn:synthetic:steel:coil/C90> <https://w3id.org/ontology-platform/steel/CoilSourceIntervalShape> LessThanOrEqualsConstraintComponent
 <urn:synthetic:steel:coil/C90> a stl:Coil ; stl:derivedFrom <urn:synthetic:steel:plate/P90> ;
     stl:startLength 8.0 ; stl:endLength 5.0 .

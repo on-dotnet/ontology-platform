@@ -5,7 +5,7 @@
 
 # EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltNumberShape> MinCountConstraintComponent
 # EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltSequenceShape> MinCountConstraintComponent
-# EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltOutputShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltOutputShape> SPARQLConstraintComponent
 # EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltInputElectrodeShape> QualifiedMinCountConstraintComponent
 <urn:synthetic:steel:remelting/S91> a stl:Remelting .
 
@@ -21,7 +21,7 @@
 <urn:synthetic:steel:electrode/E91> a stl:Electrode .
 
 # EXPECT <https://w3id.org/ontology-platform/steel/code/forging-method/OPEN> <https://w3id.org/ontology-platform/steel/MeltingRouteSchemeShape> HasValueConstraintComponent
-# EXPECT <https://w3id.org/ontology-platform/steel/code/forging-method/OPEN> <https://w3id.org/ontology-platform/steel/MeltingRouteDetailShape> QualifiedMinCountConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/forging-method/OPEN> <https://w3id.org/ontology-platform/steel/MeltingRouteDetailShape> SPARQLConstraintComponent
 <urn:synthetic:steel:materialpiece/P91> a stl:MaterialPiece ; stl:meltingRoute <code/forging-method/OPEN> .
 
 # EXPECT <urn:synthetic:steel:forging/K91> <https://w3id.org/ontology-platform/steel/ForgingMethodShape> MinCountConstraintComponent

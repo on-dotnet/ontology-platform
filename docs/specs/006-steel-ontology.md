@@ -84,7 +84,7 @@
 | OWL-Time（W3C 2017） | 只作注释参照：时间点一律用 `xsd:dateTime` 属性（005 第 6 节），不建 `time:Instant` 节点 |
 | SKOS（W3C 2009） | 代码表、同义词、定义；`skos:broader` 表示代码上下位 |
 | DCTerms | 书目条目与术语来源 `dcterms:source` |
-| SHACL（W3C 2017） | 约束只写在各模块的 `*-shapes.ttl`；SHACL-SPARQL 只用于核心约束无法表达的跨属性检查 |
+| SHACL（W3C 2017） | 约束写在各层的形状文件中。跨属性检查或需要避免 OWL API 丢失 RDF 列表的存在性检查可用 SHACL-SPARQL |
 | IEC 62264（ISA-95） | 不导入（无官方 OWL，正文收费）。核心层的类按其对象模型设计，用 SSSOM 映射登记到对象名，谓词按每一对的实际关系选（`skos:exactMatch`、`closeMatch`、`broadMatch`、`relatedMatch`）：Material Class（对 `material-category` 方案）、Material Definition（`MaterialSpecification`）、Material Lot / Sublot（`MaterialLot` / `MaterialPiece`）、Equipment 层级 Site、Area、Work Center、Work Unit、Process Segment（`ProcessSegment`）、Operations Definition（`ProcessRoute`）、Operations Request（`ProductionOrder`）、Operations Schedule（`ProductionSchedule`）、Segment Response（`Operation`）、Personnel Class（`PersonnelRole`）。只映射本本体有对应术语的对象 |
 | GS1 EPCIS 2.0 | 只在映射表里对照转换、聚合、对象事件 |
 
@@ -182,6 +182,7 @@ ontologies/steel/
 2. **不写**企业编码格式、工艺窗口、标准限值。
 3. 扩展层只收紧不放宽，写在自己的 `-shapes.ttl` 里（如特钢层的两级追溯约束，第 6.4 节）。
 4. 违反结构的用 `sh:Violation`，建议性的用 `sh:Warning`。每个形状都有 `rdfs:comment` 中文说明，且在 `examples/<层>-invalid.ttl` 里至少有一个违例。
+5. 逐值约束和禁止取值的约束逐属性写。装炉成员与重熔产出可从任一方向记录，查到一件符合类型的实物即可。卷和无缝管沿 `derivedFrom+` 按类或坯形代码及其上位代码识别来源。具体冶炼路线沿至少一级 `skos:broader` 归组。上述存在性检查用 SPARQL 表达。铁次用限定计数检查至少一台执行设备具有高炉代码。
 
 ## 8 依据与来源
 
@@ -233,6 +234,8 @@ ontologies/steel/
 7. CQ：每个查询有结果，与期望 CSV 一致（S5 期望为空）。
 8. `dist/steel.ttl` 去掉本体头后与各模块并集（去掉各模块本体头）同构，本体头只有 `stl:ontology/steel` 一个且无 `owl:imports`；三元组数不超过 50,000、文件不超过 5 MB。
 9. 与 `samples/steel-industry/ontology/` 的同名术语比对、#67 术语去向表是否完整（第 3 节），目录缺失时报错。
+10. 模块与分发图均须兼容 Protégé 另存。形状中的 RDF 列表仅允许平台结构化约束能恢复的 `sh:in`，位置限于具名节点形状的直属 `sh:property` 空白节点。第 7 节要求钢铁形状带中文 `rdfs:comment`，这类形状会作为公理保留，因此本包的形状均使用无列表写法。
+11. `owl:unionOf`、`owl:intersectionOf`、`owl:oneOf` 的成员按完整 IRI 升序排列。`owl:disjointWith` 从较小 IRI 指向较大 IRI。OWL 2 数据类型表以外的类型在模块并集和分发图中都有 `rdfs:Datatype` 声明。
 
 **每个 PR 的验收**：自检通过（PR 2 在自检脚本之前，改为在 `op-tmp-` 容器里用 rdflib 解析 `standards.ttl` 并检查每条书目的字段齐全，命令与结果写进 PR 描述；PR 3 的自检再覆盖它）；`reviewer` 复审没有必须修的项；`./dev.ps1 ci -Report` 通过；Claude 抽查定义与来源不少于 10%（看定义是否原创、来源编号是否在核实过的书目里）。
 

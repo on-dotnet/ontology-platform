@@ -12,25 +12,77 @@
     rdfs:comment "约束物料来源、作业时间、检验与物流记录的通用结构。"@zh, "Checks the shared structure of material provenance, execution times, inspection and movement records."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
-stl:CoreInstantShape a sh:PropertyShape ; sh:targetSubjectsOf stl:plannedStartAt, stl:plannedEndAt, stl:actualStartAt, stl:actualEndAt, stl:occurredAt, stl:createdAt, stl:recordedAt, stl:sampledAt, stl:resultAt ;
-    sh:path [ sh:alternativePath ( stl:plannedStartAt stl:plannedEndAt stl:actualStartAt stl:actualEndAt stl:occurredAt stl:createdAt stl:recordedAt stl:sampledAt stl:resultAt ) ] ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
-    sh:severity sh:Violation ; rdfs:comment "每个时间点都应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh .
+stl:CorePlannedStartAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:plannedStartAt ;
+    sh:path stl:plannedStartAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "计划开始时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Planned start times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CorePlannedEndAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:plannedEndAt ;
+    sh:path stl:plannedEndAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "计划结束时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Planned end times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreActualStartAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:actualStartAt ;
+    sh:path stl:actualStartAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "实际开始时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Actual start times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreActualEndAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:actualEndAt ;
+    sh:path stl:actualEndAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "实际结束时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Actual end times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreOccurredAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:occurredAt ;
+    sh:path stl:occurredAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "发生时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Occurrence times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreCreatedAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:createdAt ;
+    sh:path stl:createdAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "创建时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Creation times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreInstantShape a sh:PropertyShape ; sh:targetSubjectsOf stl:recordedAt ;
+    sh:path stl:recordedAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "记录时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Recording times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreSampledAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:sampledAt ;
+    sh:path stl:sampledAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "采样时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Sampling times require a date-time with a time zone for comparison across shifts and sites."@en .
+
+stl:CoreResultAtShape a sh:PropertyShape ; sh:targetSubjectsOf stl:resultAt ;
+    sh:path stl:resultAt ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "结果可用时间应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh, "Result availability times require a date-time with a time zone for comparison across shifts and sites."@en .
 
 stl:CoreEventPlanTimesShape a sh:PropertyShape ; sh:targetClass stl:Event ;
-    sh:path [ sh:alternativePath ( stl:plannedStartAt stl:plannedEndAt ) ] ; sh:maxCount 0 ;
-    sh:severity sh:Violation ; rdfs:comment "执行和事件记录只记实绩，计划起止时间属于关联的计划。"@zh .
+    sh:path stl:plannedStartAt ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "执行和事件记录只记实绩，计划开始时间应记录在关联的计划上。"@zh, "Events record actual times. The planned start time belongs on the associated plan."@en .
+
+stl:CoreEventPlannedEndShape a sh:PropertyShape ; sh:targetClass stl:Event ;
+    sh:path stl:plannedEndAt ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "执行和事件记录只记实绩，计划结束时间应记录在关联的计划上。"@zh, "Events record actual times. The planned end time belongs on the associated plan."@en .
+
+stl:CorePlanActualStartShape a sh:PropertyShape ; sh:targetClass stl:Plan ;
+    sh:path stl:actualStartAt ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "计划记录安排时间，实际开始时间应记录在执行或事件上。"@zh, "Plans record scheduled times. Actual start times belong on the operation or event."@en .
 
 stl:CorePlanActualTimesShape a sh:PropertyShape ; sh:targetClass stl:Plan ;
-    sh:path [ sh:alternativePath ( stl:actualStartAt stl:actualEndAt stl:occurredAt ) ] ; sh:maxCount 0 ;
-    sh:severity sh:Violation ; rdfs:comment "计划上的起止是安排时间，实际发生时刻应记录在执行或事件上。"@zh .
+    sh:path stl:actualEndAt ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "计划记录安排时间，实际结束时间应记录在执行或事件上。"@zh, "Plans record scheduled times. Actual end times belong on the operation or event."@en .
+
+stl:CorePlanOccurredAtShape a sh:PropertyShape ; sh:targetClass stl:Plan ;
+    sh:path stl:occurredAt ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "计划记录安排时间，实际发生时刻应记录在执行或事件上。"@zh, "Plans record scheduled times. Occurrence times belong on the operation or event."@en .
 
 stl:CoreCompositionBoundsShape a sh:PropertyShape ; sh:targetSubjectsOf stl:lowerLimit ;
     sh:path stl:lowerLimit ; sh:lessThanOrEquals stl:upperLimit ;
     sh:severity sh:Violation ; rdfs:comment "同一成分限值同时给出上下界时，下界应小于或等于上界。"@zh .
 
-stl:CoreMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:grossMass, stl:netMass, stl:theoreticalMass ;
-    sh:path [ sh:alternativePath ( stl:grossMass stl:netMass stl:theoreticalMass ) ] ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
-    sh:severity sh:Violation ; rdfs:comment "实物件的毛重、净重和理论重量均应为非负十进制数。"@zh .
+stl:CoreGrossMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:grossMass ;
+    sh:path stl:grossMass ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "实物件的毛重应为非负十进制数。"@zh, "The gross mass of a material piece must be a nonnegative decimal."@en .
+
+stl:CoreMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:netMass ;
+    sh:path stl:netMass ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "实物件的净重应为非负十进制数。"@zh, "The net mass of a material piece must be a nonnegative decimal."@en .
+
+stl:CoreTheoreticalMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:theoreticalMass ;
+    sh:path stl:theoreticalMass ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "实物件的理论重量应为非负十进制数。"@zh, "The theoretical mass of a material piece must be a nonnegative decimal."@en .
 
 stl:CoreSourceHeatShape a sh:PropertyShape ; sh:targetSubjectsOf stl:sourceHeat ;
     sh:path stl:sourceHeat ; sh:class stl:Heat ;

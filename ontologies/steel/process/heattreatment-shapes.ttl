@@ -12,10 +12,18 @@
     rdfs:comment "核对装炉批的实物件和工艺、代码所属方案及保温阶段起止时刻的顺序。"@zh, "Checks load membership, treatment methods and their scheme, and the order of hold start and end times."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
-stl:HeatTreatmentLoadPieceShape a sh:PropertyShape ; sh:targetClass stl:HeatTreatmentLoad ;
-    sh:path [ sh:alternativePath ( stl:hasPart [ sh:inversePath stl:partOf ] ) ] ;
-    sh:qualifiedValueShape [ sh:class stl:MaterialPiece ] ; sh:qualifiedMinCount 1 ;
-    sh:severity sh:Violation ; rdfs:comment "每个装炉批至少应包含一件实物件，可从批列出成员，也可由实物件指回装炉批。"@zh .
+stl:HeatTreatmentLoadPieceShape a sh:NodeShape ; sh:targetClass stl:HeatTreatmentLoad ;
+    sh:severity sh:Violation ; rdfs:comment "每个装炉批至少应包含一件实物件，可从批列出成员，也可由实物件指回装炉批。"@zh ;
+    sh:sparql [ a sh:SPARQLConstraint ; sh:message "装炉批须至少列出一件实物件，或由一件实物件指回本批。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this (stl:hasPart|^stl:partOf) ?piece .
+            ?piece a/rdfs:subClassOf* stl:MaterialPiece .
+          }
+        }
+    """ ] .
 stl:HeatTreatmentLoadMethodShape a sh:PropertyShape ; sh:targetClass stl:HeatTreatmentLoad ;
     sh:path stl:heatTreatmentMethod ; sh:minCount 1 ;
     sh:severity sh:Violation ; rdfs:comment "每个装炉批至少要记录一种实际采用的热处理工艺。"@zh .

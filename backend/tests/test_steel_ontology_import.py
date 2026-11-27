@@ -16,7 +16,7 @@ from test_ontology_support import change_set_items, decide, merge, sign_in
 
 BUNDLE = Path(__file__).parent / "fixtures" / "steel-ontology" / "steel.ttl"
 DIST = Path(__file__).resolve().parents[2] / "ontologies" / "steel" / "dist" / "steel.ttl"
-DIGEST = "11ada5052331aa42c9feb200ffc97aa7eaf387db605a6b3c4029d5fe31253072"
+DIGEST = "1f303b49e022933699f6323353ac7dc53967154541ae2bc6c0fa781578f925c9"
 # The decisions endpoint takes at most 5000 items per request.
 BATCH = 5000
 
