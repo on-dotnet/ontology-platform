@@ -7,6 +7,7 @@ line): nothing reaches the ontology until a reviewer merges the change set.
 """
 
 import base64
+import logging
 from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, cast
 from uuid import UUID
@@ -23,12 +24,14 @@ from ontology_platform.modules.ai.extraction import (
     Kind,
     KnownElement,
     LateCandidate,
+    MemoryOutcome,
     PendingType,
     Proposal,
     ProposedMatch,
     mark_late_candidates,
 )
 from ontology_platform.modules.ai.gateway import AiError, InputFile, ModelGateway
+from ontology_platform.modules.ai.memory_prompts import PROMPT_MAX
 from ontology_platform.modules.ai.prompts import TRANSCRIBE_INSTRUCTIONS, TranscriptOut
 from ontology_platform.modules.documents import service as documents
 from ontology_platform.modules.documents.parsers import ParsedPage, ScanPart
@@ -43,6 +46,7 @@ from ontology_platform.modules.ontology.schemas import (
 from ontology_platform.modules.ontology.schemas import ProposedMatch as ProposedMatchIn
 
 TITLE = "识别：{filename}"
+logger = logging.getLogger(__name__)
 QUOTE_MAX = 500
 SYNONYMS_MAX = 100
 SYNONYM_MAX = 200
@@ -220,12 +224,16 @@ def make_extractor(
     session_factory: async_sessionmaker[AsyncSession],
     gateway: ModelGateway,
     models: ExtractionModels,
+    memory_prompt_max: int = PROMPT_MAX,
 ) -> Callable[[UUID, LeaseCheck], Awaitable[UUID | None]]:
-    extractor = Extractor(gateway, models)
+    extractor = Extractor(gateway, models, memory_prompt_max=memory_prompt_max)
 
     async def extract(document_id: UUID, check_lease: LeaseCheck) -> UUID | None:
         async with session_factory() as db:
             document = await documents.get(db, document_id)
+            if document.change_set_id is not None:
+                # A replay has no new memory hits to record (spec 008, 6.1).
+                return document.change_set_id
             ontology_id, filename = document.ontology_id, document.filename
             uploaded_by = document.uploaded_by
             chunks = [
@@ -233,6 +241,7 @@ def make_extractor(
                 for c in await documents.list_chunks(db, document_id)
             ]
             candidates = await ontology.list_alignment_candidates(db, ontology_id)
+            memory = await ontology.review_memory_for(db, ontology_id)
             known = [known_element(element) for element in candidates.active]
             deleted = [known_element(element) for element in candidates.deleted]
             pending = pending_types(candidates.pending, known)
@@ -245,6 +254,7 @@ def make_extractor(
                 await documents.set_progress(db, document_id, step, done, total)
 
         try:
+            outcome = MemoryOutcome()
             proposals = await extractor.run(
                 document_id=document_id,
                 title=filename,
@@ -253,6 +263,8 @@ def make_extractor(
                 progress=progress,
                 deleted=deleted,
                 pending=pending,
+                memory=memory,
+                outcome=outcome,
             )
         except AiError as exc:
             raise job_error(exc) from exc
@@ -265,13 +277,23 @@ def make_extractor(
             if document.change_set_id is not None:
                 return document.change_set_id
             await documents.set_progress(db, document_id, "changeset", 1, 1)
+            # Merges lock the ontology before memory rows; keep the same lock order here.
+            await ontology.lock_ontology(db, ontology_id)
             if not proposals:
+                await ontology.record_memory_hits(db, ontology_id, tuple(outcome.memory_hits))
+                if outcome.suppressed_total:
+                    logger.info(
+                        "Document %s: all %s proposals suppressed",
+                        document_id,
+                        outcome.suppressed_total,
+                    )
                 return None
             # Under the ontology's lock, merges and other change sets wait: what appeared
             # since the identification started is checked once more, without a model.
-            await ontology.lock_ontology(db, ontology_id)
             now = await ontology.list_alignment_candidates(db, ontology_id)
-            mark_late_candidates(proposals, late_candidates(candidates, now))
+            mark_late_candidates(
+                proposals, late_candidates(candidates, now), memory=memory, outcome=outcome
+            )
             items = [to_item(proposal, document_id) for proposal in proposals]
             change_set_id = await ontology.create_change_set(
                 db,
@@ -281,7 +303,10 @@ def make_extractor(
                 document_id=document_id,
                 created_by=uploaded_by,
                 items=items,
+                suppressed=outcome.suppressed,
+                suppressed_total=outcome.suppressed_total,
             )
+            await ontology.record_memory_hits(db, ontology_id, tuple(outcome.memory_hits))
             await documents.set_change_set(db, document_id, change_set_id)
         return change_set_id
 

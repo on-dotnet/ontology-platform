@@ -140,7 +140,6 @@ def test_collected_rejections_appear_in_memory() -> None:
     ).entries
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 3 implements extraction memory guards")
 def test_extraction_memory_guard_is_registered() -> None:
     from ontology_platform.modules.ai import extraction
 
