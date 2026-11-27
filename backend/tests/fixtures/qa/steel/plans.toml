@@ -3,6 +3,10 @@
 [refs]
 T1 = "Heat"
 T2 = "Coil"
+T3 = "QualityInspection"
+T4 = "CastingSequence"
+T5 = "Slab"
+T6 = "RollingEvent"
 P1 = "steelGrade"
 P2 = "passed"
 R1 = "castIn"
@@ -93,3 +97,53 @@ missing = [
     { kind = "relation_type", label_zh = "钢卷表面缺陷", description = "缺少钢卷到表面缺陷的关系。", near = ["T2"] },
 ]
 assumptions = []
+
+# Existing element references in the assistant fields are resolved before delivery.
+# The operation helper supplies nulls for unused fields of the structured output.
+[Q5.proposal]
+reply = "请审核表面缺陷及其属性和钢卷关系。"
+
+[[Q5.proposal.operations]]
+op = "create"
+kind = "entity_type"
+temp_ref = "new:SurfaceDefect"
+fields = { local_name = "SurfaceDefect", label_zh = "表面缺陷", label_en = "Surface defect" }
+
+[[Q5.proposal.operations]]
+op = "create"
+kind = "property"
+fields = { local_name = "defectKind", label_zh = "缺陷类型", label_en = "Defect kind", domain = "new:SurfaceDefect", datatype = "string", required = false, multiple = false }
+
+[[Q5.proposal.operations]]
+op = "create"
+kind = "property"
+fields = { local_name = "defectPosition", label_zh = "位置", label_en = "Position", domain = "new:SurfaceDefect", datatype = "decimal", unit = "m", required = false, multiple = false }
+
+[[Q5.proposal.operations]]
+op = "create"
+kind = "property"
+fields = { local_name = "defectSeverity", label_zh = "严重程度", label_en = "Severity", domain = "new:SurfaceDefect", datatype = "string", required = false, multiple = false }
+
+[[Q5.proposal.operations]]
+op = "create"
+kind = "relation_type"
+fields = { local_name = "hasSurfaceDefect", label_zh = "钢卷表面缺陷", label_en = "Has surface defect", domain = "T2", range = "new:SurfaceDefect", required = false, multiple = true }
+
+# Only available to the re-ask and competency checks after human review and v3.
+[Q5_after.refs]
+T7 = "SurfaceDefect"
+P3 = "urn:ontology-platform:vocabulary:externalId"
+R6 = "hasSurfaceDefect"
+
+[Q5_after.plan]
+intent = "objects"
+start = "T2"
+filters = [{ property = "P3", op = "eq", value = "W240100501" }]
+path = [{ relation = "R6", direction = "out", filters = [] }]
+missing = []
+assumptions = []
+
+[Q5_after.answer]
+answer = "这卷钢卷有两处表面缺陷。一处为严重边裂。另一处为一般结疤。"
+cited_keys = ["K1", "K2"]
+counterpoints = []
