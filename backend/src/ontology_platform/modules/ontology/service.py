@@ -1957,7 +1957,8 @@ async def update_item(
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
     given = patch.model_fields_set
-    if patch.decision is not None or "edited" in given or "match_decision" in given:
+    # A reject reason feeds the review memory, so setting or clearing it is a decision too.
+    if patch.decision is not None or given & {"edited", "match_decision", "reject_reason"}:
         _ensure_not_own(change_set, actor, review_mode)
     item = await db.scalar(
         select(ChangeItem).where(

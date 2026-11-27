@@ -11,7 +11,7 @@ from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from psycopg.types.json import Jsonb
-from sqlalchemy import ForeignKey, Uuid, create_engine, inspect
+from sqlalchemy import ForeignKey, Uuid, create_engine, insert, inspect
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
@@ -63,7 +63,7 @@ def test_review_learning_migration_and_previous_orm(database_url: str) -> None:
             ontology_id = uuid4()
             change_set_id = uuid4()
             session.execute(
-                models.ontology_models.Ontology.__table__.insert().values(
+                insert(models.ontology_models.Ontology).values(
                     id=ontology_id, key="previous", name="Previous", base_iri="urn:previous:"
                 )
             )

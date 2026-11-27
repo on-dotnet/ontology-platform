@@ -32,6 +32,7 @@ def type_key(label_zh: str | None, label_en: str | None) -> str:
     return "t:" + _main_name(label_zh, label_en)
 
 
+# The parts of the keys below must already be main names (`_main_name`): raw labels never match.
 def relation_key(domain: str, name: str, range_: str) -> str:
     return f"r:{domain}|{name}|{range_}"
 

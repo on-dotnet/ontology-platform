@@ -1,5 +1,6 @@
 """Contracts left for the later review learning batches."""
 
+import inspect
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -11,6 +12,7 @@ from ontology_platform.modules.ai import review_assist
 from ontology_platform.modules.ai.candidates import main_name, normalize
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import service
+from ontology_platform.modules.ontology.mergeplan import name_key
 from ontology_platform.modules.ontology.review_memory import (
     ReviewMemory,
     _main_name,
@@ -121,7 +123,7 @@ async def test_a_change_set_keeps_200_suppressed_proposals_and_counts_the_rest(
     ],
 )
 def test_review_keys_follow_candidate_normalization(zh: str | None, en: str | None) -> None:
-    assert _normalize(zh or "") == normalize(zh or "")
+    assert _normalize(zh or "") == normalize(zh or "") == name_key(zh or "")
     assert _main_name(zh, en) == main_name(zh, en)
     assert type_key(zh, en) == "t:" + main_name(zh, en)
     assert relation_key("炉次", "产出", "钢卷") == "r:炉次|产出|钢卷"
@@ -142,7 +144,7 @@ def test_collected_rejections_appear_in_memory() -> None:
 def test_extraction_memory_guard_is_registered() -> None:
     from ontology_platform.modules.ai import extraction
 
-    assert "memory" in extraction.build_proposals.__code__.co_varnames
+    assert "memory" in inspect.signature(extraction.build_proposals).parameters
 
 
 @pytest.mark.xfail(strict=True, reason="Batch 6 implements review assistance")

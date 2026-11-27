@@ -36,6 +36,8 @@ def make_review_assistant(
     settings: Settings,
 ) -> Handler:
     async def handle(context: JobContext) -> None:
+        # Batch 6: every way out (done, failure, timeout, lost lease) must move the row out of
+        # queued/running, or the partial unique index keeps answering 409 for this change set.
         raise ValueError("review.assist is not implemented")
 
     return handle
