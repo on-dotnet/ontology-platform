@@ -79,6 +79,11 @@ These are not entity types:
   result (daily and weekly rounds) is a value of an attribute, not a type of its own. Results
   that are recorded one by one, each with its own measured value, the time it was obtained and
   the item it was measured on (every reading of a lab test), are records, not values.
+- Events that the text records with the same data and that differ only by what was done, or
+  where, are one type of event whose action or place is an attribute: a parcel scanned when
+  it is picked up, sorted and delivered is one scan event, not a pickup, a sorting and a
+  delivery record. Documents of different kinds that each have a number series of their own
+  and that other records cite on their own (purchase, sales and return orders) stay types.
 - Kinds of a physical thing told apart only by what they are for, the step or place they come
   from, or their role or position among the others (a sample for a sugar test and a sample for
   a blood count; the first and the last carriage of a train). They are one type; the purpose,
@@ -93,8 +98,9 @@ These are not entity types:
   document that contains them, except a line that has a line number of its own and that other
   records refer to line by line (an invoice line that every credit note cites by its number):
   such a line is an entity type.
-- Slips, copies, receipts, tags, labels and attachments that go with a thing or confirm a
-  handover (a delivery receipt, a luggage tag), unless each one has a number of its own and is
+- Slips, copies, receipts, tags, labels, cards, pages and attachments that go with a thing,
+  travel with it from step to step or confirm a handover (a delivery receipt, a luggage tag, a
+  route card, the handover page of a logbook), unless each one has a number of its own and is
   kept track of on its own; what they record belongs to the thing or event they go with.
 - Registers, ledgers, directories, lists, tables, statistics, charts and analysis reports that
   collect or summarise entries about other things (a price list, a list of members, a weekly

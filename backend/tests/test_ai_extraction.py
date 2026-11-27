@@ -2001,13 +2001,26 @@ def test_the_types_prompt_keeps_lines_and_results_that_are_tracked_one_by_one() 
     assert "has a line number of its own and that other records refer to line by line" in rules
     # Item-by-item test results are records, not the outcome values listed above them.
     assert "are records, not values" in rules
-    # Paper that only goes with a thing or a handover is not a type of its own.
-    assert "Slips, copies, receipts, tags, labels and attachments" in rules
+    # Paper that only goes with a thing or a handover is not a type of its own; #58: the steel
+    # run also kept the route cards and handover pages that travel with a heat or a coil.
+    assert "Slips, copies, receipts, tags, labels, cards, pages and attachments" in rules
+    assert "travel with it from step to step or confirm a handover" in rules
     assert "Being mentioned, kept, handed over or referred to is not enough" in rules
     # The check is for paper only: a paid steel run lost the ladle furnace and the caster when
     # it applied to every type, since the text names machines without numbers of their own.
     assert "Before proposing a new type for a document, form, record" in rules
     assert "equipment, places and materials that the work is done with or on are not held" in rules
+
+
+def test_events_that_differ_only_by_the_action_are_one_type() -> None:
+    # #58: the steel-industry run kept lifting, setting down and return records next to the
+    # movement event they are steps of, all recorded with the same data.
+    rules = " ".join(TYPES_INSTRUCTIONS.split())
+    assert "differ only by what was done, or where, are one type of event" in rules
+    assert "whose action or place is an attribute" in rules
+    # Numbered documents that other records cite on their own must not be merged by this rule.
+    assert "a number series of their own and that other records cite on their own" in rules
+    assert "stay types" in rules
 
 
 def test_a_name_that_only_adds_a_design_is_the_same_type() -> None:
