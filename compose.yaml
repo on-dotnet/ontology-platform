@@ -82,6 +82,8 @@ services:
   worker:
     image: ontology/api:${OP_IMAGE_TAG:-local}
     command: ["python", "-m", "ontology_platform.worker"]
+    # Longer than modules/jobs/runner.py STOP_GRACE so the worker can requeue unfinished jobs (#64).
+    stop_grace_period: 90s
     environment: *api-env
     volumes:
       - documents-data:/data/documents

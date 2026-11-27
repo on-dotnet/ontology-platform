@@ -86,7 +86,7 @@
 
 **`jobs.jobs`**：`id`、`kind`（`document.process`）、`payload`（jsonb）、`status`（`queued` / `running` / `succeeded` / `failed`）、`attempts`、`max_attempts`（默认 3）、`run_after`、`locked_by`、`locked_at`、`heartbeat_at`、`error_code`、`error_detail`（只记日志与库，不返回给界面）、`created_at`、`finished_at`。
 
-worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15 秒更新心跳；心跳超过 2 分钟的 `running` 任务视为中断，重新排队。失败后按 30 秒、2 分钟的间隔退避重试。worker 与 api 用同一个镜像，在 compose 中以单独的 `worker` 服务运行。一个 worker 同时处理至多 `OP_WORKER_CONCURRENCY` 个任务（默认 3），每个任务各自领取、续心跳、核对租约；停止时不再领取，等手上的任务做完（规格 004 第 7.3 节）。
+worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15 秒更新心跳；心跳超过 2 分钟的 `running` 任务视为中断，重新排队。失败后按 30 秒、2 分钟的间隔退避重试。worker 与 api 用同一个镜像，在 compose 中以单独的 `worker` 服务运行。一个 worker 同时处理至多 `OP_WORKER_CONCURRENCY` 个任务（默认 3），每个任务各自领取、续心跳、核对租约；停止时不再领取，至多等 60 秒让手上的任务做完，没做完的放回队列（规格 004 第 7.3 节）。
 
 ### 3.4 `ai` 模块
 

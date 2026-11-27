@@ -55,6 +55,32 @@ async def heartbeat(db: AsyncSession, job_id: UUID, worker_id: str) -> bool:
     return updated is not None
 
 
+async def release(db: AsyncSession, job_id: UUID, worker_id: str, attempts: int) -> bool:
+    """Return an interrupted claim without spending an attempt: shutdown is not a job failure.
+
+    Matching the owner and attempt prevents releasing a lease another worker already claimed.
+    """
+    updated = await db.scalar(
+        update(Job)
+        .where(
+            Job.id == job_id,
+            Job.status == "running",
+            Job.locked_by == worker_id,
+            Job.attempts == attempts,
+        )
+        .values(
+            status="queued",
+            attempts=attempts - 1,
+            locked_by=None,
+            locked_at=None,
+            heartbeat_at=None,
+            run_after=func.now(),
+        )
+        .returning(Job.id)
+    )
+    return updated is not None
+
+
 async def succeed(db: AsyncSession, job_id: UUID) -> None:
     await db.execute(
         update(Job)
