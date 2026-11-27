@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { CircleCheck, Download, History, Rocket } from 'lucide-react';
+import { CircleCheck, DatabaseZap, Download, History, Rocket } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +21,7 @@ import { useSelectedOntology } from '@/features/ontologies/use-selected-ontology
 import { useErrorMessage } from '@/i18n/error-message';
 import { downloadText } from '@/lib/download';
 
-import { exportReleaseTurtle, useReleases, type ReleaseSummary } from './api';
+import { exportReleaseR2rml, exportReleaseTurtle, useReleases, type ReleaseSummary } from './api';
 import { CompareCard } from './compare';
 import { ActivateReleaseDialog, PublishReleaseDialog } from './release-dialogs';
 
@@ -32,7 +32,7 @@ interface ReleasesPageProps {
 
 export function ReleasesPage({ ontologyId, onOntologyChange }: ReleasesPageProps) {
   const { t } = useTranslation();
-  const { canReview } = usePermissions();
+  const { canReview, canExportMappings } = usePermissions();
   const { query, ontologies, selected } = useSelectedOntology(ontologyId);
   const [publishing, setPublishing] = useState(false);
 
@@ -62,7 +62,7 @@ export function ReleasesPage({ ontologyId, onOntologyChange }: ReleasesPageProps
               <EmptyState icon={History} title={t('releases.noOntologyTitle')} description={t('releases.noOntologyDescription')} />
             </Card>
           ) : (
-            <ReleasesTable ontology={selected} canReview={canReview} />
+            <ReleasesTable ontology={selected} canReview={canReview} canExportMappings={canExportMappings} />
           )
         }
       </QueryState>
@@ -71,7 +71,7 @@ export function ReleasesPage({ ontologyId, onOntologyChange }: ReleasesPageProps
   );
 }
 
-function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; canReview: boolean }) {
+function ReleasesTable({ ontology, canReview, canExportMappings }: { ontology: OntologySummary; canReview: boolean; canExportMappings: boolean }) {
   const { t } = useTranslation();
   const toast = useToast();
   const message = useErrorMessage();
@@ -85,6 +85,15 @@ function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; can
       toast.success(t('releases.exported', { version: release.version }));
     },
     onError: (error) => toast.error(t('releases.exportFailed'), message(error)),
+  });
+
+  const exportR2rml = useMutation({
+    mutationFn: (release: ReleaseSummary) => exportReleaseR2rml(release.id).then((text) => ({ release, text })),
+    onSuccess: ({ release, text }) => {
+      downloadText(`${ontology.key}-v${release.version}-r2rml.ttl`, text);
+      toast.success(t('releases.exportedR2rml', { version: release.version }));
+    },
+    onError: (error) => toast.error(t('releases.exportR2rmlFailed'), message(error)),
   });
 
   return (
@@ -128,6 +137,8 @@ function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; can
                   {releases.map((release) => {
                     const exporting = exportTurtle.isPending && exportTurtle.variables?.id === release.id;
                     const exportLabel = t('releases.exportVersion', { version: release.version });
+                    const exportingR2rml = exportR2rml.isPending && exportR2rml.variables?.id === release.id;
+                    const exportR2rmlLabel = t('releases.exportR2rmlVersion', { version: release.version });
                     return (
                       <TableRow key={release.id}>
                         <TableCell className="whitespace-nowrap font-semibold tabular-nums text-foreground">
@@ -168,6 +179,19 @@ function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; can
                                 {exporting ? null : <Download aria-hidden />}
                               </Button>
                             </Tooltip>
+                            {canExportMappings && release.bindingCount > 0 ? (
+                              <Tooltip content={exportR2rmlLabel}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  aria-label={exportR2rmlLabel}
+                                  loading={exportingR2rml}
+                                  onClick={() => exportR2rml.mutate(release)}
+                                >
+                                  {exportingR2rml ? null : <DatabaseZap aria-hidden />}
+                                </Button>
+                              </Tooltip>
+                            ) : null}
                             {canReview && !release.isActive ? (
                               <Button variant="secondary" size="sm" onClick={() => setActivating(release)}>
                                 {t('releases.activate.action')}

@@ -54,6 +54,10 @@ export function exportReleaseTurtle(id: string): Promise<string> {
   return unwrap(api.GET('/api/releases/{id}/export', { params: { path: { id }, query: { format: 'turtle' } }, parseAs: 'text' }));
 }
 
+export function exportReleaseR2rml(id: string): Promise<string> {
+  return unwrap(api.GET('/api/releases/{id}/r2rml', { params: { path: { id } }, parseAs: 'text' }));
+}
+
 function isProblem(value: unknown): value is ReleaseProblem {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
