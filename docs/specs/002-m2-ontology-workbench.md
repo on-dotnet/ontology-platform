@@ -119,7 +119,7 @@ M1 的自动形状（`{类型}-shape`）继续保留：平台内新建的对象�
 
 1. 校验规则（SHACL）：谓词属于 SHACL，或类型是 SHACL 类。
 2. 逻辑公理：使用 OWL 限制、等价、不相交、属性链、类构造、身份或属性特征等逻辑词汇，也包括 `rdfs:subPropertyOf`。
-3. 实例或代码：声明业务类的实例、SKOS 概念或概念方案，或显式声明 `owl:NamedIndividual`。
+3. 实例或代码：声明业务类的实例、SKOS 概念或概念方案，显式声明 `owl:NamedIndividual`，或带代码表谓词（`skos:inScheme`、`skos:notation`、`skos:broader` 等层级与映射关系）。
 4. 多父类型：`rdfs:subClassOf` 指向具名类。
 5. 注解：全部谓词都是注解，包括常见 RDFS、都柏林核心、SKOS 和 OWL 注解，以及可从本体取得声明的注解属性。
 6. 其他：其余片段。

@@ -81,6 +81,28 @@ _ANNOTATIONS = {
     SKOS.example,
 }
 _NOTES = (SH.message, RDFS.comment, SKOS.definition)
+# Code lists: membership, notation and the links between concepts.
+_CODE_PREDICATES = {
+    SKOS.inScheme,
+    SKOS.notation,
+    SKOS.topConceptOf,
+    SKOS.hasTopConcept,
+    SKOS.broader,
+    SKOS.narrower,
+    SKOS.broaderTransitive,
+    SKOS.narrowerTransitive,
+    SKOS.related,
+    SKOS.member,
+    SKOS.memberList,
+    SKOS.exactMatch,
+    SKOS.closeMatch,
+    SKOS.broadMatch,
+    SKOS.narrowMatch,
+    SKOS.relatedMatch,
+}
+# Large imported ontologies keep tens of thousands of fragments; a smaller cache thrashes.
+_CACHE_SIZE = 65536
+_DECLARES_ANNOTATION = "AnnotationProperty"
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,7 +113,7 @@ class FragmentInfo:
     declares: frozenset[str]
 
 
-@lru_cache(maxsize=2048)
+@lru_cache(maxsize=_CACHE_SIZE)
 def fragment_info(turtle: str, prefixes: Prefixes) -> FragmentInfo:
     try:
         triples = parse_fragment(turtle, dict(prefixes))
@@ -115,7 +137,7 @@ def fragment_info(turtle: str, prefixes: Prefixes) -> FragmentInfo:
         category = "shape"
     elif predicates & _LOGIC_PREDICATES or types & _LOGIC_TYPES:
         category = "logic"
-    elif any(
+    elif predicates & _CODE_PREDICATES or any(
         t in (OWL.NamedIndividual, OWL.Thing, OWL.Nothing, RDFS.Resource)
         or not str(t).startswith((str(OWL), str(RDFS), str(RDF)))
         for t in types
@@ -141,7 +163,13 @@ def fragment_info(turtle: str, prefixes: Prefixes) -> FragmentInfo:
 
 
 def declared_annotations(fragments: Iterable[str], prefixes: Prefixes) -> frozenset[str]:
-    return frozenset(iri for text in fragments for iri in fragment_info(text, prefixes).declares)
+    # Any spelling of owl:AnnotationProperty contains its local name; skip parsing the rest.
+    return frozenset(
+        iri
+        for text in fragments
+        if _DECLARES_ANNOTATION in text
+        for iri in fragment_info(text, prefixes).declares
+    )
 
 
 def classify_axiom(
