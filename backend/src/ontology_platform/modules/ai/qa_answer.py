@@ -2,7 +2,6 @@
 
 import json
 import re
-from collections.abc import Mapping
 from itertools import chain, islice
 from typing import NamedTuple
 
@@ -19,22 +18,28 @@ from ontology_platform.modules.query.schemas import PathRow
 _VALUE_LIMIT = 200
 
 # Row refs the answer call uses for rows (K1 to K50); readers know objects by their keys.
-_REF = re.compile(r"(?<![0-9A-Za-z])K\d+(?![0-9A-Za-z])")
+_REF = re.compile(r"(?<![0-9A-Za-z_])K\d+(?![0-9A-Za-z_])")
 _REF_SEP = r"\s*(?:[、,，;；/~\uff5e\-\u2013\u2014]|和|及|与|至|到)\s*"
 _REF_GROUP = re.compile(rf"\s*[（(]\s*K\d+(?:{_REF_SEP}K\d+)*\s*[）)]")
 # Saying the objects cannot be listed contradicts the complete list shown with the answer.
+_NOT_IN_CLAUSE = r"[^，,；;。！？!?\n]"
 _DENIAL = re.compile(
-    r"(?:无法|不能|未能|没法|难以)[^。！？!?]{0,8}(?:列出|列举|罗列)"
-    r"|(?:未|没有|并未|不)(?:提供|给出|包含|列出)[^。！？!?]{0,12}(?:编号|名单|清单|列表|明细|具体)"
+    rf"(?:无法|不能|未能|没法|难以|不便){_NOT_IN_CLAUSE}{{0,8}}(?:列出|列举|罗列)"
+    rf"|(?:未|没有|并未|尚未){_NOT_IN_CLAUSE}{{0,2}}(?:列出|列举|罗列)"
+    rf"|(?:无法|不能|未能|没法|难以|不便|未|没有|并未|不)"
+    rf"{_NOT_IN_CLAUSE}{{0,6}}(?:提供|给出|列出|展示|显示|包含)"
+    rf"{_NOT_IN_CLAUSE}{{0,12}}(?:编号|名单|清单|列表|明细)"
 )
-_SENTENCE_END = re.compile(r"(?<=[。！？!?；;\n])")
+_CLAUSE_END = re.compile(r"(?<=[，,；;。！？!?\n])(?![，,；;。！？!?\n])")
+_SENTENCE_ENDS = "。！？!?\n"
+_CLAUSE_JOINS = "，,；;"
 
 
 class _Prompt(NamedTuple):
     text: str
     refs: dict[str, str]
     names: dict[str, str]
-    # Ref-shaped business words, such as a grade, that the answer may repeat as they are.
+    # Ref-shaped business values, such as a grade, that the answer may repeat as they are.
     literals: set[str]
     truncated: bool
 
@@ -43,33 +48,56 @@ def _name(row: PathRow) -> str:
     return " / ".join(k.value for k in row.source.key)
 
 
-def _resolve(text: str, names: Mapping[str, str], literals: set[str]) -> str | None:
-    """Name the objects behind row refs; None if the text refers to a row it was not given."""
+class _Readable:
+    """Rewrites model prose for readers: object names for row refs, no denial of a full list."""
 
-    def known(ref: str) -> bool:
-        return ref in names and ref not in literals
+    def __init__(self, prompt: _Prompt, listed: bool) -> None:
+        self.names = prompt.names
+        self.literals = prompt.literals
+        self.listed = listed
+        self.unknown = False
 
-    def group(match: re.Match[str]) -> str:
-        return "" if all(known(ref) for ref in _REF.findall(match[0])) else match[0]
+    def __call__(self, text: str) -> str | None:
+        text = _REF_GROUP.sub(self._group, text)
+        kept: list[str] = []
+        for clause in _CLAUSE_END.split(text):
+            resolved = self._clause(clause)
+            if resolved is not None:
+                kept.append(resolved)
+                continue
+            # Close the sentence the dropped clause ended instead of leaving a dangling comma.
+            end = clause.rstrip()[-1:]
+            if end and end in _SENTENCE_ENDS and kept:
+                last = kept[-1].rstrip()
+                if last[-1:] in _CLAUSE_JOINS:
+                    kept[-1] = last[:-1] + end
+        return "".join(kept).strip() or None
 
-    unknown = False
+    def _group(self, match: re.Match[str]) -> str:
+        refs = _REF.findall(match[0])
+        return "" if all(r in self.names and r not in self.literals for r in refs) else match[0]
 
-    def bare(match: re.Match[str]) -> str:
-        nonlocal unknown
-        ref = match[0]
-        if ref in literals:
+    def _clause(self, clause: str) -> str | None:
+        unknown = False
+
+        def bare(match: re.Match[str]) -> str:
+            nonlocal unknown
+            ref = match[0]
+            if ref in self.literals:
+                return ref
+            if ref in self.names:
+                return self.names[ref]
+            unknown = True
             return ref
-        if ref in names:
-            return names[ref]
-        unknown = True
-        return ref
 
-    resolved = _REF.sub(bare, _REF_GROUP.sub(group, text))
-    return None if unknown else resolved
-
-
-def _without_denials(text: str) -> str:
-    return "".join(s for s in _SENTENCE_END.split(text) if not _DENIAL.search(s)).strip()
+        resolved = _REF.sub(bare, clause)
+        if unknown:
+            # A ref to a row the call was not given is made up; drop what it says.
+            self.unknown = True
+            return None
+        if self.listed and _DENIAL.search(resolved):
+            return None
+        return resolved
 
 
 def _facts(
@@ -128,7 +156,7 @@ def _prompt(
     rows = []
     refs: dict[str, str] = {}
     names: dict[str, str] = {}
-    words = [question, plan.description]
+    words: list[str] = []
     answer_refs = {row.key: f"K{i}" for i, row in enumerate(evidence.rows, start=1)}
     truncated = evidence.truncated or len(evidence.rows) + len(evidence.tail) > ROW_LIMIT
     for i, row in enumerate(islice(chain(evidence.rows, evidence.tail), ROW_LIMIT), start=1):
@@ -224,14 +252,13 @@ async def answer(
         result.notes.append("answer_unavailable")
         return result
     # The platform, not the prompt alone, keeps row refs and denials of the shown list out.
-    listed = bool(result.facts.objects) and result.facts.count == len(result.facts.objects)
-
-    def readable(text: str) -> str | None:
-        resolved = _resolve(text, prompt.names, prompt.literals)
-        if resolved is not None and listed:
-            resolved = _without_denials(resolved)
-        return resolved or None
-
+    # A truncated input may rightly say that only part of the objects is shown.
+    listed = (
+        bool(result.facts.objects)
+        and result.facts.count == len(result.facts.objects)
+        and not prompt.truncated
+    )
+    readable = _Readable(prompt, listed)
     text = readable(output.answer)
     if text is None:
         result.notes.append("answer_unavailable")
@@ -239,6 +266,6 @@ async def answer(
     result.text = text
     result.counterpoints = [c for c in map(readable, output.counterpoints) if c is not None]
     result.cited_keys = [refs[ref] for ref in output.cited_keys if ref in refs]
-    if any(ref not in refs for ref in output.cited_keys):
+    if readable.unknown or any(ref not in refs for ref in output.cited_keys):
         result.notes.append("cited_unknown")
     return result

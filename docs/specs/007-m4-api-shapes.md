@@ -139,7 +139,7 @@ type QaFacts = {
 };
 type QaNote = 'cited_unknown' | 'answer_unavailable' | 'rows_not_shared' | 'rows_truncated';
 type QaAnswer = {
-  text: string | null;                   // 模型写的说明，短引用已换成对象编号；回答调用失败、回答引用了未分配的短引用或没有做（rows_not_shared）时为 null
+  text: string | null;                   // 模型写的说明，短引用已换成对象编号；回答调用失败、后处理删完为空或没有做（rows_not_shared）时为 null
   facts: QaFacts;                        // 代码生成，界面以它为准显示数字
   citedKeys: string[];                   // 模型 cited_keys 只回 K1…K50；代码将本次已分配的短引用映射回编码主键，未知引用丢弃并记 cited_unknown
   counterpoints: string[];

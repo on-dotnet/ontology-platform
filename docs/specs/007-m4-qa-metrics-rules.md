@@ -185,9 +185,11 @@ class QaAnswerOut(BaseModel):
 
 合成回答（代码）：
 
-- `answer.text` 用模型写的 `answer`，代码再做两步后处理（`counterpoints` 逐条同样处理）：
-  - 括号里只有已分配短引用的部分（如"（K1、K2）"）删掉，其余已分配的短引用换成对象编号；在问题、计划描述、对象编号或字符串属性值里原样出现过的同形词（如牌号 `K55`）不动。`answer` 里仍有未分配的短引用时，整段回答按回答调用失败处理（`text` 为空、`counterpoints` 与 `citedKeys` 为空、记 `answer_unavailable`）；某条留意点里有时，只丢弃这一条；
-  - `facts.objects` 列出了全部答案对象（条数等于 `count`）时，删掉说"无法列出""未提供编号或清单"之类的句子；删完为空时同样按回答调用失败处理。结果截断时不做这一步，模型可以说明只展示了一部分；
+- `answer.text` 用模型写的 `answer`，代码按分句（以逗号、分号、句号等切开）做后处理，`counterpoints` 逐条同样处理：
+  - 括号里只有已分配短引用的部分（如"（K1、K2）"）删掉，其余已分配的短引用换成对象编号。在对象编号或字符串属性值里原样出现过的同形词（如牌号 `K55`）不动；这是已知例外，此时模型写的同名短引用也不换。
+  - 含未分配短引用的分句是模型编造的，删掉并记 `cited_unknown`；
+  - 答案对象全部列在 `facts.objects` 里（条数等于 `count`，且输入没有截断）时，删掉说"无法列出""未提供编号或清单"之类的分句，同一句里的数字保留。输入截断时不做这一步，模型可以说明只展示了一部分；
+  - 删完为空时按回答调用失败处理：`text` 为空、`counterpoints` 与 `citedKeys` 为空、记 `answer_unavailable`；某条留意点删完为空时只丢弃这一条；
 - `answer.facts` 由代码生成：`count`、指标值（带单位与小数位）、对象列表、违规条数；界面以 `facts` 为准显示数字；
 - `cited_keys` 中已分配的短引用映射回编码主键，存入 `answer.citedKeys`；丢弃未知短引用，`answer.notes` 记 `cited_unknown`；
 - 第二次调用失败（`ai.invalid_output`、不可重试的 `AiError`）时，问题仍以 `answered` 结束，`answer.text` 为空、`answer.notes` 记 `answer_unavailable`，界面只显示事实与证据；

@@ -274,14 +274,30 @@ async def test_the_conclusion_names_objects_instead_of_row_refs(qa_demo: QaDemo)
     assert result.answer.notes == []
 
 
-async def test_a_conclusion_with_an_unknown_row_ref_is_not_shown(qa_demo: QaDemo) -> None:
+async def test_a_clause_with_an_unknown_row_ref_is_dropped(qa_demo: QaDemo) -> None:
     answer = QaAnswerOut(
-        answer="检验不合格的钢卷有 K1 和 K9。", cited_keys=["K1"], counterpoints=["K7 需要复查。"]
+        answer="检验不合格的钢卷共 2 个，其中 K9 需要复查。K1 有两次检验不合格。",
+        cited_keys=["K1"],
+        counterpoints=["K7 需要复查。", "K1 需要复检。"],
+    )
+    result = await qa_demo.run("Q2", answer=answer)
+    assert result.answer is not None
+    assert result.evidence is not None
+    first = _name(result.evidence.rows[0])
+    assert result.answer.text == f"检验不合格的钢卷共 2 个。{first} 有两次检验不合格。"
+    assert result.answer.counterpoints == [f"{first} 需要复检。"]
+    assert result.answer.notes == ["cited_unknown"]
+
+
+async def test_a_conclusion_made_only_of_unknown_row_refs_is_not_shown(qa_demo: QaDemo) -> None:
+    answer = QaAnswerOut(
+        answer="K9 检验不合格。", cited_keys=["K1"], counterpoints=["K1 需要复检。"]
     )
     result = await qa_demo.run("Q2", answer=answer)
     assert result.answer is not None
     assert result.answer.text is None
     assert result.answer.counterpoints == []
+    assert result.answer.cited_keys == []
     assert "answer_unavailable" in result.answer.notes
     assert result.answer.facts.count == 2
 
@@ -292,6 +308,17 @@ async def test_a_conclusion_with_an_unknown_row_ref_is_not_shown(qa_demo: QaDemo
         (
             "牌号 Q235B 的炉次共有 18 个。结果未提供具体炉次编号，无法逐一列出。",
             "牌号 Q235B 的炉次共有 18 个。",
+        ),
+        # The number stays when the denial shares its sentence.
+        ("共有 18 个炉次，无法逐一列出。", "共有 18 个炉次。"),
+        ("共有 18 个炉次，无法给出每个炉次的编号。", "共有 18 个炉次。"),
+        ("共有 18 个炉次，无法提供具体编号。", "共有 18 个炉次。"),
+        ("共有 18 个炉次，没有展示编号。", "共有 18 个炉次。"),
+        ("共有 18 个炉次，不便逐一列出。", "共有 18 个炉次。"),
+        ("共有 18 个炉次，未列出所有炉次。", "共有 18 个炉次。"),
+        (
+            "共有 18 个炉次；结果不包含具体的缺陷位置。",
+            "共有 18 个炉次；结果不包含具体的缺陷位置。",
         ),
         ("结果中没有给出炉次的编号清单。", None),
     ],
@@ -312,24 +339,30 @@ async def test_the_conclusion_does_not_deny_the_listed_objects(
     assert ("answer_unavailable" in result.answer.notes) == (expected is None)
 
 
-async def test_a_truncated_list_may_say_it_is_not_complete(
+async def test_a_truncated_input_may_say_the_list_is_not_complete(
     qa_demo: QaDemo, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    heats = [f"H{i:07}" for i in range(60)]
-
-    async def large_page(session: AsyncSession, statement: SelectQuery) -> Rows:
+    # All 18 heats are listed, but a cut value means the model did not see all of each row.
+    async def long_values(session: AsyncSession, statement: SelectQuery) -> Rows:
         rows = []
-        for key in heats:
-            values = {"heat_no": key, "steel_grade": "Q235B", "org_id": "ORG01", "site_id": "S1"}
+        for n in range(1, 19):
+            values = {
+                "heat_no": f"H24010{n:02}",
+                "steel_grade": "Q235B",
+                "org_id": "O" * 201,
+                "site_id": "S1",
+            }
             rows.append(tuple(values[column.name] for column in statement.columns))
         return Rows(tuple(rows), has_more=False)
 
-    monkeypatch.setattr(connectors, "select", large_page)
-    text = "共有 60 个炉次。结果只展示前 50 个，无法全部列出。"
+    monkeypatch.setattr(connectors, "select", long_values)
+    text = "共有 18 个炉次，结果有截断，无法全部列出。"
     result = await qa_demo.run(
         "Q1", answer=QaAnswerOut(answer=text, cited_keys=[], counterpoints=[])
     )
     assert result.answer is not None
+    assert len(result.answer.facts.objects) == result.answer.facts.count == 18
+    assert "rows_truncated" in result.answer.notes
     assert result.answer.text == text
 
 
