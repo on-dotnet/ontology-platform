@@ -2,8 +2,8 @@
 
 This is the one way the ai module's binding suggestions enter the ontology: as an open change
 set of source `ai_binding` whose items all wait for review. It applies, accepts and merges
-nothing, and takes no semantic elements. It implements no binding rule either: the checks are
-those of a manual save (`service`'s shape and reference checks, then `binding_rules`).
+nothing, and takes no semantic elements. Suggestions skip columns already bound under the same
+type binding. The other checks are those of a manual save (`service` and `binding_rules`).
 
 Several suggestions may be candidates for the same place (the same binding kind of the same
 element under the same parent or ends): they are tried in order, and the first that passes the
@@ -26,6 +26,7 @@ from ontology_platform.modules.ontology.models import BINDING_KINDS
 SOURCE: Final = "ai_binding"
 # Left out because an item it refers to (by temp_ref) was left out.
 DEPENDENCY_DROPPED: Final = "binding.dependency_dropped"
+COLUMN_IN_USE: Final = "binding.column_in_use"
 
 
 class NotABindingProposalError(ValueError):
@@ -84,6 +85,12 @@ async def _select(
     _only_new_bindings(items)
     await service._ontology_or_404(db, ontology_id, lock=lock)
     elements = {e.id: e for e in await service._elements(db, ontology_id, all_kinds=True)}
+    # A reviewer may have bound a column since the model saw the catalog.
+    bound_columns = {
+        (e.parent_id, e.binding.get("column"))
+        for e in elements.values()
+        if e.kind == "property_binding" and e.status == "active" and e.binding
+    }
 
     dropped: dict[int, Dropped] = {}
     # Per place, the candidates not tried yet; the first of each is tried at once.
@@ -110,6 +117,14 @@ async def _select(
             continue
         if ref is not None:
             seen.add(ref)
+        fields = item.proposed
+        if (
+            item.kind == "property_binding"
+            and isinstance(fields.binding, schemas.ColumnBinding)
+            and (rules.parse_id(fields.parent_ref or ""), fields.binding.column) in bound_columns
+        ):
+            dropped[position] = Dropped(position, COLUMN_IN_USE, "the column is bound on this type")
+            continue
         place = _place(item)
         if place in waiting:
             waiting[place].append(position)

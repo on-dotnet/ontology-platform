@@ -648,6 +648,40 @@ async def test_nothing_to_propose_leaves_no_change_set(
     }
 
 
+async def test_a_column_in_use_is_dropped_only_under_its_own_type_binding(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    s = await steel(db)
+    await ready(db, s)
+    await sign_in(client, db, Role.ADMIN)
+    await bind(client, s)  # externalId already uses heat_no under Heat.
+    # Batch and its subtype Heat share a table. Both can use batchCode.
+    gateway = CatalogGateway(
+        [table_match(s.batch, "heat")],
+        {
+            s.heat.id: ColumnsOut(properties=[column(s.batch_code, "heat_no")], relations=[]),
+            s.batch.id: ColumnsOut(properties=[column(s.batch_code, "heat_no")], relations=[]),
+        },
+    )
+    body = await ask(client, s, typeIds=[str(s.heat.id), str(s.batch.id)])
+    await answer(app, body["id"], gateway)
+
+    row = await stored(app, body["id"])
+    assert row.change_set_id is not None
+    items = await items_of(db, row.change_set_id)
+    (parent,) = [item for item in items if item.kind == "type_binding"]
+    assert parent.proposed["subjectRef"] == str(s.batch.id)
+    assert (row.proposed, row.dropped) == (2, 1)
+    (finished,) = await audit_events(db, "binding.suggestion_finished")
+    assert finished.detail["reasons"] == {"binding.column_in_use": 1}
+    (property_item,) = [item for item in items if item.kind == "property_binding"]
+    assert property_item.proposed == {
+        "subjectRef": str(s.batch_code.id),
+        "parentRef": parent.temp_ref,
+        "binding": {"target": "column", "column": "heat_no"},
+    }
+
+
 async def test_a_scope_over_the_limits_is_refused(client: AsyncClient, db: AsyncSession) -> None:
     s = await steel(db)
     await ready(db, s)
@@ -839,6 +873,77 @@ def _join_of(hop: ForeignKeyHop | LinkTableHop) -> dict[str, Any]:
         "columns": list(hop.columns),
         "references": list(hop.references),
     }
+
+
+async def test_unlabelled_vocabulary_properties_can_be_matched_independently_for_each_type(
+    app: FastAPI,
+    client: AsyncClient,
+    db: AsyncSession,
+    external_source: ExternalSource,
+    settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    imported = await import_and_merge(
+        client,
+        b"""
+        @prefix ex: <urn:synthetic:metals:> .
+        @prefix op: <urn:ontology-platform:vocabulary:> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+        ex:Heat a owl:Class .
+        ex:Coil a owl:Class .
+        op:externalId a owl:DatatypeProperty ; rdfs:range xsd:string .
+        op:organizationId a owl:DatatypeProperty ; rdfs:range xsd:string .
+        op:siteId a owl:DatatypeProperty ; rdfs:range xsd:string .
+        """,
+    )
+    ontology_id = UUID(imported["ontology"]["id"])
+    source = await _steel_catalog(app, db, client, external_source, settings, monkeypatch)
+    elements = await db.scalars(select(Element).where(Element.ontology_id == ontology_id))
+    ids = {e.local_name: str(e.id) for e in elements}
+    keys = {"Heat": "heat_no", "Coil": "coil_no"}
+    gateway = CatalogGateway(
+        [table_match(ids[name], name.lower()) for name in keys],
+        {
+            UUID(ids[name]): ColumnsOut(properties=[column(ids["externalId"], key)], relations=[])
+            for name, key in keys.items()
+        },
+    )
+
+    response = await client.post(
+        f"/api/ontologies/{ontology_id}/binding-suggestions",
+        json={"dataSourceId": str(source.id), "schemas": ["mes"]},
+        headers=csrf_headers(client),
+    )
+    assert response.status_code == 202, response.text
+    await answer(app, response.json()["id"], gateway)
+
+    candidates = {}
+    for purpose, text in gateway.texts:
+        if purpose == COLUMNS_PURPOSE:
+            type_id = json.loads(text.split("Object type:\n")[1].split("\n\n")[0])["id"]
+            props = json.loads(text.split("Properties to map:\n")[1].split("\n\n")[0])
+            assert all(p["domainId"] is None for p in props)
+            candidates[type_id] = {p["id"]: p["localName"] for p in props}
+    expected = {ids[name]: name for name in ("externalId", "organizationId", "siteId")}
+    assert candidates == {ids["Heat"]: expected, ids["Coil"]: expected}
+
+    row = await stored(app, response.json()["id"])
+    assert (row.proposed, row.dropped) == (4, 0)
+    assert row.change_set_id is not None
+    items = await items_of(db, row.change_set_id)
+    parents = {i.temp_ref: i.proposed["subjectRef"] for i in items if i.kind == "type_binding"}
+    assert {
+        (
+            parents[i.proposed["parentRef"]],
+            i.proposed["subjectRef"],
+            i.proposed["binding"]["column"],
+        )
+        for i in items
+        if i.kind == "property_binding"
+    } == {(ids[name], ids["externalId"], key) for name, key in keys.items()}
 
 
 async def test_the_expected_steel_bindings_reach_the_release_once_reviewed(
