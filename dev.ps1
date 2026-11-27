@@ -603,22 +603,25 @@ function Save-EvalStream([string]$RecordingsDir) {
     end { [pscustomobject]@{ Last = $last; Saved = $saved } }
 }
 
-# Scores extraction on a case pack. Rootless Docker cannot bind-mount local folders, so documents
-# and recordings go in as JSON on stdin; results and new recordings return line by line on stdout.
-# A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
-# optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
-# must not be committed. Results and recordings of a folder case are named "dir-<folder>".
 # The code root and image tag an evaluation builds from: this checkout, or with -CodeFrom another
 # worktree of this repository. Only worktrees qualify: the model key must not run code from an
-# arbitrary folder.
+# arbitrary folder. git still lists a worktree whose folder was deleted, so check the folder too.
 function Resolve-CodeFrom([string]$CodeFrom) {
     if (-not $CodeFrom) { return $Root, $env:OP_IMAGE_TAG }
     $codeRoot = [IO.Path]::GetFullPath($CodeFrom, (Get-Location).Path).TrimEnd('\', '/')
     $workspace = Get-Workspaces | Where-Object { $_.Path -eq (Get-NormalizedPath $codeRoot) } | Select-Object -First 1
     if (-not $workspace) { Stop-Dev "-CodeFrom 只接受本仓库的 worktree（git worktree list）：$codeRoot" }
+    if (-not (Test-Path -LiteralPath (Join-Path $codeRoot 'compose.yaml') -PathType Leaf)) {
+        Stop-Dev "-CodeFrom 的 worktree 目录不存在或缺少 compose.yaml：$codeRoot"
+    }
     return $codeRoot, $workspace.Tag
 }
 
+# Scores extraction on a case pack. Rootless Docker cannot bind-mount local folders, so documents
+# and recordings go in as JSON on stdin; results and new recordings return line by line on stdout.
+# A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
+# optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
+# must not be committed. Results and recordings of a folder case are named "dir-<folder>".
 function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [bool]$SequentialOnly, [string]$CodeFrom) {
     if (-not $Case) { $Case = 'steel' }
     $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path).TrimEnd('\', '/')

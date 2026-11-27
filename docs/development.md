@@ -147,11 +147,11 @@ M3 的数据绑定与查询用一套人工合成的冶金 MES 数据作外部数
 
 默认优先回放已有录制，只有新输入才调用模型并产生费用。一次完整运行约十次调用，按脚本预期路径是五次计划、四次回答、一次缺口提议，重试会增加次数。`./dev.ps1 eval-qa -Replay` 只回放，容器拿不到模型 Key 和代理。缺录制会报告题号和步骤。录制与模型名在 `.verification/eval/recordings/qa-steel/`，每次调用完成就写入录制目录；Ctrl-C 或容器被杀时已付费的调用仍会保留，中断后容器会被删除。
 
-`-Recordings <目录>` 换一个录制目录；`-CodeFrom <worktree>` 用另一个 worktree 的代码构建镜像，问题、答案、样例数据、模型配置和结果文件仍用主检出目录的，结果文件名带那个 worktree 的镜像标签（与下面识别评测的同名参数相同）。改问答提示词的分支在合并前付费对比时，在主检出目录运行 `./dev.ps1 eval-qa -CodeFrom .claude/worktrees/<名称>`。
+`-Recordings <目录>` 换一个录制目录；`-CodeFrom <worktree>` 用另一个 worktree 的代码构建镜像，问题、答案、样例数据、模型配置和结果文件仍用主检出目录的，结果文件名带那个 worktree 的镜像标签（与下面识别评测的同名参数相同）。改问答提示词的分支在合并前付费对比时，在主检出目录运行 `./dev.ps1 eval-qa -CodeFrom .claude/worktrees/<名称>`；不想让分支的新录制写进默认录制目录时同时给 `-Recordings`。`-CodeFrom` 构建时会把主检出目录的模型配置交给那个 worktree 的 `compose.yaml` 与 Dockerfile，只对自己信任的分支使用；评测会重建那个 worktree 的 api 镜像，不要和它的 `ci`、`test-api` 同时运行。
 
 汇总表每题一行。“检验”是正式 CQ 结果。Q5 的数字期望属于 v3，在 v2 正确识别缺口时检验值为 `unanswerable`。“v2达标”另计本次演示的预期；“计划”显示等价或首个不符项。“调用”只计本次模型调用，回放单列。“输入泄露”给出该题提示词中的命中数。
 
-完整结果在 `.verification/eval/qa-steel[-replay]-<时间>.json`。`questions` 内有实际计划、回答、检验差异、耗时、用量及 Q5 提议明细。`promptLeaks` 给出命中词、题号、调用序号与步骤。流程完成返回 0，即使有题目未通过；环境故障、回放缺失或模型不可用导致流程中断时返回非零。
+完整结果在 `.verification/eval/qa-steel[-replay][-<镜像标签>]-<时间>.json`，用了 `-CodeFrom` 才带镜像标签。`questions` 内有实际计划、回答、检验差异、耗时、用量及 Q5 提议明细。`promptLeaks` 给出命中词、题号、调用序号与步骤。流程完成返回 0，即使有题目未通过；环境故障、回放缺失或模型不可用导致流程中断时返回非零。
 
 ## 识别评测
 
