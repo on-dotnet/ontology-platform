@@ -24,7 +24,7 @@ interface DataSourceDialogProps {
   source?: DataSource;
   repairPassword?: boolean;
   onClose: () => void;
-  onSaved: (source: DataSource) => void | Promise<void>;
+  onSaved: (source: DataSource, testAfterCreate: boolean) => void | Promise<void>;
 }
 
 const maxLengths = { name: 100, host: 255, database: 128, username: 128, password: 1024 };
@@ -56,14 +56,14 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
   function change<K extends keyof SourceForm>(field: K, value: SourceForm[K]) {
     setForm((current) => ({ ...current, [field]: value }));
     setError(null);
-    if (field !== 'name' && field !== 'allowSamples') setResult(null);
+    if (!initial || (field !== 'name' && field !== 'allowSamples')) setResult(null);
   }
 
   async function run(operation: Operation) {
     if (controller.current) return;
     setAttempted(operation);
     setError(null);
-    setResult(null);
+    if (operation === 'test' || initial) setResult(null);
     const errors = validationErrors(form, passwordRequired, operation);
     const [invalidField] = Object.keys(errors);
     if (invalidField) {
@@ -86,7 +86,7 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
               params: { path: { id: initial.id } }, body: patchRequest(form, initial), signal,
             }))
           : await unwrap(api.POST('/api/data-sources', { body: createRequest(form), signal }));
-        if (!signal.aborted) await onSaved(saved);
+        if (!signal.aborted) await onSaved(saved, !initial && result?.ok === true);
       }
     } catch (cause) {
       if (!signal.aborted) setError(cause);

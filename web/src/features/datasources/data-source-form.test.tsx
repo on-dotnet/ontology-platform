@@ -100,8 +100,44 @@ describe('data source dialog', () => {
     expect(screen.queryAllByDisplayValue(newPassword.trim())).toHaveLength(0);
     expect(document.body).not.toHaveTextContent(newPassword.trim());
     expect(api.calls('POST', collection).map((r) => r.body)).toEqual([{ ...connection, name: saved.name, allowSamples: true }]);
+    expect(api.calls('POST', `${collection}/${saved.id}/test`)).toHaveLength(0);
     // A long walk through the whole form; slow when the gate runs everything at once.
   }, 15_000);
+
+  it.each(['unchanged', 'untested', 'consent changed', 'test failed'] as const)(
+    'records a saved test only for a successful, unchanged draft (%s)', async (scenario) => {
+      const saved = makeSource({ id: 'new-source', name: '新库' });
+      const savedTestPath = `${collection}/${saved.id}/test`;
+      let current = saved;
+      const { form, user, api } = await openForm('create', {
+        [`POST ${collection}`]: () => saved,
+        [`POST ${testPath}`]: () => scenario === 'test failed'
+          ? { ...success, ok: false, code: 'datasource.connect_failed', reason: 'timeout' }
+          : success,
+        [`POST ${savedTestPath}`]: () => {
+          current = { ...saved, lastTest: { at: saved.createdAt, ok: true, code: null, warnings: [] } };
+          return success;
+        },
+        [`GET ${collection}/:id`]: () => current,
+      });
+      await user.type(form.getByRole('textbox', { name: '名称' }), saved.name);
+      await user.type(form.getByRole('textbox', { name: '主机' }), 'db.test');
+      await user.type(form.getByRole('textbox', { name: '数据库' }), 'db');
+      await user.type(form.getByRole('textbox', { name: '用户名' }), 'reader');
+      await user.type(form.getByLabelText(/^口令/), newPassword);
+      if (scenario !== 'untested') {
+        await user.click(form.getByRole('button', { name: '测试连接' }));
+        if (scenario === 'test failed') expect(await form.findByRole('alert')).toHaveTextContent('连接超时');
+        else expect(await form.findByText(/连接成功/)).toBeVisible();
+      }
+      if (scenario === 'consent changed') await user.click(form.getByRole('switch', { name: '允许把样本值发给模型' }));
+      await user.click(form.getByRole('button', { name: '保存数据源' }));
+      await screen.findByRole('heading', { name: saved.name });
+      expect(api.calls('POST', savedTestPath)).toHaveLength(scenario === 'unchanged' ? 1 : 0);
+      const history = within(await screen.findByRole('region', { name: '最近一次测试' }));
+      expect(await history.findByText(scenario === 'unchanged' ? '正常' : '未测试')).toBeVisible();
+    },
+  );
 
   it('validates on blur and blocks invalid requests with a summary', async () => {
     const { form, user, api } = await openForm('create');

@@ -25,6 +25,17 @@ export function useSource(id: string, canBrowse: boolean) {
   });
 }
 
+export async function testSavedSource(client: QueryClient, id: string) {
+  try {
+    return await unwrap(api.POST('/api/data-sources/{id}/test', { params: { path: { id } } }));
+  } finally {
+    await Promise.all([
+      client.invalidateQueries({ queryKey: sourceKey(id), exact: true }),
+      client.invalidateQueries({ queryKey: listKey }),
+    ]);
+  }
+}
+
 export async function rememberSource(client: QueryClient, source: DataSource) {
   // Polls and mutation responses can arrive after a newer edit or archive.
   const key = sourceKey(source.id);

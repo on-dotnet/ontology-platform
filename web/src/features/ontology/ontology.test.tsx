@@ -114,6 +114,17 @@ function ontologyServer(extra: Record<string, RouteHandler> = {}) {
 }
 
 describe('ontology list view', () => {
+  it('names each element kind in the create menu', async () => {
+    const user = userEvent.setup();
+    ontologyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    await user.click(await screen.findByRole('button', { name: '新建' }));
+    const menu = within(await screen.findByRole('menu'));
+    for (const name of ['对象类型', '关系', '属性', '约束', '指标']) {
+      expect(menu.getByRole('menuitem', { name })).toBeVisible();
+    }
+  });
+
   it('opens competency questions as the last view and returns to the element list', async () => {
     const user = userEvent.setup();
     ontologyServer({
@@ -122,8 +133,12 @@ describe('ontology list view', () => {
     });
     renderApp('/ontology?ontology=onto-steel&view=list');
     await screen.findByRole('table', { name: '本体元素' });
-    const tab = screen.getByRole('radio', { name: '能力问题' });
-    expect(within(tab.closest('fieldset')!).getAllByRole('radio').at(-1)).toBe(tab);
+    const views = within(screen.getByRole('group', { name: '视图' }));
+    expect(views.getByRole('radio', { name: '列表' })).toBeChecked();
+    expect(views.getByRole('radio', { name: '图谱' })).not.toBeChecked();
+    expect(views.getByRole('radio', { name: 'Turtle' })).not.toBeChecked();
+    const tab = views.getByRole('radio', { name: '能力问题' });
+    expect(views.getAllByRole('radio').at(-1)).toBe(tab);
     await user.click(tab);
     expect(await screen.findByRole('heading', { name: '能力问题' })).toBeVisible();
     expect(screen.queryByRole('table', { name: '本体元素' })).toBeNull();
