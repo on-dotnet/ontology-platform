@@ -1,7 +1,9 @@
 """Build authoritative facts and project only permitted business values into answer prose."""
 
 import json
+import re
 from itertools import chain, islice
+from typing import NamedTuple
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,8 +13,96 @@ from ontology_platform.modules.ai.qa_prompts import QA_ANSWER_INSTRUCTIONS, QaAn
 from ontology_platform.modules.ai.qa_run import ROW_LIMIT
 from ontology_platform.modules.connectors import service as connectors
 from ontology_platform.modules.ontology.qa_context import QaContext
+from ontology_platform.modules.query.schemas import PathRow
 
 _VALUE_LIMIT = 200
+
+# Row refs the answer call uses for rows (K1 to K50); readers know objects by their keys.
+_REF = re.compile(r"(?<![0-9A-Za-z_])K\d+(?![0-9A-Za-z_])")
+_REF_SEP = r"\s*(?:[、,，;；/~\uff5e\-\u2013\u2014]|和|及|与|至|到)\s*"
+_REF_GROUP = re.compile(rf"\s*[（(]\s*K\d+(?:{_REF_SEP}K\d+)*\s*[）)]")
+# Saying the objects cannot be listed contradicts the complete list shown with the answer.
+_NOT_IN_CLAUSE = r"[^，,；;。！？!?\n]"
+_DENIAL = re.compile(
+    rf"(?:无法|不能|未能|没法|难以|不便){_NOT_IN_CLAUSE}{{0,8}}(?:列出|列举|罗列)"
+    rf"|(?:未|没有|并未|尚未){_NOT_IN_CLAUSE}{{0,2}}(?:列出|列举|罗列)"
+    # No bare 不, and 未 only right before the verb: 不合格 and 未包含 state facts.
+    rf"|(?:(?:无法|不能|未能|没法|难以|不便|没有|并未|尚未|不会|不再|不予)"
+    rf"{_NOT_IN_CLAUSE}{{0,6}}(?:提供|给出|列出|展示|显示|包含)"
+    rf"|未(?:提供|给出|展示|显示))"
+    rf"{_NOT_IN_CLAUSE}{{0,12}}(?:编号|名单|清单|列表|明细)"
+)
+# A comma between digits is a thousands separator, not a clause end.
+_CLAUSE_END = re.compile(
+    r"(?:(?<=[，；;。！？!?\n])|(?<=(?<!\d),)|(?<=,)(?!\d))(?![，,；;。！？!?\n])"
+)
+_SENTENCE_ENDS = "。！？!?\n"
+_CLAUSE_JOINS = "，,；;"
+
+
+class _Prompt(NamedTuple):
+    text: str
+    refs: dict[str, str]
+    names: dict[str, str]
+    # Ref-shaped business values, such as a grade, that the answer may repeat as they are.
+    literals: set[str]
+    truncated: bool
+
+
+def _name(row: PathRow) -> str:
+    return " / ".join(k.value for k in row.source.key)
+
+
+class _Readable:
+    """Rewrites model prose for readers: object names for row refs, no denial of a full list."""
+
+    def __init__(self, prompt: _Prompt, listed: bool) -> None:
+        self.names = prompt.names
+        self.literals = prompt.literals
+        self.listed = listed
+        self.unknown = False
+
+    def __call__(self, text: str) -> str | None:
+        text = _REF_GROUP.sub(self._group, text)
+        kept: list[str] = []
+        for clause in _CLAUSE_END.split(text):
+            resolved = self._clause(clause)
+            if resolved is not None:
+                kept.append(resolved)
+                continue
+            # Close the sentence the dropped clause ended instead of leaving a dangling comma.
+            end = clause.rstrip()[-1:]
+            if end and end in _SENTENCE_ENDS and kept:
+                last = kept[-1].rstrip()
+                if last[-1:] in _CLAUSE_JOINS:
+                    kept[-1] = last[:-1] + end
+        return "".join(kept).strip() or None
+
+    def _group(self, match: re.Match[str]) -> str:
+        refs = _REF.findall(match[0])
+        return "" if all(r in self.names and r not in self.literals for r in refs) else match[0]
+
+    def _clause(self, clause: str) -> str | None:
+        unknown = False
+
+        def bare(match: re.Match[str]) -> str:
+            nonlocal unknown
+            ref = match[0]
+            if ref in self.literals:
+                return ref
+            if ref in self.names:
+                return self.names[ref]
+            unknown = True
+            return ref
+
+        resolved = _REF.sub(bare, clause)
+        if unknown:
+            # A ref to a row the call was not given is made up; drop what it says.
+            self.unknown = True
+            return None
+        if self.listed and _DENIAL.search(resolved):
+            return None
+        return resolved
 
 
 def _facts(
@@ -28,9 +118,7 @@ def _facts(
     objects = []
     if plan.intent == "objects":
         objects = [
-            schemas.QaFactObject(
-                type_id=row.type_id, key=row.key, label=" / ".join(k.value for k in row.source.key)
-            )
+            schemas.QaFactObject(type_id=row.type_id, key=row.key, label=_name(row))
             for row in evidence.rows
         ]
     return schemas.QaFacts(
@@ -69,9 +157,11 @@ def _prompt(
     context: QaContext,
     evidence: schemas.QaEvidence,
     facts: schemas.QaFacts,
-) -> tuple[str, dict[str, str], bool]:
+) -> _Prompt:
     rows = []
     refs: dict[str, str] = {}
+    names: dict[str, str] = {}
+    words: list[str] = []
     answer_refs = {row.key: f"K{i}" for i, row in enumerate(evidence.rows, start=1)}
     truncated = evidence.truncated or len(evidence.rows) + len(evidence.tail) > ROW_LIMIT
     for i, row in enumerate(islice(chain(evidence.rows, evidence.tail), ROW_LIMIT), start=1):
@@ -80,6 +170,9 @@ def _prompt(
         bound = context.model.type(row.type_id)
         if bound is None:
             raise ValueError("A result row has no type in the checked model.")
+        name = _name(row)[:_VALUE_LIMIT]
+        names[ref] = name
+        words.append(name)
         values = []
         truncated |= bool(row.truncated)
         for prop in bound.properties:
@@ -89,8 +182,13 @@ def _prompt(
                     truncated = True
                     value = value[:_VALUE_LIMIT]
                 values.append({"label": prop.label, "value": value})
+                if isinstance(value, str):
+                    words.append(value)
         parent = answer_refs.get(row.via[plan.target]) if i > len(evidence.rows) else None
-        rows.append({"ref": ref, "type": bound.label, "values": values, "answerRef": parent})
+        # The key values name the object; the key columns stay out of the prompt (spec 007 5.5).
+        rows.append(
+            {"ref": ref, "type": bound.label, "name": name, "values": values, "answerRef": parent}
+        )
     metric = evidence.metric
     rule_counts = []
     if evidence.rules is not None:
@@ -119,7 +217,8 @@ def _prompt(
         "truncated": truncated,
         "limit": ROW_LIMIT,
     }
-    return json.dumps(payload, ensure_ascii=False), refs, truncated
+    literals = {ref for word in words for ref in _REF.findall(word)}
+    return _Prompt(json.dumps(payload, ensure_ascii=False), refs, names, literals, truncated)
 
 
 async def answer(
@@ -140,15 +239,16 @@ async def answer(
         if evidence.truncated:
             result.notes.append("rows_truncated")
         return result
-    text, refs, truncated = _prompt(question, plan, context, evidence, result.facts)
-    if truncated:
+    prompt = _prompt(question, plan, context, evidence, result.facts)
+    refs = prompt.refs
+    if prompt.truncated:
         result.notes.append("rows_truncated")
     try:
         output = await gateway.structured(
             purpose="qa.answer",
             model=model,
             instructions=QA_ANSWER_INSTRUCTIONS,
-            text=text,
+            text=prompt.text,
             schema=QaAnswerOut,
         )
     except AiError as exc:
@@ -156,9 +256,23 @@ async def answer(
             raise
         result.notes.append("answer_unavailable")
         return result
-    result.text = output.answer
-    result.counterpoints = output.counterpoints
+    # The platform, not the prompt alone, keeps row refs and denials of the shown list out.
+    # A truncated input may rightly say that only part of the objects is shown.
+    listed = (
+        bool(result.facts.objects)
+        and result.facts.count == len(result.facts.objects)
+        and not prompt.truncated
+    )
+    readable = _Readable(prompt, listed)
+    text = readable(output.answer)
+    if text is None:
+        result.notes.append("answer_unavailable")
+        if readable.unknown:
+            result.notes.append("cited_unknown")
+        return result
+    result.text = text
+    result.counterpoints = [c for c in map(readable, output.counterpoints) if c is not None]
     result.cited_keys = [refs[ref] for ref in output.cited_keys if ref in refs]
-    if any(ref not in refs for ref in output.cited_keys):
+    if readable.unknown or any(ref not in refs for ref in output.cited_keys):
         result.notes.append("cited_unknown")
     return result

@@ -190,6 +190,8 @@ async def test_qa_gateway_sees_only_authorized_fields(
             {
                 "ref": f"K{i}",
                 "type": typ.label,
+                # #128: the primary key values, without the key column names.
+                "name": " / ".join(k.value for k in row.source.key),
                 "answerRef": ref,
                 "values": [
                     {"label": p.label, "value": row.values[p.property_id]} for p in typ.properties
@@ -236,6 +238,26 @@ async def test_qa_answer_caps_combined_rows_and_property_text(
     assert "截断后的内容" not in call.text
     assert result.cited_keys == [evidence.tail[0].key]
     assert set(result.notes) == {"rows_truncated", "cited_unknown"}
+
+
+async def test_a_business_value_shaped_like_a_row_ref_stays(
+    db: AsyncSession, qa_demo: QaDemo
+) -> None:
+    question = await qa_demo.run("Q2")
+    assert question.evidence is not None
+    assert question.plan is not None
+    evidence = question.evidence.model_copy(deep=True)
+    evidence.rows[0].values[UUID(qa_demo.steel.ids["coilStatus"])] = "K55"
+    context = await qa_context(db, qa_demo.steel.ontology.id)
+    qa_demo.gateway.outputs["qa.answer"] = QaAnswerOut(
+        answer="K1 的状态是 K55（K1）。", cited_keys=["K1"], counterpoints=[]
+    )
+    result = await qa_answer.answer(
+        db, qa_demo.gateway, "scripted", question.question, question.plan, context, evidence, 2
+    )
+    name = " / ".join(k.value for k in evidence.rows[0].source.key)
+    assert result.text == f"{name} 的状态是 K55。"
+    assert result.notes == []
 
 
 @pytest.mark.parametrize("case", ["Q3", "Q4"])
