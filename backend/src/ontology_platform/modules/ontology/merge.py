@@ -7,10 +7,12 @@ change set views read them too; this module depends on service, never the other 
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 from uuid import UUID, uuid4
 
 from pydantic import ValidationError
+from sqlalchemy import update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
@@ -28,10 +30,16 @@ from ontology_platform.modules.ontology.models import (
     SEMANTIC_KINDS,
     ChangeItem,
     ChangeSet,
+    ChangeSetSource,
+    Decision,
     Element,
+    MatchDecision,
+    MatchKind,
     Ontology,
+    ReviewMemoryRow,
 )
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
+from ontology_platform.modules.ontology.review_memory import DecidedItem, RejectReason, collect
 from ontology_platform.modules.ontology.schemas import ReviewMode
 from ontology_platform.modules.ontology.service import (
     DEPENDENCY_SKIPPED,
@@ -43,6 +51,7 @@ from ontology_platform.modules.ontology.service import (
     _elements,
     _ensure_not_own,
     _ensure_open,
+    _evict_review_memory,
     _items,
     _links,
     _now,
@@ -51,6 +60,175 @@ from ontology_platform.modules.ontology.service import (
     header_of,
     iri_of,
 )
+
+
+async def _collect_review_memory(
+    db: AsyncSession,
+    change_set: ChangeSet,
+    items: Sequence[ChangeItem],
+    merge: "_Merge",
+    now: datetime,
+    actor: UUID,
+    ip: str | None,
+) -> None:
+    by_id = {item.id: item for item in items}
+    by_ref = {item.temp_ref: item for item in items if item.temp_ref}
+
+    def label(element: Element | None) -> str | None:
+        return (element.label_zh or element.label_en or element.local_name) if element else None
+
+    def ref_label(ref: str | None) -> str | None:
+        if not ref:
+            return None
+        element_id = rules.parse_id(ref)
+        if element_id:
+            return label(merge._elements.get(element_id))
+        other = by_ref.get(ref)
+        return (
+            label(merge._elements.get(other.applied_element_id))
+            if other and other.applied_element_id
+            else None
+        )
+
+    decided: list[DecidedItem] = []
+    for item in items:
+        if item.kind not in ("entity_type", "relation_type", "property") or (
+            item.op != "create" and item.decision != "accepted"
+        ):
+            continue
+        fields = rules.effective_fields(item.proposed, item.edited)
+        target = merge._elements.get(item.applied_element_id) if item.applied_element_id else None
+        resolution = merge._plan.get(item.id)
+        applied = (
+            item.decision == "accepted"
+            and merge.outcomes.get(item.id) is None
+            and target is not None
+        )
+        created = (
+            applied
+            and item.op in ("create", "restore")
+            and not (resolution is not None and resolution.mode == "into")
+        )
+        renamed = applied and (
+            item.op == "update"
+            and ("label_zh" in fields.model_fields_set or "label_en" in fields.model_fields_set)
+        )
+        other = merge._elements.get(item.match_element_id) if item.match_element_id else None
+        other_item = by_id.get(item.match_item_id) if item.match_item_id else None
+        if other is None and item.match_item_id and other_item is None:
+            other_item = await db.get(ChangeItem, item.match_item_id)
+        if other_item is not None:
+            other = (
+                merge._elements.get(other_item.applied_element_id)
+                if other_item.applied_element_id
+                else None
+            )
+        other_label = label(other)
+        if other_label is None and other_item is not None:
+            other_fields = rules.effective_fields(other_item.proposed, other_item.edited)
+            other_label = other_fields.label_zh or other_fields.label_en
+        domain_label = (
+            label(merge._elements.get(target.domain_id))
+            if target and target.domain_id
+            else ref_label(fields.domain_ref)
+        )
+        range_label = (
+            label(merge._elements.get(target.range_id))
+            if target and target.range_id
+            else ref_label(fields.range_ref)
+        )
+        # Without a resolved domain or range name, the item has no stable matching key.
+        if (
+            item.decision == "rejected"
+            and item.kind in ("relation_type", "property")
+            and not domain_label
+        ):
+            continue
+        if item.decision == "rejected" and item.kind == "relation_type" and not range_label:
+            continue
+        decided.append(
+            DecidedItem(
+                item_id=item.id,
+                kind=item.kind,
+                op=item.op,
+                decision=cast(Decision, item.decision),
+                reject_reason=cast(RejectReason | None, item.reject_reason),
+                proposed_label_zh=item.proposed.get("labelZh"),
+                proposed_label_en=item.proposed.get("labelEn"),
+                final_label_zh=target.label_zh
+                if target is not None and applied
+                else fields.label_zh,
+                final_label_en=target.label_en
+                if target is not None and applied
+                else fields.label_en,
+                domain_label=domain_label,
+                range_label=range_label,
+                created_element_id=target.id if target is not None and created else None,
+                renamed_element_id=target.id if target is not None and renamed else None,
+                match_kind=cast(MatchKind | None, item.match_kind),
+                match_decision=cast(MatchDecision | None, item.match_decision),
+                match_other_label=other_label,
+                match_other_element_id=other.id if other else None,
+            )
+        )
+    delta = collect(cast(ChangeSetSource, change_set.source), decided)
+    for kind, key in delta.superseded_keys:
+        await db.execute(
+            update(ReviewMemoryRow)
+            .where(
+                ReviewMemoryRow.ontology_id == change_set.ontology_id,
+                ReviewMemoryRow.kind == "rejected",
+                ReviewMemoryRow.element_kind == kind,
+                ReviewMemoryRow.key == key,
+                ReviewMemoryRow.deleted_at.is_(None),
+            )
+            .values(deleted_at=now, deleted_reason="superseded", deleted_by=None)
+        )
+    for entry in delta.upserts:
+        values = {
+            "ontology_id": change_set.ontology_id,
+            "kind": entry.kind,
+            "element_kind": entry.element_kind,
+            "key": entry.key,
+            "label": entry.label,
+            "detail": dict(entry.detail),
+            "source_change_set_id": change_set.id,
+            "source_item_id": entry.source_item_id,
+            "decided_by": by_id[entry.source_item_id].decided_by if entry.source_item_id else None,
+            "created_at": now,
+            "hits": 0,
+            "last_hit_at": None,
+            "deleted_at": None,
+            "deleted_reason": None,
+            "deleted_by": None,
+        }
+        statement = insert(ReviewMemoryRow).values(**values)
+        await db.execute(
+            statement.on_conflict_do_update(
+                index_elements=[
+                    ReviewMemoryRow.ontology_id,
+                    ReviewMemoryRow.kind,
+                    ReviewMemoryRow.element_kind,
+                    ReviewMemoryRow.key,
+                ],
+                set_={
+                    key: value
+                    for key, value in values.items()
+                    if key not in ("ontology_id", "kind", "element_kind", "key")
+                },
+            )
+        )
+    if delta.upserts:
+        await _evict_review_memory(db, change_set.ontology_id, now)
+        audit.record(
+            db,
+            "review_memory.collected",
+            actor_id=actor,
+            target_type="change_set",
+            target_id=str(change_set.id),
+            detail={"count": len(delta.upserts)},
+            ip=ip,
+        )
 
 
 def _rule_references(element: Element) -> set[UUID]:
@@ -804,6 +982,7 @@ async def _apply_change_set(
         if merge.outcomes[item.id] is not None
     ]
     applied = len(accepted) - len(skipped)
+    await _collect_review_memory(db, change_set, items, merge, now, actor, ip)
     change_set.status = "merged"
     change_set.merged_by = actor
     change_set.merged_at = now

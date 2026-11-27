@@ -131,13 +131,40 @@ def test_review_keys_follow_candidate_normalization(zh: str | None, en: str | No
     assert pair_key("钢包车", "钢包") == "k:钢包||钢包车"
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 2 implements memory collection")
 def test_collected_rejections_appear_in_memory() -> None:
+    from ontology_platform.modules.ontology.review_memory import DecidedItem
+
     ontology_id = uuid4()
-    delta = collect("ai_extraction", [])
-    assert apply_delta(
-        ReviewMemory(ontology_id, ()), delta, now=datetime.now(UTC), max_entries=500
-    ).entries
+    delta = collect(
+        "ai_extraction",
+        [
+            DecidedItem(
+                item_id=uuid4(),
+                kind="entity_type",
+                op="create",
+                decision="rejected",
+                reject_reason=None,
+                proposed_label_zh="炉次",
+                proposed_label_en=None,
+                final_label_zh="炉次",
+                final_label_en=None,
+                domain_label=None,
+                range_label=None,
+                created_element_id=None,
+                renamed_element_id=None,
+                match_kind=None,
+                match_decision=None,
+                match_other_label=None,
+                match_other_element_id=None,
+            )
+        ],
+    )
+    assert (
+        apply_delta(
+            ReviewMemory(ontology_id, ()), delta, now=datetime.now(UTC), max_entries=500
+        ).find("rejected", "t:炉次")
+        is not None
+    )
 
 
 def test_extraction_memory_guard_is_registered() -> None:
