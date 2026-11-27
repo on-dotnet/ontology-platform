@@ -62,7 +62,6 @@ from ontology_platform.modules.ontology.schemas import (
     LinkTableJoin,
     ProposedItem,
     TableBinding,
-    TypeBindingView,
 )
 
 # Payload: {"suggestionId": "<uuid>"}
@@ -297,11 +296,6 @@ def _key(table: Table) -> TableKey:
     return (table.schema_name, table.name)
 
 
-async def _type_view(db: AsyncSession, ontology_id: UUID, type_id: UUID) -> TypeBindingView:
-    (view,) = await ontology_bindings.binding_views(db, ontology_id, type_id)
-    return view
-
-
 async def _plan(db: AsyncSession, row: _Request) -> _Plan:
     """The catalog step: the tables in scope, and what the working version still lacks."""
     source = await _usable_source(db, row.data_source_id)
@@ -316,11 +310,12 @@ async def _plan(db: AsyncSession, row: _Request) -> _Plan:
     ]
     by_id = {element.id: element for element in everything}
     wanted = {UUID(value) for value in row.scope.get("typeIds") or ()}
+    type_ids = [element.id for element in everything if element.kind == "entity_type"]
+    views = await ontology_bindings.binding_views_for(db, row.ontology_id, type_ids)
     types: list[_Type] = []
-    for element in everything:
-        if element.kind != "entity_type":
-            continue
-        view = await _type_view(db, row.ontology_id, element.id)
+    for type_id in type_ids:
+        element = by_id[type_id]
+        view = views[type_id]
         requested = not wanted or element.id in wanted
         bound_table: Table | None = None
         if view.table is not None:

@@ -283,16 +283,32 @@ async def binding_views(
 ) -> list[schemas.TypeBindingView]:
     """The bindings of one object type (`type_id`), or of every bound object type, in the
     working version, each checked against the cached catalog (spec 003, 6.5)."""
+    return await _load_binding_views(db, ontology_id, [type_id] if type_id is not None else None)
+
+
+async def binding_views_for(
+    db: AsyncSession, ontology_id: UUID, type_ids: Iterable[UUID]
+) -> dict[UUID, schemas.TypeBindingView]:
+    """The working-version binding views of the requested active object types."""
+    views = await _load_binding_views(db, ontology_id, type_ids)
+    return {view.type_id: view for view in views}
+
+
+async def _load_binding_views(
+    db: AsyncSession, ontology_id: UUID, type_ids: Iterable[UUID] | None
+) -> list[schemas.TypeBindingView]:
     await service._ontology_or_404(db, ontology_id)
     everything = await service._elements(db, ontology_id, all_kinds=True)
     by_id = {element.id: element for element in everything}
     active = [element for element in everything if element.status == "active"]
     tables = {e.subject_id: e for e in active if e.kind == "type_binding" and e.subject_id}
-    if type_id is not None:
-        chosen = by_id.get(type_id)
-        if chosen is None or chosen.kind != "entity_type" or chosen.status != "active":
-            raise AppError(404, "element.not_found", "Element not found.")
-        types = [chosen]
+    if type_ids is not None:
+        types = []
+        for type_id in dict.fromkeys(type_ids):
+            chosen = by_id.get(type_id)
+            if chosen is None or chosen.kind != "entity_type" or chosen.status != "active":
+                raise AppError(404, "element.not_found", "Element not found.")
+            types.append(chosen)
     else:
         types = sorted(
             (by_id[subject] for subject in tables if subject in by_id),
