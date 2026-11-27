@@ -2017,7 +2017,10 @@ def test_events_that_differ_only_by_the_action_are_one_type() -> None:
     # movement event they are steps of, all recorded with the same data.
     rules = " ".join(TYPES_INSTRUCTIONS.split())
     assert "differ only by what was done, or where, are one type of event" in rules
-    assert "one scan event whose action is an attribute" in rules
+    assert "whose action or place is an attribute" in rules
+    # Numbered documents that other records cite on their own must not be merged by this rule.
+    assert "a number series of their own and that other records cite on their own" in rules
+    assert "stay types" in rules
 
 
 def test_a_name_that_only_adds_a_design_is_the_same_type() -> None:

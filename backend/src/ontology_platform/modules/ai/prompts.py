@@ -76,12 +76,14 @@ These are not entity types:
   own.
 - Outcomes, statuses, the possible values of a decision, quality levels and other categories
   (these are values). A kind of activity or record told apart only by its level, frequency or
-  result (daily and weekly rounds) is a value of an attribute, not a type of its own. Events
-  that the text records with the same data and that differ only by what was done, or where,
-  are one type of event: a parcel scanned when it is picked up, sorted and delivered is one
-  scan event whose action is an attribute, not a pickup, a sorting and a delivery record. Results
+  result (daily and weekly rounds) is a value of an attribute, not a type of its own. Results
   that are recorded one by one, each with its own measured value, the time it was obtained and
   the item it was measured on (every reading of a lab test), are records, not values.
+- Events that the text records with the same data and that differ only by what was done, or
+  where, are one type of event whose action or place is an attribute: a parcel scanned when
+  it is picked up, sorted and delivered is one scan event, not a pickup, a sorting and a
+  delivery record. Documents of different kinds that each have a number series of their own
+  and that other records cite on their own (purchase, sales and return orders) stay types.
 - Kinds of a physical thing told apart only by what they are for, the step or place they come
   from, or their role or position among the others (a sample for a sugar test and a sample for
   a blood count; the first and the last carriage of a train). They are one type; the purpose,
