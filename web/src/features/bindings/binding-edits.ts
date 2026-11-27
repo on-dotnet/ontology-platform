@@ -199,6 +199,14 @@ function remove(kind: DependentKind | 'type_binding', { elementId, revision }: T
   return { op: 'delete', kind, targetElementId: elementId, targetRevision: revision };
 }
 
+export function unbindEdits(model: BindingModel): EditItem[] {
+  if (!model.original) return [];
+  return [
+    ...[...model.dependents.values()].map((target) => remove(target.kind, target)),
+    remove('type_binding', model.original),
+  ];
+}
+
 function sameColumns(left: string[], right: string[]) {
   return left.length === right.length && left.every((column, index) => column === right[index]);
 }
@@ -216,8 +224,7 @@ export function bindingEdits(model: BindingModel, dataSourceId: string, table: C
   const same = sameTable(original, dataSourceId, table);
   const items: EditItem[] = [];
   if (original && !same) {
-    for (const target of model.dependents.values()) items.push(remove(target.kind, target));
-    items.push(remove('type_binding', original));
+    items.push(...unbindEdits(model));
   }
   const binding: TableBinding = { target: 'table', dataSourceId, schema: table.schema, table: table.name, keyColumns: choices.keys };
   let ownRef: string;

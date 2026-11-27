@@ -10,6 +10,7 @@ import { elementDetailFixture, elementFixture, impactFixture, ontologyFixture } 
 import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
 import type { CatalogTable, DataSource, RelationBindingView, TypeBindingView } from './api';
+import { bindingModel, unbindEdits } from './binding-edits';
 
 const EDITS = '/api/ontologies/onto-steel/edits';
 const NOW = '2026-11-25T08:00:00Z';
@@ -504,6 +505,77 @@ describe('BindingSection', () => {
         binding: { target: 'join', join: { kind: 'foreign_key', side: 'source', columns: ['cast_no'], references: ['sequence_no'] } },
       } },
     ]));
+  });
+
+  it('confirms the table and dependent counts before unbinding and submits every delete with its revision', async () => {
+    const { api, user, dialog } = await openEditor({ view: heatWithJoins });
+    await user.click(dialog.getByRole('button', { name: formText('unbind') }));
+    const confirmation = within(await screen.findByRole('dialog', { name: formText('unbindConfirm.title') }));
+    expect(confirmation.getByText(formText('unbindConfirm.description', {
+      table: 'mes.heat', properties: 1, relations: 2,
+    }))).toBeVisible();
+    // The confirmation says what the editor says: applied at once or sent to review.
+    const outcome = [formText('appliesAtOnce'), formText('submitsForReview')].find((text) => dialog.queryByText(text));
+    expect(outcome).toBeDefined();
+    expect(confirmation.getByText(outcome ?? '')).toBeVisible();
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+    await user.click(confirmation.getByRole('button', { name: formText('unbind') }));
+    expect(await submittedItems(api)).toEqual([
+      { op: 'delete', kind: 'property_binding', targetElementId: 'bd-weight', targetRevision: 5 },
+      { op: 'delete', kind: 'relation_binding', targetElementId: 'bd-in-cast', targetRevision: 7 },
+      { op: 'delete', kind: 'relation_binding', targetElementId: 'bd-first-heat', targetRevision: 9 },
+      { op: 'delete', kind: 'type_binding', targetElementId: 'bd-heat', targetRevision: 3 },
+    ]);
+  });
+
+  it('does not submit when unbinding is cancelled', async () => {
+    const { api, user, dialog } = await openEditor({ view: heatWithJoins });
+    await user.click(dialog.getByRole('button', { name: formText('unbind') }));
+    const confirmation = within(await screen.findByRole('dialog', { name: formText('unbindConfirm.title') }));
+    await user.click(confirmation.getByRole('button', { name: i18n.t('common.cancel') }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: formText('unbindConfirm.title') })).not.toBeInTheDocument());
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('closes the confirmation and shows the server problem in the editor when unbinding fails', async () => {
+    // Any rejected edit takes this path; the type mismatch is just a problem with a known message.
+    const { api, user, dialog } = await openEditor({ view: heatWithJoins, editError: 'binding.type_mismatch' });
+    await user.click(dialog.getByRole('button', { name: formText('unbind') }));
+    const confirmation = within(await screen.findByRole('dialog', { name: formText('unbindConfirm.title') }));
+    await user.click(confirmation.getByRole('button', { name: formText('unbind') }));
+    expect(await dialog.findByText(i18n.t('errors.binding.type_mismatch'))).toBeVisible();
+    expect(screen.queryByRole('dialog', { name: formText('unbindConfirm.title') })).not.toBeInTheDocument();
+    expect(api.calls('POST', EDITS)).toHaveLength(1);
+  });
+
+  it('keeps the binding when another editor adds a relation before unbinding', async () => {
+    const { api, user, dialog, ontologyElements } = await openEditor({ view: heatWithJoins });
+    await user.click(dialog.getByRole('button', { name: formText('unbind') }));
+    ontologyElements.push(elementFixture({
+      id: 'bd-concurrent-join', kind: 'relation_binding', subjectId: inCast.id,
+      domainId: 'bd-heat', rangeId: 'bd-cast',
+      binding: { target: 'join', join: { kind: 'foreign_key', side: 'source', columns: ['cast_no'], references: ['sequence_no'] } },
+    }));
+    const confirmation = within(await screen.findByRole('dialog', { name: formText('unbindConfirm.title') }));
+    await user.click(confirmation.getByRole('button', { name: formText('unbind') }));
+    expect(await dialog.findByText(formText('dependenciesChanged'))).toBeVisible();
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('does not offer unbinding for a type without a table binding', async () => {
+    const user = userEvent.setup();
+    bindingServer({ view: unboundHeat, user: userWithRole('editor') });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    const dialog = await openBinder(user);
+    expect(dialog.queryByRole('button', { name: formText('unbind') })).not.toBeInTheDocument();
+  });
+
+  it('deletes only the type binding when no properties or relations are bound', () => {
+    const view: TypeBindingView = { ...editableHeat, properties: [], relations: [] };
+    const model = bindingModel(heat, [heat], view, [view], [], []);
+    expect(unbindEdits(model)).toEqual([
+      { op: 'delete', kind: 'type_binding', targetElementId: 'bd-heat', targetRevision: 3 },
+    ]);
   });
 
   it('keeps the draft when another editor adds a dependent binding before the table is replaced', async () => {
