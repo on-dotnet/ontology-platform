@@ -104,13 +104,14 @@ async def _collect_review_memory(
             and merge.outcomes.get(item.id) is None
             and target is not None
         )
-        created = applied and item.op in ("create", "restore")
+        created = (
+            applied
+            and item.op in ("create", "restore")
+            and not (resolution is not None and resolution.mode == "into")
+        )
         renamed = applied and (
-            (item.op == "create" and resolution is not None and resolution.mode == "into")
-            or (
-                item.op == "update"
-                and ("label_zh" in fields.model_fields_set or "label_en" in fields.model_fields_set)
-            )
+            item.op == "update"
+            and ("label_zh" in fields.model_fields_set or "label_en" in fields.model_fields_set)
         )
         other = merge._elements.get(item.match_element_id) if item.match_element_id else None
         other_item = by_id.get(item.match_item_id) if item.match_item_id else None
@@ -136,7 +137,7 @@ async def _collect_review_memory(
             if target and target.range_id
             else ref_label(fields.range_ref)
         )
-        # A rejected dependent whose reference never applied has no stable matching key.
+        # Without a resolved domain or range name, the item has no stable matching key.
         if (
             item.decision == "rejected"
             and item.kind in ("relation_type", "property")

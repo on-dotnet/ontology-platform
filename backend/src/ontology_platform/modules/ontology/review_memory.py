@@ -78,6 +78,7 @@ class ReviewMemory:
 
 @dataclass(frozen=True)
 class DecidedItem:
+    # Into an existing element sets neither id; created_element_id means a new element.
     item_id: UUID
     kind: str
     op: str
@@ -130,19 +131,23 @@ def collect(source: ChangeSetSource, items: Sequence[DecidedItem]) -> MemoryDelt
             key = relation_key(domain, name, range_)
         else:
             key = property_key(domain, name)
-        if item.decision == "accepted" and (
-            item.created_element_id is not None or item.renamed_element_id is not None
+        if (
+            name
+            and item.decision == "accepted"
+            and (item.created_element_id is not None or item.renamed_element_id is not None)
         ):
             superseded.append((kind, key))
         if source != "ai_extraction" or item.op != "create":
             continue
         label = item.proposed_label_zh or item.proposed_label_en or ""
+        proposed_name = _main_name(item.proposed_label_zh, item.proposed_label_en)
+        if not proposed_name:
+            continue
         if (
             item.decision == "rejected"
             and item.reject_reason in (None, "out_of_scope", "incorrect")
             and item.match_kind is None
         ):
-            proposed_name = _main_name(item.proposed_label_zh, item.proposed_label_en)
             rejected_key = (
                 type_key(item.proposed_label_zh, item.proposed_label_en)
                 if kind == "entity_type"
@@ -165,12 +170,10 @@ def collect(source: ChangeSetSource, items: Sequence[DecidedItem]) -> MemoryDelt
                 None,
             )
             upserts[(entry.kind, kind, rejected_key)] = entry
-        if item.decision != "accepted":
-            continue
         if (
-            kind == "entity_type"
+            item.decision == "accepted"
+            and kind == "entity_type"
             and item.created_element_id is not None
-            and item.renamed_element_id is None
             and item.final_label_zh is not None
             and _main_name(item.final_label_zh, None) != _main_name(item.proposed_label_zh, None)
         ):
@@ -193,6 +196,8 @@ def collect(source: ChangeSetSource, items: Sequence[DecidedItem]) -> MemoryDelt
             and item.match_kind == "possible"
             and item.match_decision == "different"
             and item.match_other_label
+            and _main_name(item.final_label_zh, item.final_label_en)
+            and _main_name(item.match_other_label, None)
         ):
             pair = pair_key(
                 _main_name(item.final_label_zh, item.final_label_en),
@@ -219,6 +224,7 @@ def collect(source: ChangeSetSource, items: Sequence[DecidedItem]) -> MemoryDelt
 def apply_delta(
     memory: ReviewMemory, delta: MemoryDelta, *, now: datetime, max_entries: int
 ) -> ReviewMemory:
+    original = {(entry.kind, entry.element_kind, entry.key): entry for entry in memory.entries}
     entries = {
         (entry.kind, entry.element_kind, entry.key): entry
         for entry in memory.entries
@@ -230,7 +236,7 @@ def apply_delta(
         key = (new.kind, new.element_kind, new.key)
         detail = new.detail
         entries[key] = MemoryEntry(
-            id=entries[key].id if key in entries else uuid4(),
+            id=original[key].id if key in original else uuid4(),
             kind=new.kind,
             element_kind=new.element_kind,
             key=new.key,
@@ -255,4 +261,6 @@ def apply_delta(
         key=lambda entry: (entry.last_hit_at or entry.created_at, str(entry.id)),
         reverse=True,
     )
-    return ReviewMemory(memory.ontology_id, tuple(newest[:max_entries]))
+    return ReviewMemory(
+        memory.ontology_id, tuple(newest[:max_entries] if delta.upserts else newest)
+    )

@@ -1,6 +1,6 @@
 """Review memory management and access."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
@@ -49,9 +49,6 @@ async def test_memory_list_delete_restore_clear(client: AsyncClient, db: AsyncSe
             assert (forbidden.status_code, forbidden.json()["code"]) == (403, "auth.forbidden")
     deleted = await client.delete(f"{base}/{row.id}", headers=csrf_headers(client))
     assert deleted.status_code == 204
-    assert await service.review_memory_for(db, ontology.id) == await service.review_memory_for(
-        db, ontology.id
-    )
     assert all(e.id != row.id for e in (await service.review_memory_for(db, ontology.id)).entries)
     missing = await client.delete(f"{base}/{row.id}", headers=csrf_headers(client))
     assert (missing.status_code, missing.json()["code"]) == (404, "review_memory.not_found")
@@ -75,6 +72,11 @@ async def test_memory_list_delete_restore_clear(client: AsyncClient, db: AsyncSe
         "review_memory.restored",
         "review_memory.cleared",
     }
+    cleared_event = next(event for event in events if event.action == "review_memory.cleared")
+    assert cleared_event.detail["count"] == 2
+    await db.refresh(row)
+    assert row.deleted_reason == "cleared"
+    assert row.deleted_by is not None
 
 
 async def test_hits_ignore_deleted(client: AsyncClient, db: AsyncSession) -> None:
@@ -105,14 +107,104 @@ async def test_memory_pagination_and_token(client: AsyncClient, db: AsyncSession
     first = await client.get(base, params={"limit": 1})
     assert first.status_code == 200
     assert first.json()["total"] == 3
-    assert first.json()["max"] >= 3
+    assert first.json()["max"] == 500
     assert first.json()["nextCursor"] is not None
     second = await client.get(base, params={"limit": 1, "cursor": first.json()["nextCursor"]})
     assert second.status_code == 200
     assert second.json()["items"][0]["id"] != first.json()["items"][0]["id"]
+    last = await client.get(base, params={"limit": 1, "cursor": second.json()["nextCursor"]})
+    assert last.status_code == 200
+    assert last.json()["nextCursor"] is None
     token = await token_holder(client)
     refused = await client.get(base, headers=token)
     assert (refused.status_code, refused.json()["code"]) == (403, "auth.token_not_allowed")
+
+
+async def test_pagination_survives_deletion_and_rejects_bad_cursor(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    rows = [await _entry(db, ontology.id, label) for label in ("甲", "乙", "丙")]
+    for index, row in enumerate(rows):
+        row.created_at = datetime.now(UTC) - timedelta(days=3 - index)
+    await db.commit()
+    base = f"/api/ontologies/{ontology.id}/review-memory"
+    await sign_in(client, db, Role.REVIEWER)
+    first = (await client.get(base, params={"limit": 1})).json()
+    assert first["items"][0]["id"] == str(rows[2].id)
+    assert (
+        await client.delete(f"{base}/{rows[2].id}", headers=csrf_headers(client))
+    ).status_code == 204
+    second = (await client.get(base, params={"limit": 1, "cursor": first["nextCursor"]})).json()
+    assert second["items"][0]["id"] == str(rows[1].id)
+    for cursor in ("bad", str(uuid4()), str(rows[0].id)):
+        response = await client.get(base, params={"cursor": cursor})
+        if cursor == str(rows[0].id):
+            assert response.status_code == 200
+        else:
+            assert (response.status_code, response.json()["code"]) == (422, "query.invalid_cursor")
+    other = await add_ontology(db, key="other")
+    cross = await client.get(
+        f"/api/ontologies/{other.id}/review-memory", params={"cursor": str(rows[0].id)}
+    )
+    assert (cross.status_code, cross.json()["code"]) == (422, "query.invalid_cursor")
+
+
+async def test_cross_ontology_management_and_restore_boundaries(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    a = await add_ontology(db)
+    b = await add_ontology(db, key="other")
+    row = await _entry(db, a.id)
+    await sign_in(client, db, Role.REVIEWER)
+    wrong = f"/api/ontologies/{b.id}/review-memory/{row.id}"
+    assert (await client.delete(wrong, headers=csrf_headers(client))).status_code == 404
+    assert (await client.post(f"{wrong}/restore", headers=csrf_headers(client))).status_code == 404
+    base = f"/api/ontologies/{a.id}/review-memory"
+    before = (await db.scalars(select(AuditEvent))).all()
+    assert (
+        await client.post(f"{base}/{row.id}/restore", headers=csrf_headers(client))
+    ).status_code == 200
+    assert len((await db.scalars(select(AuditEvent))).all()) == len(before)
+    missing = await client.post(f"{base}/{uuid4()}/restore", headers=csrf_headers(client))
+    assert missing.status_code == 404
+    for reason in ("evicted", "superseded"):
+        row.deleted_at = datetime.now(UTC)
+        row.deleted_reason = reason
+        await db.commit()
+        response = await client.post(f"{base}/{row.id}/restore", headers=csrf_headers(client))
+        assert (response.status_code, response.json()["code"]) == (
+            409,
+            "review_memory.not_restorable",
+        )
+
+
+async def test_list_filters_search_and_validation(client: AsyncClient, db: AsyncSession) -> None:
+    ontology = await add_ontology(db)
+    rejected = await _entry(db, ontology.id, "a%b_c\\d")
+    renamed = await _entry(db, ontology.id, "old")
+    renamed.kind = "renamed"
+    renamed.detail = {"toLabelZh": "NewHeat", "toLabelEn": None, "elementId": str(uuid4())}
+    apart = await _entry(db, ontology.id, "source")
+    apart.kind = "kept_apart"
+    apart.detail = {"otherLabel": "OtherCoil", "otherElementId": None}
+    await db.commit()
+    await sign_in(client, db, Role.VIEWER)
+    base = f"/api/ontologies/{ontology.id}/review-memory"
+    for kind, row in (("rejected", rejected), ("renamed", renamed), ("kept_apart", apart)):
+        response = await client.get(base, params={"kind": kind})
+        assert [item["id"] for item in response.json()["items"]] == [str(row.id)]
+        assert response.json()["total"] == 3
+    for query, row in (
+        ("newheat", renamed),
+        ("othercoil", apart),
+        ("%", rejected),
+        ("_", rejected),
+        ("\\", rejected),
+    ):
+        response = await client.get(base, params={"q": query})
+        assert [item["id"] for item in response.json()["items"]] == [str(row.id)]
+    assert (await client.get(base, params={"q": "x" * 101})).status_code == 422
 
 
 async def test_restore_uses_fresh_time_for_eviction(

@@ -71,8 +71,9 @@ async def delete_review_memory(
     entryId: UUID,  # noqa: N803 (the path names it in camelCase)
     user: Reviewer,
     db: DbSession,
+    request: Request,
 ) -> None:
-    await service.delete_review_memory(db, id, entryId, actor=user.id)
+    await service.delete_review_memory(db, id, entryId, actor=user.id, ip=client_ip(request))
 
 
 @router.post(
@@ -84,15 +85,20 @@ async def restore_review_memory(
     entryId: UUID,  # noqa: N803 (the path names it in camelCase)
     user: Reviewer,
     db: DbSession,
+    request: Request,
 ) -> schemas.ReviewMemoryEntry:
-    return await service.restore_review_memory(db, id, entryId, actor=user.id)
+    return await service.restore_review_memory(
+        db, id, entryId, actor=user.id, ip=client_ip(request)
+    )
 
 
 @router.post(
     "/ontologies/{id}/review-memory/clear", responses=problem_responses(401, 403, 404, 422)
 )
-async def clear_review_memory(id: UUID, user: Reviewer, db: DbSession) -> schemas.ReviewMemoryClear:
-    return await service.clear_review_memory(db, id, actor=user.id)
+async def clear_review_memory(
+    id: UUID, user: Reviewer, db: DbSession, request: Request
+) -> schemas.ReviewMemoryClear:
+    return await service.clear_review_memory(db, id, actor=user.id, ip=client_ip(request))
 
 
 def _may_review_own(user: Principal, settings: Settings) -> bool:
