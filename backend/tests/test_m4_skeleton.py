@@ -301,7 +301,6 @@ async def test_batch_5a_queue_question(
     assert (question["status"], question["origin"]) == ("queued", "user")
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 6: queued questions cannot generate gap proposals")
 async def test_batch_6_gap_requires_unanswerable(
     app: FastAPI, client: AsyncClient, db: AsyncSession
 ) -> None:

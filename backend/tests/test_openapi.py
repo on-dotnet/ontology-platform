@@ -90,6 +90,7 @@ CQ = "/competency-questions"
 # What an authorized caller gets from operations that are no longer stubs (nothing released yet).
 QA_LIST = f"{ONTOLOGY}/qa/questions"
 QA_DETAIL = "/api/qa/questions/{id}"
+QA_GAP = f"{QA_DETAIL}/gap-proposal"
 M4_IMPLEMENTED: dict[tuple[str, str], tuple[int, str | None]] = {
     ("post", f"{ONTOLOGY}/objects/traverse"): (409, "query.no_release"),
     ("get", f"{ONTOLOGY}/metrics"): (409, "query.no_release"),
@@ -98,6 +99,7 @@ M4_IMPLEMENTED: dict[tuple[str, str], tuple[int, str | None]] = {
     ("post", QA_LIST): (409, "query.no_release"),
     ("get", QA_LIST): (200, None),
     ("get", QA_DETAIL): (200, None),
+    ("post", QA_GAP): (409, "qa.not_unanswerable"),
 }
 M4_OPERATIONS = {
     f"{ONTOLOGY}/objects/traverse": {"post": 200},
@@ -106,7 +108,7 @@ M4_OPERATIONS = {
     f"{ONTOLOGY}/rules/check": {"post": 200},
     f"{ONTOLOGY}/qa/questions": {"post": 202, "get": 200},
     "/api/qa/questions/{id}": {"get": 200},
-    "/api/qa/questions/{id}/gap-proposal": {"post": 202},
+    QA_GAP: {"post": 202},
     ONTOLOGY + CQ: {"get": 200, "post": 201},
     "/api/competency-questions/{id}": {"patch": 200},
     "/api/competency-questions/{id}/archive": {"post": 200},
@@ -129,9 +131,15 @@ def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) ->
         for method, success in methods.items():
             responses = paths[path][method]["responses"]
             assert "schema" in responses[str(success)]["content"]["application/json"]
-            if path in (QA_LIST, QA_DETAIL):
+            if path in (QA_LIST, QA_DETAIL, QA_GAP):
                 assert "501" not in responses
                 assert "application/problem+json" in responses["403"]["content"]
+                if path == QA_GAP:
+                    for status in ("200", "202"):
+                        assert responses[status]["content"]["application/json"]["schema"] == {
+                            "$ref": "#/components/schemas/QaQuestion"
+                        }
+                    assert "application/problem+json" in responses["409"]["content"]
             else:
                 assert "application/problem+json" in responses["501"]["content"]
     media = paths[ONTOLOGY + CQ + "/import"]["post"]["requestBody"]["content"]

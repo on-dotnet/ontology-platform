@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api, unwrap } from '@/api/client';
 import type { components } from '@/api/schema';
@@ -11,6 +11,11 @@ type Create = components['schemas']['QaQuestionCreate'];
 const listKey = (ontologyId: string) => ['qa', 'recent', ontologyId] as const;
 const detailKey = (id: string | undefined) => ['qa', 'question', id] as const;
 export const isActive = (question?: Question) => question?.status === 'queued' || question?.status === 'running';
+export const isGapActive = (proposal?: Question['gapProposal']) => proposal?.status === 'queued' || proposal?.status === 'running';
+
+function needsPolling(question?: Question) {
+  return isActive(question) || isGapActive(question?.gapProposal);
+}
 
 export function useRecentQuestions(id: string) {
   return useQuery({
@@ -28,20 +33,49 @@ export function useQuestion(id: string | undefined, summary: Question | undefine
   return useQuery({
     queryKey: detailKey(id),
     enabled: !!id,
-    // List entries omit evidence. Only an active question can be displayed from its summary.
-    initialData: isActive(summary) ? summary : undefined,
+    // Active questions and gap proposals can be shown from a summary while detail loads.
+    initialData: needsPolling(summary) ? summary : undefined,
     initialDataUpdatedAt: 0,
+    // Reopening a question must pick up proposals started in another session.
+    staleTime: 0,
     queryFn: async ({ signal }) => {
       const next = await unwrap(api.GET('/api/qa/questions/{id}', { params: { path: { id: id! } }, signal }));
-      if (!isActive(next) && (isActive(client.getQueryData<Question>(detailKey(id))) || isActive(summary))) {
+      if (!needsPolling(next) && (needsPolling(client.getQueryData<Question>(detailKey(id))) || needsPolling(summary))) {
         void client.invalidateQueries({ queryKey: listKey(next.ontologyId) });
       }
       return next;
     },
-    refetchInterval: ({ state }) => !stopsPolling(state.error) && isActive(state.data) ? 2000 : false,
+    refetchInterval: ({ state }) => !stopsPolling(state.error) && needsPolling(state.data) ? 2000 : false,
     refetchOnWindowFocus: false,
     retry: false,
   });
+}
+
+export function useGapProposal(id: string) {
+  const client = useQueryClient();
+  const mutationKey = ['qa', 'gap-proposal', id] as const;
+  const pending = useIsMutating({ mutationKey }) > 0;
+  const mutation = useMutation({
+    mutationKey,
+    mutationFn: () => unwrap(api.POST('/api/qa/questions/{id}/gap-proposal', { params: { path: { id } } })),
+    onSuccess: async (question) => {
+      const queryKey = detailKey(id);
+      // A detail fetch started before this POST may still have the old question.
+      await client.cancelQueries({ queryKey, exact: true });
+      client.setQueryData<Question>(queryKey, (current) =>
+        current?.gapProposal && !isGapActive(current.gapProposal) ? current : question);
+    },
+    onError: (error) => {
+      // A lost response can still mean the server accepted the proposal.
+      if (!stopsPolling(error)) return client.invalidateQueries({ queryKey: detailKey(id) });
+    },
+  });
+  return {
+    pending, error: mutation.error,
+    submit: () => {
+      if (!client.isMutating({ mutationKey }) && !client.getQueryData<Question>(detailKey(id))?.gapProposal) mutation.mutate();
+    },
+  };
 }
 
 function createQuestion(id: string, body: Create) {

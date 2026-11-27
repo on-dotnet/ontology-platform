@@ -111,7 +111,7 @@ export function countDecisions(items: readonly Pick<ChangeItem, 'decision'>[]): 
 
 /** Change sets proposed by AI: their items carry the AI label, confidence and evidence. */
 export function isAiSource(source: ChangeSetSource): boolean {
-  return source === 'ai_extraction' || source === 'ai_assistant' || source === 'ai_binding';
+  return source === 'ai_extraction' || source === 'ai_assistant' || source === 'ai_binding' || source === 'ai_qa';
 }
 
 /** Sources reviewed as a whole: imports and manual edits offer "accept all". */

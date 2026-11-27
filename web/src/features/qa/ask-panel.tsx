@@ -7,12 +7,13 @@ import { isApiError, isForbidden } from '@/api/errors';
 import { EmptyState } from '@/components/states/empty-state';
 import { ForbiddenState } from '@/components/states/forbidden-state';
 import { LoadingState } from '@/components/states/loading-state';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { aiHealth, useAiStatus } from '@/features/ai/api';
 
 import { AnswerCard } from './answer-card';
 import { isActive, useCreateQuestion, useQuestion, useRecentQuestions } from './api';
+import { GapActions } from './gap-actions';
 import { QuestionError } from './question-error';
 import { QuestionForm } from './question-form';
 import { QuestionProgress } from './question-progress';
@@ -58,7 +59,11 @@ export function AskPanel({ ontologyId }: { ontologyId: string }) {
             <CardTitle>{question.question}</CardTitle>
             {isActive(question) && <QuestionProgress question={question} />}
             {question.status === 'answered' && <AnswerCard key={question.id} question={question} />}
-            {question.status === 'unanswerable' && <UnanswerableCard gaps={question.gaps} />}
+            {question.status === 'unanswerable' && <UnanswerableCard gaps={question.gaps} actions={<div className="space-y-2">
+              <GapActions question={question} />
+              <Button variant="secondary" size="sm" disabled={unconfigured || create.isPending}
+                onClick={() => create.mutate({ question: question.question })}>{t('qa.askAgain')}</Button>
+            </div>} />}
             {question.status === 'failed' && <QuestionError error={question.errorCode}
               disabled={unconfigured || create.isPending} retry={() => create.mutate({ question: question.question })} />}
           </> : id || recent.isPending ? <LoadingState variant="detail" />
