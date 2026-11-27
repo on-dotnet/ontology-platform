@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 import type { components } from '@/api/schema';
 import { ontologyKeys } from '@/features/ontologies/api';
 import i18n from '@/i18n';
-import { formatDateTime } from '@/lib/format';
 import { ONTOLOGY_ID, ontologyFixture } from '@/test/fixtures';
 import { problemResponse, renderApp } from '@/test/utils';
 
@@ -225,33 +224,44 @@ describe('explore published objects', () => {
     expect(screen.queryByRole('button', { name: /移除.*Q999/ })).toBeNull();
   });
 
-  it('shows calendar dates, preserves unzoned times and formats zoned times as absolute instants', async () => {
+  it('shows calendar dates, keeps unzoned wall times and formats zoned times as instants, all to the second', async () => {
     const properties: components['schemas']['ObjectProperty'][] = [
       { propertyId: 'day', label: '生产日', datatype: 'date', unit: null, ops: ['eq'] },
       { propertyId: 'dateColumn', label: '日期列', datatype: 'dateTime', unit: null, ops: ['eq'] },
       { propertyId: 'time', label: '出炉时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
       { propertyId: 'local', label: '现场时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
+      { propertyId: 'spaced', label: '记录时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
       { propertyId: 'utc', label: 'UTC', datatype: 'dateTime', unit: null, ops: ['eq'] },
+      { propertyId: 'micro', label: '采样时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
+      { propertyId: 'odd', label: '备注时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
     ];
-    const time = '2024-03-02T00:30:00+08:00';
+    const time = '2024-03-02T00:30:05+08:00';
     const local = '2024-03-10T02:30:45.123456';
-    const utc = '2024-03-01T16:30:00Z';
+    const spaced = '2024-03-10 02:30:45';
+    const utc = '2024-03-01T16:30:05Z';
+    const micro = '2024-03-01T16:30:05.654321+00:00';
+    const odd = '下午三点';
     mockExplore({
       [`GET ${typesPath}`]: () => ({ release, items: [{ ...heatType, properties }] }),
       [`POST ${searchPath}`]: () => ({
-        ...firstPage, items: [{ ...heatRow, values: { day: '2024-03-01', dateColumn: '2024-03-01', time, local, utc } }],
+        ...firstPage,
+        items: [{ ...heatRow, values: { day: '2024-03-01', dateColumn: '2024-03-01', time, local, spaced, utc, micro, odd } }],
       }),
     });
     renderApp('/explore');
     const table = await screen.findByRole('table', { name: '炉次' });
+    const text = (value: string) => table.querySelector(`time[datetime="${value}"]`)?.textContent;
     const dates = table.querySelectorAll('time[datetime="2024-03-01"]');
     expect(dates).toHaveLength(2);
     for (const date of dates) expect(date.textContent).toBe('2024年3月1日');
-    expect(table.querySelector(`time[datetime="${local}"]`)?.textContent).toBe(local);
-    const expected = formatDateTime(utc, 'zh-CN');
-    for (const instant of [time, utc]) {
-      expect(table.querySelector(`time[datetime="${instant}"]`)?.textContent).toBe(expected);
-    }
+    // #79: a wall time without an offset keeps its clock reading, in the same format and with its seconds.
+    for (const wall of [local, spaced]) expect(text(wall)).toBe('2024年3月10日 02:30:45');
+    // Zoned values are one instant, shown in local time to the second; microseconds do not break parsing.
+    const instant = text(utc);
+    // The minutes depend on the machine's timezone; some are offset by half an hour.
+    expect(instant).toMatch(/2024年3月\d+日 \d{2}:\d{2}:05$/);
+    for (const same of [time, micro]) expect(text(same)).toBe(instant);
+    expect(text(odd)).toBe(odd);
   });
 
   it('sends the cursor, ends pagination at null and starts a changed sort on the first page', async () => {

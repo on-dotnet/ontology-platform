@@ -239,8 +239,12 @@ function PropertyAndRelationBindings({ view, all }: { view: TypeBindingView; all
 function JoinDescription({ join }: { join: Join }) {
   const { t } = useTranslation();
   const separator = t('common.listSeparator');
+  // The same columns read the other way round when the key sits on the other table, so the side is part of the text.
   const description = join.kind === 'foreign_key'
-    ? t('bindings.relations.foreignKey', { columns: join.columns.join(separator), references: join.references.join(separator) })
+    ? t(join.side === 'source' ? 'bindings.relations.foreignKeySource' : 'bindings.relations.foreignKeyTarget', {
+        columns: join.columns.join(separator),
+        references: join.references.join(separator),
+      })
     : t('bindings.relations.linkTable', { table: tableName(join.schema, join.table) });
   return <span className="break-all text-xs">{description}</span>;
 }

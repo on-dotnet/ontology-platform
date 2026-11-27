@@ -18,6 +18,27 @@ export function formatDateTime(iso: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(time);
 }
 
+// Offsets come as +08:00, +0800 or, in PostgreSQL's text output, just +08.
+const DATA_DATE_TIME = /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})(?::(\d{2})(?:\.(\d+))?)?(Z|[+-]\d{2}(?::?\d{2})?)?$/i;
+
+/**
+ * A date and time value read from a data source, to the second (#79).
+ * A value with an offset is an instant and shows in local time; one without is a wall-clock time
+ * the source stored as written, so it shows unchanged in the same format. Anything else is kept as is.
+ */
+export function formatDataDateTime(value: string, locale: string): string {
+  const match = DATA_DATE_TIME.exec(value);
+  if (!match) return value;
+  const [, date = '', minutes = '', seconds = '00', fraction = '', zone] = match;
+  // Sources write up to microseconds; not every engine parses more than milliseconds.
+  const millis = fraction.padEnd(3, '0').slice(0, 3);
+  const offset = zone ? zone.toUpperCase().replace(/^([+-]\d{2}):?(\d{2})?$/, (_, hours: string, minutes?: string) => `${hours}:${minutes ?? '00'}`) : 'Z';
+  const time = Date.parse(`${date}T${minutes}:${seconds}.${millis}${offset}`);
+  if (Number.isNaN(time)) return value;
+  const options: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'medium' };
+  return new Intl.DateTimeFormat(locale, zone ? options : { ...options, timeZone: 'UTC' }).format(time);
+}
+
 /** Relative time for the last seven days ("3 分钟前"), the local date after that (ui-guidelines §6). */
 export function formatRecent(iso: string, locale: string, now: number = Date.now()): string {
   const time = parse(iso);
