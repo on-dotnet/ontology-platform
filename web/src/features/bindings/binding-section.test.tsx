@@ -362,12 +362,27 @@ describe('BindingSection', () => {
     expect(within(codeRow).getByText('继承')).toBeInTheDocument();
     expect(within(codeRow).getByText('未绑定')).toBeInTheDocument();
 
-    expect(within(section).getByText('外键 cast_no → cast_no')).toBeInTheDocument();
+    expect(within(section).getByText('外键（在起点表）cast_no → cast_no')).toBeInTheDocument();
     expect(within(section).getByRole('button', { name: '目录里找不到这一列，可能已被改名' })).toBeInTheDocument();
 
     expect(within(section).getByText('有待审核的绑定修改')).toBeInTheDocument();
     expect(within(section).getByRole('link', { name: '去审核' })).toHaveAttribute('href', '/review/cs-binding');
     expect(within(section).getByRole('button', { name: '编辑绑定' })).toBeInTheDocument();
+  });
+
+  it('says which table holds the foreign key of a relation join', async () => {
+    // #75: the same columns read the other way round when the key sits on the target table.
+    const user = userEvent.setup();
+    const relations = boundHeat.relations.map((relation) => ({
+      ...relation,
+      join: { ...relation.join, join: { ...relation.join.join, side: 'target' as const } },
+    }));
+    bindingServer({ view: { ...boundHeat, relations }, user: userWithRole('editor') });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const section = await openHeat(user);
+    expect(await within(section).findByText('外键（在终点表）cast_no → cast_no')).toBeInTheDocument();
+    expect(within(section).queryByText(/在起点表/)).toBeNull();
   });
 
   it('tells a viewer that nothing is bound, without a way to bind', async () => {

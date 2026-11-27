@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { components } from '@/api/schema';
 import { Badge } from '@/components/ui/badge';
 import translations from '@/i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatDataDateTime } from '@/lib/format';
 
 type Row = components['schemas']['ObjectRow'];
 type Property = components['schemas']['ObjectProperty'];
@@ -26,8 +26,7 @@ export function PropertyValue({ property, row }: { property: Property; row: Row 
     if (/^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value))) {
       display = <time dateTime={value}>{new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(value))}</time>;
     } else {
-      const hasTimeZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value);
-      display = <time dateTime={value}>{hasTimeZone ? formatDateTime(value, i18n.language) : value}</time>;
+      display = <time dateTime={value}>{formatDataDateTime(value, i18n.language)}</time>;
     }
   } else display = String(value);
   return (
