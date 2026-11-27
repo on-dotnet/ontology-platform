@@ -24,7 +24,6 @@ export type ColumnFamily = CatalogColumn['family'];
 export const bindingKeys = {
   all: ['bindings'] as const,
   views: (ontologyId: string, typeId?: string) => [...bindingKeys.all, 'views', ontologyId, typeId ?? ''] as const,
-  dataSources: () => [...bindingKeys.all, 'data-sources'] as const,
   tables: (dataSourceId: string, q: string) => [...bindingKeys.all, 'tables', dataSourceId, q] as const,
   table: (dataSourceId: string, schema: string, table: string) => [...bindingKeys.all, 'table', dataSourceId, schema, table] as const,
 };
@@ -38,15 +37,6 @@ export function useBindingViews(ontologyId: string, typeId?: string) {
     queryKey: bindingKeys.views(ontologyId, typeId),
     queryFn: () =>
       unwrap(api.GET('/api/ontologies/{id}/bindings', { params: { path: { id: ontologyId }, query: typeId ? { typeId } : {} } })),
-  });
-}
-
-/** Data sources a type may be bound to (archived ones are left out of the choice). */
-export function useDataSources(enabled = true) {
-  return useQuery({
-    queryKey: bindingKeys.dataSources(),
-    queryFn: () => unwrap(api.GET('/api/data-sources')),
-    enabled,
   });
 }
 

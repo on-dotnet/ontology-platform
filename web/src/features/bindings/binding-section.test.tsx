@@ -1,12 +1,13 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import type { UserInfo } from '@/features/auth/api';
+import { listKey, rememberSource } from '@/features/datasources/api';
 import type { EditRequest, Element } from '@/features/ontologies/api';
 import i18n from '@/i18n';
 import { elementDetailFixture, elementFixture, impactFixture, ontologyFixture } from '@/test/fixtures';
-import { mockApi, problemResponse, renderApp, userWithRole } from '@/test/utils';
+import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
 import type { CatalogTable, DataSource, RelationBindingView, TypeBindingView } from './api';
 
@@ -197,16 +198,47 @@ const heatWithJoins: TypeBindingView = {
   ],
 };
 
+const nextHeat = elementFixture({
+  id: 'el-next-heat',
+  kind: 'relation_type',
+  localName: 'nextHeat',
+  labelZh: '下一炉',
+  labelEn: 'Next heat',
+  definitionZh: null,
+  domainId: heat.id,
+  rangeId: heat.id,
+});
+// The server lists a self-relation once in each direction.
+const selfOut: RelationBindingView = {
+  relationId: nextHeat.id, label: '下一炉', direction: 'out', otherTypeId: heat.id, otherTypeLabel: '炉次', join: null,
+};
+const selfIn: RelationBindingView = { ...selfOut, direction: 'in' };
+const selfJoin: NonNullable<RelationBindingView['join']> = {
+  elementId: 'bd-next', revision: 4, check: 'ok',
+  join: { kind: 'foreign_key', side: 'source', columns: ['cast_no'], references: ['heat_no'] },
+};
+const heatWithSelfJoin: TypeBindingView = {
+  ...editableHeat,
+  relations: [{ ...selfOut, join: selfJoin }, { ...selfIn, join: selfJoin }],
+};
+
 interface BindingServerOptions {
   view: TypeBindingView;
   user?: UserInfo;
   ontologyElements?: Element[];
   otherViews?: TypeBindingView[];
   tables?: CatalogTable[];
+  /** Read on each request, so a test can change what the data page would have changed. */
+  sources?: DataSource[];
+  /** Answers the data source list instead of `sources`. */
+  sourceList?: RouteHandler;
+  nextCursor?: string;
   editError?: string;
 }
 
-function bindingServer({ view, user, ontologyElements = elements, otherViews = [], tables = [heatTable], editError }: BindingServerOptions) {
+function bindingServer({
+  view, user, ontologyElements = elements, otherViews = [], tables = [heatTable], sources = [mes], sourceList, nextCursor, editError,
+}: BindingServerOptions) {
   const views = [view, ...otherViews];
   return mockApi(
     {
@@ -225,12 +257,13 @@ function bindingServer({ view, user, ontologyElements = elements, otherViews = [
         return views.filter((item) => (typeId ? item.typeId === typeId : item.table !== null));
       },
       'GET /api/ontologies/:id/graph': () => ({ nodes: [], edges: [] }),
-      'GET /api/data-sources': () => [mes],
+      'GET /api/data-sources': sourceList ?? (() => sources),
       'GET /api/data-sources/:id/catalog/tables': ({ query }) => ({
-        items: tables
+        // A later page holds the tables after the first, so a test can tell the pages apart.
+        items: tables.slice(query.has('cursor') ? 1 : 0)
           .filter((table) => table.name.includes(query.get('q')?.toLowerCase() ?? ''))
           .map(({ schema, name, kind, comment, columnCount, boundType }) => ({ schema, name, kind, comment, columnCount, boundType })),
-        nextCursor: null,
+        nextCursor: nextCursor ?? null,
       }),
       'GET /api/data-sources/:id/catalog/tables/:schema/:table': ({ params }) =>
         tables.find((table) => params.id === mes.id && params.schema === table.schema && params.table === table.name)
@@ -253,8 +286,10 @@ async function openHeat(user: ReturnType<typeof userEvent.setup>) {
 }
 
 async function openEditor({
-  view = editableHeat, tables = [currentHeatTable, castTable], editError,
-}: Partial<Pick<BindingServerOptions, 'view' | 'tables' | 'editError'>> = {}) {
+  view = editableHeat, tables = [currentHeatTable, castTable], sources, sourceList, nextCursor, editError, extraElements = [],
+}: Partial<Pick<BindingServerOptions, 'view' | 'tables' | 'sources' | 'sourceList' | 'nextCursor' | 'editError'>> & {
+  extraElements?: Element[];
+} = {}) {
   const other: TypeBindingView = {
     typeId: cast.id,
     table: { ...boundHeat.table, elementId: 'bd-cast', table: castTable.name, keyColumns: ['sequence_no'] },
@@ -265,13 +300,24 @@ async function openEditor({
     openChangeSetIds: [],
   };
   const user = userEvent.setup();
-  const ontologyElements = [...elements, firstHeat];
-  const api = bindingServer({ view, tables, editError, user: userWithRole('editor'), ontologyElements, otherViews: [other] });
-  renderApp('/ontology?ontology=onto-steel&view=list');
+  const ontologyElements = [...elements, firstHeat, ...extraElements];
+  const api = bindingServer({
+    view, tables, sources, sourceList, nextCursor, editError, user: userWithRole('editor'), ontologyElements, otherViews: [other],
+  });
+  const { queryClient } = renderApp('/ontology?ontology=onto-steel&view=list');
   const section = await openHeat(user);
   await user.click(await within(section).findByRole('button', { name: i18n.t('bindings.edit') }));
   const dialog = within(await screen.findByRole('dialog', { name: formText('editTitle', { type: '炉次' }) }));
-  return { api, user, dialog, ontologyElements, save: () => user.click(dialog.getByRole('button', { name: formText('save') })) };
+  return {
+    api, user, dialog, ontologyElements, queryClient,
+    save: () => user.click(dialog.getByRole('button', { name: formText('save') })),
+  };
+}
+
+async function openBinder(user: ReturnType<typeof userEvent.setup>) {
+  const section = await openHeat(user);
+  await user.click(await within(section).findByRole('button', { name: i18n.t('bindings.bind') }));
+  return within(await screen.findByRole('dialog', { name: formText('createTitle', { type: '炉次' }) }));
 }
 
 async function submittedItems(api: ReturnType<typeof bindingServer>) {
@@ -381,7 +427,7 @@ describe('BindingSection', () => {
     const { api, user, dialog, save } = await openEditor();
     expect(await dialog.findByRole('checkbox', { name: 'heat_no' })).toBeChecked();
     await user.click(dialog.getByRole('checkbox', { name: 'cast_no' }));
-    await user.type(dialog.getByRole('searchbox', { name: formText('tableSearch') }), 'heat{Enter}');
+    await user.type(dialog.getByRole('searchbox', { name: formText('table') }), 'heat{Enter}');
     expect(api.calls('POST', EDITS)).toHaveLength(0);
     await save();
 
@@ -502,6 +548,8 @@ describe('BindingSection', () => {
     await dialog.findByRole('option', { name: /mes\.heat/ });
     await user.click(dialog.getByRole('button', { name: formText('save') }));
     expect(await dialog.findByText(formText('errors.tableRequired'))).toBeVisible();
+    expect(dialog.getByRole('searchbox', { name: formText('table') }))
+      .toHaveAccessibleDescription(`${formText('tableSearch')} ${formText('errors.tableRequired')}`);
     expect(api.calls('POST', EDITS)).toHaveLength(0);
   });
 
@@ -600,6 +648,291 @@ describe('BindingSection', () => {
     await save();
     expect(await relation.findByText(formText('errors.joinColumnsRequired'))).toBeVisible();
     expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('links to the review list when several binding change sets are open', async () => {
+    const user = userEvent.setup();
+    bindingServer({ view: { ...boundHeat, openChangeSetIds: ['cs-binding', 'cs-later'] }, user: userWithRole('editor') });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const section = await openHeat(user);
+    const link = await within(section).findByRole('link', { name: i18n.t('bindings.pending.listLink', { count: 2 }) });
+    expect(link).toHaveAttribute('href', '/review?ontology=onto-steel');
+    expect(within(section).queryByRole('link', { name: i18n.t('bindings.pending.link') })).not.toBeInTheDocument();
+  });
+
+  it('names the table search by its visible label and searches only once the typing pauses', async () => {
+    const { api, dialog } = await openEditor({ nextCursor: 'page-2' });
+    const search = await dialog.findByRole('searchbox', { name: formText('table') });
+    expect(search).toHaveAccessibleDescription(formText('tableSearch'));
+    const next = await dialog.findByRole('button', { name: i18n.t('pagination.next') });
+    expect(next).toBeEnabled();
+
+    for (const value of ['h', 'he', 'hea', 'heat']) fireEvent.change(search, { target: { value } });
+    // The cursor on screen belongs to the previous search until the new one is sent.
+    expect(next).toBeDisabled();
+
+    const sent = () => api.calls('GET', `/api/data-sources/${mes.id}/catalog/tables`).flatMap((call) => call.query.get('q') ?? []);
+    await waitFor(() => expect(sent()).toContain('heat'));
+    expect(sent()).toEqual(['heat']);
+    await waitFor(() => expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeEnabled());
+  });
+
+  it('keeps the page on screen until the new search is sent, then starts at its first page', async () => {
+    const { api, user, dialog } = await openEditor({ nextCursor: 'page-2' });
+    await user.click(await dialog.findByRole('button', { name: i18n.t('pagination.next') }));
+    await waitFor(() => expect(dialog.queryByRole('option', { name: /mes\.heat/ })).not.toBeInTheDocument());
+    expect(await dialog.findByRole('option', { name: /mes\.casting_sequence/ })).toBeInTheDocument();
+
+    fireEvent.change(dialog.getByRole('searchbox', { name: formText('table') }), { target: { value: 'cast' } });
+    expect(dialog.queryByRole('option', { name: /mes\.heat/ })).not.toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.previous') })).toBeDisabled();
+
+    const calls = () => api.calls('GET', `/api/data-sources/${mes.id}/catalog/tables`);
+    await waitFor(() => expect(calls().some((call) => call.query.get('q') === 'cast')).toBe(true));
+    expect(calls().filter((call) => call.query.has('q') && call.query.has('cursor'))).toHaveLength(0);
+  });
+
+  it.each([
+    ['listed as archived', [{ ...mes, status: 'archived' as const }]],
+    ['missing from the list', []],
+  ])('says that the bound data source is archived (%s) and offers only the others', async (_case, bound) => {
+    const view: TypeBindingView = {
+      ...editableHeat,
+      table: { ...boundHeat.table, dataSource: { id: mes.id, name: mes.name, status: 'archived' } },
+    };
+    const { dialog } = await openEditor({ view, sources: [...bound, { ...mes, id: 'ds-lims', name: 'LIMS' }] });
+
+    expect(await dialog.findByText(formText('sourceArchived.title'))).toBeVisible();
+    expect(dialog.getByText(formText('sourceArchived.description', { name: mes.name }))).toBeVisible();
+    const select = dialog.getByRole('combobox', { name: formText('dataSource') });
+    expect(select).toHaveValue('');
+    expect(within(select).getByRole('option', { name: 'LIMS' })).toBeInTheDocument();
+    expect(within(select).queryByRole('option', { name: mes.name })).not.toBeInTheDocument();
+  });
+
+  it('follows the changes the data page makes to the data sources while the dialog is open', async () => {
+    const sources = [mes];
+    const { api, dialog, queryClient, save } = await openEditor({ sources });
+    const select = await dialog.findByRole('combobox', { name: formText('dataSource') });
+    expect(select).toHaveValue(mes.id);
+    expect(dialog.queryByText(formText('sourceArchived.title'))).not.toBeInTheDocument();
+
+    const archived: DataSource = { ...mes, status: 'archived', revision: 2 };
+    sources[0] = archived;
+    await act(() => rememberSource(queryClient, archived));
+
+    expect(await dialog.findByText(formText('sourceArchived.title'))).toBeVisible();
+    expect(within(select).queryByRole('option', { name: mes.name })).not.toBeInTheDocument();
+    // Saving still answers, by asking for another source.
+    await save();
+    expect(await dialog.findByText(formText('errors.dataSourceRequired'))).toBeVisible();
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('chooses the bound data source from a fresh list, not from an outdated cached one', async () => {
+    const user = userEvent.setup();
+    let release = () => {};
+    const held = new Promise<void>((resolve) => { release = resolve; });
+    const api = bindingServer({
+      view: editableHeat, tables: [currentHeatTable], user: userWithRole('editor'),
+      sourceList: async () => { await held; return [mes]; },
+    });
+    const { queryClient } = renderApp('/ontology?ontology=onto-steel&view=list');
+    queryClient.setQueryData(listKey, []);
+
+    const section = await openHeat(user);
+    await user.click(await within(section).findByRole('button', { name: i18n.t('bindings.edit') }));
+    // Everything else the dialog reads has arrived; only the data source list is still on its way.
+    await waitFor(() => {
+      expect(api.calls('GET', '/api/data-sources')).toHaveLength(1);
+      expect(queryClient.isFetching()).toBe(1);
+    });
+    await act(() => new Promise<void>((resolve) => { setTimeout(resolve, 20); }));
+    expect(screen.queryByRole('combobox', { name: formText('dataSource') })).not.toBeInTheDocument();
+
+    release();
+    expect(await screen.findByRole('combobox', { name: formText('dataSource') })).toHaveValue(mes.id);
+  });
+
+  it('asks to retry a failed data source refresh instead of choosing from the cached list', async () => {
+    const user = userEvent.setup();
+    let failing = true;
+    bindingServer({
+      view: editableHeat, tables: [currentHeatTable], user: userWithRole('editor'),
+      sourceList: () => (failing ? problemResponse(409, 'test.failed') : [mes]),
+    });
+    const { queryClient } = renderApp('/ontology?ontology=onto-steel&view=list');
+    queryClient.setQueryData(listKey, []);
+
+    const section = await openHeat(user);
+    await user.click(await within(section).findByRole('button', { name: i18n.t('bindings.edit') }));
+    const dialog = within(await screen.findByRole('dialog', { name: formText('editTitle', { type: '炉次' }) }));
+    const retry = await dialog.findByRole('button', { name: i18n.t('common.retry') });
+    expect(dialog.queryByRole('combobox', { name: formText('dataSource') })).not.toBeInTheDocument();
+
+    failing = false;
+    await user.click(retry);
+    expect(await dialog.findByRole('combobox', { name: formText('dataSource') })).toHaveValue(mes.id);
+  });
+
+  it('keeps the form and its draft when a later data source refresh fails', async () => {
+    let failing = false;
+    const { user, dialog, queryClient } = await openEditor({
+      sourceList: () => (failing ? problemResponse(409, 'test.failed') : [mes]),
+    });
+    // Queried afresh each time: a removed form would keep its old checkbox state.
+    const draft = () => within(dialog.getByRole('group', { name: formText('keyColumns') })).getByRole('checkbox', { name: 'cast_no' });
+    await dialog.findByRole('group', { name: formText('keyColumns') });
+    await user.click(draft());
+
+    failing = true;
+    await act(() => queryClient.invalidateQueries({ queryKey: listKey }));
+
+    expect(await dialog.findByRole('button', { name: i18n.t('common.retry') })).toBeVisible();
+    expect(draft()).toBeChecked();
+  });
+
+  it('updates only the relation binding, with the revision it saw, when the table stays and a join changes', async () => {
+    const { api, user, dialog, save } = await openEditor({ view: heatWithJoins });
+    const relation = within(await dialog.findByRole('group', { name: outgoing.label }));
+    const references = await relation.findByRole('group', { name: formText('references') });
+    await user.click(await within(references).findByRole('checkbox', { name: 'sequence_no', checked: true }));
+    await checkColumn(user, references, 'first_heat_no');
+    await save();
+
+    expect(await submittedItems(api)).toEqual([{
+      op: 'update', kind: 'relation_binding', targetElementId: 'bd-in-cast', targetRevision: 7,
+      fields: { binding: { target: 'join', join: {
+        kind: 'foreign_key', side: 'source', columns: ['cast_no'], references: ['first_heat_no'],
+      } } },
+    }]);
+  });
+
+  it('creates a self-relation join with the new table at both ends', async () => {
+    const user = userEvent.setup();
+    const view: TypeBindingView = { ...unboundHeat, relations: [selfOut, selfIn] };
+    const api = bindingServer({
+      view, tables: [currentHeatTable], ontologyElements: [...elements, nextHeat], user: userWithRole('editor'),
+    });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    const dialog = await openBinder(user);
+    await user.selectOptions(await dialog.findByRole('combobox', { name: formText('dataSource') }), mes.id);
+    await user.click(await dialog.findByRole('option', { name: /mes\.heat/ }));
+
+    // One editor for the pair, although the relation is listed in both directions.
+    expect(await dialog.findAllByRole('group', { name: '下一炉' })).toHaveLength(1);
+    const relation = within(dialog.getByRole('group', { name: '下一炉' }));
+    await user.selectOptions(relation.getByRole('combobox', { name: formText('joinKind') }), formText('joinKinds.foreign_key'));
+    const columns = await relation.findByRole('group', { name: formText('columns') });
+    const references = relation.getByRole('group', { name: formText('references') });
+    expect(within(references).getByRole('checkbox', { name: 'heat_no' })).toBeChecked();
+    await checkColumn(user, columns, 'cast_no');
+    await user.click(dialog.getByRole('button', { name: formText('save') }));
+
+    const items = await submittedItems(api);
+    const newRef = items[0]?.tempRef;
+    expect(newRef).toMatch(/\S/);
+    expect(items).toEqual([
+      expect.objectContaining({ op: 'create', kind: 'type_binding', tempRef: newRef }),
+      { op: 'create', kind: 'relation_binding', fields: {
+        subjectRef: nextHeat.id, domainRef: newRef, rangeRef: newRef, binding: { target: 'join', join: selfJoin.join },
+      } },
+    ]);
+  });
+
+  it('rebuilds a self-relation join on both ends of the replacement table', async () => {
+    const replacement: CatalogTable = { ...currentHeatTable, name: 'heat_v2' };
+    const { api, user, dialog, save } = await openEditor({
+      view: heatWithSelfJoin, tables: [currentHeatTable, castTable, replacement], extraElements: [nextHeat],
+    });
+    await user.click(await dialog.findByRole('option', { name: /mes\.heat_v2/ }));
+    const relation = within(await dialog.findByRole('group', { name: '下一炉' }));
+    expect(relation.getByRole('combobox', { name: formText('joinKind') })).toHaveValue('foreign_key');
+    await save();
+
+    const items = await submittedItems(api);
+    const newRef = items.find((item) => item.op === 'create' && item.kind === 'type_binding')?.tempRef;
+    expect(newRef).toMatch(/\S/);
+    expect(items).toHaveLength(6);
+    expect(items).toEqual(expect.arrayContaining([
+      { op: 'delete', kind: 'relation_binding', targetElementId: 'bd-next', targetRevision: 4 },
+      { op: 'delete', kind: 'type_binding', targetElementId: 'bd-heat', targetRevision: 3 },
+      { op: 'create', kind: 'relation_binding', fields: {
+        subjectRef: nextHeat.id, domainRef: newRef, rangeRef: newRef, binding: { target: 'join', join: selfJoin.join },
+      } },
+    ]));
+  });
+
+  it('drops a self-relation join when the replacement table lacks one of its columns', async () => {
+    // archived_heat still has the foreign key column cast_no, but no heat_no for it to refer to.
+    const { api, user, dialog, save } = await openEditor({
+      view: heatWithSelfJoin, tables: [currentHeatTable, castTable, archiveTable], extraElements: [nextHeat],
+    });
+    await user.click(await dialog.findByRole('option', { name: /mes\.archived_heat/ }));
+    const relation = within(await dialog.findByRole('group', { name: '下一炉' }));
+    expect(relation.getByRole('combobox', { name: formText('joinKind') })).toHaveValue('none');
+    await save();
+
+    const items = await submittedItems(api);
+    expect(items.filter((item) => item.kind === 'relation_binding')).toEqual([
+      { op: 'delete', kind: 'relation_binding', targetElementId: 'bd-next', targetRevision: 4 },
+    ]);
+  });
+
+  it('clears the link-table columns of the edited end when its key changes, until they are chosen again', async () => {
+    const link: CatalogTable = {
+      ...heatTable, schema: 'mapping', name: 'heat_cast', comment: null, columnCount: 3, primaryKey: null,
+      columns: ['heat_key', 'heat_part', 'sequence_key'].map((name, index) => (
+        { name, type: 'text', family: 'string', nullable: false, comment: null, position: index + 1 }
+      )),
+    };
+    const linked = (sourceColumns: string[], targetColumns: string[]) => (
+      { kind: 'link_table' as const, schema: link.schema, table: link.name, sourceColumns, targetColumns }
+    );
+    const view: TypeBindingView = {
+      ...editableHeat,
+      relations: [
+        { ...outgoing, join: { elementId: 'bd-link-out', revision: 2, check: 'ok', join: linked(['heat_key'], ['sequence_key']) } },
+        { ...incoming, join: { elementId: 'bd-link-in', revision: 6, check: 'ok', join: linked(['sequence_key'], ['heat_key']) } },
+      ],
+    };
+    const { api, user, dialog, save } = await openEditor({ view, tables: [currentHeatTable, castTable, link] });
+    const columnsOf = async (relation: string, group: 'sourceColumns' | 'targetColumns') => (
+      within(await dialog.findByRole('group', { name: relation })).findByRole('group', { name: formText(group) })
+    );
+    const outSource = await columnsOf(outgoing.label, 'sourceColumns');
+    const outTarget = await columnsOf(outgoing.label, 'targetColumns');
+    const inSource = await columnsOf(incoming.label, 'sourceColumns');
+    const inTarget = await columnsOf(incoming.label, 'targetColumns');
+    expect(within(outSource).getByRole('checkbox', { name: 'heat_key' })).toBeChecked();
+
+    const keys = dialog.getByRole('group', { name: formText('keyColumns') });
+    await user.click(within(keys).getByRole('checkbox', { name: 'cast_no' }));
+
+    // The edited type is the source of one relation and the target of the other.
+    expect(within(outSource).queryByRole('checkbox', { checked: true })).not.toBeInTheDocument();
+    expect(within(outTarget).getByRole('checkbox', { name: 'sequence_key' })).toBeChecked();
+    expect(within(inSource).getByRole('checkbox', { name: 'sequence_key' })).toBeChecked();
+    expect(within(inTarget).queryByRole('checkbox', { checked: true })).not.toBeInTheDocument();
+    await save();
+    expect(await dialog.findAllByText(formText('errors.joinColumnsRequired'))).toHaveLength(2);
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+
+    for (const group of [outSource, inTarget]) {
+      await checkColumn(user, group, 'heat_key');
+      await checkColumn(user, group, 'heat_part');
+    }
+    await save();
+    const items = await submittedItems(api);
+    expect(items).toHaveLength(3);
+    expect(items).toEqual(expect.arrayContaining([
+      expect.objectContaining({ op: 'update', kind: 'type_binding', targetElementId: 'bd-heat', targetRevision: 3 }),
+      { op: 'update', kind: 'relation_binding', targetElementId: 'bd-link-out', targetRevision: 2,
+        fields: { binding: { target: 'join', join: linked(['heat_key', 'heat_part'], ['sequence_key']) } } },
+      { op: 'update', kind: 'relation_binding', targetElementId: 'bd-link-in', targetRevision: 6,
+        fields: { binding: { target: 'join', join: linked(['sequence_key'], ['heat_key', 'heat_part']) } } },
+    ]));
   });
 
   it('shows the localized type mismatch inside the edit dialog when the server rejects a property binding', async () => {

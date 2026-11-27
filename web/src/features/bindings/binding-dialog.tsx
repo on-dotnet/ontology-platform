@@ -13,11 +13,12 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { listKey, useSourceList } from '@/features/datasources/api';
 import { elementName, useElements, type EditItem, type Element } from '@/features/ontologies/api';
 import { useSaveEdits, useSaveErrorMessage } from '@/features/ontology/edit-actions';
 
 import {
-  bindingKeys, canBeKey, columnFits, useBindingViews, useCatalogTable, useDataSources,
+  bindingKeys, canBeKey, columnFits, useBindingViews, useCatalogTable,
   type CatalogTable, type DataSource, type TypeBindingView,
 } from './api';
 import { bindingEdits, bindingModel, defaultChoices, joinProblem, replacementChanged, withKeys, type BindingModel, type Choices } from './binding-edits';
@@ -35,7 +36,8 @@ interface DialogProps {
 
 export function BindingDialog({ open, onOpenChange, ontologyId, type, all, view }: DialogProps) {
   const { t, i18n } = useTranslation();
-  const sources = useDataSources();
+  // Shared with the data page, so what changes there shows here.
+  const sources = useSourceList();
   const views = useBindingViews(ontologyId);
   const editing = view.table ? ontologyId : undefined;
   const properties = useElements(editing, { kind: 'property_binding' });
@@ -54,8 +56,13 @@ export function BindingDialog({ open, onOpenChange, ontologyId, type, all, view 
   const forbidden = queries.some((query) => isForbidden(query.error));
   const availableSources = sources.data;
   const boundViews = views.data;
-  const ready = availableSources !== undefined && boundViews !== undefined &&
+  // The form picks the bound source once, so it waits for a list fetched by this opening rather than a
+  // cached one. A later refetch that fails keeps the form.
+  const [listed, setListed] = useState(false);
+  if (!listed && sources.isFetchedAfterMount && sources.isSuccess) setListed(true);
+  const ready = availableSources !== undefined && listed && boundViews !== undefined &&
     (!editing || (properties.data !== undefined && relations.data !== undefined));
+  const refresh = () => Promise.all([bindingKeys.all, listKey].map((queryKey) => client.invalidateQueries({ queryKey })));
   async function save(items: EditItem[], model: BindingModel) {
     if (saving.current) return;
     if (!items.length) {
@@ -76,12 +83,12 @@ export function BindingDialog({ open, onOpenChange, ontologyId, type, all, view 
         const latest = current && bindingModel(type, all, current, latestViews, columns.data ?? [], joins.data ?? []);
         if (!latest || replacementChanged(model, latest, items)) {
           setFailure({ changed: true });
-          await client.invalidateQueries({ queryKey: bindingKeys.all });
+          await refresh();
           return;
         }
       }
       await mutation.mutateAsync({ items, appliedTitle: t('bindings.form.saved') });
-      await client.invalidateQueries({ queryKey: bindingKeys.all });
+      await refresh();
       onOpenChange(false);
     } catch (error) {
       setFailure({ error });
@@ -140,6 +147,9 @@ function BindingForm({ type, all, view, views, sources, propertyBindings, relati
   const [touchedSource, setTouchedSource] = useState(false);
   const [touchedKeys, setTouchedKeys] = useState(false);
   const source = activeSources.find((item) => item.id === sourceId);
+  // The list is newer than the view when the data page archives the source while this dialog is open.
+  const bound = model.original?.dataSource;
+  const archivedSource = bound && (sources.find((item) => item.id === bound.id) ?? bound).status === 'archived' ? bound : undefined;
   const ready = source?.catalog?.status === 'ready';
   const detail = useCatalogTable(ready ? sourceId : undefined, selected?.schema, selected?.name);
   const table = detail.isSuccess ? detail.data : undefined;
@@ -175,6 +185,11 @@ function BindingForm({ type, all, view, views, sources, propertyBindings, relati
       </InlineNotice>
       {submitted && count > 0 && <InlineNotice tone="error">{t('review.edit.validationSummary', { count })}</InlineNotice>}
       {serverError && <InlineNotice tone="error">{serverError}</InlineNotice>}
+      {archivedSource && (
+        <InlineNotice tone="warning" title={t('bindings.form.sourceArchived.title')}>
+          {t('bindings.form.sourceArchived.description', { name: archivedSource.name })}
+        </InlineNotice>
+      )}
       <div className="space-y-1">
         <Label htmlFor={id} required>{t('bindings.form.dataSource')}</Label>
         <NativeSelect id={id} aria-label={t('bindings.form.dataSource')} aria-required aria-invalid={sourceError || undefined}
@@ -249,7 +264,7 @@ function BindingForm({ type, all, view, views, sources, propertyBindings, relati
       <DialogDescription>{t(apply ? 'bindings.form.appliesAtOnce' : 'bindings.form.submitsForReview')}</DialogDescription>
       <div className="flex justify-end gap-2">
         <DialogClose disabled={pending} className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
-        <Button type="submit" loading={pending} disabled={Boolean(source && !ready) || Boolean(selected && !table)}>{t('bindings.form.save')}</Button>
+        <Button type="submit" loading={pending} disabled={Boolean(source && (!ready || (selected && !table)))}>{t('bindings.form.save')}</Button>
       </div>
     </form>
   );
