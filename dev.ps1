@@ -25,7 +25,7 @@
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里对 OP_AI_MODEL、OP_AI_REASONING_MODEL 各发一次最小的结构化调用（带识别时用的推理强度），
                     只显示可用与否、模型、强度和错误类型，不显示地址与 Key
-  eval [案例|目录] [-Replay] [-Recordings <目录>] [-Sequential]
+  eval [案例|目录] [-Replay] [-Recordings <目录>] [-Sequential] [-CodeFrom <worktree>]
                     识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/。
                     也可给一个结构相同的目录（带 / 或 \，如 .verification/private-docs/<名称>），
                     结果与录制以 dir-<目录名> 命名；没有 eval/expected.toml 时只识别、不打分。
@@ -34,7 +34,9 @@
                     -Recordings 换一个录制目录，例如 worktree 里用主检出目录的录制。
                     跑两个场景（规格 004 第 10 节）：顺序场景每份资料的变更集合并后再识别下一份；同基线场景
                     全部对着起始本体识别完再依次合并。都按合并计划全部接受，并报告跳过的项、重复的类型与关系；
-                    -Sequential 只跑顺序场景（例如同基线场景还没有录制时只回放）
+                    -Sequential 只跑顺序场景（例如同基线场景还没有录制时只回放）；
+                    -CodeFrom 用本仓库另一个 worktree 的代码构建镜像来评测，模型配置、录制和结果
+                    仍用运行脚本的这个目录的，在主检出目录评测分支不必切换分支
   eval-qa [-Replay] 在一次性数据库评测钢铁样例的五条问答与缺口提议。已有录制优先回放，-Replay 只回放。
   owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
                     除已知改写外不得有差异；报告存 .verification/owl-check/
@@ -63,7 +65,8 @@ param(
     [switch]$Report,
     [switch]$Replay,
     [string]$Recordings = '',
-    [switch]$Sequential
+    [switch]$Sequential,
+    [string]$CodeFrom = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -150,8 +153,10 @@ function Get-ImageTag {
 
 $ImageTag = Get-ImageTag
 
-function Get-ComposeArgs {
-    $composeArgs = @('-f', (Join-Path $Root 'compose.yaml'))
+function Get-ComposeArgs([string]$CodeRoot = $Root) {
+    # Settings always come from this checkout; only the compose file (and so the build context)
+    # may be another worktree's.
+    $composeArgs = @('-f', (Join-Path $CodeRoot 'compose.yaml'))
     if ((Get-Setting 'OP_MIRROR' 'on') -ne 'off') { $composeArgs += @('--env-file', (Join-Path $Root 'dev/mirrors.cn.env')) }
     if (Test-Path -LiteralPath $EnvLocal) { $composeArgs += @('--env-file', $EnvLocal) }
     return $composeArgs
@@ -600,7 +605,7 @@ function Save-EvalStream([string]$RecordingsDir) {
 # A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
 # optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
 # must not be committed. Results and recordings of a folder case are named "dir-<folder>".
-function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [bool]$SequentialOnly) {
+function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [bool]$SequentialOnly, [string]$CodeFrom) {
     if (-not $Case) { $Case = 'steel' }
     $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path).TrimEnd('\', '/')
     $isFolder = $Case -match '[\\/]'
@@ -619,8 +624,23 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     if (-not $hasAnswers) { Write-Note "没有 eval/expected.toml：只做识别，不打分" }
     $RecordingsDir = $RecordingsDir ? [IO.Path]::GetFullPath($RecordingsDir, (Get-Location).Path) : (Join-Path $Root ".verification/eval/recordings/$Case")
     if ($ReplayOnly -and -not (Test-Path -LiteralPath $RecordingsDir -PathType Container)) { Stop-Dev "只回放需要录制，目录不存在：$RecordingsDir" }
+    # -CodeFrom scores another worktree's code with this checkout's model settings, so a branch
+    # can be measured before merging without checking it out here. Only worktrees of this
+    # repository qualify: the model key must not run code from an arbitrary folder.
+    $codeRoot = $Root
+    $codeTag = $env:OP_IMAGE_TAG
+    if ($CodeFrom) {
+        $codeRoot = [IO.Path]::GetFullPath($CodeFrom, (Get-Location).Path).TrimEnd('\', '/')
+        $workspace = Get-Workspaces | Where-Object { $_.Path -eq (Get-NormalizedPath $codeRoot) } | Select-Object -First 1
+        if (-not $workspace) { Stop-Dev "-CodeFrom 只接受本仓库的 worktree（git worktree list）：$codeRoot" }
+        $codeTag = $workspace.Tag
+    }
     Confirm-BaseImages
-    Invoke-Compose build api
+    # compose.yaml reads the tag from the environment; the main switch restores the caller's value.
+    $env:OP_IMAGE_TAG = $codeTag
+    $composeArgs = Get-ComposeArgs $codeRoot
+    docker compose @composeArgs build api | Out-Host
+    if ($LASTEXITCODE -ne 0) { Stop-Dev "构建 $codeRoot 的 api 镜像失败，退出码 $LASTEXITCODE" $LASTEXITCODE }
     $files = @{}
     foreach ($item in Get-ChildItem -LiteralPath (Join-Path $caseDir 'docs') -File) {
         $files["docs/$($item.Name)"] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($item.FullName))
@@ -638,8 +658,7 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     $scenarios = $SequentialOnly ? @('sequential') : @('sequential', 'sameBaseline')
     $bundle = @{ files = $files; recordings = $recordingTexts; manifest = $manifest; mode = $mode; scenarios = $scenarios } | ConvertTo-Json -Compress -Depth 4
     $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
-    $outFile = Join-Path $outDir "$Case$($ReplayOnly ? '-replay' : '')-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
-    $composeArgs = Get-ComposeArgs
+    $outFile = Join-Path $outDir "$Case$($ReplayOnly ? '-replay' : '')$($CodeFrom ? "-$codeTag" : '')-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
     # Replay never reaches the model: the container gets no key and no proxy.
     $noModel = $ReplayOnly ? @('-e', 'OP_OPENAI_API_KEY=', '-e', 'OP_AI_PROXY=') : @()
     $previousConsole = [Console]::OutputEncoding
@@ -647,7 +666,7 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     $OutputEncoding = [Text.UTF8Encoding]::new($false)
     $container = New-TempName 'eval'
     try {
-        Write-Step "识别 $caseDir（$($ReplayOnly ? '只回放' : '有录制就回放')，录制目录 $RecordingsDir；进度显示在下方）"
+        Write-Step "识别 $caseDir（$($ReplayOnly ? '只回放' : '有录制就回放')，录制目录 $RecordingsDir$($CodeFrom ? "，代码取自 $codeRoot" : '')；进度显示在下方）"
         $stream = $bundle | docker compose @composeArgs run --rm -T --no-deps @noModel --name $container api python -m ontology_platform.modules.ai.eval | Save-EvalStream $RecordingsDir
         $code = $LASTEXITCODE
     } finally {
@@ -1004,7 +1023,7 @@ try {
         'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
         'seed-steel' { Invoke-SeedSteel }
         'fmt' { Invoke-Fmt $Rest }
-        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent }
+        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent $CodeFrom }
         'eval-qa' { Invoke-EvalQa $Replay.IsPresent }
         'owl-check' { Invoke-OwlCheck }
         'ai-check' {
