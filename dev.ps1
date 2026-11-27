@@ -35,6 +35,7 @@
                     跑两个场景（规格 004 第 10 节）：顺序场景每份资料的变更集合并后再识别下一份；同基线场景
                     全部对着起始本体识别完再依次合并。都按合并计划全部接受，并报告跳过的项、重复的类型与关系；
                     -Sequential 只跑顺序场景（例如同基线场景还没有录制时只回放）
+  eval-qa [-Replay] 在一次性数据库评测钢铁样例的五条问答与缺口提议。已有录制优先回放，-Replay 只回放。
   owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
                     除已知改写外不得有差异；报告存 .verification/owl-check/
   schema-check      检查 web/src/api/schema.d.ts 与后端当前的 OpenAPI 一致（按 gen-api 的办法生成后比较，
@@ -645,6 +646,89 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     Write-Ok "结果已保存到 $outFile"
 }
 
+function Invoke-EvalQa([bool]$ReplayOnly) {
+    $prefix = New-TempName 'eval-qa'
+    $db = "$prefix-db"
+    $api = "$prefix-api"
+    $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
+    $recordDir = Join-Path $outDir 'recordings/qa-steel'
+    $inputs = @('samples/steel/qa/ontology.ttl', 'samples/steel/qa/expected-bindings.toml',
+        'samples/steel/qa/metrics.toml', 'samples/steel/qa/questions.toml',
+        'backend/tests/fixtures/qa/steel/plans.toml',
+        'samples/steel/relational/01-schema.sql', 'samples/steel/relational/02-data.sql')
+    $files = @{}
+    foreach ($path in $inputs) {
+        $files[(Split-Path -Leaf $path)] = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $Root $path)))
+    }
+    $recordings = @()
+    $manifest = $null
+    if (Test-Path -LiteralPath $recordDir) {
+        foreach ($file in Get-ChildItem -LiteralPath $recordDir -Filter '*.json' -File) {
+            $content = [IO.File]::ReadAllText($file.FullName)
+            if ($file.Name -eq 'models.json') { $manifest = $content } else { $recordings += $content }
+        }
+    }
+    $mode = $ReplayOnly ? 'replay' : 'record'
+    $bundle = @{ mode = $mode; recordings = $recordings; manifest = $manifest; files = $files } | ConvertTo-Json -Depth 4 -Compress
+    $noModel = $ReplayOnly ? @('-e', 'OP_OPENAI_API_KEY=', '-e', 'OP_AI_PROXY=') : @()
+    Confirm-BaseImages
+    Invoke-Compose build api
+    $overlay = Join-Path $outDir "$prefix.yaml"
+    # Compose merges mounts by target. Cover both image VOLUMEs with tmpfs before starting either service.
+    $config = @'
+services:
+  postgres:
+    volumes: [{type: tmpfs, target: /var/lib/postgresql}]
+  api:
+    volumes: [{type: tmpfs, target: /data/documents}]
+  worker:
+    volumes: [{type: tmpfs, target: /data/documents}]
+volumes: !reset {}
+'@
+    $argsQa = @(Get-ComposeArgs) + @('-f', $overlay, '-p', $prefix)
+    $password = [Guid]::NewGuid().ToString('N')
+    $adminUrl = "postgresql+psycopg://ontology:${password}@postgres:5432/postgres"
+    $previousConsole = [Console]::OutputEncoding
+    try {
+        [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+        $OutputEncoding = [Text.UTF8Encoding]::new($false)
+        Set-Content -LiteralPath $overlay -Value $config -Encoding utf8NoBOM
+        Write-Step "启动问答评测临时环境 $prefix（$($ReplayOnly ? '只回放' : '优先回放')）"
+        docker compose @argsQa run --rm -d --no-deps --use-aliases --name $db -e POSTGRES_DB=postgres -e "POSTGRES_PASSWORD=$password" postgres | Out-Null
+        if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $db @('pg_isready', '-h', '127.0.0.1', '-U', 'ontology', '-d', 'postgres'))) { throw '评测临时数据库未就绪' }
+        $output = $bundle | docker compose @argsQa run --rm -T --no-deps @noModel --name $api -e OP_ENV=development -e "OP_DATABASE_URL=$adminUrl" -e "OP_QA_EVAL_ADMIN_URL=$adminUrl" api python -m ontology_platform.qa_eval
+        $code = $LASTEXITCODE
+    } finally {
+        [Console]::OutputEncoding = $previousConsole
+        docker rm -f $api $db *> $null
+        docker network rm "${prefix}_default" *> $null
+        Remove-Item -LiteralPath $overlay -ErrorAction SilentlyContinue
+        $left = @(docker ps -aq --filter "name=^/${prefix}-(api|db)$")
+        if ($LASTEXITCODE -ne 0 -or $left.Count) { throw "无法确认 $prefix 的容器已清理" }
+        Write-Ok "已确认 $prefix 的临时容器无残留"
+    }
+    $reply = ($output -join "`n") | ConvertFrom-Json
+    foreach ($file in $reply.files) {
+        if ($file.name -cnotmatch '^([0-9a-f]{64}|models)\.json$') { Stop-Dev '评测返回了意外的录制文件名' }
+        New-Item -ItemType Directory -Force -Path $recordDir | Out-Null
+        Set-Content -LiteralPath (Join-Path $recordDir $file.name) -Encoding utf8NoBOM -NoNewline -Value $file.content
+    }
+    if ($code -ne 0) { Stop-Dev "问答评测失败：$($reply.error)" $code }
+    $outFile = Join-Path $outDir "qa-steel$($ReplayOnly ? '-replay' : '')-$(Get-Date -Format 'yyyyMMdd-HHmmssfff').json"
+    Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value $reply.result
+    $result = $reply.result | ConvertFrom-Json
+    $result.questions | ForEach-Object {
+        $row = $_
+        [pscustomobject]@{
+            题号 = $row.case; 状态 = $row.status; 检验 = $row.result; v2达标 = $row.v2Pass
+            计划 = $row.planEquivalent ? '等价' : $row.firstMismatch
+            调用 = $row.usage.calls; 回放 = $row.usage.replayed; 秒 = $row.elapsedSeconds
+            输入泄露 = @($result.promptLeaks | Where-Object { $_.question -eq $row.case }).Count
+        }
+    } | Format-Table -AutoSize | Out-Host
+    Write-Ok "CQ 通过 $($result.summary.passed)/5，符合 v2 预期 $($result.summary.v2Passed)/5，计划等价 $($result.summary.equivalent)/5。结果已保存到 $outFile"
+}
+
 # Scores, merge counts and usage of one scenario of an evaluation result.
 function Show-EvalScenario([string]$Title, $result) {
     Write-Host "  $Title"
@@ -897,6 +981,7 @@ try {
         'seed-steel' { Invoke-SeedSteel }
         'fmt' { Invoke-Fmt $Rest }
         'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent }
+        'eval-qa' { Invoke-EvalQa $Replay.IsPresent }
         'owl-check' { Invoke-OwlCheck }
         'ai-check' {
             Confirm-BaseImages
