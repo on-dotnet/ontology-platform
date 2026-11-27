@@ -107,7 +107,7 @@ _CODE_PREDICATES = {
     SKOS.relatedMatch,
 }
 # Large imported ontologies keep tens of thousands of fragments; a smaller cache thrashes.
-_CACHE_SIZE = 65536
+FRAGMENT_CACHE_SIZE = 65536
 _DECLARES_ANNOTATION = "AnnotationProperty"
 
 
@@ -119,7 +119,7 @@ class FragmentInfo:
     declares: frozenset[str]
 
 
-@lru_cache(maxsize=_CACHE_SIZE)
+@lru_cache(maxsize=FRAGMENT_CACHE_SIZE)
 def fragment_info(turtle: str, prefixes: Prefixes) -> FragmentInfo:
     try:
         triples = parse_fragment(turtle, dict(prefixes))
