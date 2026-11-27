@@ -288,12 +288,12 @@
         "multiple_parents": {
           "label_one": "{{count}} 个对象类型有多个父类型",
           "label_other": "{{count}} 个对象类型有多个父类型",
-          "description": "表单只支持一个父类型，这些父类型已作为高级公理保留，导出时不丢。"
+          "description": "表单只支持一个父类型，这些父类型已作为其他语句保留，导出时不丢。"
         },
         "unsupported_shape": {
           "label_one": "{{count}} 个 SHACL 形状用了表单不支持的写法",
           "label_other": "{{count}} 个 SHACL 形状用了表单不支持的写法",
-          "description": "这些形状已作为高级公理原样保留，导出时不丢。"
+          "description": "这些形状已作为其他语句原样保留，导出时不丢。"
         },
         "lost_list": {
           "label_one": "{{count}} 条规则的枚举取值被 Protégé 丢掉了",
@@ -395,12 +395,23 @@
     "notFound": "未在原文中找到这段引语，请对照原文核实后再决定。",
     "sourceText": "资料原文"
   },
+  "statement": {
+    "groupInfo": "表单表达不了的内容，按 Turtle 原文保留，导出不丢。",
+    "category": {
+      "shape": "校验规则（SHACL）",
+      "logic": "逻辑公理",
+      "individual": "实例或代码",
+      "parent": "多父类型",
+      "annotation": "注解",
+      "other": "其他"
+    }
+  },
   "kinds": {
     "entity_type": "对象类型",
     "relation_type": "关系",
     "property": "属性",
     "constraint": "约束",
-    "axiom": "高级公理",
+    "axiom": "其他语句",
     "type_binding": "类型绑定",
     "property_binding": "属性绑定",
     "relation_binding": "关系绑定",
@@ -411,7 +422,7 @@
     "relation_type": "关系",
     "property": "属性",
     "constraint": "约束",
-    "axiom": "高级公理",
+    "axiom": "其他语句",
     "type_binding": "类型绑定",
     "property_binding": "属性绑定",
     "relation_binding": "关系绑定",
@@ -710,7 +721,7 @@
       "activeRelease": "当前版本",
       "noRelease": "尚未发布",
       "constraints": "约束",
-      "axioms": "高级公理"
+      "axioms": "其他语句"
     },
     "graph": {
       "label": "本体图谱：{{nodes}} 个对象类型，{{edges}} 条连线",
@@ -784,12 +795,12 @@
       "iri": "IRI",
       "unknownElement": "未知元素",
       "rules": "规则",
-      "relatedAxioms": "相关公理",
-      "noRelatedAxioms": "没有相关公理。",
-      "axiomTitle": "高级公理",
+      "relatedAxioms": "相关的其他语句",
+      "noRelatedAxioms": "没有相关的其他语句。",
+      "axiomTitle": "其他语句",
       "turtle": "Turtle",
       "subject": "所属元素",
-      "noSubject": "这条公理不属于某个元素。"
+      "noSubject": "这条语句不属于某个元素。"
     },
     "moreActions": "更多操作",
     "newOntology": "新建本体",
@@ -929,11 +940,11 @@
       "discardDescription": "Turtle 里的修改还没有生成变更集，离开后会丢失。"
     },
     "axiom": {
-      "createTitle": "新建高级公理",
-      "editTitle": "编辑高级公理",
+      "createTitle": "新建其他语句",
+      "editTitle": "编辑其他语句",
       "fragment": "Turtle 片段",
-      "fragmentInfoLabel": "关于高级公理",
-      "fragmentInfo": "一条公理是一个主语的一个三元组，加上从它的宾语出发的空白节点。名称、父类型、定义域等表单能表达的内容，请到对应元素上编辑。",
+      "fragmentInfoLabel": "关于其他语句",
+      "fragmentInfo": "一条语句是一个主语的一个三元组，加上从它的宾语出发的空白节点。名称、父类型、定义域等表单能表达的内容，请到对应元素上编辑。",
       "fragmentRequired": "请输入 Turtle 片段",
       "prefixesHint": "可以使用本体的前缀。",
       "showPrefixes": "查看前缀（{{count}}）",
@@ -1037,7 +1048,7 @@
       "levelInfoLabel": "关于“{{level}}”",
       "levelInfo": {
         "breaking": "删除了元素，或改了数据类型、单位、定义域、值域、父类型、互逆关系等，依赖它们的数据和查询可能失效。",
-        "review": "约束、高级公理和数据绑定内容的变化，请确认它们符合预期。",
+        "review": "约束、其他语句和数据绑定内容的变化，请确认它们符合预期。",
         "compatible": "新增、恢复，或名称、定义、同义词等变化，不影响已有的数据和查询。"
       },
       "change": {
@@ -1076,7 +1087,7 @@
       "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。"
     },
     "ontology": {
-      "info": "用图谱或列表查看对象类型、关系、属性、约束和高级公理，点击元素查看详情和来源；Turtle 视图可以直接编辑整份 Turtle。"
+      "info": "用图谱或列表查看对象类型、关系、属性、约束和其他语句，点击元素查看详情和来源；Turtle 视图可以直接编辑整份 Turtle。"
     },
     "data": {
       "info": "连接数据源、浏览表目录，并把数据绑定到本体。",

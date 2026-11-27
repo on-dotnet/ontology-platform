@@ -333,12 +333,13 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
           <div ref={listRef} className="space-y-6">
             {pageGroups.map((group) => (
               <section key={group.kind} aria-labelledby={`group-${group.kind}`} className="space-y-3">
-                <h2 id={`group-${group.kind}`} className="flex items-center gap-2 text-base font-semibold text-foreground">
-                  {t(`kinds.${group.kind}`)}
-                  <Badge tone="neutral" className="tabular-nums">
-                    {group.items.length}
-                  </Badge>
-                </h2>
+                <div className="flex items-center gap-1">
+                  <h2 id={`group-${group.kind}`} className="flex items-center gap-2 text-base font-semibold text-foreground">
+                    {t(`kinds.${group.kind}`)}
+                    <Badge tone="neutral" className="tabular-nums">{group.items.length}</Badge>
+                  </h2>
+                  {group.kind === 'axiom' ? <InfoTip label={t('ontologyPage.axiom.fragmentInfoLabel')}>{t('statement.groupInfo')}</InfoTip> : null}
+                </div>
                 {group.shown.map((item) => (
                   <Fragment key={item.id}>
                     <ChangeItemCard
@@ -500,7 +501,7 @@ function SameConceptDialog({ changeSet, items, context, open, onOpenChange }: Sa
           <ul className="max-h-72 space-y-1.5 overflow-y-auto text-sm">
             {items.map((item) => (
               <li key={item.id} className="flex flex-wrap items-center gap-x-1.5">
-                <span className="font-medium text-foreground">{itemLabel(item, context)}</span>
+                <span className="font-medium text-foreground">{itemLabel(item, context, t)}</span>
                 <ArrowRight className="size-3.5 text-muted-foreground" aria-hidden />
                 <span className="sr-only">{t('review.matchBulk.into')}</span>
                 <span className="font-medium text-foreground">{item.match.label}</span>
@@ -558,7 +559,7 @@ function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps
           {t('review.evidenceTitle')}
         </CardTitle>
         <p className="truncate text-sm text-muted-foreground">
-          {isBindingKind(item.kind) ? bindingSentence(t, item, context) : itemLabel(item, context)}
+          {isBindingKind(item.kind) ? bindingSentence(t, item, context) : itemLabel(item, context, t)}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -612,7 +613,7 @@ function MergeResultNotice({ result, items, context }: { result: MergeResult; it
           const item = byId.get(skip.itemId);
           return (
             <li key={skip.itemId}>
-              <span className="font-medium">{item ? itemLabel(item, context) : t('review.unknownItem')}</span>
+              <span className="font-medium">{item ? itemLabel(item, context, t) : t('review.unknownItem')}</span>
               {t('common.colon')}
               {codeMessage(i18n, skip.code)}
             </li>

@@ -45,6 +45,8 @@ ITEM_FIELDS = {
     "proposed",
     "edited",
     "before",
+    "axiomCategory",
+    "axiomNote",
     "decision",
     "confidence",
     "rationale",

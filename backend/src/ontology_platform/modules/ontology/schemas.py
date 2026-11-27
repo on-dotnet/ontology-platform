@@ -408,8 +408,20 @@ class _ElementBase(CamelModel):
     updated_at: datetime
 
 
+AxiomCategory = Literal["shape", "logic", "individual", "parent", "annotation", "other"]
+
+
 class Element(_ElementBase):
     metric: MetricDefinition | None = None
+    axiom_category: AxiomCategory | None = None
+    axiom_note: str | None = None
+
+
+class SnapshotElement(Element):
+    """Internal serialization shared by snapshots and RDF export."""
+
+    axiom_category: AxiomCategory | None = Field(default=None, exclude=True)
+    axiom_note: str | None = Field(default=None, exclude=True)
 
 
 class ElementCopy(_ElementBase):
@@ -523,6 +535,8 @@ class ChangeItem(CamelModel):
     edited: ElementFields | None
     # For updates: the target element's current values, for comparison.
     before: ElementFields | None
+    axiom_category: AxiomCategory | None = None
+    axiom_note: str | None = None
     decision: Decision
     confidence: float | None
     rationale: str | None

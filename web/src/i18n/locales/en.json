@@ -288,12 +288,12 @@
         "multiple_parents": {
           "label_one": "{{count}} object type has several parent types",
           "label_other": "{{count}} object types have several parent types",
-          "description": "The form supports one parent type. These parent types are kept as advanced axioms and exported unchanged."
+          "description": "The form supports one parent type. These parent types are kept as other statements and exported unchanged."
         },
         "unsupported_shape": {
           "label_one": "{{count}} SHACL shape uses features the form does not support",
           "label_other": "{{count}} SHACL shapes use features the form does not support",
-          "description": "These shapes are kept as advanced axioms, exactly as written, and exported unchanged."
+          "description": "These shapes are kept as other statements, exactly as written, and exported unchanged."
         },
         "lost_list": {
           "label_one": "{{count}} rule lost its allowed values in Protégé",
@@ -395,12 +395,23 @@
     "notFound": "This quote was not found in the source. Check the source before deciding.",
     "sourceText": "Source text"
   },
+  "statement": {
+    "groupInfo": "Content the forms cannot express, kept as Turtle and exported unchanged.",
+    "category": {
+      "shape": "Validation rule (SHACL)",
+      "logic": "Logical axiom",
+      "individual": "Instance or code",
+      "parent": "Extra parent type",
+      "annotation": "Annotation",
+      "other": "Other"
+    }
+  },
   "kinds": {
     "entity_type": "Object types",
     "relation_type": "Relations",
     "property": "Properties",
     "constraint": "Constraints",
-    "axiom": "Advanced axioms",
+    "axiom": "Other statements",
     "type_binding": "Type binding",
     "property_binding": "Property binding",
     "relation_binding": "Relation binding",
@@ -411,7 +422,7 @@
     "relation_type": "Relation",
     "property": "Property",
     "constraint": "Constraint",
-    "axiom": "Advanced axiom",
+    "axiom": "Other statement",
     "type_binding": "Type binding",
     "property_binding": "Property binding",
     "relation_binding": "Relation binding",
@@ -710,7 +721,7 @@
       "activeRelease": "Current release",
       "noRelease": "Not published yet",
       "constraints": "Constraints",
-      "axioms": "Advanced axioms"
+      "axioms": "Other statements"
     },
     "graph": {
       "label": "Ontology graph: {{nodes}} object types, {{edges}} connections",
@@ -784,12 +795,12 @@
       "iri": "IRI",
       "unknownElement": "Unknown element",
       "rules": "Rules",
-      "relatedAxioms": "Related axioms",
-      "noRelatedAxioms": "No related axioms.",
-      "axiomTitle": "Advanced axiom",
+      "relatedAxioms": "Related other statements",
+      "noRelatedAxioms": "No related other statements.",
+      "axiomTitle": "Other statement",
       "turtle": "Turtle",
       "subject": "Belongs to",
-      "noSubject": "This axiom does not belong to an element."
+      "noSubject": "This statement does not belong to an element."
     },
     "moreActions": "More actions",
     "newOntology": "New ontology",
@@ -929,11 +940,11 @@
       "discardDescription": "Your Turtle edits have not become a change set yet and will be lost."
     },
     "axiom": {
-      "createTitle": "New advanced axiom",
-      "editTitle": "Edit advanced axiom",
+      "createTitle": "New other statement",
+      "editTitle": "Edit other statement",
       "fragment": "Turtle fragment",
-      "fragmentInfoLabel": "About advanced axioms",
-      "fragmentInfo": "An axiom is one triple of one subject, with the blank nodes reachable from its object. Edit what the forms can express, such as names, parent types and domains, on the element itself.",
+      "fragmentInfoLabel": "About other statements",
+      "fragmentInfo": "A statement is one triple of one subject, with the blank nodes reachable from its object. Edit what the forms can express, such as names, parent types and domains, on the element itself.",
       "fragmentRequired": "Enter a Turtle fragment",
       "prefixesHint": "You can use the ontology's prefixes.",
       "showPrefixes": "Show prefixes ({{count}})",
@@ -1037,7 +1048,7 @@
       "levelInfoLabel": "About “{{level}}”",
       "levelInfo": {
         "breaking": "Elements deleted, or their data type, unit, domain, range, parent type or inverse changed. Data and queries that rely on them may break.",
-        "review": "Changes to constraints, advanced axioms and binding contents. Check that they are what you expect.",
+        "review": "Changes to constraints, other statements and binding contents. Check that they are what you expect.",
         "compatible": "Additions, restores, or changes to names, definitions and synonyms. Existing data and queries are not affected."
       },
       "change": {
@@ -1076,7 +1087,7 @@
       "info": "Review change sets item by item: accept, edit or reject each change. Only approved changes enter the ontology."
     },
     "ontology": {
-      "info": "Browse object types, relations, properties, constraints and advanced axioms as a graph or a list, and select an element to see its details and where it came from. The Turtle view edits the whole ontology as Turtle."
+      "info": "Browse object types, relations, properties, constraints and other statements as a graph or a list, and select an element to see its details and where it came from. The Turtle view edits the whole ontology as Turtle."
     },
     "data": {
       "info": "Connect data sources, browse table catalogs and bind data to the ontology.",

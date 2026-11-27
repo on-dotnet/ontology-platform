@@ -24,7 +24,7 @@ const EXPORT = [
 
 const moltenSteel = elementFixture({ revision: 3 });
 const ladle = elementFixture({ id: 'el-ladle', localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle', definitionZh: '盛装钢水的容器。' });
-const disjoint = axiomFixture({ revision: 2 });
+const disjoint = axiomFixture({ revision: 2, axiomCategory: 'logic' });
 const keyed = axiomFixture({ id: 'el-axiom-keys', turtle: 'steel:MoltenSteel owl:hasKey ( steel:heatNumber ) .' });
 const ladleAxiom = axiomFixture({ id: 'el-axiom-ladle', turtle: 'steel:Ladle owl:disjointWith steel:Slag .', subjectId: 'el-ladle' });
 const imports = axiomFixture({ id: 'el-axiom-imports', turtle: '<https://example.org/ontology/steel> owl:imports <https://example.org/units> .', subjectId: null });
@@ -242,8 +242,8 @@ describe('expert mode: single axioms', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     await user.click(await screen.findByRole('button', { name: '新建' }));
-    await user.click(await screen.findByRole('menuitem', { name: '高级公理' }));
-    const dialog = await screen.findByRole('dialog', { name: '新建高级公理' });
+    await user.click(await screen.findByRole('menuitem', { name: '其他语句' }));
+    const dialog = await screen.findByRole('dialog', { name: '新建其他语句' });
     expect(within(dialog).getByText('保存后立即生效。')).toBeInTheDocument();
     const fragment = within(dialog).getByRole('textbox', { name: 'Turtle 片段' });
     expect(fragment).toHaveAccessibleDescription('可以使用本体的前缀。');
@@ -273,7 +273,7 @@ describe('expert mode: single axioms', () => {
       apply: true,
     });
     expect(await screen.findByText('已保存')).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: '新建高级公理' })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '新建其他语句' })).not.toBeInTheDocument());
   });
 
   it.each([
@@ -285,15 +285,15 @@ describe('expert mode: single axioms', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     await user.click(await screen.findByRole('button', { name: '新建' }));
-    await user.click(await screen.findByRole('menuitem', { name: '高级公理' }));
-    const dialog = await screen.findByRole('dialog', { name: '新建高级公理' });
+    await user.click(await screen.findByRole('menuitem', { name: '其他语句' }));
+    const dialog = await screen.findByRole('dialog', { name: '新建其他语句' });
     await user.type(within(dialog).getByRole('textbox', { name: 'Turtle 片段' }), 'steel:Ladle rdfs:label "钢包"@zh .');
     await user.click(within(dialog).getByRole('button', { name: '保存' }));
 
     const alert = await within(dialog).findByRole('alert');
     expect(alert).toHaveTextContent('没有保存');
     expect(alert).toHaveTextContent(text);
-    expect(screen.getByRole('dialog', { name: '新建高级公理' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: '新建其他语句' })).toBeInTheDocument();
   });
 
   it('rewrites an axiom from its panel with the revision it read, and submits it for review when it must', async () => {
@@ -302,11 +302,11 @@ describe('expert mode: single axioms', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     const table = await screen.findByRole('table', { name: '本体元素' });
-    await user.click(within(table).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
-    const sheet = await screen.findByRole('dialog', { name: '高级公理' });
+    await user.click(within(table).getByRole('button', { name: '逻辑公理' }));
+    const sheet = await screen.findByRole('dialog', { name: '其他语句' });
     await user.click(within(sheet).getByRole('button', { name: '编辑' }));
 
-    const dialog = await screen.findByRole('dialog', { name: '编辑高级公理' });
+    const dialog = await screen.findByRole('dialog', { name: '编辑其他语句' });
     expect(within(dialog).getByText('保存后生成变更集，审核通过后才会生效。')).toBeInTheDocument();
     const fragment = within(dialog).getByRole('textbox', { name: 'Turtle 片段' });
     expect(fragment).toHaveValue('steel:MoltenSteel owl:disjointWith steel:Slag .');
@@ -340,9 +340,9 @@ describe('expert mode: single axioms', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     const table = await screen.findByRole('table', { name: '本体元素' });
-    await user.click(within(table).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
-    await user.click(within(await screen.findByRole('dialog', { name: '高级公理' })).getByRole('button', { name: '编辑' }));
-    const dialog = await screen.findByRole('dialog', { name: '编辑高级公理' });
+    await user.click(within(table).getByRole('button', { name: '逻辑公理' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '其他语句' })).getByRole('button', { name: '编辑' }));
+    const dialog = await screen.findByRole('dialog', { name: '编辑其他语句' });
     const fragment = within(dialog).getByRole('textbox', { name: 'Turtle 片段' });
     await user.clear(fragment);
     await user.type(fragment, 'steel:MoltenSteel owl:disjointWith steel:Ladle .');
@@ -351,7 +351,7 @@ describe('expert mode: single axioms', () => {
     await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
     expect(api.calls('POST', EDITS)[0]?.body).toMatchObject({ items: [{ op: 'update', targetRevision: 2 }], apply: true });
     expect(await screen.findByText('已保存')).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑高级公理' })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑其他语句' })).not.toBeInTheDocument());
   });
 
   it('asks before discarding an unsaved fragment', async () => {
@@ -360,8 +360,8 @@ describe('expert mode: single axioms', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     await user.click(await screen.findByRole('button', { name: '新建' }));
-    await user.click(await screen.findByRole('menuitem', { name: '高级公理' }));
-    const dialog = await screen.findByRole('dialog', { name: '新建高级公理' });
+    await user.click(await screen.findByRole('menuitem', { name: '其他语句' }));
+    const dialog = await screen.findByRole('dialog', { name: '新建其他语句' });
     await user.type(within(dialog).getByRole('textbox', { name: 'Turtle 片段' }), 'steel:Ladle owl:disjointWith steel:Slag .');
 
     await user.keyboard('{Escape}');
@@ -372,7 +372,7 @@ describe('expert mode: single axioms', () => {
 
     await user.click(within(dialog).getByRole('button', { name: '取消' }));
     await user.click(within(await screen.findByRole('dialog', { name: '放弃未保存的修改？' })).getByRole('button', { name: '放弃修改' }));
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: '新建高级公理' })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '新建其他语句' })).not.toBeInTheDocument());
     expect(api.calls('POST', EDITS)).toHaveLength(0);
   });
 
@@ -382,7 +382,7 @@ describe('expert mode: single axioms', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     const table = await screen.findByRole('table', { name: '本体元素' });
-    await user.click(screen.getByRole('radio', { name: '高级公理' }));
+    await user.click(screen.getByRole('radio', { name: '其他语句' }));
 
     const steelGroup = await within(table).findByRole('rowgroup', { name: '钢水' });
     const bodies = within(table)
@@ -390,13 +390,13 @@ describe('expert mode: single axioms', () => {
       .filter((group) => group.tagName === 'TBODY');
     expect(bodies.map((group) => group.querySelector('th')?.textContent)).toEqual(['钢包1 条', '钢水2 条', '不属于任何元素1 条']);
     expect(
-      within(steelGroup)
-        .getAllByRole('button')
-        .map((button) => button.textContent),
+      within(steelGroup).getAllByText(/^steel:MoltenSteel owl:/).map((fragment) => fragment.textContent),
     ).toEqual(['steel:MoltenSteel owl:disjointWith steel:Slag .', 'steel:MoltenSteel owl:hasKey ( steel:heatNumber ) .']);
     // The group names the subject, so the rows do not repeat it.
     expect(within(steelGroup).queryByText('所属：钢水')).not.toBeInTheDocument();
     const annotations = within(table).getByRole('rowgroup', { name: '不属于任何元素' });
-    expect(within(annotations).getByRole('button', { name: /owl:imports/ })).toBeInTheDocument();
+    expect(within(annotations).getByText(/owl:imports/)).not.toBeVisible();
+    await user.click(within(annotations).getByText('Turtle 片段'));
+    expect(within(annotations).getByText(/owl:imports/)).toBeVisible();
   });
 });

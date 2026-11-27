@@ -52,7 +52,7 @@ const shape = elementFixture({
   ],
   origin: 'import',
 });
-const disjoint = axiomFixture({ flags: ['non_standard'] });
+const disjoint = axiomFixture({ axiomCategory: 'logic', flags: ['non_standard'] });
 // Imported: only an English name, the inverse of `holds`, no domain or range.
 const heldBy = elementFixture({
   id: 'el-held-by',
@@ -212,27 +212,51 @@ describe('ontology list view', () => {
 });
 
 describe('constraints and axioms', () => {
+  it('shows the category and Chinese note before expanding the Turtle in the list', async () => {
+    const user = userEvent.setup();
+    const note = '必须记录钢水的温度';
+    const turtle = `steel:Heat sh:property [ sh:path steel:temperature ; sh:message "${note}"@zh ] .`;
+    const axiom = { ...axiomFixture({ turtle }), axiomCategory: 'shape', axiomNote: note };
+    ontologyServer({
+      'GET /api/ontologies/:id/elements': () => [axiom],
+    });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    await user.click(await screen.findByRole('radio', { name: '其他语句' }));
+    expect(await screen.findByRole('heading', { name: '其他语句' })).toBeVisible();
+    expect(screen.getByRole('button', { name: '关于其他语句' })).toHaveAccessibleDescription('表单表达不了的内容，按 Turtle 原文保留，导出不丢。');
+    const list = within(screen.getByRole('table', { name: '本体元素' }));
+    expect(list.getByText('校验规则（SHACL）')).toBeVisible();
+    expect(list.getByText(note)).toBeVisible();
+    const summary = list.getByText('Turtle 片段');
+    expect(list.queryByText(turtle)).not.toBeVisible();
+    await user.click(summary);
+    expect(list.getByText(turtle)).toBeVisible();
+  });
+
   it('lists axioms by their Turtle and opens the full fragment with its subject and rewrite warning', async () => {
     const user = userEvent.setup();
     const api = ontologyServer();
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     const table = await screen.findByRole('table', { name: '本体元素' });
-    await user.click(screen.getByRole('radio', { name: '高级公理' }));
+    await user.click(screen.getByRole('radio', { name: '其他语句' }));
     // Listed under the element it belongs to: a group heading row, then the axiom.
     const group = await within(table).findByRole('rowgroup', { name: '钢水' });
     expect(within(table).getAllByRole('row')).toHaveLength(3);
     expect(api.requests.some((request) => request.path.endsWith('/elements') && request.query.get('kind') === 'axiom')).toBe(true);
 
-    await user.click(within(group).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
-    const sheet = await screen.findByRole('dialog', { name: '高级公理' });
+    await user.click(within(group).getByRole('button', { name: '逻辑公理' }));
+    const sheet = await screen.findByRole('dialog', { name: '其他语句' });
+    expect(sheet.querySelector('pre')).not.toBeVisible();
+    await user.click(within(sheet).getByText('Turtle 片段'));
     expect(sheet.querySelector('pre')).toHaveTextContent('steel:MoltenSteel owl:disjointWith steel:Slag .');
     expect(within(sheet).getByRole('button', { name: '非标准写法' })).toHaveAccessibleDescription('在 Protégé 中打开时会改写这条公理。');
 
     // The subject opens in the same panel and lists the axiom among its related axioms.
     await user.click(within(sheet).getByRole('button', { name: '钢水' }));
     const subject = await screen.findByRole('dialog', { name: '钢水' });
-    expect(within(subject).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' })).toBeInTheDocument();
+    expect(within(subject).getByRole('button', { name: '逻辑公理' })).toBeInTheDocument();
   });
 
   it('shows a constraint with its target type, IRI and rule table', async () => {
@@ -456,7 +480,7 @@ describe('list pagination', () => {
     renderApp('/ontology?ontology=onto-steel&view=list');
 
     await screen.findByRole('table', { name: '本体元素' });
-    await user.click(screen.getByRole('radio', { name: '高级公理' }));
+    await user.click(screen.getByRole('radio', { name: '其他语句' }));
     const pager = await screen.findByRole('navigation', { name: '分页' });
     expect(pager).toHaveTextContent('第 1–50 项，共 60 项');
     // The table is rebuilt for the new filter: look it up again.
@@ -464,6 +488,10 @@ describe('list pagination', () => {
     expect(within(table).getAllByRole('rowgroup')).toHaveLength(3);
     await user.click(within(pager).getByRole('button', { name: '下一页' }));
     expect(pager).toHaveTextContent('第 51–60 项，共 60 项');
-    expect(within(table).getAllByRole('button', { name: /^steel:A\d\d/ })).toHaveLength(10);
+    // Groups are ordered by subject name: the 30 ladle rows precede the 30 molten-steel rows.
+    const lastGroup = within(table).getByRole('rowgroup', { name: '钢水' });
+    expect(within(lastGroup).getAllByText(/^steel:A\d\d/).map((fragment) => fragment.textContent)).toEqual(
+      axioms.slice(20, 30).map((axiom) => axiom.turtle),
+    );
   });
 });

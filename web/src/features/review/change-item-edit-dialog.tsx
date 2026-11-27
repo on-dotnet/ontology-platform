@@ -50,7 +50,7 @@ export function ChangeItemEditDialog({ changeSetId, item, items, context, onClos
       <DialogContent closeLabel={t('common.close')} className="max-h-[calc(100dvh-2rem)] w-[min(42rem,calc(100vw-2rem))] overflow-y-auto">
         {item ? (
           <>
-            <DialogTitle>{t('review.edit.title', { name: itemLabel(item, context) })}</DialogTitle>
+            <DialogTitle>{t('review.edit.title', { name: itemLabel(item, context, t) })}</DialogTitle>
             <DialogDescription>{t(`review.edit.description.${item.kind}`)}</DialogDescription>
             <EditItemForm key={item.id} changeSetId={changeSetId} item={item} items={items} context={context} onSaved={onSaved} />
           </>

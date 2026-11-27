@@ -477,7 +477,7 @@ function importItems(): ChangeItem[] {
         ],
       },
     }),
-    itemFixture({ ...imported, id: 'item-axiom', seq: 2, kind: 'axiom', tempRef: null, flags: ['non_standard'], proposed: { turtle: AXIOM } }),
+    itemFixture({ ...imported, id: 'item-axiom', seq: 2, kind: 'axiom', axiomCategory: 'logic', tempRef: null, flags: ['non_standard'], proposed: { turtle: AXIOM } }),
     itemFixture({
       ...imported,
       id: 'item-delete',
@@ -671,6 +671,31 @@ describe('historical metric proposals', () => {
 });
 
 describe('import change set review', () => {
+  it('describes other statements and expands the original Turtle on demand', async () => {
+    const user = userEvent.setup();
+    const note = '钢种来自产品目录';
+    const turtle = `steel:Grade rdfs:comment "${note}"@zh .`;
+    const axiom = {
+      ...itemFixture({ kind: 'axiom', tempRef: null, proposed: { turtle } }),
+      axiomCategory: 'annotation' as const,
+      axiomNote: note,
+    };
+    reviewServer({
+      initial: changeSetFixture([axiom], { id: 'cs-import', source: 'import', documentId: null }),
+    });
+    renderApp('/review/cs-import');
+
+    expect(await screen.findByRole('heading', { name: /^其他语句/ })).toBeVisible();
+    expect(screen.getByRole('button', { name: '关于其他语句' })).toHaveAccessibleDescription('表单表达不了的内容，按 Turtle 原文保留，导出不丢。');
+    const item = within(screen.getByRole('article'));
+    expect(item.getByText('注解')).toBeVisible();
+    expect(item.getByText(note)).toBeVisible();
+    const summary = item.getByText('Turtle 片段');
+    expect(item.queryByText(turtle)).not.toBeVisible();
+    await user.click(summary);
+    expect(item.getByText(turtle)).toBeVisible();
+  });
+
   it('shows constraints with their rules, axioms as Turtle, and deletes and restores with the current values', async () => {
     const api = importServer();
     renderApp('/review/cs-import');
@@ -678,7 +703,7 @@ describe('import change set review', () => {
     const shape = await screen.findByRole('article', { name: /钢水校验/ });
     expect(screen.getByText('导入', { selector: 'span' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: /^约束/ })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: /^高级公理/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /^其他语句/ })).toBeInTheDocument();
     // Deleted elements are loaded too, so restores name their target.
     expect(api.requests.some((request) => request.path.endsWith('/elements') && request.query.get('status') === 'all')).toBe(true);
 
@@ -696,7 +721,7 @@ describe('import change set review', () => {
     expect(grade).toHaveTextContent('^Q[0-9]+$');
     expect(within(grade as HTMLElement).getByRole('button', { name: 'Protégé 丢掉了枚举取值' })).toBeInTheDocument();
 
-    const axiom = card(/steel:Slab owl:unionOf/);
+    const axiom = card(/^逻辑公理$/);
     expect(axiom.querySelector('pre')).toHaveTextContent('steel:HotSlab steel:ColdSlab');
     expect(within(axiom).getByRole('button', { name: '非标准写法' })).toHaveAccessibleDescription('在 Protégé 中打开时会改写这条公理。');
 
@@ -774,7 +799,7 @@ describe('import change set review', () => {
 
     expect(card(/^钢包/)).toHaveTextContent('自动生成校验规则');
 
-    const gone = card(/owl:disjointWith/);
+    const gone = card(/^其他$/);
     expect(gone).toHaveTextContent('将删除以下内容：');
     expect(gone.querySelector('pre')).toHaveTextContent(oneLine);
 

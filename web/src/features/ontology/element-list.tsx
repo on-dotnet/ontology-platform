@@ -2,6 +2,7 @@ import { RotateCcw, Search, X } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { InfoTip } from '@/components/feedback/hint-tip';
 import { EmptyState } from '@/components/states/empty-state';
 import { QueryState } from '@/components/states/query-state';
 import { Badge, type BadgeTone } from '@/components/ui/badge';
@@ -18,16 +19,15 @@ import {
   displayName,
   ELEMENT_KINDS,
   elementName,
-  turtleSummary,
   useElements,
   type Element,
   type ElementKind,
   type ElementStatusFilter,
 } from '@/features/ontologies/api';
-import { cn } from '@/lib/cn';
 import { usePagination } from '@/lib/pagination';
 
 import { useRestoreElement } from './edit-actions';
+import { AxiomBadge, AxiomFragment } from './element-content';
 
 /** Search waits this long after the last keystroke. */
 export const SEARCH_DEBOUNCE_MS = 300;
@@ -108,7 +108,11 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
       </TableCell>
       <TableCell className="font-mono text-xs text-muted-foreground">{element.localName ?? '—'}</TableCell>
       <TableCell className="max-w-md">
-        <p className="line-clamp-2 text-muted-foreground">{element.definitionZh ?? element.definitionEn ?? '—'}</p>
+        {element.kind === 'axiom' ? (
+          <p className="text-muted-foreground">{element.axiomNote ?? '—'}</p>
+        ) : (
+          <p className="line-clamp-2 text-muted-foreground">{element.definitionZh ?? element.definitionEn ?? '—'}</p>
+        )}
       </TableCell>
       {showActions ? (
         <TableCell className="whitespace-nowrap">
@@ -184,6 +188,12 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
         ) : null}
       </div>
 
+      {kind === 'axiom' ? (
+        <div className="flex items-center gap-1 px-4 pt-3">
+          <h2 className="font-semibold">{t('kinds.axiom')}</h2>
+          <InfoTip label={t('ontologyPage.axiom.fragmentInfoLabel')}>{t('statement.groupInfo')}</InfoTip>
+        </div>
+      ) : null}
       <QueryState query={query}>
         {(elements) =>
           elements.length === 0 ? (
@@ -297,11 +307,11 @@ interface NameCellProps {
   onSelect: (elementId: string) => void;
 }
 
-/** Name and second line: axioms show their Turtle; constraints their target type; others the English name. */
+/** Axioms open by category; constraints show their target type. */
 function NameCell({ element, language, nameOf, showSubject, onSelect }: NameCellProps) {
   const { t } = useTranslation();
   const isAxiom = element.kind === 'axiom';
-  const name = isAxiom ? turtleSummary(element.turtle) : displayName(element, language);
+  const name = displayName(element, language);
   let detail: string | null = null;
   if (element.kind === 'constraint') {
     const target = nameOf(element.domainId);
@@ -321,14 +331,12 @@ function NameCell({ element, language, nameOf, showSubject, onSelect }: NameCell
       <button
         type="button"
         onClick={() => onSelect(element.id)}
-        className={cn(
-          'block max-w-full truncate rounded text-left font-medium text-primary-strong hover:underline',
-          isAxiom && 'font-mono text-xs',
-        )}
+        className="block max-w-full truncate rounded text-left font-medium text-primary-strong hover:underline"
       >
-        {name || '—'}
+        {isAxiom ? <AxiomBadge category={element.axiomCategory} /> : name || '—'}
       </button>
       {detail ? <p className="truncate text-xs text-muted-foreground">{detail}</p> : null}
+      {isAxiom ? <AxiomFragment turtle={element.turtle} /> : null}
     </>
   );
 }

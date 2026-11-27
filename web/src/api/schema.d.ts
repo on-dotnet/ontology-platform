@@ -1818,6 +1818,10 @@ export interface components {
             proposed: components["schemas"]["ElementFields"];
             edited: components["schemas"]["ElementFields"] | null;
             before: components["schemas"]["ElementFields"] | null;
+            /** Axiomcategory */
+            axiomCategory?: ("shape" | "logic" | "individual" | "parent" | "annotation" | "other") | null;
+            /** Axiomnote */
+            axiomNote?: string | null;
             /**
              * Decision
              * @enum {string}
@@ -2648,6 +2652,10 @@ export interface components {
              */
             updatedAt: string;
             metric?: components["schemas"]["MetricDefinition"] | null;
+            /** Axiomcategory */
+            axiomCategory?: ("shape" | "logic" | "individual" | "parent" | "annotation" | "other") | null;
+            /** Axiomnote */
+            axiomNote?: string | null;
         };
         /** ElementChange */
         ElementChange: {
@@ -2762,6 +2770,10 @@ export interface components {
              */
             updatedAt: string;
             metric?: components["schemas"]["MetricDefinition"] | null;
+            /** Axiomcategory */
+            axiomCategory?: ("shape" | "logic" | "individual" | "parent" | "annotation" | "other") | null;
+            /** Axiomnote */
+            axiomNote?: string | null;
             /** Provenance */
             provenance: components["schemas"]["Provenance"][];
         };
