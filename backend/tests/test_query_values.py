@@ -26,6 +26,7 @@ NUMERIC = column("decimal", "numeric")
 BOOLEAN = column("boolean", "boolean")
 DATE = column("date", "date")
 TIMESTAMP = column("dateTime", "timestamp with time zone")
+LOCAL_TIMESTAMP = column("dateTime", "timestamp(3) without time zone")
 IDENTIFIER = column("opaque", "UUID")
 ENUM = column("opaque", "mes.grade")
 PROPERTY = UUID(int=13)
@@ -135,6 +136,24 @@ def test_datetime_filter_on_date_column_normalizes_only_timestamp_conditions(
 
 
 @pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (LOCAL_TIME, datetime.fromisoformat(LOCAL_TIME)),
+        (OFFSET_TIME, datetime.fromisoformat("2024-02-28T19:32:03.010200")),
+        ("2024-02-29T01:02:03Z", datetime.fromisoformat(LOCAL_TIME)),
+    ],
+)
+def test_a_timestamp_column_without_a_zone_compares_in_utc_like_a_date_column(
+    raw: str, expected: datetime
+) -> None:
+    # Bound with its offset, the source session's time zone would decide what matches.
+    item = schemas.Filter(property_id=PROPERTY, op="in", value=[raw])
+    assert values.condition(item, LOCAL_TIMESTAMP, "dateTime") == Condition(
+        ColumnRef(LOCAL_TIMESTAMP.name), "in", (expected,)
+    )
+
+
+@pytest.mark.parametrize(
     ("op", "raw", "col", "datatype"),
     [
         ("eq", None, TEXT, "string"),
@@ -155,6 +174,7 @@ def test_datetime_filter_on_date_column_normalizes_only_timestamp_conditions(
         # In UTC these fall outside the years a date can hold.
         ("eq", "0001-01-01T00:00:00+05:00", DATE, "dateTime"),
         ("in", ["9999-12-31T23:59:00-02:00"], DATE, "dateTime"),
+        ("eq", "0001-01-01T00:00:00+05:00", LOCAL_TIMESTAMP, "dateTime"),
         # Only a dateTime property may compare a date column with a time of day.
         ("eq", "2026-01-01T00:00:00", DATE, "date"),
         ("eq", "bad-uuid", IDENTIFIER, "string"),

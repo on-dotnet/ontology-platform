@@ -102,6 +102,18 @@ def parse_value(value: object, column: CatalogColumn) -> str | int | Decimal | d
     raise ValueError("Invalid value for the column type.")
 
 
+def _utc_wall_time(instant: datetime) -> datetime:
+    """A time with an offset as UTC without a zone, for a column that keeps no zone. Bound
+    with its offset, the source session's time zone would decide what it matches."""
+    if instant.tzinfo is None:
+        return instant
+    try:
+        return instant.astimezone(UTC).replace(tzinfo=None)
+    except OverflowError as exc:
+        # 0001-01-01T00:00:00+05:00 has no UTC time within the supported years.
+        raise ValueError("The time is out of range.") from exc
+
+
 def _condition_value(value: object, column: CatalogColumn, datatype: Datatype) -> Value:
     if (
         datatype == "dateTime"
@@ -109,15 +121,11 @@ def _condition_value(value: object, column: CatalogColumn, datatype: Datatype) -
         and isinstance(value, str)
         and _TIMESTAMP.fullmatch(value)
     ):
-        instant = datetime.fromisoformat(value)
-        if instant.tzinfo is None:
-            return instant
-        try:
-            return instant.astimezone(UTC).replace(tzinfo=None)
-        except OverflowError as exc:
-            # 0001-01-01T00:00:00+05:00 has no UTC time within the supported years.
-            raise ValueError("The time is out of range.") from exc
-    return parse_value(value, column)
+        return _utc_wall_time(datetime.fromisoformat(value))
+    parsed = parse_value(value, column)
+    if isinstance(parsed, datetime) and "with time zone" not in column.type.lower():
+        return _utc_wall_time(parsed)
+    return parsed
 
 
 def condition(item: schemas.Filter, column: CatalogColumn, datatype: Datatype) -> Condition:

@@ -204,7 +204,7 @@ type ObjectDetail = ObjectRow & { release: ReleaseRef; relations: ObjectTypeInfo
 
 - **出发对象不存在**：走一跳（`…/related`）不单独核对出发对象是否存在。关系是外键绑定时返回空页（200，`items` 为空，`nextCursor` 为 null），不报 `query.object_not_found`；关系绑在连接表上时返回连接表里匹配到的对象，出发对象删除后没有残留行时同样是空页。主键编码不合法，或数据库拒绝主键里的取值（例如已改名的枚举值），返回 404 `query.object_not_found`；连接表的列类型和出发类型的主键列不同、主键值无法无损转换时返回 409 `query.source_mismatch`。MCP 的 `get_related_objects` 相同。
 - **筛选条件不合法**：`Filter` 的 `op` 不是上面列出的运算符，或 `value` 的类型不对时，校验阶段（`model_validate`）直接抛出 `query.invalid_filter`（422）；请求里还有别的字段错误时只报这一个，不返回 `validation.failed` 的字段清单。直接用 `Filter` 模型的调用方（如 MCP 工具）收到的是 `AppError`，不是 pydantic 的 `ValidationError`。
-- **日期时间筛选**：`dateTime` 属性绑在 `date` 列时，筛选接受日期或日期时间；带时区的日期时间先换算为 UTC 再去掉时区，按日期列的当天零点比较。
+- **日期时间筛选**：`dateTime` 属性绑在 `date` 列时，筛选接受日期或日期时间；带时区的日期时间先换算为 UTC 再去掉时区，按日期列的当天零点比较。绑在 `timestamp without time zone` 列时口径相同：带时区的条件先换算为 UTC 再去掉时区，不交给数据源会话的时区换算；换算后超出可表示年份的返回 422 `query.invalid_filter`。绑在 `timestamp with time zone` 列时按带时区的时刻比较，不换算；不带时区的条件按 UTC 解释（连接器会话固定为 UTC），读出的值也带 `+00:00`。
 - **关系列表**：`relations` 列出从这个类型出发的绑定，以及指向它的绑定的反向读法（`direction` 为 `in`）。关系 R 声明的互逆关系 R' 在相同的两端类型之间也有出向绑定、并且这个绑定可用时，不列 R 的反向项；R' 不可用但 R 的反向项可用时，只列 R 的反向项；两者都不可用时保留 R' 的出向项。
 
 ## MCP（批次 6）

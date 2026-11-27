@@ -176,6 +176,22 @@ async def test_both_barriers_are_in_place(
     assert read_only is True  # barrier two: every transaction is BEGIN READ ONLY
 
 
+async def test_sessions_use_utc_whatever_the_sources_default(
+    db: AsyncSession, external_source: ExternalSource
+) -> None:
+    # Times without a zone are compared and times with one are read in UTC, so that what a
+    # query matches and shows does not depend on how the source or its role is set up.
+    reader = f'"{external_source.reader}"'
+    admin_rows(external_source, f"ALTER ROLE {reader} SET TimeZone = 'Asia/Shanghai'")
+    try:
+        async with connect(db, reader_params(external_source)) as conn:
+            zone = (await conn.execute(text("SHOW TimeZone"))).scalar()
+    finally:
+        admin_rows(external_source, f"ALTER ROLE {reader} RESET TimeZone")
+
+    assert zone == "UTC"
+
+
 async def _delete_with(db: AsyncSession, source: ExternalSource) -> ConnectorError:
     with pytest.raises(ConnectorError) as raised:
         async with connect(db, writer_params(source)) as conn:

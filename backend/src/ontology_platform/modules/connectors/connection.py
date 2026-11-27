@@ -274,6 +274,9 @@ def _options(settings: Settings) -> str:
         "statement_timeout": settings.query_timeout_seconds * 1000,
         "lock_timeout": LOCK_TIMEOUT_MS,
         "idle_in_transaction_session_timeout": IDLE_IN_TRANSACTION_TIMEOUT_MS,
+        # Overrides a server, database or role default: a time without a zone compares with one
+        # that has a zone, and a time with a zone is read, the same way for every source.
+        "TimeZone": "UTC",
     }
     return " ".join(f"-c {name}={value}" for name, value in values.items())
 
