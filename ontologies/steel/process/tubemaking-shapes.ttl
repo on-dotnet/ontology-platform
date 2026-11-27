@@ -13,19 +13,35 @@
     rdfs:comment "校验无缝管的来源物料、管件尺寸以及制管焊接作业的方法记录。"@zh, "Checks seamless tube stock, recorded tube dimensions and the methods used in seam welding operations."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
-stl:SeamlessTubeStockShape a sh:PropertyShape ; sh:targetClass stl:SeamlessTube ;
-    sh:path [ sh:oneOrMorePath stl:derivedFrom ] ;
-    sh:qualifiedValueShape [ sh:or (
-        [ sh:class stl:TubeBillet ] [ sh:class stl:RoundBillet ] [ sh:class stl:HollowShell ]
-        [ sh:property [ sh:path ( stl:productForm [ sh:zeroOrMorePath skos:broader ] ) ;
-            sh:qualifiedValueShape [ sh:in ( <code/product-form/ROUNDBIL> <code/product-form/SHELL> ) ] ; sh:qualifiedMinCount 1 ] ]
-    ) ] ;
-    sh:qualifiedMinCount 1 ; sh:severity sh:Violation ;
-    rdfs:comment "沿无缝钢管的直接来源逐段回溯，应至少找到一件制管用实心管坯、圆坯或毛管。圆坯与毛管也可按产品形态代码识别。"@zh .
+stl:SeamlessTubeStockShape a sh:NodeShape ; sh:targetClass stl:SeamlessTube ;
+    sh:severity sh:Violation ;
+    rdfs:comment "沿无缝钢管的直接来源逐段回溯，应至少找到一件制管用实心管坯、圆坯或毛管。圆坯与毛管也可按产品形态代码识别。"@zh ;
+    sh:sparql [ a sh:SPARQLConstraint ; sh:message "沿无缝钢管的来源链未找到制管用实心管坯、圆坯或毛管。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX form: <https://w3id.org/ontology-platform/steel/code/product-form/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom+/a/rdfs:subClassOf* ?class .
+            FILTER (?class IN (stl:TubeBillet, stl:RoundBillet, stl:HollowShell))
+          }
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom+/stl:productForm/skos:broader* ?form .
+            FILTER (?form IN (form:ROUNDBIL, form:SHELL))
+          }
+        }
+    """ ] .
 
-stl:TubeDimensionValueShape a sh:PropertyShape ; sh:targetSubjectsOf stl:tubeOutsideDiameter, stl:tubeWallThickness ;
-    sh:path [ sh:alternativePath ( stl:tubeOutsideDiameter stl:tubeWallThickness ) ] ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
-    sh:severity sh:Violation ; rdfs:comment "已记录的管外径和管壁厚度均应为大于零的十进制数，单位为毫米。"@zh .
+stl:TubeDimensionValueShape a sh:PropertyShape ; sh:targetSubjectsOf stl:tubeWallThickness ;
+    sh:path stl:tubeWallThickness ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "已记录的管壁厚度应为大于零的十进制数，单位为毫米。"@zh,
+        "Each recorded tube wall thickness must be a positive decimal in millimetres."@en .
+
+stl:TubeOutsideDiameterValueShape a sh:PropertyShape ; sh:targetSubjectsOf stl:tubeOutsideDiameter ;
+    sh:path stl:tubeOutsideDiameter ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "已记录的管外径应为大于零的十进制数，单位为毫米。"@zh,
+        "Each recorded tube outside diameter must be a positive decimal in millimetres."@en .
 
 stl:TubeWeldingMethodShape a sh:PropertyShape ; sh:targetClass stl:TubeWelding ;
     sh:path stl:weldMethod ; sh:minCount 1 ;

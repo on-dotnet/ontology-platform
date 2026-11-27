@@ -13,18 +13,26 @@
     rdfs:comment "校验钢卷的坯料来源、母卷区段与涂镀层代码归属。"@zh, "Checks source stock, intervals along parent coils and membership of coating type codes."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
-stl:CoilSourceStockShape a sh:PropertyShape ; sh:targetClass stl:Coil ;
-    sh:path [ sh:oneOrMorePath stl:derivedFrom ] ;
-    sh:qualifiedValueShape [ sh:or (
-        [ sh:class stl:ContinuouslyCastPiece ] [ sh:class stl:BreakdownRolledStock ]
-        [ sh:class stl:Slab ] [ sh:class stl:Bloom ] [ sh:class stl:Billet ]
-        [ sh:class stl:BeamBlank ] [ sh:class stl:Ingot ]
-        [ sh:property [ sh:path ( stl:productForm [ sh:zeroOrMorePath skos:broader ] ) ;
-            sh:qualifiedValueShape [ sh:in ( <code/product-form/SLAB> <code/product-form/BLOOM>
-                <code/product-form/SQBILLET> <code/product-form/RECTBILLET> <code/product-form/ROUNDBIL>
-                <code/product-form/BEAMBLANK> <code/product-form/INGOT> ) ] ; sh:qualifiedMinCount 1 ] ]
-    ) ] ; sh:qualifiedMinCount 1 ;
-    sh:severity sh:Violation ; rdfs:comment "每卷应沿一步或多步直接来源关系追到至少一件坯料或钢锭。分卷、合卷可经过中间卷；坯锭可由实物类或坯形代码识别。"@zh .
+stl:CoilSourceStockShape a sh:NodeShape ; sh:targetClass stl:Coil ;
+    sh:severity sh:Violation ; rdfs:comment "每卷应沿一步或多步直接来源关系追到至少一件坯料或钢锭。分卷、合卷可经过中间卷；坯锭可由实物类或坯形代码识别。"@zh ;
+    sh:sparql [ a sh:SPARQLConstraint ; sh:message "沿钢卷的来源链未找到属于坯料或钢锭的实物类或坯形代码。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX form: <https://w3id.org/ontology-platform/steel/code/product-form/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom+/a/rdfs:subClassOf* ?class .
+            FILTER (?class IN (stl:ContinuouslyCastPiece, stl:BreakdownRolledStock, stl:Slab,
+                               stl:Bloom, stl:Billet, stl:BeamBlank, stl:Ingot))
+          }
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom+/stl:productForm/skos:broader* ?form .
+            FILTER (?form IN (form:SLAB, form:BLOOM, form:SQBILLET, form:RECTBILLET,
+                              form:ROUNDBIL, form:BEAMBLANK, form:INGOT))
+          }
+        }
+    """ ] .
 
 stl:CoilSourceIntervalShape a sh:PropertyShape ; sh:targetSubjectsOf stl:startLength, stl:endLength ;
     sh:path stl:startLength ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:lessThanOrEquals stl:endLength ;

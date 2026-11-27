@@ -20,6 +20,9 @@
         "Public standards cited by the steel ontology, one record per edition, holding only identifier, titles, edition, status, catalogue link and replacement relations."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
+xsd:gYear a rdfs:Datatype ;
+    rdfs:comment "xsd:gYear 未列入 OWL 2 数据类型表。显式声明可避免 Protégé 另存时补写声明。"@zh .
+
 <source/industry-practice> a dcterms:BibliographicResource ;
     rdfs:label "行业通用"@zh, "Industry practice"@en ;
     skos:definition "没有可引用的公开标准、按钢铁行业通行做法定义的来源。"@zh,

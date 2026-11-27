@@ -25,7 +25,7 @@ stl:ManufacturingRecord a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
     rdfs:label "制造记录"@zh, "Manufacturing record"@en ; skos:prefLabel "制造记录"@zh, "Manufacturing record"@en ;
     skos:definition "可在制造业务中留存和引用的记录，其内容可以是计划、实绩或凭证。"@zh, "A record preserving a plan, an occurrence or a document for later reference in manufacturing."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
-stl:Event a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+stl:Event a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ; owl:disjointWith stl:Plan ;
     rdfs:label "事件"@zh, "Event"@en ; skos:prefLabel "事件"@zh, "Event"@en ;
     skos:definition "在生产或交付履历中能够按实际发生时间定位的一次业务事实。"@zh, "An occurrence locatable in the production or delivery history by its actual time."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
@@ -33,7 +33,7 @@ stl:Operation a owl:Class ; rdfs:subClassOf stl:Event, prov:Activity ;
     rdfs:label "工序执行"@zh, "Operation"@en ; skos:prefLabel "工序执行"@zh, "Operation"@en ;
     skos:definition "现场某项工序的一次实施，投入、产出和执行设备均可归到本次作业。"@zh, "A particular execution of a shop-floor step to which its equipment and material flows can be attributed."@en ;
     dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/manufacturing> .
-stl:Plan a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ; owl:disjointWith stl:Event ;
+stl:Plan a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
     rdfs:label "计划"@zh, "Plan"@en ; skos:prefLabel "计划"@zh, "Plan"@en ;
     skos:definition "在执行前约定预期作业、资源或时间的记录。"@zh, "A record setting out intended work, resources or timing before execution."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/manufacturing> .

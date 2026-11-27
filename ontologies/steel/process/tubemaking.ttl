@@ -58,12 +58,12 @@ stl:weldMethod a owl:ObjectProperty ; rdfs:domain stl:TubeWelding ; rdfs:range s
     rdfs:label "制管焊接方法"@zh, "Tube seam welding method"@en ; skos:prefLabel "制管焊接方法"@zh, "Tube seam welding method"@en ;
     skos:definition "从一次管体焊接作业指向实际用于接合管边的焊接方法代码。"@zh, "Identifies the method actually used to join the tube edges in a seam welding operation."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
-stl:tubeOutsideDiameter a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelTube stl:HollowShell ) ] ; rdfs:range xsd:decimal ;
+stl:tubeOutsideDiameter a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:HollowShell stl:SteelTube ) ] ; rdfs:range xsd:decimal ;
     stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
     rdfs:label "管外径"@zh, "Tube outside diameter"@en ; skos:prefLabel "管外径"@zh, "Tube outside diameter"@en ;
     skos:definition "圆形钢管或毛管在给定截面上沿直径方向两外表面间的距离，以毫米计。"@zh, "The distance across the outside surfaces of a round tube or shell on a diameter of a given section, in millimetres."@en ;
     dcterms:source <std/gbt-17395-2024> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
-stl:tubeWallThickness a owl:DatatypeProperty ; rdfs:subPropertyOf stl:thickness ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelTube stl:HollowShell ) ] ; rdfs:range xsd:decimal ;
+stl:tubeWallThickness a owl:DatatypeProperty ; rdfs:subPropertyOf stl:thickness ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:HollowShell stl:SteelTube ) ] ; rdfs:range xsd:decimal ;
     stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
     rdfs:label "管壁厚度"@zh, "Tube wall thickness"@en ; skos:prefLabel "管壁厚度"@zh, "Tube wall thickness"@en ;
     skos:definition "钢管或毛管在给定位置沿壁厚方向从内表面到外表面的距离，以毫米计。"@zh, "The distance through the wall of a tube or shell from the inside surface to the outside at a given position, in millimetres."@en ;
