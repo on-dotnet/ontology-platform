@@ -222,6 +222,20 @@ def test_merge_counts_report_skipped_items_and_duplicates() -> None:
         # 氧气转炉 is no name of the expected 转炉 group: unexpected, not a duplicate.
         "groups": ["炉次 / 炉次", "钢包 / 盛钢桶"],
     }
+    # A synonym does not put a distinct type into a group (#63): 钢包缺陷 is no 钢包.
+    [ladle] = [e for e in version.elements if e.label_zh == "钢包"]
+    version.elements.append(
+        replace(
+            ladle,
+            id=uuid4(),
+            local_name="LadleDefect",
+            label_zh="钢包缺陷",
+            label_en=None,
+            synonyms=("钢包",),
+        )
+    )
+    groups = merge_counts(version, skipped, expected)["duplicateTypeGroups"]["groups"]
+    assert groups == ["炉次 / 炉次", "钢包 / 盛钢桶"]
 
 
 def test_an_item_referencing_one_listed_after_it_is_merged_as_the_merge_does() -> None:
