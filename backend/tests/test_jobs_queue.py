@@ -305,6 +305,138 @@ async def test_stopping_lets_the_jobs_in_progress_finish(app: FastAPI, db: Async
     assert await _statuses(db, ids) == [("succeeded", None)] * 2
 
 
+async def test_stop_timeout_requeues_all_jobs_without_spending_attempts(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    stop = asyncio.Event()
+    never = asyncio.Event()
+    ids = [await service.enqueue(db, "test.stop.timeout", {}) for _ in range(2)]
+    await db.commit()
+    started: set[UUID] = set()
+    cancelled: set[UUID] = set()
+
+    async def handle(context: JobContext) -> None:
+        started.add(context.id)
+        if started == set(ids):
+            stop.set()
+        try:
+            await never.wait()
+        except asyncio.CancelledError:
+            cancelled.add(context.id)
+            raise
+
+    register("test.stop.timeout", handle)
+    async with asyncio.timeout(3):
+        await run_worker(
+            app.state.session_factory,
+            "a",
+            stop_event=stop,
+            poll_interval=0.01,
+            concurrency=2,
+            stop_grace=0.1,
+        )
+    assert cancelled == set(ids)
+    assert await _statuses(db, ids) == [("queued", None)] * 2
+    for job_id in ids:
+        job = await db.get(Job, job_id, populate_existing=True)
+        assert job is not None
+        assert (job.attempts, job.locked_by, job.locked_at, job.heartbeat_at) == (
+            0,
+            None,
+            None,
+            None,
+        )
+
+
+async def test_stop_grace_preserves_finished_job_and_requeues_only_timeout(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    stop = asyncio.Event()
+    never = asyncio.Event()
+    quick = await service.enqueue(db, "test.stop.quick", {})
+    slow = await service.enqueue(db, "test.stop.slow", {})
+    await db.commit()
+    started = asyncio.Event()
+
+    async def finish(context: JobContext) -> None:
+        await started.wait()
+        stop.set()
+
+    async def wait_forever(context: JobContext) -> None:
+        started.set()
+        await never.wait()
+
+    register("test.stop.quick", finish)
+    register("test.stop.slow", wait_forever)
+    async with asyncio.timeout(3):
+        await run_worker(
+            app.state.session_factory,
+            "a",
+            stop_event=stop,
+            poll_interval=0.01,
+            concurrency=2,
+            stop_grace=0.1,
+        )
+    assert await _statuses(db, [quick, slow]) == [("succeeded", None), ("queued", None)]
+    quick_job = await db.get(Job, quick, populate_existing=True)
+    slow_job = await db.get(Job, slow, populate_existing=True)
+    assert quick_job is not None
+    assert slow_job is not None
+    assert quick_job.attempts == 1
+    assert (slow_job.attempts, slow_job.locked_by) == (0, None)
+
+
+async def test_released_job_can_be_claimed_by_another_worker(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    stop = asyncio.Event()
+    started = asyncio.Event()
+    never = asyncio.Event()
+    job_id = await service.enqueue(db, "test.stop.retry", {})
+    await db.commit()
+
+    async def interrupted(context: JobContext) -> None:
+        started.set()
+        stop.set()
+        await never.wait()
+
+    register("test.stop.retry", interrupted)
+    async with asyncio.timeout(3):
+        await run_worker(
+            app.state.session_factory,
+            "a",
+            stop_event=stop,
+            poll_interval=0.01,
+            stop_grace=0.1,
+        )
+    assert started.is_set()
+    assert await _statuses(db, [job_id]) == [("queued", None)]
+
+    next_stop = asyncio.Event()
+
+    async def completed(context: JobContext) -> None:
+        assert context.worker_id == "b"
+        next_stop.set()
+
+    register("test.stop.retry", completed)
+    async with asyncio.timeout(3):
+        await run_worker(app.state.session_factory, "b", stop_event=next_stop, poll_interval=0.01)
+    job = await db.get(Job, job_id, populate_existing=True)
+    assert job is not None
+    assert (job.status, job.attempts) == ("succeeded", 1)
+
+
+async def test_release_requires_the_current_worker_and_attempt(db: AsyncSession) -> None:
+    job_id = await service.enqueue(db, "test.release", {})
+    claimed = await service.claim(db, "new-owner")
+    assert claimed is not None
+    before = (claimed.status, claimed.attempts, claimed.locked_by, claimed.locked_at)
+    assert await service.release(db, job_id, "old-owner", claimed.attempts) is False
+    assert await service.release(db, job_id, "new-owner", claimed.attempts - 1) is False
+    await db.refresh(claimed)
+    assert (claimed.status, claimed.attempts, claimed.locked_by, claimed.locked_at) == before
+
+
 async def test_each_job_at_the_same_time_keeps_its_own_heartbeat_and_lease(
     app: FastAPI, db: AsyncSession, monkeypatch: pytest.MonkeyPatch
 ) -> None:

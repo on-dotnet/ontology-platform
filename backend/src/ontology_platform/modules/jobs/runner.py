@@ -16,6 +16,8 @@ from ontology_platform.modules.jobs.models import Job
 
 logger = logging.getLogger(__name__)
 HEARTBEAT_INTERVAL = 15.0
+# compose.yaml must give the worker a longer stop_grace_period than this.
+STOP_GRACE = 60.0
 
 
 class RetryableJobError(Exception):
@@ -130,19 +132,22 @@ async def run_worker(
     poll_interval: float = 2.0,
     stop_event: asyncio.Event | None = None,
     concurrency: int = 1,
+    stop_grace: float = STOP_GRACE,
 ) -> None:
     """Runs up to `concurrency` jobs at once (spec 004, 7.3), each with its own claim, heartbeat
-    and lease check. On stop no job is claimed any more; the jobs in progress finish first.
+    and lease check. On stop, wait up to `stop_grace` seconds for active jobs, then cancel and
+    requeue unfinished claims without spending an attempt.
 
     An error outside a job's handler (recording its outcome failed) stops the worker as it did
     with one job at a time, once the other jobs in progress have finished.
     """
     stop = stop_event if stop_event is not None else asyncio.Event()
-    running: set[asyncio.Task[None]] = set()
+    stop_wait = asyncio.create_task(stop.wait())
+    running: dict[asyncio.Task[None], tuple[str, JobContext]] = {}
     failed: list[BaseException] = []
 
     def finished(task: asyncio.Task[None]) -> None:
-        running.discard(task)
+        running.pop(task, None)
         error = None if task.cancelled() else task.exception()
         if error is not None:
             # Taking the exception silences asyncio's warning: log every one, raise the first.
@@ -152,7 +157,7 @@ async def run_worker(
     try:
         while not stop.is_set() and not failed:
             if len(running) >= concurrency:
-                await asyncio.wait(running, return_when=asyncio.FIRST_COMPLETED)
+                await asyncio.wait({*running, stop_wait}, return_when=asyncio.FIRST_COMPLETED)
                 continue
             work: tuple[str, JobContext] | None = None
             async with session_factory.begin() as db:
@@ -172,13 +177,31 @@ async def run_worker(
                 await _wait(stop, poll_interval)
                 continue
             task = asyncio.create_task(_run(*work, worker_id))
-            running.add(task)
+            running[task] = work
             task.add_done_callback(finished)
+        if stop.is_set() and running:
+            _, pending = await asyncio.wait(running, timeout=stop_grace)
+            interrupted = [(task, running[task]) for task in pending if task in running]
+            for task, _ in interrupted:
+                task.cancel()
+            await asyncio.gather(*(task for task, _ in interrupted), return_exceptions=True)
+            for _, (kind, context) in interrupted:
+                try:
+                    async with session_factory.begin() as db:
+                        released = await service.release(
+                            db, context.id, worker_id, context.attempts
+                        )
+                    if released:
+                        logger.warning("Requeued interrupted job %s (%s)", context.id, kind)
+                except Exception:
+                    logger.exception("Could not requeue interrupted job %s (%s)", context.id, kind)
     except asyncio.CancelledError:
         for task in running:
             task.cancel()
         raise
     finally:
+        stop_wait.cancel()
+        await asyncio.gather(stop_wait, return_exceptions=True)
         if running:
             await asyncio.gather(*running, return_exceptions=True)
     if failed:
