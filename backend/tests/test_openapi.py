@@ -49,6 +49,11 @@ M1_PATHS = {
     "/api/workbench/summary",
 }
 M2_PATHS = {
+    "/api/ontologies/{id}/review-memory",
+    "/api/ontologies/{id}/review-memory/{entryId}",
+    "/api/ontologies/{id}/review-memory/{entryId}/restore",
+    "/api/ontologies/{id}/review-memory/clear",
+    "/api/change-sets/{id}/review-assist",
     "/api/ontologies/import",
     "/api/ontologies/{id}/import",
     "/api/ontologies/{id}/turtle",

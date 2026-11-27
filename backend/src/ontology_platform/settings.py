@@ -83,6 +83,12 @@ class Settings(BaseSettings):
     qa_running_max: int = Field(default=3, gt=0)
     metric_rows_max: int = Field(default=10_000, gt=0)
     qa_job_timeout_seconds: int = Field(default=180, gt=0)
+    review_memory_max: int = Field(default=500, gt=0)
+    review_memory_prompt_max: int = Field(default=40, gt=0)
+    review_assists_per_hour: int = Field(default=20, gt=0)
+    review_assist_items_max: int = Field(default=400, gt=0)
+    review_assist_batch: int = Field(default=80, gt=0)
+    review_assist_timeout_seconds: int = Field(default=300, gt=0)
 
     @property
     def previous_secret_keys(self) -> list[SecretStr]:

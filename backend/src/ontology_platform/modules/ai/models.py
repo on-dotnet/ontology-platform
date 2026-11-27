@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, Index, String, Text, false, func
+from sqlalchemy import CheckConstraint, Index, String, Text, false, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -153,5 +153,43 @@ class QaQuestionRow(Base):
     gap_dropped: Mapped[int] = mapped_column(default=0, server_default="0")
     gap_error_code: Mapped[str | None] = mapped_column(String(64))
     error_code: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    finished_at: Mapped[datetime | None]
+
+
+class ReviewAssistRow(Base):
+    __tablename__ = "review_assists"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('queued', 'running', 'done', 'partial', 'failed')", name="status"
+        ),
+        Index(
+            "ix_review_assists_change_set_id_created_at", "change_set_id", text("created_at DESC")
+        ),
+        Index("ix_review_assists_requested_by_created_at", "requested_by", "created_at"),
+        Index(
+            "uq_review_assists_change_set_id_running",
+            "change_set_id",
+            unique=True,
+            postgresql_where=text("status IN ('queued', 'running')"),
+        ),
+        {"schema": "ai"},
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    change_set_id: Mapped[UUID]
+    ontology_id: Mapped[UUID]
+    requested_by: Mapped[UUID | None]
+    locale: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text)
+    error_code: Mapped[str | None] = mapped_column(Text)
+    ai_used: Mapped[bool] = mapped_column(default=False, server_default=false())
+    truncated: Mapped[bool] = mapped_column(default=False, server_default=false())
+    result: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
+    items_total: Mapped[int] = mapped_column(default=0, server_default="0")
+    items_ai: Mapped[int] = mapped_column(default=0, server_default="0")
+    dropped: Mapped[int] = mapped_column(default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     finished_at: Mapped[datetime | None]

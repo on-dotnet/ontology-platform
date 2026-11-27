@@ -22,7 +22,15 @@ from support import (
 )
 
 SCHEMA = "ontology"
-TABLES = {"ontologies", "elements", "change_sets", "change_items", "evidence", "releases"}
+TABLES = {
+    "ontologies",
+    "elements",
+    "change_sets",
+    "change_items",
+    "evidence",
+    "releases",
+    "review_memory",
+}
 
 
 def include_name(name: str | None, type_: str, parent_names: object) -> bool:

@@ -3,7 +3,7 @@
 The model modules are imported so that their tables are registered on Base.metadata.
 """
 
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import psycopg
 import pytest
@@ -11,13 +11,90 @@ from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from psycopg.types.json import Jsonb
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import ForeignKey, Uuid, create_engine, insert, inspect
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
-from ontology_platform import models  # noqa: F401  (registers every module's tables)
+from ontology_platform import models
 from ontology_platform.db import Base
 from support import PUBLIC_SEARCH_PATH, alembic_config, libpq_dsn, truncate_tables
 
 SCHEMAS = {table.schema for table in Base.metadata.tables.values()}
+
+
+class PreviousBase(DeclarativeBase):
+    pass
+
+
+class PreviousChangeSet(PreviousBase):
+    __tablename__ = "change_sets"
+    __table_args__ = ({"schema": "ontology"},)
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    ontology_id: Mapped[UUID] = mapped_column(Uuid)
+    title: Mapped[str]
+    source: Mapped[str]
+
+
+class PreviousChangeItem(PreviousBase):
+    __tablename__ = "change_items"
+    __table_args__ = ({"schema": "ontology"},)
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    change_set_id: Mapped[UUID] = mapped_column(ForeignKey("ontology.change_sets.id"))
+    seq: Mapped[int]
+    op: Mapped[str]
+    kind: Mapped[str]
+    proposed: Mapped[dict[str, object]] = mapped_column(JSONB)
+
+
+def test_review_learning_migration_and_previous_orm(database_url: str) -> None:
+    truncate_tables(database_url)
+    config = alembic_config(database_url)
+    command.downgrade(config, "0012")
+    engine = create_engine(database_url)
+    try:
+        with engine.connect() as connection:
+            assert not inspect(connection).has_table("review_memory", schema="ontology")
+            assert not inspect(connection).has_table("review_assists", schema="ai")
+        command.upgrade(config, "0013")
+        with engine.connect() as connection:
+            assert inspect(connection).has_table("review_memory", schema="ontology")
+            assert inspect(connection).has_table("review_assists", schema="ai")
+        with Session(engine) as session:
+            ontology_id = uuid4()
+            change_set_id = uuid4()
+            session.execute(
+                insert(models.ontology_models.Ontology).values(
+                    id=ontology_id, key="previous", name="Previous", base_iri="urn:previous:"
+                )
+            )
+            session.add(
+                PreviousChangeSet(
+                    id=change_set_id, ontology_id=ontology_id, title="previous", source="manual"
+                )
+            )
+            session.flush()
+            session.add(
+                PreviousChangeItem(
+                    id=uuid4(),
+                    change_set_id=change_set_id,
+                    seq=1,
+                    op="create",
+                    kind="entity_type",
+                    proposed={"labelZh": "旧版"},
+                )
+            )
+            session.commit()
+            assert session.get(PreviousChangeSet, change_set_id) is not None
+        with engine.connect() as connection:
+            assert connection.exec_driver_sql(
+                "SELECT suppressed, suppressed_total FROM ontology.change_sets WHERE id = %s",
+                (change_set_id,),
+            ).one() == ([], 0)
+        command.downgrade(config, "0012")
+        command.upgrade(config, "0013")
+    finally:
+        engine.dispose()
+        command.upgrade(config, "head")
 
 
 def include_name(name: str | None, type_: str, parent_names: object) -> bool:

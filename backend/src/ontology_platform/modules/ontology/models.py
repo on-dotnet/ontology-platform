@@ -291,6 +291,57 @@ class ChangeSet(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     merged_by: Mapped[UUID | None]
     merged_at: Mapped[datetime | None]
+    suppressed: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, default=list, server_default=text("'[]'::jsonb")
+    )
+    suppressed_total: Mapped[int] = mapped_column(default=0, server_default="0")
+
+
+class ReviewMemoryRow(Base):
+    __tablename__ = "review_memory"
+    __table_args__ = (
+        CheckConstraint("kind IN ('rejected', 'renamed', 'kept_apart')", name="kind"),
+        CheckConstraint(
+            "element_kind IN ('entity_type', 'relation_type', 'property')", name="element_kind"
+        ),
+        CheckConstraint(
+            "deleted_reason IS NULL OR deleted_reason IN "
+            "('deleted', 'cleared', 'evicted', 'superseded')",
+            name="deleted_reason",
+        ),
+        UniqueConstraint("ontology_id", "kind", "element_kind", "key"),
+        Index(
+            "ix_review_memory_ontology_id_active",
+            "ontology_id",
+            postgresql_where=text("deleted_at IS NULL"),
+        ),
+        {"schema": SCHEMA},
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    ontology_id: Mapped[UUID] = mapped_column(
+        ForeignKey("ontology.ontologies.id", ondelete="CASCADE")
+    )
+    kind: Mapped[str] = mapped_column(Text)
+    element_kind: Mapped[str] = mapped_column(Text)
+    key: Mapped[str] = mapped_column(Text)
+    label: Mapped[str] = mapped_column(Text)
+    detail: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
+    source_change_set_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("ontology.change_sets.id", ondelete="SET NULL")
+    )
+    source_item_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("ontology.change_items.id", ondelete="SET NULL")
+    )
+    decided_by: Mapped[UUID | None]
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    hits: Mapped[int] = mapped_column(default=0, server_default="0")
+    last_hit_at: Mapped[datetime | None]
+    deleted_at: Mapped[datetime | None]
+    deleted_reason: Mapped[str | None] = mapped_column(Text)
+    deleted_by: Mapped[UUID | None]
 
 
 class ChangeItem(Base):
@@ -313,6 +364,11 @@ class ChangeItem(Base):
             "match_decision IS NULL OR match_decision IN ('same', 'different')",
             name="match_decision",
         ),
+        CheckConstraint(
+            "reject_reason IS NULL OR reject_reason IN "
+            "('out_of_scope', 'incorrect', 'duplicate', 'keep_open')",
+            name="reject_reason",
+        ),
         {"schema": SCHEMA},
     )
 
@@ -334,6 +390,7 @@ class ChangeItem(Base):
     proposed: Mapped[dict[str, Any]] = mapped_column(JSONB)
     edited: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     decision: Mapped[str] = mapped_column(String(16), default="pending", server_default="pending")
+    reject_reason: Mapped[str | None] = mapped_column(Text)
     confidence: Mapped[float | None] = mapped_column(Double)
     rationale: Mapped[str | None] = mapped_column(Text)
     flags: Mapped[list[str]] = mapped_column(

@@ -9,7 +9,7 @@ from uuid import uuid4
 
 from ontology_platform import models  # noqa: F401  (registers all module tables)
 from ontology_platform.db import create_database_engine, create_session_factory
-from ontology_platform.modules.ai import assistant, binding_suggest, qa, qa_gap
+from ontology_platform.modules.ai import assistant, binding_suggest, qa, qa_gap, review_assist
 from ontology_platform.modules.ai.extraction import ExtractionModels
 from ontology_platform.modules.ai.gateway import OpenAIGateway
 from ontology_platform.modules.ai.pipeline import make_extractor, make_transcriber
@@ -50,6 +50,12 @@ async def run() -> None:
         )
         qa.register_listener(record_result)
         register(qa.JOB_KIND, qa.make_answerer(session_factory, gateway, settings.ai_model))
+        register(
+            review_assist.JOB_KIND,
+            review_assist.make_review_assistant(
+                session_factory, gateway, settings.ai_model, settings
+            ),
+        )
         register(
             qa_gap.JOB_KIND, qa_gap.make_gap_proposer(session_factory, gateway, settings.ai_model)
         )
