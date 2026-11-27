@@ -2021,6 +2021,14 @@ def test_a_name_that_only_adds_a_design_is_the_same_type() -> None:
     assert "when the context shows other kinds as well" in resolve
 
 
+def test_kinds_of_a_thing_told_apart_by_purpose_or_position_are_one_type() -> None:
+    # #58: steel-industry kept about ten kinds of sample (by the test or the step they serve)
+    # and the leading or ordinary slab as types; the answers treat these as values.
+    types = " ".join(TYPES_INSTRUCTIONS.split())
+    assert "Kinds of a physical thing told apart only by what they are for" in types
+    assert "the purpose, step or position is an attribute of it" in types
+
+
 def test_the_prompts_give_examples_in_generic_words_only() -> None:
     cjk = re.compile(r"[一-鿿]")
     for prompt in (TYPES_INSTRUCTIONS, RESOLVE_INSTRUCTIONS, RELATIONS_INSTRUCTIONS):
