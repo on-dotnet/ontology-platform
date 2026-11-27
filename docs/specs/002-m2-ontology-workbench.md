@@ -118,10 +118,10 @@ M1 的自动形状（`{类型}-shape`）继续保留：平台内新建的对象�
 按片段中三元组的完整 IRI 依次判定，取第一个命中的类别。
 
 1. 校验规则（SHACL）：谓词属于 SHACL，或类型是 SHACL 类。
-2. 逻辑公理：使用 OWL 限制、等价、不相交、属性链、类构造、身份或属性特征等逻辑词汇，也包括 `rdfs:subPropertyOf`。
-3. 实例或代码：声明业务类的实例、SKOS 概念或概念方案，显式声明 `owl:NamedIndividual`，或带代码表谓词（`skos:inScheme`、`skos:notation`、`skos:broader` 等层级与映射关系）。
+2. 逻辑公理：使用 OWL 限制、等价、不相交、属性链、类构造、身份或属性特征等逻辑词汇，也包括 `rdfs:subPropertyOf`、`rdfs:domain` 和 `rdfs:range`。
+3. 实例或代码：声明业务类的实例、SKOS 概念或概念方案，显式声明 `owl:NamedIndividual`，带代码表谓词（`skos:inScheme`、`skos:notation`、`skos:broader` 等层级与映射关系），或谓词是本体中的对象属性或数据属性（属性断言）。
 4. 多父类型：`rdfs:subClassOf` 指向具名类。
-5. 注解：全部谓词都是注解，包括常见 RDFS、都柏林核心、SKOS 和 OWL 注解，以及可从本体取得声明的注解属性。
+5. 注解：全部谓词都是注解，包括常见 RDFS、都柏林核心、SKOS 和 OWL 注解，以及本体头的版本信息（`owl:versionIRI` 等）。不是对象属性或数据属性的自定义谓词，无论是否声明，都按注解属性处理，与导出补声明的规则一致。
 6. 其他：其余片段。
 
 `axiomNote` 只取当前片段的中文说明，优先取 `sh:message@zh`，其次取 `rdfs:comment@zh`，最后取 `skos:definition@zh`。均无值时返回 null。
