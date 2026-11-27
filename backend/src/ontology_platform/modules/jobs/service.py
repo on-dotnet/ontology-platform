@@ -114,3 +114,13 @@ async def requeue_stale(db: AsyncSession, older_than: timedelta = STALE_AFTER) -
         update(Job).where(*stale).values(status="queued", **released).returning(Job.id)
     )
     return len(recovered.all())
+
+
+async def latest_question_job_is_terminal(db: AsyncSession, kind: str, question_id: UUID) -> bool:
+    status = await db.scalar(
+        select(Job.status)
+        .where(Job.kind == kind, Job.payload["questionId"].as_string() == str(question_id))
+        .order_by(Job.created_at.desc(), Job.id.desc())
+        .limit(1)
+    )
+    return status in ("succeeded", "failed")
