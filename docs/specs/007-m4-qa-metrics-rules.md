@@ -348,6 +348,8 @@ class MetricDefinition(CamelModel):
 
 通过硬过滤的项仍走 `propose` 已有的校验。`QA_GAP_INSTRUCTIONS` 额外要求：只为 `gaps.elements` 里的概念提议。`AssistantOperationOut.kind` 不含 `metric`，所以 M4 的回流只提议类型、关系、属性；缺指标时缺口卡片只给出说明和"新建指标"入口（editor 以上），提议指标留到第 17 节的后续工作。
 
+问题询问一个对象有哪些 X 时，如果每个 X 都有多个字段，就提议新建 X 的对象类型、描述 X 的属性，以及从已有类型指向 X 的多值关系。已有类型只缺一个单值字段时，只提议该属性，主键已绑定的类型不再重复提议编号属性。
+
 ### 9.2 缺绑定
 
 `gaps.bindings` 非空时，界面显示"让 AI 建议绑定"，跳到数据页的 AI 绑定建议对话框并带上 `typeIds`（M3 的 `BindingSuggestionCreate.type_ids`）。不新增接口。
