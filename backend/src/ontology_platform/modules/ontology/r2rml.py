@@ -58,9 +58,7 @@ def export_r2rml(snapshot: Sequence[Mapping[str, Any]]) -> str:
     # binding_rules.node_problems, which requires every binding's subject and both ends of a
     # relation binding to be active. Loosening those rules must revisit this function.
     iris = {row["id"]: URIRef(row["iri"]) for row in snapshot if row.get("iri")}
-    datatypes = {
-        row["id"]: row.get("datatype") for row in snapshot if row["kind"] == "property"
-    }
+    datatypes = {row["id"]: row.get("datatype") for row in snapshot if row["kind"] == "property"}
     classes = {
         row["id"]: iris[row["subjectId"]] for row in snapshot if row["kind"] == "type_binding"
     }
