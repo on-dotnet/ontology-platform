@@ -39,6 +39,7 @@ it('submits once across repeated clicks and selection changes, then polls throug
   } });
   const { queryClient } = renderApp(askTab);
   const button = await screen.findByRole('button', { name: '生成变更提议' });
+  expect(screen.queryByRole('button', { name: '重试' })).toBeNull();
   const binding = screen.getByRole('link', { name: '让 AI 建议绑定' });
   expect(button.compareDocumentPosition(binding) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   act(() => { button.click(); button.click(); });
@@ -63,6 +64,60 @@ it('submits once across repeated clicks and selection changes, then polls throug
   const finished = api.calls('GET', detailPath).length;
   await tick();
   expect(api.calls('GET', detailPath)).toHaveLength(finished);
+  expect(api.calls('POST', proposalPath)).toHaveLength(1);
+});
+
+it('polls a running proposal every two seconds and stops after five minutes with a retry action', async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const api = qaServer([proposal('running')], editor);
+  renderApp(askTab);
+  expect(await screen.findByRole('button', { name: '正在生成变更提议' })).toBeDisabled();
+  expect(screen.queryByRole('button', { name: '重试' })).toBeNull();
+
+  const initial = api.calls('GET', detailPath).length;
+  for (let n = 1; n <= 3; n++) {
+    await tick();
+    expect(api.calls('GET', detailPath)).toHaveLength(initial + n);
+  }
+  await act(() => vi.advanceTimersByTimeAsync(4 * 60_000 + 44_000));
+  expect(screen.queryByRole('button', { name: '重试' })).toBeNull();
+  const nearDeadline = api.calls('GET', detailPath).length;
+  await tick();
+  expect(api.calls('GET', detailPath)).toHaveLength(nearDeadline + 1);
+
+  await act(() => vi.advanceTimersByTimeAsync(8_000));
+  const stopped = api.calls('GET', detailPath).length;
+  await act(() => vi.advanceTimersByTimeAsync(6_000));
+  expect(api.calls('GET', detailPath)).toHaveLength(stopped);
+  expect(screen.getByText('提议生成时间过长，可以重试。')).toBeVisible();
+  expect(screen.getByRole('button', { name: '重试' })).toBeEnabled();
+  expect(api.calls('POST', proposalPath)).toHaveLength(0);
+});
+
+it('retries a timed-out proposal once, resumes polling the queued response and shows the result', async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const items = [proposal('running')];
+  const api = qaServer(items, { ...editor, [`POST ${proposalPath}`]: () => {
+    items[0] = proposal('queued');
+    return jsonResponse(items[0], 202);
+  } });
+  const { queryClient } = renderApp(askTab);
+  expect(await screen.findByRole('button', { name: '正在生成变更提议' })).toBeDisabled();
+  await act(() => vi.advanceTimersByTimeAsync(5 * 60_000));
+
+  const retry = screen.getByRole('button', { name: '重试' });
+  act(() => { retry.click(); retry.click(); });
+  await waitFor(() => expect(api.calls('POST', proposalPath)).toHaveLength(1));
+  expect(await screen.findByRole('button', { name: '正在生成变更提议' })).toBeDisabled();
+  expect(queryClient.getQueryData<Question>(['qa', 'question', missing.id])?.gapProposal?.status).toBe('queued');
+  expect(screen.queryByRole('button', { name: '重试' })).toBeNull();
+  const before = api.calls('GET', detailPath).length;
+  await tick();
+  expect(api.calls('GET', detailPath)).toHaveLength(before + 1);
+  items[0] = proposal('done');
+  await tick();
+  expect(await screen.findByRole('link', { name: '去审核' })).toHaveAttribute('href', '/review/changes-1');
+  expect(screen.getByText('已生成变更提议')).toBeVisible();
   expect(api.calls('POST', proposalPath)).toHaveLength(1);
 });
 

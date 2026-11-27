@@ -27,7 +27,7 @@ export function AskPanel({ ontologyId }: { ontologyId: string }) {
   const recent = useRecentQuestions(ontologyId);
   const items = recent.data?.items ?? [];
   const id = selection ?? items[0]?.id;
-  const detail = useQuestion(id, items.find((item) => item.id === id));
+  const { detail, gapPolling } = useQuestion(id, items.find((item) => item.id === id));
   const question = detail.data;
   const create = useCreateQuestion(ontologyId, select);
   const ai = useAiStatus();
@@ -60,7 +60,7 @@ export function AskPanel({ ontologyId }: { ontologyId: string }) {
             {isActive(question) && <QuestionProgress question={question} />}
             {question.status === 'answered' && <AnswerCard key={question.id} question={question} />}
             {question.status === 'unanswerable' && <UnanswerableCard gaps={question.gaps} actions={<div className="space-y-2">
-              <GapActions question={question} />
+              <GapActions question={question} gapPolling={gapPolling} />
               <Button variant="secondary" size="sm" disabled={unconfigured || create.isPending}
                 onClick={() => create.mutate({ question: question.question })}>{t('qa.askAgain')}</Button>
             </div>} />}
