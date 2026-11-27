@@ -1,0 +1,16 @@
+@prefix ex: <urn:synthetic:shacl-lists:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+ex:ontology a owl:Ontology .
+ex:Item a owl:Class .
+ex:p a owl:DatatypeProperty .
+
+ex:LogicalAndShape a sh:NodeShape ;
+    rdfs:label "Conjunction"@en ;
+    sh:targetClass ex:Item ;
+    sh:property [
+        sh:path ex:p ;
+        sh:and ( [ sh:minLength 1 ] [ sh:maxLength 8 ] )
+    ] .
