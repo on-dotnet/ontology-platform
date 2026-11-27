@@ -915,16 +915,17 @@ $SteelReaderPassword = 'steel-reader-dev-only'
 function Invoke-SeedSteel {
     if ((Get-Setting 'OP_ENV' 'development') -eq 'production') { Stop-Dev 'OP_ENV=production 时不装载样例库' }
     $files = @('01-schema.sql', '02-data.sql')
-    $sources = @()
-    foreach ($name in $files) {
+    # The test image only has backend/, so the tests carry byte-identical copies; the binding
+    # answers are compared too, or the end-to-end tests could pass against stale answers.
+    foreach ($name in $files + 'expected-bindings.toml') {
         $sample = Join-Path $Root "samples/steel/relational/$name"
         $copy = Join-Path $Root "backend/tests/fixtures/connectors/steel/$name"
         if (-not (Test-Path -LiteralPath $sample) -or -not (Test-Path -LiteralPath $copy)) { Stop-Dev "缺少 $name" }
         if ((Get-FileHash -LiteralPath $sample).Hash -ne (Get-FileHash -LiteralPath $copy).Hash) {
             Stop-Dev "samples/steel/relational/$name 与测试副本 backend/tests/fixtures/connectors/steel/$name 不一致"
         }
-        $sources += [IO.File]::ReadAllText($sample, [Text.UTF8Encoding]::new($false))
     }
+    $sources = foreach ($name in $files) { [IO.File]::ReadAllText((Join-Path $Root "samples/steel/relational/$name"), [Text.UTF8Encoding]::new($false)) }
     if (-not (Wait-Healthy @('postgres') 15)) { Stop-Dev 'postgres 没有运行，请先运行 ./dev.ps1 up' }
 
     # CREATE DATABASE cannot run inside a transaction, so the account and the database come first.

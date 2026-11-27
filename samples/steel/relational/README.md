@@ -16,4 +16,4 @@
 
 在仓库根目录运行 `./dev.ps1 seed-steel`，即可将样例装入开发用 PostgreSQL 的 `steel_mes` 库。只读账号为 `steel_reader`。账号口令和新建数据源的参数见[开发手册的“冶金样例库”一节](../../../docs/development.md)。
 
-测试镜像使用 [backend/tests/fixtures/connectors/steel/](../../../backend/tests/fixtures/connectors/steel/) 下的两个 SQL 副本。修改 SQL 时须同步更新，两处文件必须逐字节相同。
+测试镜像使用 [backend/tests/fixtures/connectors/steel/](../../../backend/tests/fixtures/connectors/steel/) 下的副本：两个 SQL 文件和 `expected-bindings.toml`。修改这三个文件时须同步更新，两处文件必须逐字节相同，`./dev.ps1 seed-steel` 装载前会比对。
