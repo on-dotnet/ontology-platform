@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api, unwrap } from '@/api/client';
@@ -44,11 +44,19 @@ function ScopeOption({ name, detail, checked, onChange }: {
 
 export function ScopePicker({ source, disabled, onSubmit }: Props) {
   const { t } = useTranslation();
+  const searchId = useId();
   const [mode, setMode] = useState<Mode>('schemas');
   const [schemaNames, setSchemaNames] = useState<Set<string> | null>(null);
   const [selectedTables, setSelectedTables] = useState(new Map<string, TableRef>());
   const [search, setSearch] = useState('');
-  const [cursors, setCursors] = useState<string[]>([]);
+  const [page, setPage] = useState<{ query: string; cursors: string[] }>({ query: '', cursors: [] });
+  const { query, cursors } = page;
+  useEffect(() => {
+    const timer = setTimeout(() => setPage((current) => current.query === search
+      ? current : { query: search, cursors: [] }), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const setCursors = (next: string[]) => setPage({ query, cursors: next });
   const bySchema = mode === 'schemas';
   const schemas = useQuery({
     queryKey: [...catalogKey(source.id), source.catalog?.refreshedAt, 'schemas'],
@@ -59,8 +67,8 @@ export function ScopePicker({ source, disabled, onSubmit }: Props) {
   });
   const schemaPage = usePagination(schemas.data?.length ?? 0);
   const cursor = bySchema ? undefined : cursors.at(-1);
-  const firstPage = useCatalogTables(bySchema || cursor ? undefined : source.id, search);
-  const laterPage = useNextCatalogPage(source.id, search, cursor);
+  const firstPage = useCatalogTables(bySchema || cursor ? undefined : source.id, query);
+  const laterPage = useNextCatalogPage(source.id, query, cursor);
   const tables = cursor ? laterPage : firstPage;
 
   const selectedSchemas = (schemas.data ?? []).filter(({ name }) => schemaNames === null || schemaNames.has(name));
@@ -117,8 +125,11 @@ export function ScopePicker({ source, disabled, onSubmit }: Props) {
         </QueryState>
       ) : (
         <>
-          <Input type="search" aria-label={t('bindings.form.tableSearch')} placeholder={t('bindings.form.tableSearch')}
-            maxLength={128} value={search} onChange={(event) => { setSearch(event.target.value); setCursors([]); }} />
+          <div className="space-y-2">
+            <label htmlFor={searchId} className="block text-sm font-semibold">{t('bindings.suggest.searchTables')}</label>
+            <Input id={searchId} type="search" placeholder={t('bindings.form.tableSearch')}
+              maxLength={128} value={search} onChange={(event) => setSearch(event.target.value)} />
+          </div>
           <QueryState query={tables} requiredRole="editor">
             {({ items, nextCursor }) => (
               <>
@@ -133,10 +144,10 @@ export function ScopePicker({ source, disabled, onSubmit }: Props) {
                 ) : <p className="text-sm text-muted-foreground">{t('bindings.form.noTables')}</p>}
                 {(cursor || nextCursor) && (
                   <nav aria-label={t('pagination.label')} className="flex justify-end gap-2">
-                    <Button size="sm" variant="secondary" disabled={!cursor} onClick={() => setCursors(cursors.slice(0, -1))}>
+                    <Button size="sm" variant="secondary" disabled={query !== search || !cursor} onClick={() => setCursors(cursors.slice(0, -1))}>
                       {t('pagination.previous')}
                     </Button>
-                    <Button size="sm" variant="secondary" disabled={!nextCursor}
+                    <Button size="sm" variant="secondary" disabled={query !== search || !nextCursor}
                       onClick={() => { if (nextCursor) setCursors([...cursors, nextCursor]); }}>
                       {t('pagination.next')}
                     </Button>

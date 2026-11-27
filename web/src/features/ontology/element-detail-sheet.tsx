@@ -324,7 +324,7 @@ function StructureSection({ element, all, onSelect, language }: KindSectionProps
   if (element.kind === 'entity_type') {
     const properties = all.filter((item) => item.kind === 'property' && item.domainId === element.id);
     const outgoing = all.filter((item) => item.kind === 'relation_type' && item.domainId === element.id);
-    const incoming = all.filter((item) => item.kind === 'relation_type' && item.rangeId === element.id);
+    const incoming = all.filter((item) => item.kind === 'relation_type' && item.rangeId === element.id && item.domainId !== element.id);
     const children = all.filter((item) => item.kind === 'entity_type' && item.parentId === element.id);
     return (
       <>
