@@ -79,6 +79,10 @@ These are not entity types:
   result (daily and weekly rounds) is a value of an attribute, not a type of its own. Results
   that are recorded one by one, each with its own measured value, the time it was obtained and
   the item it was measured on (every reading of a lab test), are records, not values.
+- Kinds of a physical thing told apart only by what they are for, the step or place they come
+  from, or their role or position among the others (a sample for a sugar test and a sample for
+  a blood count; the first and the last carriage of a train). They are one type; the purpose,
+  step or position is an attribute of it.
 - Measurable quantities (attributes).
 - People, roles and departments mentioned only as the one who acts; a role that an existing
   kind of thing plays (a preferred carrier, a guarantor who is also a customer); places such
