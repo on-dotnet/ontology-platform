@@ -1,6 +1,8 @@
-import { act, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import i18n from '@/i18n';
 
 import type { components } from '@/api/schema';
 import { makeSource } from '@/features/datasources/test-fixtures';
@@ -98,6 +100,43 @@ describe('AI binding suggestions', () => {
     await waitFor(() => expect(api.calls('POST', postPath).map((call) => call.body)).toEqual([{
       dataSourceId: source.id, tables: [{ schema: 'steel', name: 'heat' }, { schema: 'steel', name: 'cast' }],
     }]));
+  });
+
+  it('labels table search, settles rapid typing once, and blocks paging while it settles', async () => {
+    const api = server({ 'GET /api/data-sources/:id/catalog/tables': () => ({
+      items: [{ schema: 'steel', name: 'heat', kind: 'table', comment: null, columnCount: 2, boundType: null }],
+      nextCursor: 'page-2',
+    }) });
+    const user = userEvent.setup();
+    const dialog = await openSource(user);
+    await user.click(await dialog.findByRole('radio', { name: '按表' }));
+    const search = dialog.getByLabelText(i18n.t('bindings.suggest.searchTables'));
+    expect(dialog.getByText(i18n.t('bindings.suggest.searchTables'))).toBeVisible();
+    const next = await dialog.findByRole('button', { name: i18n.t('pagination.next') });
+    expect(next).toBeEnabled();
+
+    for (const value of ['h', 'he', 'hea', 'heat']) fireEvent.change(search, { target: { value } });
+    expect(next).toBeDisabled();
+    const searches = () => api.calls('GET', `/api/data-sources/${source.id}/catalog/tables`)
+      .map((call) => call.query.get('q')).filter(Boolean);
+    await waitFor(() => expect(searches()).toEqual(['heat']));
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeEnabled();
+
+    // A new search starts again from the first page; clearing it waits the same way.
+    const calls = () => api.calls('GET', `/api/data-sources/${source.id}/catalog/tables`);
+    fireEvent.click(dialog.getByRole('button', { name: i18n.t('pagination.next') }));
+    await waitFor(() => expect(calls().at(-1)?.query.get('cursor')).toBe('page-2'));
+    fireEvent.change(search, { target: { value: 'cast' } });
+    await waitFor(() => expect(calls().at(-1)?.query.get('q')).toBe('cast'));
+    expect(calls().at(-1)?.query.get('cursor')).toBeNull();
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.previous') })).toBeDisabled();
+    const before = calls().length;
+    for (const value of ['cas', 'c', '']) fireEvent.change(search, { target: { value } });
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeDisabled();
+    await waitFor(() => expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeEnabled());
+    expect(calls().slice(before).map((call) => call.query.get('q'))).not.toContain('cas');
+    expect(calls().slice(before).map((call) => call.query.get('q'))).not.toContain('c');
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.previous') })).toBeDisabled();
   });
 
   it('offers ready active data sources and restricts suggestions to the unbound type', async () => {

@@ -195,6 +195,25 @@ describe('ontology list view', () => {
     expect(await screen.findByRole('dialog', { name: '温度' })).toHaveTextContent('℃');
   });
 
+  it('lists a self-relation once and counts it once without duplicate keys', async () => {
+    const user = userEvent.setup();
+    const self = elementFixture({ id: 'el-self', kind: 'relation_type', localName: 'follows',
+      labelZh: '后继', labelEn: 'follows', domainId: moltenSteel.id, rangeId: moltenSteel.id });
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      ontologyServer({ 'GET /api/ontologies/:id/elements': () => [moltenSteel, self] });
+      renderApp('/ontology?ontology=onto-steel&view=list');
+      const table = await screen.findByRole('table', { name: '本体元素' });
+      await user.click(within(table).getByRole('button', { name: '钢水' }));
+      const sheet = within(await screen.findByRole('dialog', { name: '钢水' }));
+      expect(await sheet.findByText('关系（1）')).toBeVisible();
+      expect(sheet.getAllByRole('button', { name: '后继' })).toHaveLength(1);
+      expect(errors.mock.calls.some(([message]) => String(message).includes('Encountered two children with the same key'))).toBe(false);
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
   it('names elements without a Chinese name by their English or local name, and shows the inverse of a relation', async () => {
     const user = userEvent.setup();
     ontologyServer();
