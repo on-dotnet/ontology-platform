@@ -100,14 +100,23 @@ class SteelGateway:
 
 
 def evaluate(
-    bundle: dict[str, Any], gateway: SteelGateway | None = None
+    bundle: dict[str, Any],
+    gateway: SteelGateway | None = None,
+    lines: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], int]:
-    return qa_eval.evaluate(bundle, os.environ["OP_TEST_ADMIN_DATABASE_URL"], gateway)
+    return qa_eval.evaluate(
+        bundle,
+        os.environ["OP_TEST_ADMIN_DATABASE_URL"],
+        gateway,
+        (lines if lines is not None else []).append,
+    )
 
 
 def test_record_and_replay_in_fresh_databases(bundle: dict[str, Any]) -> None:
-    reply, code = evaluate(bundle, SteelGateway())
+    lines: list[dict[str, Any]] = []
+    reply, code = evaluate(bundle, SteelGateway(), lines)
     assert code == 0, reply.get("error")
+    assert reply["type"] == "result"
     result = json.loads(reply["result"])
     rows = result["questions"]
     assert [q["result"] for q in rows] == ["pass"] * 4 + ["unanswerable"]
@@ -128,10 +137,14 @@ def test_record_and_replay_in_fresh_databases(bundle: dict[str, Any]) -> None:
         "钢卷表面缺陷",
     }
     assert {i["op"] for i in gap["items"]} == {"create"}
-    manifest = next(f["content"] for f in reply["files"] if f["name"] == "models.json")
-    records = [f["content"] for f in reply["files"] if f["name"] != "models.json"]
+    assert lines[0]["type"] == "file"
+    assert lines[0]["name"] == "models.json"
+    manifest = lines[0]["content"]
+    records = [f["content"] for f in lines[1:]]
+    assert all(f["type"] == "file" for f in lines[1:])
     bundle.update(mode="replay", recordings=records, manifest=manifest)
-    replay, code = evaluate(bundle)
+    replay_lines: list[dict[str, Any]] = []
+    replay, code = evaluate(bundle, lines=replay_lines)
     assert code == 0, replay.get("error")
     actual = json.loads(replay["result"])
     assert actual["summary"] == result["summary"]
@@ -139,7 +152,7 @@ def test_record_and_replay_in_fresh_databases(bundle: dict[str, Any]) -> None:
     assert all(
         q["usage"]["replayed"] == 2 and q["usage"]["calls"] == 0 for q in actual["questions"]
     )
-    assert replay["files"] == []
+    assert replay_lines == []
 
     bundle["recordings"] = [r for r in records if json.loads(r)["purpose"] != "qa.gap"]
     missing, code = evaluate(bundle)
@@ -177,7 +190,29 @@ def test_failed_question_does_not_abort_the_batch(bundle: dict[str, Any]) -> Non
 
 
 def test_persistent_model_outage(bundle: dict[str, Any]) -> None:
-    reply, code = evaluate(bundle, SteelGateway(broken="all"))
+    lines: list[dict[str, Any]] = []
+    reply, code = evaluate(bundle, SteelGateway(broken="all"), lines)
     assert code == 1
+    assert reply["type"] == "error"
     assert reply["error"] == "Q1-Q5 qa.plan 模型连续不可用"
-    assert reply["files"] == []
+    assert lines == []
+
+
+def test_interrupt_keeps_first_question_recording(bundle: dict[str, Any]) -> None:
+    class Interrupted(SteelGateway):
+        def __init__(self) -> None:
+            super().__init__()
+            self.calls = 0
+
+        async def structured[T: BaseModel](self, **call: Any) -> T:
+            if self.calls >= 2:
+                raise KeyboardInterrupt
+            self.calls += 1
+            return await super().structured(**call)
+
+    lines: list[dict[str, Any]] = []
+    with pytest.raises(KeyboardInterrupt):
+        evaluate(bundle, Interrupted(), lines)
+    assert [line["name"] for line in lines[:1]] == ["models.json"]
+    assert len(lines) >= 2
+    assert all(line["type"] == "file" for line in lines)

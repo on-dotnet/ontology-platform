@@ -20,9 +20,9 @@ of the last recorded run (models.json), so that a workspace without the model se
 for the same keys. Ids of documents, chunks and accepted elements follow from names, since the
 ids of existing types are part of later prompts.
 
-Progress goes to stderr. Stdout is one JSON object: {"result": "<result JSON text>",
-"files": [{"name": ..., "content": ...}]} with the new recording files, or {"error": ...,
-"files": [...]} when the run failed, so that calls already paid for are kept.
+Progress goes to stderr. Stdout is JSON Lines: a models.json file line before the first
+recording file line, then one file line per new recording, flushed immediately. The last
+line is a result or error object. Interrupted runs retain the file lines already emitted.
 
 The result keeps the merged elements and parents, so that a changed expected.toml can be
 scored against the same run: `--rescore` reads {"expected": "<toml text>", "elements": [...],
@@ -61,9 +61,11 @@ from ontology_platform.modules.ai.pipeline import to_item
 from ontology_platform.modules.ai.replay import (
     STAGE_COUNTS,
     MeteredGateway,
+    RecordingStream,
     ReplayGateway,
     ReplayMissError,
     load_recordings,
+    write_json_line,
 )
 from ontology_platform.modules.documents.chunking import chunk_pages
 from ontology_platform.modules.documents.parsers import detect_type, parse_document
@@ -1179,18 +1181,10 @@ def _models(settings: Settings, mode: str, manifest: str | None) -> ExtractionMo
     return ExtractionModels.of(settings)
 
 
-def _files(gateway: ReplayGateway, models: ExtractionModels) -> list[dict[str, str]]:
-    files = [{"name": name, "content": text} for name, text in gateway.recording_files()]
-    # Only a run that recorded something says which models the recordings are for: a run that
-    # failed before its first answer (no key, wrong model) must not redirect later replays.
-    if files:
-        manifest = json.dumps({"models": asdict(models)}, indent=1)
-        files.append({"name": MANIFEST, "content": manifest})
-    return files
-
-
 def evaluate(
-    bundle: dict[str, Any], inner: ModelGateway | None = None
+    bundle: dict[str, Any],
+    inner: ModelGateway | None = None,
+    write_line: Callable[[dict[str, Any]], None] = write_json_line,
 ) -> tuple[dict[str, Any], int]:
     """Runs a bundle; returns the object for stdout and the exit code.
 
@@ -1214,17 +1208,18 @@ def evaluate(
         bundle.get("recordings", []),
         on_invalid=lambda index: log(f"recording {index} is not readable, skipped"),
     )
-    gateway = ReplayGateway(recordings, inner)
+    stream = RecordingStream(json.dumps({"models": asdict(models)}, indent=1), write_line)
+    gateway = ReplayGateway(recordings, inner, on_record=stream.on_record)
     try:
         result = asyncio.run(run_case(files, gateway, models, scenarios))
     except (AiError, ReplayMissError, ExpectedError) as exc:
         error = f"{type(exc).__name__}: {exc}"
-        return {"error": error, "files": _files(gateway, models)}, 1
+        return {"type": "error", "error": error}, 1
     except Exception as exc:
         traceback.print_exc()
-        return {"error": type(exc).__name__, "files": _files(gateway, models)}, 1
+        return {"type": "error", "error": type(exc).__name__}, 1
     text = json.dumps(result, ensure_ascii=False, indent=2)
-    return {"result": text, "files": _files(gateway, models)}, 0
+    return {"type": "result", "result": text}, 0
 
 
 def main() -> int:
@@ -1236,7 +1231,7 @@ def main() -> int:
         print(json.dumps(score(known, expected, parents), ensure_ascii=False))
         return 0
     output, code = evaluate(bundle)
-    print(json.dumps(output, ensure_ascii=False))
+    write_json_line(output)
     return code
 
 

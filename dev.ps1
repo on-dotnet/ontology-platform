@@ -566,8 +566,37 @@ function Invoke-Fmt([string[]]$Files) {
     }
 }
 
+# Reads an eval's JSON Lines as they arrive and saves each recording at once (through a .tmp file),
+# so that an interrupted run keeps the calls it paid for. Returns the last result or error line.
+function Save-EvalStream([string]$RecordingsDir) {
+    begin {
+        $last = $null
+        $saved = 0
+        $warned = $false
+    }
+    process {
+        try { $line = $_ | ConvertFrom-Json -ErrorAction Stop } catch { $line = $null }
+        if (-not $line -or -not $line.PSObject.Properties['type']) {
+            if (-not $warned) { Write-Note '评测返回了无法解析的输出行，已跳过'; $warned = $true }
+        } elseif ($line.type -eq 'file') {
+            if ($line.name -cnotmatch '^([0-9a-f]{64}|models)\.json$') { Stop-Dev "评测返回了意外的文件名：$($line.name)" }
+            if (-not (Test-Path -LiteralPath $RecordingsDir)) { New-Item -ItemType Directory -Force -Path $RecordingsDir | Out-Null }
+            $path = Join-Path $RecordingsDir $line.name
+            Set-Content -LiteralPath "$path.tmp" -Encoding utf8NoBOM -NoNewline -Value $line.content
+            Move-Item -LiteralPath "$path.tmp" -Destination $path -Force
+            if ($line.name -ne 'models.json') { $saved++ }
+        } elseif ($line.type -eq 'result' -or $line.type -eq 'error') {
+            $last = $line
+        } elseif (-not $warned) {
+            Write-Note '评测返回了未知类型的输出行，已跳过'
+            $warned = $true
+        }
+    }
+    end { [pscustomobject]@{ Last = $last; Saved = $saved } }
+}
+
 # Scores extraction on a case pack. Rootless Docker cannot bind-mount local folders, so documents
-# and recordings go in as JSON on stdin; the result and new recordings come back on stdout.
+# and recordings go in as JSON on stdin; results and new recordings return line by line on stdout.
 # A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
 # optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
 # must not be committed. Results and recordings of a folder case are named "dir-<folder>".
@@ -616,25 +645,19 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     $previousConsole = [Console]::OutputEncoding
     [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
     $OutputEncoding = [Text.UTF8Encoding]::new($false)
+    $container = New-TempName 'eval'
     try {
         Write-Step "识别 $caseDir（$($ReplayOnly ? '只回放' : '有录制就回放')，录制目录 $RecordingsDir；进度显示在下方）"
-        $output = $bundle | docker compose @composeArgs run --rm -T --no-deps @noModel --name (New-TempName 'eval') api python -m ontology_platform.modules.ai.eval
+        $stream = $bundle | docker compose @composeArgs run --rm -T --no-deps @noModel --name $container api python -m ontology_platform.modules.ai.eval | Save-EvalStream $RecordingsDir
         $code = $LASTEXITCODE
     } finally {
         [Console]::OutputEncoding = $previousConsole
+        docker rm -f $container *> $null
     }
-    try { $reply = ($output -join "`n") | ConvertFrom-Json } catch { $reply = $null }
-    if (-not $reply -or -not $reply.PSObject.Properties['files']) { Stop-Dev "评测没有返回结果，退出码 $code" }
-    # Recordings paid for are kept even when the run failed later.
-    $saved = 0
-    foreach ($file in @($reply.files)) {
-        if ($file.name -notmatch '^([0-9a-f]{64}|models)\.json$') { Stop-Dev "评测返回了意外的文件名：$($file.name)" }
-        if (-not (Test-Path -LiteralPath $RecordingsDir)) { New-Item -ItemType Directory -Force -Path $RecordingsDir | Out-Null }
-        Set-Content -LiteralPath (Join-Path $RecordingsDir $file.name) -Encoding utf8NoBOM -NoNewline -Value $file.content
-        if ($file.name -ne 'models.json') { $saved++ }
-    }
-    if ($saved -gt 0) { Write-Ok "新录制 $saved 次模型调用，存到 $RecordingsDir" }
-    if ($code -ne 0 -or -not $reply.PSObject.Properties['result']) {
+    if ($stream.Saved -gt 0) { Write-Ok "新录制 $($stream.Saved) 次模型调用，存到 $RecordingsDir" }
+    $reply = $stream.Last
+    if (-not $reply) { Stop-Dev "评测没有返回结果，退出码 $code" }
+    if ($code -ne 0 -or $reply.type -eq 'error') {
         $detail = $reply.PSObject.Properties['error'] ? $reply.error : "退出码 $code"
         Stop-Dev "评测失败：$detail"
     }
@@ -696,7 +719,7 @@ volumes: !reset {}
         Write-Step "启动问答评测临时环境 $prefix（$($ReplayOnly ? '只回放' : '优先回放')）"
         docker compose @argsQa run --rm -d --no-deps --use-aliases --name $db -e POSTGRES_DB=postgres -e "POSTGRES_PASSWORD=$password" postgres | Out-Null
         if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $db @('pg_isready', '-h', '127.0.0.1', '-U', 'ontology', '-d', 'postgres'))) { throw '评测临时数据库未就绪' }
-        $output = $bundle | docker compose @argsQa run --rm -T --no-deps @noModel --name $api -e OP_ENV=development -e "OP_DATABASE_URL=$adminUrl" -e "OP_QA_EVAL_ADMIN_URL=$adminUrl" api python -m ontology_platform.qa_eval
+        $stream = $bundle | docker compose @argsQa run --rm -T --no-deps @noModel --name $api -e OP_ENV=development -e "OP_DATABASE_URL=$adminUrl" -e "OP_QA_EVAL_ADMIN_URL=$adminUrl" api python -m ontology_platform.qa_eval | Save-EvalStream $recordDir
         $code = $LASTEXITCODE
     } finally {
         [Console]::OutputEncoding = $previousConsole
@@ -707,13 +730,13 @@ volumes: !reset {}
         if ($LASTEXITCODE -ne 0 -or $left.Count) { throw "无法确认 $prefix 的容器已清理" }
         Write-Ok "已确认 $prefix 的临时容器无残留"
     }
-    $reply = ($output -join "`n") | ConvertFrom-Json
-    foreach ($file in $reply.files) {
-        if ($file.name -cnotmatch '^([0-9a-f]{64}|models)\.json$') { Stop-Dev '评测返回了意外的录制文件名' }
-        New-Item -ItemType Directory -Force -Path $recordDir | Out-Null
-        Set-Content -LiteralPath (Join-Path $recordDir $file.name) -Encoding utf8NoBOM -NoNewline -Value $file.content
+    if ($stream.Saved -gt 0) { Write-Ok "新录制 $($stream.Saved) 次模型调用，存到 $recordDir" }
+    $reply = $stream.Last
+    if (-not $reply) { Stop-Dev "评测没有返回结果，退出码 $code" }
+    if ($code -ne 0 -or $reply.type -eq 'error') {
+        $detail = $reply.PSObject.Properties['error'] ? $reply.error : "退出码 $code"
+        Stop-Dev "问答评测失败：$detail" $code
     }
-    if ($code -ne 0) { Stop-Dev "问答评测失败：$($reply.error)" $code }
     $outFile = Join-Path $outDir "qa-steel$($ReplayOnly ? '-replay' : '')-$(Get-Date -Format 'yyyyMMdd-HHmmssfff').json"
     Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value $reply.result
     $result = $reply.result | ConvertFrom-Json

@@ -12,10 +12,11 @@ URL is not part of the key: the same model name at another provider replays the 
 
 import hashlib
 import json
+import sys
 import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from contextvars import ContextVar
-from typing import Any
+from typing import Any, TextIO
 
 from pydantic import BaseModel
 
@@ -31,6 +32,27 @@ _CALL_USAGE: ContextVar[list[int] | None] = ContextVar("call_usage", default=Non
 
 class ReplayMissError(Exception):
     """Replay only, and a call was not recorded."""
+
+
+def write_json_line(value: dict[str, Any], stream: TextIO | None = None) -> None:
+    target = stream if stream is not None else sys.stdout
+    target.write(json.dumps(value, ensure_ascii=False) + "\n")
+    target.flush()
+
+
+class RecordingStream:
+    """Emit the manifest once, immediately before the first new recording."""
+
+    def __init__(self, manifest: str, write_line: Callable[[dict[str, Any]], None]) -> None:
+        self.manifest = manifest
+        self.write_line = write_line
+        self.started = False
+
+    def on_record(self, name: str, content: str) -> None:
+        if not self.started:
+            self.write_line({"type": "file", "name": "models.json", "content": self.manifest})
+            self.started = True
+        self.write_line({"type": "file", "name": name, "content": content})
 
 
 def call_key(
@@ -127,10 +149,12 @@ class ReplayGateway:
         inner: ModelGateway | None,
         *,
         labels: Mapping[Any, str] | None = None,
+        on_record: Callable[[str, str], None] | None = None,
     ) -> None:
         self._recordings = dict(recordings)
         self._inner = inner
         self._labels = dict(labels or {})
+        self._on_record = on_record
         self.new_recordings: dict[str, dict[str, Any]] = {}
         self._stats: dict[str, dict[str, dict[str, Any]]] = {}
 
@@ -215,6 +239,8 @@ class ReplayGateway:
         _add_recorded(stage, record)
         self._recordings[key] = record
         self.new_recordings[key] = record
+        if self._on_record is not None:
+            self._on_record(*_recording_file(key, record))
         return result
 
     async def ping(self) -> bool:
@@ -222,10 +248,7 @@ class ReplayGateway:
 
     def recording_files(self) -> list[tuple[str, str]]:
         """(file name, text) of each new recording."""
-        return [
-            (f"{key}.json", json.dumps(record, ensure_ascii=False, indent=1, sort_keys=True))
-            for key, record in self.new_recordings.items()
-        ]
+        return [_recording_file(key, record) for key, record in self.new_recordings.items()]
 
     def stats(self) -> dict[str, dict[str, dict[str, Any]]]:
         """Per document and stage: paid calls (attempts), replayed calls, seconds, tokens."""
@@ -240,6 +263,10 @@ class ReplayGateway:
             }
             for document, stages in self._stats.items()
         }
+
+
+def _recording_file(key: str, record: dict[str, Any]) -> tuple[str, str]:
+    return f"{key}.json", json.dumps(record, ensure_ascii=False, indent=1, sort_keys=True)
 
 
 def _usage_of(gateway: ModelGateway, usage: Sequence[int]) -> tuple[int, int, int, int]:
