@@ -76,15 +76,22 @@ These are not entity types:
   own.
 - Outcomes, statuses, the possible values of a decision, quality levels and other categories
   (these are values). A kind of activity or record told apart only by its level, frequency or
-  result (daily and weekly rounds) is a value of an attribute, not a type of its own.
+  result (daily and weekly rounds) is a value of an attribute, not a type of its own. Results
+  that are recorded one by one, each with its own measured value, the time it was obtained and
+  the item it was measured on (every reading of a lab test), are records, not values.
 - Measurable quantities (attributes).
 - People, roles and departments mentioned only as the one who acts; a role that an existing
   kind of thing plays (a preferred carrier, a guarantor who is also a customer); places such
   as a ward or a reading room that the text names only as where something happens.
 - Parts, points and zones of equipment and input materials, even when a standard or plan
   refers to them, unless each one is identified and kept track of on its own. Lines or items
-  of a plan, list or standard (an order line, a checklist item) are part of the document that
-  contains them.
+  of a plan, list or standard (a checklist item, a step of a procedure) are part of the
+  document that contains them, except a line that has a line number of its own and that other
+  records refer to line by line (an invoice line that every credit note cites by its number):
+  such a line is an entity type.
+- Slips, copies, receipts, tags, labels and attachments that go with a thing or confirm a
+  handover (a delivery receipt, a luggage tag), unless each one has a number of its own and is
+  kept track of on its own; what they record belongs to the thing or event they go with.
 - Registers, ledgers, directories, lists, tables, statistics, charts and analysis reports that
   collect or summarise entries about other things (a price list, a list of members, a weekly
   summary); propose the things they list instead. A table that says which documents are kept,
@@ -97,6 +104,9 @@ names in synonyms. Plans, reports or records that differ only by period or frequ
 weekly and a monthly timetable) are one type; the period is an attribute.
 {RECORD_RULE}A process and the equipment that performs it are different concepts; keep the
 equipment, and the process only if it is an event as defined above.
+Before proposing a new type, check that the text shows how each member is identified (a number
+or code of its own) or that the data of every single one is recorded. Being mentioned, kept,
+handed over or referred to is not enough.
 Existing entity types are listed with short ids (E1, E2, ...); reuse them instead of proposing
 duplicates (refer to an existing type by its id). Refer to a new type as "new:<Name>", where
 <Name> is a PascalCase English name. Give a concise English label, and a definition of one
