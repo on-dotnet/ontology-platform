@@ -63,7 +63,6 @@ function ActiveBindingSection({ ontologyId, type, all }: BindingSectionProps) {
           if (view?.typeId !== type.id) {
             return <ErrorState error={null} title={t('bindings.loadFailed')} onRetry={() => void views.refetch()} />;
           }
-          const [changeSetId] = view.openChangeSetIds;
           return (
             <>
               {view.table ? (
@@ -74,13 +73,7 @@ function ActiveBindingSection({ ontologyId, type, all }: BindingSectionProps) {
               ) : (
                 <p className="text-sm text-muted-foreground">{t('bindings.empty')}</p>
               )}
-              {changeSetId ? (
-                <InlineNotice tone="info" title={t('bindings.pending.title')} announce={false}>
-                  <Link to="/review/$changeSetId" params={{ changeSetId }} className="rounded font-medium text-primary-strong hover:underline">
-                    {t('bindings.pending.link')}
-                  </Link>
-                </InlineNotice>
-              ) : null}
+              <PendingChanges ontologyId={ontologyId} changeSetIds={view.openChangeSetIds} />
               {canEditBindings ? (
                 <div className="flex flex-wrap gap-2">
                   <Button variant="secondary" size="sm" aria-haspopup="dialog" disabled={!all}
@@ -106,6 +99,25 @@ function ActiveBindingSection({ ontologyId, type, all }: BindingSectionProps) {
           onOpenChange={(next) => { if (!next) setEditing(null); }} />
       )}
     </section>
+  );
+}
+
+/** One waiting change set is opened directly; the view carries no titles to tell several apart, the review list does. */
+function PendingChanges({ ontologyId, changeSetIds }: { ontologyId: string; changeSetIds: string[] }) {
+  const { t } = useTranslation();
+  const [changeSetId] = changeSetIds;
+  if (!changeSetId) return null;
+  const className = 'rounded font-medium text-primary-strong hover:underline';
+  return (
+    <InlineNotice tone="info" title={t('bindings.pending.title')} announce={false}>
+      {changeSetIds.length > 1 ? (
+        <Link to="/review" search={{ ontology: ontologyId }} className={className}>
+          {t('bindings.pending.listLink', { count: changeSetIds.length })}
+        </Link>
+      ) : (
+        <Link to="/review/$changeSetId" params={{ changeSetId }} className={className}>{t('bindings.pending.link')}</Link>
+      )}
+    </InlineNotice>
   );
 }
 

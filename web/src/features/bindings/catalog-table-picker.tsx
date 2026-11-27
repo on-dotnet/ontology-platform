@@ -1,4 +1,4 @@
-import { useId, useState, type KeyboardEvent } from 'react';
+import { useEffect, useId, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { QueryState } from '@/components/states/query-state';
@@ -35,26 +35,47 @@ function navigateOptions(event: KeyboardEvent<HTMLDivElement>) {
   options[next]?.focus();
 }
 
+const SEARCH_DELAY_MS = 300;
+
+/**
+ * The search that is sent, once typing has paused, so that a search does not send a request per
+ * keystroke. It changes together with its cursors: a cursor only fits the search that returned it.
+ */
+function useSettledSearch(text: string) {
+  const [page, setPage] = useState<{ query: string; cursors: string[] }>({ query: text, cursors: [] });
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setPage((current) => (current.query === text ? current : { query: text, cursors: [] })),
+      SEARCH_DELAY_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [text]);
+  return { ...page, setCursors: (cursors: string[]) => setPage({ query: page.query, cursors }) };
+}
+
 export function CatalogTablePicker({ dataSourceId, label, value, onChange, error }: Props) {
   const { t } = useTranslation();
   const id = useId();
   const [search, setSearch] = useState('');
-  const [cursors, setCursors] = useState<string[]>([]);
+  const { query, cursors, setCursors } = useSettledSearch(search);
   const cursor = cursors.at(-1);
-  const firstPage = useCatalogTables(cursor ? undefined : dataSourceId, search);
-  const laterPage = useNextCatalogPage(dataSourceId, search, cursor);
+  const firstPage = useCatalogTables(cursor ? undefined : dataSourceId, query);
+  const laterPage = useNextCatalogPage(dataSourceId, query, cursor);
+  // While the search is still settling, the cursors on screen belong to the previous one.
+  const paging = query === search;
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-semibold">{label} <span aria-hidden className="text-error-strong">*</span></label>
       {value && <span className="font-mono text-sm">{tableName(value.schema, value.name)}</span>}
+      <span id={`${id}-hint`} className="sr-only">{t('bindings.form.tableSearch')}</span>
       <Input
-        id={id} type="search" maxLength={128} aria-label={t('bindings.form.tableSearch')}
-        aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined}
+        id={id} type="search" maxLength={128}
+        aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-hint ${id}-error` : `${id}-hint`}
         placeholder={t('bindings.form.tableSearch')} value={search}
         onKeyDown={(event) => {
           if (event.key === 'Enter' && !event.nativeEvent.isComposing) event.preventDefault();
         }}
-        onChange={(event) => { setSearch(event.target.value); setCursors([]); }}
+        onChange={(event) => setSearch(event.target.value)}
       />
       <QueryState query={cursor ? laterPage : firstPage} requiredRole="editor" loading={<Skeleton className="h-12 rounded-lg" />}>
         {({ items, nextCursor }) => {
@@ -81,10 +102,10 @@ export function CatalogTablePicker({ dataSourceId, label, value, onChange, error
               ) : <p className="text-sm text-muted-foreground">{t('bindings.form.noTables')}</p>}
               {(cursor || nextCursor) && (
                 <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="secondary" disabled={!cursor} onClick={() => setCursors(cursors.slice(0, -1))}>
+                  <Button size="sm" variant="secondary" disabled={!paging || !cursor} onClick={() => setCursors(cursors.slice(0, -1))}>
                     {t('pagination.previous')}
                   </Button>
-                  <Button size="sm" variant="secondary" disabled={!nextCursor} onClick={() => { if (nextCursor) setCursors([...cursors, nextCursor]); }}>
+                  <Button size="sm" variant="secondary" disabled={!paging || !nextCursor} onClick={() => { if (nextCursor) setCursors([...cursors, nextCursor]); }}>
                     {t('pagination.next')}
                   </Button>
                 </div>

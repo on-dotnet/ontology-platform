@@ -43,7 +43,8 @@
   },
   "pending": {
     "title": "有待审核的绑定修改",
-    "link": "去审核"
+    "link": "去审核",
+    "listLink": "去审核列表（{{count}} 个变更集）"
   },
   "table": {
     "dataSource": "数据源",
@@ -83,6 +84,10 @@
     "dataSourcePlaceholder": "选择数据源",
     "noDataSources": "还没有可用的数据源，请管理员在数据页添加。",
     "catalogNotReady": "这个数据源还没有读取目录，请先在数据页读取目录。",
+    "sourceArchived": {
+      "title": "原数据源已归档",
+      "description": "{{name}} 已归档，不能继续使用。改选其他数据源并保存会删除原有的绑定和关系连接，只按本次选择的内容重新建立。"
+    },
     "table": "表",
     "tableSearch": "搜索表名",
     "noTables": "没有找到表",

@@ -43,7 +43,8 @@
   },
   "pending": {
     "title": "Binding changes are waiting for review",
-    "link": "Go to review"
+    "link": "Go to review",
+    "listLink": "Go to the review list ({{count}} change sets)"
   },
   "table": {
     "dataSource": "Data source",
@@ -83,6 +84,10 @@
     "dataSourcePlaceholder": "Choose a data source",
     "noDataSources": "No data source is available yet. Ask an administrator to add one on the Data page.",
     "catalogNotReady": "This data source's catalog has not been read yet. Read it on the Data page first.",
+    "sourceArchived": {
+      "title": "The original data source is archived",
+      "description": "{{name}} is archived and can no longer be used. Saving with another data source deletes the existing bindings and relation joins and creates only what you choose here."
+    },
     "table": "Table",
     "tableSearch": "Search tables",
     "noTables": "No tables found",
