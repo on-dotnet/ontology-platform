@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     ai_proxy: SecretStr | None = None
     # OpenAI-compatible endpoint; unset means the official OpenAI API.
     ai_base_url: str | None = None
+    # Ask the provider not to store responses; disable for services without the store parameter.
+    ai_no_store: bool = True
     ai_model: str = "gpt-6.2-sol"
     ai_reasoning_model: str = "gpt-6.2-astra"
     # `ai_effort` for the resolve and relations stages; `ai_reasoning_effort` for types. The terms

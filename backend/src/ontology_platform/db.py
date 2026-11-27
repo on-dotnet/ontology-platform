@@ -32,6 +32,8 @@ def create_database_engine(database_url: str) -> AsyncEngine:
     return create_async_engine(
         database_url,
         pool_pre_ping=True,
+        # Keep bound values such as token hashes and credentials out of exception logs.
+        hide_parameters=True,
         connect_args={"connect_timeout": 5},
     )
 

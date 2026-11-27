@@ -17,6 +17,7 @@ import pytest
 from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql.psycopg import PGDialectAsync_psycopg
+from sqlalchemy.exc import DataError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
@@ -147,6 +148,16 @@ async def test_writes_fail_on_a_connector_connection(
     assert admin_rows(
         external_source, "SELECT count(*) FROM pg_namespace WHERE nspname = 'op_intruder'"
     ) == [(0,)]
+
+
+async def test_external_database_errors_hide_bound_parameters(
+    db: AsyncSession, external_source: ExternalSource
+) -> None:
+    marker = "op-hidden-param-marker"
+    async with connect(db, reader_params(external_source)) as conn:
+        with pytest.raises(DataError) as caught:
+            await conn.execute(text("SELECT 1 / 0, CAST(:v AS text)"), {"v": marker})
+        assert marker not in str(caught.value)
 
 
 async def test_both_barriers_are_in_place(
