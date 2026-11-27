@@ -15,9 +15,10 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { usePermissions } from '@/features/auth/permissions';
 import { SuggestBindingsDialog } from '@/features/bindings/suggest/suggest-bindings-dialog';
+import { useErrorMessage } from '@/i18n/error-message';
 import { usePagination } from '@/lib/pagination';
 
-import { rememberSource, useSourceList, type DataSource } from './api';
+import { rememberSource, testSavedSource, useSourceList, type DataSource } from './api';
 import { DataSourceDialog } from './data-source-dialog';
 import { SourceStatus } from './source-status';
 
@@ -33,6 +34,7 @@ export function DataSourcesPage() {
   const client = useQueryClient();
   const navigate = useNavigate();
   const toast = useToast();
+  const message = useErrorMessage();
 
   const create = canManageDataSources && (
     <Button onClick={() => setCreating(true)}><Plus aria-hidden />{t('datasources.create')}</Button>
@@ -60,8 +62,16 @@ export function DataSourcesPage() {
           }} />
       )}
       {creating && canManageDataSources && (
-        <DataSourceDialog onClose={() => setCreating(false)} onSaved={async (source) => {
-          await rememberSource(client, source);
+        <DataSourceDialog onClose={() => setCreating(false)} onSaved={async (source, testAfterCreate) => {
+          if (testAfterCreate) {
+            try {
+              await testSavedSource(client, source.id);
+            } catch (error) {
+              toast.error(t('datasources.test.action'), message(error));
+            }
+          } else {
+            await rememberSource(client, source);
+          }
           setCreating(false);
           toast.success(t('datasources.saved'));
           await navigate({ to: '/data/$dataSourceId', params: { dataSourceId: source.id } });

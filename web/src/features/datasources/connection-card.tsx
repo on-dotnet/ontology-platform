@@ -3,7 +3,6 @@ import { Cable } from 'lucide-react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { api, unwrap } from '@/api/client';
 import { isApiError } from '@/api/errors';
 import { WarnTip } from '@/components/feedback/hint-tip';
 import { InlineNotice } from '@/components/feedback/inline-notice';
@@ -13,7 +12,7 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
 
-import { listKey, sourceKey, type DataSource } from './api';
+import { sourceKey, testSavedSource, type DataSource } from './api';
 import { ConnectionTestResult } from './connection-test-result';
 
 type ConnectionCardProps = { source: DataSource; onRepairPassword?: () => void };
@@ -34,19 +33,11 @@ function ConnectionDetails({ source, onRepairPassword }: ConnectionCardProps) {
   const key = sourceKey(source.id);
   const { lastTest } = source;
   const at = lastTest?.at;
-  function refreshSource() {
-    return Promise.all([
-      client.invalidateQueries({ queryKey: key, exact: true }),
-      client.invalidateQueries({ queryKey: listKey }),
-    ]);
-  }
   const test = useMutation({
     mutationFn: async () => {
-      const result = await unwrap(api.POST('/api/data-sources/{id}/test', { params: { path: { id: source.id } } }));
-      await refreshSource();
+      const result = await testSavedSource(client, source.id);
       return { result, observedAt: client.getQueryData<DataSource>(key)?.lastTest?.at };
     },
-    onError: refreshSource,
   });
   const { connection } = source;
   if (!connection) return null;

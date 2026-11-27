@@ -212,7 +212,10 @@ describe('manual metric elements', () => {
     expect(form.getByText('请先应用或取消正在填写的筛选条件。')).toBeInTheDocument();
     expect(api.calls('POST', EDITS)).toHaveLength(0);
     await user.click(filter.getByRole('button', { name: '取消' }));
-    await user.click(form.getByRole('checkbox', { name: '显示为百分数' }));
+    const percent = form.getByRole('checkbox', { name: '显示为百分数' });
+    expect(percent).not.toBeChecked();
+    await user.click(percent);
+    expect(percent).toBeChecked();
     await user.type(form.getByRole('textbox', { name: '单位' }), '%');
     await user.click(form.getByRole('button', { name: '提交审核' }));
     await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
