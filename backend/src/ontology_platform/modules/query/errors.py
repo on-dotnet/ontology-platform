@@ -29,6 +29,10 @@ def sort_value_too_long() -> AppError:
     )
 
 
+def key_too_long() -> AppError:
+    return AppError(422, "query.key_too_long", "An object key is too long to show.")
+
+
 def invalid_value(
     exc: InvalidValueError, key_specs: Sequence[CatalogColumn], filtered: bool
 ) -> AppError:

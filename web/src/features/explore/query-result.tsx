@@ -42,6 +42,7 @@ function QueryLoading({ cancel, hasContent = false }: { cancel: () => void; hasC
 const queryErrors = new Set([
   'source_unavailable', 'source_mismatch', 'timeout', 'busy', 'source_disabled',
   'invalid_filter', 'invalid_cursor', 'object_not_found', 'type_not_bound', 'sort_value_too_long',
+  'key_too_long',
 ]);
 
 type Query<T> = Pick<UseQueryResult<T>, 'fetchStatus' | 'data' | 'error' | 'refetch'> & {
@@ -80,11 +81,15 @@ function QueryFailure({ error, id, retry, onRestart, onFirstPage, onClearSort }:
   const recover = reason === 'invalid_cursor' ? onFirstPage ?? onRestart : onRestart;
   // The same sorted request would fail again, and the failure hides the column headers.
   const clearSort = reason === 'sort_value_too_long' ? onClearSort : undefined;
+  // The key is what the source stores: asking again cannot succeed.
+  const action = reason === 'key_too_long' ? undefined : (
+    <Button variant="secondary" size="sm" onClick={clearSort ?? (restart ? recover ?? retry : retry)}>
+      {t(clearSort ? 'explore.clearSort' : restart ? 'explore.restart' : 'explore.retry')}
+    </Button>
+  );
   return (
     <InlineNotice tone="error" title={t(`explore.errors.${queryErrors.has(reason) ? reason : 'other'}`)}
-      action={<Button variant="secondary" size="sm" onClick={clearSort ?? (restart ? recover ?? retry : retry)}>
-        {t(clearSort ? 'explore.clearSort' : restart ? 'explore.restart' : 'explore.retry')}
-      </Button>} />
+      action={action} />
   );
 }
 

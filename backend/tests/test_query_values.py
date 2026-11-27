@@ -114,6 +114,27 @@ def test_scalar_condition_binds_the_column_type(
 
 
 @pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("2026-01-01", date(2026, 1, 1)),
+        ("2026-01-01T00:00:00", datetime.fromisoformat("2026-01-01T00:00:00")),
+        ("2026-01-01T02:00:00+02:00", datetime.fromisoformat("2026-01-01T00:00:00")),
+        ("2026-01-01T00:00:00Z", datetime.fromisoformat("2026-01-01T00:00:00")),
+    ],
+)
+def test_datetime_filter_on_date_column_normalizes_only_timestamp_conditions(
+    raw: str, expected: date
+) -> None:
+    item = schemas.Filter(property_id=PROPERTY, op="in", value=[raw])
+    assert values.condition(item, DATE, "dateTime") == Condition(
+        ColumnRef(DATE.name), "in", (expected,)
+    )
+    if "T" in raw:
+        with pytest.raises(ValueError, match="Invalid value for the column type"):
+            values.parse_value(raw, DATE)
+
+
+@pytest.mark.parametrize(
     ("op", "raw", "col", "datatype"),
     [
         ("eq", None, TEXT, "string"),
@@ -131,6 +152,11 @@ def test_scalar_condition_binds_the_column_type(
         ("startsWith", "ab", IDENTIFIER, "string"),
         ("contains", "2", NUMERIC, "decimal"),
         ("eq", "2024-02-30", DATE, "dateTime"),
+        # In UTC these fall outside the years a date can hold.
+        ("eq", "0001-01-01T00:00:00+05:00", DATE, "dateTime"),
+        ("in", ["9999-12-31T23:59:00-02:00"], DATE, "dateTime"),
+        # Only a dateTime property may compare a date column with a time of day.
+        ("eq", "2026-01-01T00:00:00", DATE, "date"),
         ("eq", "bad-uuid", IDENTIFIER, "string"),
         ("isNull", None, INTEGER, "string"),
     ],

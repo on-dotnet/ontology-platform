@@ -592,6 +592,10 @@ class _Renderer:
             if not _TYPE_NAME.fullmatch(spec.type):
                 raise SourceMismatchError
             return cast(bindparam(None, value, type_=String()), _NamedType(spec.type))
+        if spec.family == "date" and isinstance(value, datetime):
+            # A dateTime filter on a date column compares with the day's midnight; a date
+            # parameter would drop the time of day.
+            return bindparam(None, value, type_=TIMESTAMP(timezone=False))
         return bindparam(None, value, type_=_bind_type(spec))
 
     def condition(self, condition: Condition) -> ColumnElement[bool]:

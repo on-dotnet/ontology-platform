@@ -106,6 +106,15 @@ describe('explore query states', () => {
     }));
   });
 
+  it('says an object key is too long and offers no retry that would fail again', async () => {
+    const api = mockExplore({ [`POST ${searchPath}`]: () => problemResponse(422, 'query.key_too_long') });
+    renderApp('/explore');
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('对象主键太长，无法显示。');
+    expect(within(alert).queryByRole('button')).toBeNull();
+    expect(api.calls('POST', searchPath)).toHaveLength(1);
+  });
+
   it('filters a date and time property by date alone', async () => {
     const castAt: components['schemas']['ObjectProperty'] = {
       propertyId: 'castAt', label: '浇铸时间', datatype: 'dateTime', unit: null, ops: ['ge'],

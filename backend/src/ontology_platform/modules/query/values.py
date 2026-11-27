@@ -1,7 +1,7 @@
 """Translate query filters and scalar values at the connector boundary."""
 
 import re
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from uuid import UUID
 
@@ -102,6 +102,24 @@ def parse_value(value: object, column: CatalogColumn) -> str | int | Decimal | d
     raise ValueError("Invalid value for the column type.")
 
 
+def _condition_value(value: object, column: CatalogColumn, datatype: Datatype) -> Value:
+    if (
+        datatype == "dateTime"
+        and column.family == "date"
+        and isinstance(value, str)
+        and _TIMESTAMP.fullmatch(value)
+    ):
+        instant = datetime.fromisoformat(value)
+        if instant.tzinfo is None:
+            return instant
+        try:
+            return instant.astimezone(UTC).replace(tzinfo=None)
+        except OverflowError as exc:
+            # 0001-01-01T00:00:00+05:00 has no UTC time within the supported years.
+            raise ValueError("The time is out of range.") from exc
+    return parse_value(value, column)
+
+
 def condition(item: schemas.Filter, column: CatalogColumn, datatype: Datatype) -> Condition:
     invalid = AppError(422, "query.invalid_filter", "The filter is invalid.")
     op = item.op
@@ -116,10 +134,12 @@ def condition(item: schemas.Filter, column: CatalogColumn, datatype: Datatype) -
                     return Condition(ref, "is_null" if op == "isNull" else "not_null")
             case "in":
                 if isinstance(value, list) and len(value) <= schemas.IN_VALUES_MAX:
-                    return Condition(ref, "in", tuple(parse_value(v, column) for v in value))
+                    return Condition(
+                        ref, "in", tuple(_condition_value(v, column, datatype) for v in value)
+                    )
             case _:
                 operator: Operator = "starts_with" if op == "startsWith" else op
-                return Condition(ref, operator, parse_value(value, column))
+                return Condition(ref, operator, _condition_value(value, column, datatype))
     except ValueError:
         raise invalid from None
     raise invalid

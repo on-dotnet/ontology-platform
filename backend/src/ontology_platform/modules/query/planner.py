@@ -145,9 +145,21 @@ def relations(
         for r in model.relations
         if r.binding_id not in unusable
     }
+    usable_reverse = {
+        (r.inverse_id, r.target_type_id, r.source_type_id)
+        for r in model.relations
+        if r.binding_id not in unusable
+    }
     result: dict[UUID, list[schemas.ObjectRelation]] = {}
     for step in _relation_steps(model, origin):
         relation = step.relation
+        if (
+            step.direction == "out"
+            and relation.binding_id in unusable
+            and (relation.relation_id, step.origin.type_id, step.other.type_id) in usable_reverse
+        ):
+            # The working inverse's reverse reading already exposes this name and can be opened.
+            continue
         label = relation.label
         if step.direction == "in":
             if (relation.inverse_id, step.origin.type_id, step.other.type_id) in outgoing:
