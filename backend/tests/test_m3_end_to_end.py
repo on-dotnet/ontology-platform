@@ -3,38 +3,42 @@
 an access token.
 
 `run_flow` is also the "全流程" of the credential scan in test_m3_secret_scan.py: its requests go
-through the public interfaces only (the jobs run inline and element ids are read from the
-database), and it keeps every response it got and the gateway that saw what the model saw.
+through the public interfaces, and the production worker runs the queued jobs. It keeps
+every response and the gateway that saw what the model saw.
 """
 
+import asyncio
 import tomllib
+from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+from unittest.mock import Mock
 from uuid import UUID
 
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
+from ontology_platform import worker
+from ontology_platform.modules.ai import qa
 from ontology_platform.modules.ai.binding_prompts import ColumnsOut
-from ontology_platform.modules.ai.binding_suggest import JOB_KIND, make_handler
 from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.connectors import config as connectors_config
-from ontology_platform.modules.connectors import jobs as connectors_jobs
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.jobs import runner
 from ontology_platform.modules.jobs import service as queue
-from ontology_platform.modules.ontology.models import Element
+from ontology_platform.modules.jobs.models import Job
 from ontology_platform.settings import Settings
 from support import csrf_headers, make_client
 from test_ai_binding_suggest import EXPECTED, CatalogGateway, _relation_out, column, table_match
 from test_connectors_support import admin_rows
 from test_mcp_support import call_tool, new_token
 from test_ontology_import import STEEL, import_and_merge
-from test_ontology_support import accept_and_merge, sign_in
+from test_ontology_support import accept_and_merge
 
 NS = "urn:synthetic:metals:"
 HEAT = "H2401001"
@@ -71,18 +75,44 @@ def _keep(responses: list[Response]) -> Any:
     return hook
 
 
-async def _run_jobs(factory: async_sessionmaker[AsyncSession]) -> int:
+async def _run_jobs(settings: Settings, gateway: CatalogGateway) -> int:
+    # Shut the worker down on its first empty claim, using its normal shutdown callback.
+    stop: Callable[[], None]
+    claim = queue.claim
     count = 0
-    while True:
-        async with factory.begin() as db:
-            job = await queue.claim(db, "m3-e2e")
+
+    def on_signal(_: int, callback: Callable[[], None]) -> None:
+        nonlocal stop
+        stop = callback
+
+    async def claim_until_empty(db: AsyncSession, worker_id: str) -> Job | None:
+        nonlocal count
+        job = await claim(db, worker_id)
         if job is None:
-            return count
-        context = runner.JobContext(
-            job.id, job.payload, factory, attempts=job.attempts, worker_id="m3-e2e"
-        )
-        await runner._execute(job.kind, context, "m3-e2e")
-        count += 1
+            stop()
+        else:
+            count += 1
+        return job
+
+    with pytest.MonkeyPatch.context() as patch:
+        worker_settings = settings.model_copy(update={"worker_concurrency": 1})
+        patch.setattr(worker, "Settings", lambda: worker_settings)
+        patch.setattr(worker, "OpenAIGateway", Mock(return_value=gateway))
+        patch.setattr(runner, "_handlers", {})
+        patch.setattr(qa, "_listeners", [])
+        for name in (
+            "register_extractor",
+            "register_vision_transcriber",
+            "register_usage_provider",
+        ):
+            patch.setattr(worker, name, Mock())
+        loop = asyncio.get_running_loop()
+        patch.setattr(loop, "add_signal_handler", on_signal)
+        patch.setattr(loop, "remove_signal_handler", Mock())
+        patch.setattr(queue, "claim", claim_until_empty)
+        async with asyncio.timeout(60):
+            await worker.run()
+    return count
 
 
 def _gateway(ids: dict[str, str]) -> CatalogGateway:
@@ -136,19 +166,16 @@ async def run_flow(
     settings: Settings,
     monkeypatch: pytest.MonkeyPatch,
 ) -> Flow:
-    factory: async_sessionmaker[AsyncSession] = app.state.session_factory
     monkeypatch.setattr(connectors_config, "_configured", settings)
-    monkeypatch.setattr(runner, "_handlers", {})
-    connectors_jobs.register_handlers(factory, settings)
     responses: list[Response] = []
     client.event_hooks["response"].append(_keep(responses))
-    await sign_in(client, db, Role.ADMIN)
+    token, token_id = await new_token(client, db, Role.ADMIN, ["ontology:read", "objects:read"])
     imported = await import_and_merge(client, STEEL, filename="steel.ttl")
     ontology_id = imported["ontology"]["id"]
-    rows = await db.scalars(select(Element).where(Element.ontology_id == UUID(ontology_id)))
-    ids = {row.iri: str(row.id) for row in rows if row.iri}
+    elements = await client.get(f"/api/ontologies/{ontology_id}/elements")
+    assert elements.status_code == 200, elements.text
+    ids = {e["iri"]: e["id"] for e in elements.json() if e["iri"]}
     gateway = _gateway(ids)
-    runner.register(JOB_KIND, make_handler(factory, gateway, "test-model"))
     csrf = csrf_headers(client)
 
     # A data source on the steel sample, tested, its catalog read and browsed.
@@ -174,7 +201,7 @@ async def run_flow(
     base = f"/api/data-sources/{source['id']}"
     assert _ok(await client.post(f"{base}/test", headers=csrf))["ok"] is True
     _ok(await client.post(f"{base}/catalog/refresh", headers=csrf), 202)
-    assert await _run_jobs(factory) == 1
+    assert await _run_jobs(settings, gateway) == 1
     assert _ok(await client.get(base))["catalog"]["status"] == "ready"
     _ok(await client.get(f"{base}/catalog/tables/mes/heat"))
 
@@ -187,7 +214,7 @@ async def run_flow(
         ),
         202,
     )
-    assert await _run_jobs(factory) == 1
+    assert await _run_jobs(settings, gateway) == 1
     suggestion = _ok(await client.get(f"/api/binding-suggestions/{requested['id']}"))
     assert (suggestion["status"], suggestion["dropped"]) == ("succeeded", 0)
     assert suggestion["samplesSent"] is True
@@ -196,7 +223,7 @@ async def run_flow(
     assert detail["status"] == "open"
     url = f"/api/ontologies/{ontology_id}/objects"
     unreleased = await client.post(f"{url}/search", json={"typeId": ids[NS + "Heat"]}, headers=csrf)
-    # Nothing released yet: the bindings under review cannot be queried.
+    # This only establishes that there is no effective release yet.
     assert unreleased.status_code == 409
     assert unreleased.headers["content-type"] == "application/problem+json"
     assert unreleased.json()["code"] == "query.no_release"
@@ -208,9 +235,7 @@ async def run_flow(
         201,
     )
 
-    # A heat, then hop by hop to its coils. Creating the token signs in again: a new CSRF token.
-    token, token_id = await new_token(client, db, Role.ADMIN, ["ontology:read", "objects:read"])
-    csrf = csrf_headers(client)
+    # A heat, then hop by hop to its coils.
     flow = Flow(
         ontology_id=ontology_id,
         source_id=source["id"],
@@ -309,6 +334,13 @@ async def test_from_a_data_source_to_coils_over_the_api_and_mcp(
     assert coils["nextCursor"] is None
     # Every MCP call is audited under the token.
     called = await db.scalars(select(AuditEvent).where(AuditEvent.action == "mcp.tool_called"))
-    assert [(e.target_id, e.detail["tokenId"], e.detail["code"]) for e in called] == [
-        (flow.token_id, flow.token_id, "ok")
-    ] * (len(HOPS) + 2)
+    events = called.all()
+    assert all(
+        (e.target_id, e.detail["tokenId"], e.detail["code"]) == (flow.token_id, flow.token_id, "ok")
+        for e in events
+    )
+    assert Counter((e.detail["tool"], e.detail["ontology"]) for e in events) == {
+        ("list_ontologies", None): 1,
+        ("search_objects", flow.ontology_id): 1,
+        ("get_related_objects", flow.ontology_id): len(HOPS),
+    }
