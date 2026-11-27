@@ -1993,6 +1993,23 @@ def test_the_types_prompt_names_what_is_not_a_type() -> None:
     assert "differ only by period, frequency or category" not in rules
 
 
+def test_the_types_prompt_keeps_lines_and_results_that_are_tracked_one_by_one() -> None:
+    # #93: the prompt gave "an order line" as a line that is never a type, while an order line
+    # with its own number that later records cite line by line is one (steel-industry answers).
+    rules = " ".join(TYPES_INSTRUCTIONS.split())
+    assert "an order line" not in rules
+    assert "has a line number of its own and that other records refer to line by line" in rules
+    # Item-by-item test results are records, not the outcome values listed above them.
+    assert "are records, not values" in rules
+    # Paper that only goes with a thing or a handover is not a type of its own.
+    assert "Slips, copies, receipts, tags, labels and attachments" in rules
+    assert "Being mentioned, kept, handed over or referred to is not enough" in rules
+    # The check is for paper only: a paid steel run lost the ladle furnace and the caster when
+    # it applied to every type, since the text names machines without numbers of their own.
+    assert "Before proposing a new type for a document, form, record" in rules
+    assert "equipment, places and materials that the work is done with or on are not held" in rules
+
+
 def test_the_prompts_give_examples_in_generic_words_only() -> None:
     cjk = re.compile(r"[一-鿿]")
     for prompt in (TYPES_INSTRUCTIONS, RESOLVE_INSTRUCTIONS, RELATIONS_INSTRUCTIONS):
