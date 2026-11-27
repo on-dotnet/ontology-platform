@@ -95,7 +95,7 @@ M3 的数据绑定与查询用一套人工合成的冶金 MES 数据作外部数
 
 1. 开发栈运行时执行 `./dev.ps1 seed-steel`。它在开发用的 postgres 实例里建库 `steel_mes` 和只读账号 `steel_reader`（口令 `steel-reader-dev-only`，只在开发环境使用，性质同开发管理员口令），执行两个 SQL 文件，授予该账号对 `mes` 模式的查询权限，并把账号的默认事务设为只读。每次运行都重建 `mes` 模式，可以重复运行；它只动 `steel_mes` 这个库，不碰平台自己的库；`OP_ENV=production` 时拒绝运行。
 2. 在"数据"页新建数据源：主机 `postgres`，端口 5432，库 `steel_mes`，用户 `steel_reader`，口令同上。
-3. 测试镜像里只有 `backend/`，所以 `backend/tests/fixtures/connectors/steel/` 放同样的两个 SQL 文件；改样例时两处一起改，`seed-steel` 装载前会比对，不一致就停下。测试不依赖 `seed-steel`：每个测试进程自己建临时库装入样例（`backend/tests/external_source.py`）。
+3. 测试镜像里只有 `backend/`，所以 `backend/tests/fixtures/connectors/steel/` 放同样的两个 SQL 文件和绑定期望 `expected-bindings.toml`（AI 绑定建议的端到端测试用）；改样例时两处一起改，`seed-steel` 装载前会比对这三个文件，不一致就停下。测试不依赖 `seed-steel`：每个测试进程自己建临时库装入样例（`backend/tests/external_source.py`）。
 
 ## 数据源凭据的密钥轮换
 
