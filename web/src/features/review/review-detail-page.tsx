@@ -35,6 +35,7 @@ import {
   isAiSource,
   matchPlace,
   mergeChangeSet,
+  PartialDecisionError,
   patchItem,
   rejectChangeSet,
   replaceItemInCache,
@@ -204,7 +205,14 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
       toast.success(t(isAi ? 'review.bulkAccepted' : 'review.allAccepted', { count: itemIds.length }));
       await Promise.all([refreshDetail(), markListStale()]);
     },
-    onError: (error) => toast.error(t('review.decideFailed'), message(error)),
+    onError: async (error) => {
+      if (!(error instanceof PartialDecisionError)) {
+        toast.error(t('review.decideFailed'), message(error));
+        return;
+      }
+      toast.error(t('review.decidePartial', { saved: error.saved, total: error.total }), message(error.reason));
+      await Promise.all([refreshDetail(), markListStale()]);
+    },
   });
 
   const merge = useMutation({
@@ -467,7 +475,16 @@ function SameConceptDialog({ changeSet, items, context, open, onOpenChange }: Sa
         queryClient.invalidateQueries({ queryKey: [...changeSetKeys.all, 'list'], refetchType: 'none' }),
       ]);
     },
+    // Saved batches stay accepted; reload so the list and the retry cover only the rest.
+    onError: async (error) => {
+      if (!(error instanceof PartialDecisionError)) return;
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: changeSetKeys.detail(changeSet.id) }),
+        queryClient.invalidateQueries({ queryKey: [...changeSetKeys.all, 'list'], refetchType: 'none' }),
+      ]);
+    },
   });
+  const partial = accept.error instanceof PartialDecisionError ? accept.error : null;
   return (
     <Dialog
       open={open}
@@ -496,8 +513,11 @@ function SameConceptDialog({ changeSet, items, context, open, onOpenChange }: Sa
             ))}
           </ul>
           {accept.isError ? (
-            <InlineNotice tone="error" title={t('review.matchBulk.failedTitle')}>
-              {message(accept.error)}
+            <InlineNotice
+              tone="error"
+              title={partial ? t('review.decidePartial', { saved: partial.saved, total: partial.total }) : t('review.matchBulk.failedTitle')}
+            >
+              {message(partial ? partial.reason : accept.error)}
             </InlineNotice>
           ) : null}
           <div className="flex justify-end gap-2">

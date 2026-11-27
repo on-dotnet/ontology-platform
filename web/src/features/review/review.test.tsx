@@ -806,6 +806,59 @@ describe('import change set review', () => {
   });
 });
 
+describe('accepting more items than one request takes', () => {
+  const total = 10001;
+  const ids = Array.from({ length: total }, (_, index) => `item-${index}`);
+  // Ten thousand items take a while to render and decide in jsdom.
+  const SLOW = 15_000;
+
+  /** An import change set whose second decisions request fails once; the others are applied. */
+  function batchServer() {
+    const imported = ids.map((id, index) =>
+      itemFixture({ id, seq: index + 1, tempRef: `new:N${index}`, proposed: { localName: `N${index}`, labelZh: `项目${index + 1}` },
+        confidence: null, rationale: null, evidence: [] }),
+    );
+    let state = changeSetFixture(imported, { id: 'cs-import', title: '导入：steel.ttl', source: 'import', documentId: null });
+    let requests = 0;
+    return reviewServer({
+      initial: state,
+      extra: {
+        'GET /api/change-sets': () => [state],
+        'GET /api/change-sets/:id': () => state,
+        'POST /api/change-sets/:id/decisions': ({ body }) => {
+          requests += 1;
+          if (requests === 2) return problemResponse(503, 'service.unavailable');
+          const { itemIds, decision } = body as { itemIds: string[]; decision: ChangeItem['decision'] };
+          const chosen = new Set(itemIds);
+          const next = state.items.map((item) => (chosen.has(item.id) ? { ...item, decision } : item));
+          state = { ...state, items: next, counts: countDecisions(next) };
+          return state;
+        },
+      },
+    });
+  }
+
+  it('sends 5000 items per request in order, stops at a failed batch, keeps the saved ones and retries the rest', async () => {
+    const user = userEvent.setup();
+    const api = batchServer();
+    const sent = () => api.calls('POST', '/api/change-sets/cs-import/decisions').map((call) => (call.body as { itemIds: string[] }).itemIds);
+    renderApp('/review/cs-import');
+
+    await user.click(await screen.findByRole('button', { name: `接受全部（${total}）` }, { timeout: SLOW }));
+
+    expect((await screen.findAllByText('已保存 5000/10001 项，其余没有保存，请重试', {}, { timeout: SLOW })).length).toBeGreaterThan(0);
+    // The third batch is never sent once the second has failed.
+    expect(sent()).toEqual([ids.slice(0, 5000), ids.slice(5000, 10000)]);
+    // The first batch stays accepted: the page reloads and offers only the rest.
+    const retry = await screen.findByRole('button', { name: '接受全部（5001）' }, { timeout: SLOW });
+
+    await user.click(retry);
+    await waitFor(() => expect(sent()).toHaveLength(4), { timeout: SLOW });
+    expect(sent().slice(2)).toEqual([ids.slice(5000, 10000), ids.slice(10000)]);
+    await waitFor(() => expect(screen.queryByRole('button', { name: /^接受全部（/ })).not.toBeInTheDocument(), { timeout: SLOW });
+  }, 60_000);
+});
+
 describe('change item pagination', () => {
   const many = Array.from({ length: 120 }, (_, index) =>
     itemFixture({
