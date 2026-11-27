@@ -1,8 +1,8 @@
 """The settings the connector reads when it connects: the credential keys, the statement timeout
 and the row limit.
 
-The worker hands its settings over through `configure` (connectors.jobs). The API process reads
-them from the OP_* environment, as `create_app()` does: the functions other modules call
+The worker (connectors.jobs) and `create_app()` hand their settings over through `configure`;
+code that runs without either reads the OP_* environment. The functions other modules call
 (`service.select`, `service.sample_values`) take no settings, and the routes' signatures are fixed
 by the M3 skeleton.
 """
@@ -15,6 +15,7 @@ _configured: Settings | None = None
 
 
 def configure(settings: Settings | None) -> None:
+    """Called by `create_app` and by the worker; each call replaces the previous settings."""
     global _configured
     _configured = settings
 

@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from ontology_platform.db import create_database_engine, create_session_factory
 from ontology_platform.errors import install_error_handlers
 from ontology_platform.modules.ai.api import router as ai_router
+from ontology_platform.modules.connectors import config as connectors_config
 from ontology_platform.modules.connectors.api import router as connectors_router
 from ontology_platform.modules.connectors.service import register_usage_provider
 from ontology_platform.modules.cq.api import router as cq_router
@@ -53,6 +54,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
+    connectors_config.configure(settings)
     docs = settings.env != "production"
     app = FastAPI(
         title="Ontology Platform API",

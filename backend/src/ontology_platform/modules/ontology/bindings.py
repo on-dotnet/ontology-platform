@@ -640,18 +640,22 @@ async def _release_in_effect(
 ) -> tuple[Ontology, Release] | None:
     """The ontology (by id, by its id as text, or by key) and its active release. The
     release's Turtle, which can be megabytes, is not read."""
-    if isinstance(ontology, str):
-        ontology = rules.parse_id(ontology) or ontology
-    by_id = isinstance(ontology, UUID)
-    condition = Ontology.id == ontology if by_id else Ontology.key == ontology
-    row = (
-        await db.execute(
-            select(Ontology, Release)
-            .join(Release, Release.id == Ontology.active_release_id)
-            .where(condition)
-            .options(defer(Release.turtle))
-        )
-    ).first()
+    identifier = rules.parse_id(ontology) if isinstance(ontology, str) else ontology
+    statement = (
+        select(Ontology, Release)
+        .join(Release, Release.id == Ontology.active_release_id)
+        .options(defer(Release.turtle))
+    )
+    if isinstance(identifier, UUID):
+        row = (await db.execute(statement.where(Ontology.id == identifier))).first()
+        if row is not None:
+            return row[0], row[1]
+        # The id of an ontology without a release in effect is not another ontology's key.
+        if await db.scalar(select(Ontology.id).where(Ontology.id == identifier)) is not None:
+            return None
+    if not isinstance(ontology, str):
+        return None
+    row = (await db.execute(statement.where(Ontology.key == ontology))).first()
     return (row[0], row[1]) if row is not None else None
 
 

@@ -247,6 +247,8 @@ async def test_update_and_no_op_audit_only_actual_changes(
     unchanged = await _patch(client, source, name=source["name"], allowSamples=False)
     assert unchanged.status_code == 200
     assert unchanged.json() == source
+    # A save that changes nothing leaves no audit event.
+    assert [event.action for event in await _events(db)] == ["datasource.created"]
 
     rejected = await _patch(
         client, source, allowSamples=True, sslMode="require", schemas=["mes"], port=5432
@@ -277,12 +279,12 @@ async def test_update_and_no_op_audit_only_actual_changes(
     assert row.credential_updated_at == datetime.fromisoformat(rotated["credentialUpdatedAt"])
     assert (await client.get(f"{SOURCES}/{source['id']}")).json() == rotated
 
-    _, no_op, edit, rotate = await _events(db)
-    for event in (no_op, edit, rotate):
+    created, edit, rotate = await _events(db)
+    assert created.action == "datasource.created"
+    for event in (edit, rotate):
         assert event.action == "datasource.updated"
         assert (event.target_type, event.target_id) == ("data_source", source["id"])
         assert event.actor_id == row.created_by
-    assert no_op.detail == {"fields": [], "passwordChanged": False}
     assert sorted(edit.detail["fields"]) == ["allowSamples", "schemas"]
     assert edit.detail == {"fields": edit.detail["fields"], "passwordChanged": False}
     assert rotate.detail == {"fields": [], "passwordChanged": True}

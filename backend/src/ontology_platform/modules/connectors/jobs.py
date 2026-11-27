@@ -20,7 +20,7 @@ from ontology_platform.modules.jobs import service as queue
 from ontology_platform.modules.jobs.runner import JobContext, register
 from ontology_platform.settings import Settings
 
-# Payload: {"dataSourceId": "<uuid>"}
+# Payload: {"dataSourceId": "<uuid>", "actorId": "<uuid>"} (actorId optional for old jobs)
 REFRESH_CATALOG = "connectors.refresh_catalog"
 
 
@@ -72,7 +72,7 @@ async def _record(
         return
     if row.revision != revision:
         # The settings changed while reading: what was read may be another database.
-        await queue.enqueue(db, REFRESH_CATALOG, {"dataSourceId": str(source_id)})
+        await queue.enqueue(db, REFRESH_CATALOG, job.payload)
         await job.check_lease(db)
         return
     detail: dict[str, str | int]
@@ -89,9 +89,22 @@ async def _record(
         "datasource.catalog_refreshed",
         target_type="data_source",
         target_id=str(source_id),
+        actor_id=_actor_id(job.payload),
         detail=detail,
     )
     await job.check_lease(db)
+
+
+def _actor_id(payload: dict[str, object]) -> UUID | None:
+    """Who asked for the refresh; jobs queued before the field existed have none. A bad value
+    must not fail the job: the catalog would stay "refreshing"."""
+    raw = payload.get("actorId")
+    if not isinstance(raw, str):
+        return None
+    try:
+        return UUID(raw)
+    except ValueError:
+        return None
 
 
 def register_handlers(

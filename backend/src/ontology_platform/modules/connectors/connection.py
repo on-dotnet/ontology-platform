@@ -45,7 +45,7 @@ from sqlalchemy import select as sql_select
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION, REAL, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.exc import DBAPIError
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql.elements import ColumnClause
 from sqlalchemy.types import NullType, TypeEngine, UserDefinedType
@@ -189,15 +189,19 @@ _platform_identities: dict[str, _ServerIdentity] = {}
 
 
 async def _platform_identity(db: AsyncSession) -> _ServerIdentity:
-    key = db.get_bind().engine.url.render_as_string()
+    bind = db.bind
+    # A session may be bound to a connection of the engine (a savepoint session, for one).
+    engine = bind.engine if isinstance(bind, AsyncConnection) else bind
+    if not isinstance(engine, AsyncEngine):
+        raise RuntimeError("The platform session must be bound to an async engine")
+    key = engine.url.render_as_string()
     identity = _platform_identities.get(key)
     if identity is None:
-        # A session that was idle is left idle: a long read of the source must not keep a
-        # transaction open on the platform's database.
-        idle = not db.in_transaction() and not (db.new or db.dirty or db.deleted)
-        identity = await _identity_of(db.execute)
-        if idle:
-            await db.rollback()
+        # The caller may have pending objects or loaded state, so read on a separate short
+        # connection. It takes a second pooled connection, and only until the identity is
+        # cached: an account that cannot read the system identifier pays it on every check.
+        async with engine.connect() as conn:
+            identity = await _identity_of(conn.execute)
         # Only a system identifier is stable: the start time changes when the platform's server
         # restarts, so without one the identity is read again every time.
         if identity.system_identifier is not None:

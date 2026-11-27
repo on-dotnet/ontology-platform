@@ -2,6 +2,7 @@
 modules (spec 003, 6.4 to 6.6, and the snapshot side of section 15)."""
 
 import re
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -13,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import bindings as ontology_bindings
 from ontology_platform.modules.ontology import expert, importing, service
-from ontology_platform.modules.ontology.models import Element, Release
+from ontology_platform.modules.ontology.models import Element, Ontology, Release
 from support import csrf_headers
 from test_ontology_bindings_support import (
     Steel,
@@ -132,6 +133,41 @@ async def test_without_a_release_there_is_no_bound_model(db: AsyncSession) -> No
 
     assert await ontology_bindings.bound_model(db, s.ontology.id) is None
     assert await ontology_bindings.released_ontology(db, s.ontology.id) is None
+
+
+async def test_uuid_shaped_key_falls_back_after_an_id_miss(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    s, release = await _bound_and_published(client, db)
+    key = "a0000000-0000-4000-8000-000000000071"
+    assert s.ontology.id != UUID(key)
+    s.ontology.key = key
+    await db.commit()
+
+    model = await ontology_bindings.bound_model(db, key)
+    assert model is not None
+    assert str(model.release_id) == release["id"]
+    assert model.ontology_id == s.ontology.id
+
+
+async def test_an_unreleased_ontologys_id_does_not_fall_back_to_a_key(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    s, _ = await _bound_and_published(client, db)
+    now = datetime.now(UTC)
+    unreleased = Ontology(
+        id=UUID("b0000000-0000-4000-8000-000000000071"),
+        key="draft",
+        name="草稿",
+        base_iri="https://example.org/ontology/draft#",
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(unreleased)
+    s.ontology.key = str(unreleased.id)
+    await db.commit()
+
+    assert await ontology_bindings.bound_model(db, str(unreleased.id)) is None
 
 
 async def test_the_bound_model_describes_the_release_in_effect(

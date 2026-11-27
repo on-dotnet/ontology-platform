@@ -388,17 +388,17 @@ async def update_data_source(
     if changes or body.password is not None:
         row.revision += 1
         row.updated_at = now
-    _audit(
-        db,
-        "datasource.updated",
-        data_source_id,
-        actor,
-        ip,
-        {
-            "fields": sorted(to_camel(key) for key in changes),
-            "passwordChanged": body.password is not None,
-        },
-    )
+        _audit(
+            db,
+            "datasource.updated",
+            data_source_id,
+            actor,
+            ip,
+            {
+                "fields": sorted(to_camel(key) for key in changes),
+                "passwordChanged": body.password is not None,
+            },
+        )
     return await _commit_source(db, row, actor)
 
 
@@ -516,7 +516,11 @@ async def request_catalog_refresh(
     row = await _active_source(db, data_source_id)
     row.catalog_status = "refreshing"
     row.catalog_error_code = None
-    await queue.enqueue(db, jobs.REFRESH_CATALOG, {"dataSourceId": str(data_source_id)})
+    await queue.enqueue(
+        db,
+        jobs.REFRESH_CATALOG,
+        {"dataSourceId": str(data_source_id), "actorId": str(actor.id)},
+    )
     return await _commit_source(db, row, actor)
 
 

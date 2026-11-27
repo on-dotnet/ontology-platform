@@ -100,6 +100,7 @@ type Binding =
 // 绑定种类的 parentRef / domainRef / rangeRef 指向类型绑定（元素 id 或同一变更集里的 temp_ref）。
 type ChangeSetSource = M2ChangeSetSource | 'ai_binding' | 'mcp';
 type ItemFlag = M2ItemFlag | 'key_unverified';
+// ChangeSetSummary 新增 createdByName: string | null（提交人显示名；无人提交或用户已不存在时为 null）。
 
 // 证据：原来只有资料证据，现在增加目录证据
 type CatalogFact = 'table' | 'column' | 'primary_key' | 'foreign_key' | 'sample';

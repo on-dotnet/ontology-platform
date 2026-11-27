@@ -1,21 +1,25 @@
 """A data source can never be the platform's own database (spec 003, 5.2)."""
 
 import socket
+from uuid import uuid4
 
 import pytest
 from pydantic import SecretStr
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import attributes
 
 from external_source import ExternalSource
-from ontology_platform.modules.connectors import connection
+from ontology_platform.main import create_app
+from ontology_platform.modules.connectors import config, connection
 from ontology_platform.modules.connectors.connection import (
     ConnectionParams,
     connect,
     ensure_not_platform_address,
 )
 from ontology_platform.modules.connectors.errors import PlatformDatabaseError
+from ontology_platform.modules.identity.models import Role, User
 from ontology_platform.settings import Settings
 from test_connectors_support import reader_params
 
@@ -87,3 +91,56 @@ async def test_the_identity_check_uses_the_system_identifier_for_a_plain_account
     assert is_superuser == "off"
     assert identity.system_identifier is not None
     assert identity.database == external_source.database
+
+
+@pytest.mark.parametrize("state", ["idle", "pending", "in_transaction"])
+async def test_identity_check_preserves_the_callers_session(
+    db: AsyncSession, external_source: ExternalSource, state: str
+) -> None:
+
+    loaded = (await db.scalars(select(User).limit(1))).first()
+    assert loaded is not None
+    await db.commit()
+    new = User(
+        username=f"identity-{uuid4().hex}",
+        display_name="Pending",
+        password_hash="unused",
+        role=Role.VIEWER,
+    )
+    if state == "pending":
+        db.add(new)
+    if state == "in_transaction":
+        await db.execute(text("SELECT 1"))
+    connection._platform_identities.clear()
+    await connection.test_connection(db, reader_params(external_source))
+    assert "display_name" not in attributes.instance_state(loaded).expired_attributes
+    assert loaded.display_name
+    assert (new in db.new) is (state == "pending")
+    if state == "idle":
+        assert not db.in_transaction()
+    if state == "in_transaction":
+        assert db.in_transaction()
+
+
+async def test_identity_check_accepts_a_session_bound_to_a_connection(
+    db: AsyncSession, external_source: ExternalSource
+) -> None:
+    # As the capability-question check does: a savepoint session on the caller's connection.
+    async with AsyncSession(
+        bind=await db.connection(), join_transaction_mode="create_savepoint"
+    ) as nested:
+        connection._platform_identities.clear()
+        result = await connection.test_connection(nested, reader_params(external_source))
+
+    assert result.ok
+
+
+def test_the_app_configures_the_connectors_with_its_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(config, "_configured", None)
+    settings = Settings()
+
+    create_app(settings)
+
+    assert config.current() is settings

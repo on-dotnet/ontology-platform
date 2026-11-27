@@ -41,7 +41,7 @@ async def create_data_source(
     return await service.create_data_source(db, body, actor=user, ip=client_ip(request))
 
 
-@router.post("/data-sources/test", responses=problem_responses(401, 403, 404, 422))
+@router.post("/data-sources/test", responses=problem_responses(401, 403, 404, 409, 422))
 async def check_connection(
     body: schemas.ConnectionTestRequest,
     request: Request,
