@@ -8,8 +8,8 @@ from collections import Counter
 from dataclasses import dataclass, field, replace
 from typing import Any, Literal
 
-from rdflib import URIRef
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib import BNode, URIRef
+from rdflib.namespace import RDF, RDFS, SH, XSD
 
 from ontology_platform.modules.ontology.rdf.model import AxiomState, ElementState, OntologyState
 
@@ -140,6 +140,65 @@ def keep_lost_lists(current: OntologyState, target: OntologyState) -> int:
                         restored += 1
                         break
         wanted.rules = tuple(rules)
+    return restored
+
+
+_LOST_AXIOM_LISTS = frozenset({SH["in"], SH.alternativePath})
+
+
+def _empty_list_positions(axiom: AxiomState) -> bool:
+    relevant = [value for _, predicate, value in axiom.triples if predicate in _LOST_AXIOM_LISTS]
+    if not relevant:
+        return False
+    return all(
+        isinstance(value, BNode)
+        and not any(subject == value for subject, _, _ in axiom.triples)
+        and sum(obj == value for _, _, obj in axiom.triples) == 1
+        for value in relevant
+    )
+
+
+def _without_axiom_lists(axiom: AxiomState) -> str | None:
+    """Compare a complete old RDF list as the empty node OWL API writes in its place."""
+    triples = set(axiom.triples)
+    references = Counter(obj for _, _, obj in triples)
+    heads = [triple for triple in triples if triple[1] in _LOST_AXIOM_LISTS]
+    if not heads:
+        return None
+    for subject, predicate, head in heads:
+        cell = head
+        cells: set[BNode] = set()
+        while cell != RDF.nil:
+            if not isinstance(cell, BNode) or cell in cells or references[cell] != 1:
+                return None
+            cells.add(cell)
+            outgoing = [(p, o) for s, p, o in triples if s == cell]
+            if len(outgoing) != 2 or {p for p, _ in outgoing} != {RDF.first, RDF.rest}:
+                return None
+            cell = next(obj for pred, obj in outgoing if pred == RDF.rest)
+        if not cells:
+            return None
+        triples.difference_update({triple for triple in triples if triple[0] in cells})
+        triples.remove((subject, predicate, head))
+        triples.add((subject, predicate, BNode()))
+    return AxiomState(tuple(triples)).key
+
+
+def keep_lost_axiom_lists(current: OntologyState, target: OntologyState) -> int:
+    """Keep a unique unchanged axiom when OWL API has only erased its nested SHACL lists."""
+    existing = {axiom.key for axiom in current.axioms}
+    restored = 0
+    for index, wanted in enumerate(target.axioms):
+        if wanted.key in existing or not _empty_list_positions(wanted):
+            continue
+        matches = [
+            old
+            for old in current.axioms
+            if old.subject == wanted.subject and _without_axiom_lists(old) == wanted.key
+        ]
+        if len(matches) == 1:
+            target.axioms[index] = matches[0]
+            restored += 1
     return restored
 
 

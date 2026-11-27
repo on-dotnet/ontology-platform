@@ -12,7 +12,7 @@ from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import expert
 from ontology_platform.modules.ontology.models import ChangeSet, Element, Ontology
 from support import csrf_headers
-from test_ontology_import import STEEL, export, import_and_merge
+from test_ontology_import import FIXTURES, STEEL, export, import_and_merge
 from test_ontology_support import change_set_items, sign_in
 
 SMALL = b"""
@@ -71,6 +71,26 @@ async def test_unchanged_turtle_makes_no_change_set(client: AsyncClient, db: Asy
 
     assert response.status_code == 200
     assert response.json()["changeSetId"] is None
+
+
+async def test_expert_edit_does_not_restore_a_lost_nested_list(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    original = (FIXTURES / "shacl-lists" / "qualified-in.ttl").read_bytes()
+    saved = (FIXTURES / "owlapi" / "shacl-lists" / "qualified-in.ttl").read_text()
+    result = await import_and_merge(client, original, filename="qualified-in.ttl")
+
+    response = await save(client, result["ontology"]["id"], saved)
+
+    assert response.status_code == 200, response.text
+    items = await change_set_items(client, response.json()["changeSetId"])
+    assert [(item["op"], item["kind"]) for item in items] == [
+        ("create", "axiom"),
+        ("create", "axiom"),
+        ("delete", "axiom"),
+    ]
+    assert any("sh:in [" in item["proposed"].get("turtle", "") for item in items)
 
 
 async def test_a_syntax_error_names_its_line(client: AsyncClient, db: AsyncSession) -> None:
