@@ -1,7 +1,8 @@
 """FastAPI application factory. Importing this module does not touch the database."""
 
+import asyncio
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from importlib.metadata import version
 
 from fastapi import FastAPI
@@ -19,6 +20,7 @@ from ontology_platform.modules.identity.api import router as auth_router
 from ontology_platform.modules.mcp.api import router as mcp_router
 from ontology_platform.modules.metrics.api import router as metrics_router
 from ontology_platform.modules.ontology import bindings as ontology_bindings
+from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.api import router as ontology_router
 from ontology_platform.modules.query.api import router as query_router
 from ontology_platform.modules.workbench.api import router as workbench_router
@@ -38,7 +40,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 settings.admin_username,
                 settings.admin_password.get_secret_value(),
             )
-        yield
+        warmup = asyncio.create_task(ontology_service.warm_axiom_categories(session_factory))
+        try:
+            yield
+        finally:
+            warmup.cancel()
+            with suppress(asyncio.CancelledError):
+                await warmup
     finally:
         await engine.dispose()
 

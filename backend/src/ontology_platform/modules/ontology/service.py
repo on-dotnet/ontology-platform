@@ -9,11 +9,13 @@ Change sets are the only way the working version changes (AGENTS.md, "AI 不直�
 """
 
 import asyncio
+import logging
 import re
 import secrets
 import string
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http import HTTPStatus
@@ -23,7 +25,7 @@ from uuid import UUID, uuid4
 from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
@@ -55,6 +57,7 @@ from ontology_platform.modules.ontology.models import (
     Ontology,
     Release,
 )
+from ontology_platform.modules.ontology.rdf import axiom_categories
 from ontology_platform.modules.ontology.rdf.axiom_categories import (
     Prefixes,
     classify_axiom,
@@ -883,6 +886,66 @@ def _axiom_fields(
         else (None, None)
     )
     return {"axiom_category": category, "axiom_note": note}
+
+
+async def warm_axiom_categories(session_factory: async_sessionmaker[AsyncSession]) -> int:
+    """Prime the axiom list's fragment cache, starting with recently updated ontologies."""
+    logger = logging.getLogger(__name__)
+    try:
+        async with session_factory() as db:
+            ordered_ids = select(Ontology.id).order_by(Ontology.updated_at.desc(), Ontology.id)
+            ids = await db.scalars(ordered_ids)
+            ontology_ids = ids.all()
+    except Exception:
+        logger.exception("Could not list ontologies for axiom cache warmup")
+        return 0
+
+    warmed = 0
+
+    def warm_batch(
+        fragments: Sequence[str | None], vocabulary: tuple[Prefixes, frozenset[str], frozenset[str]]
+    ) -> None:
+        nonlocal warmed
+        for turtle in fragments:
+            if turtle:
+                _axiom_fields("axiom", turtle, *vocabulary)
+                warmed += 1
+
+    for ontology_id in ontology_ids:
+        remaining = axiom_categories.FRAGMENT_CACHE_SIZE - warmed
+        if remaining <= 0:
+            break
+        try:
+            async with session_factory() as db:
+                ontology = await _ontology_or_404(db, ontology_id)
+                vocabulary = await _axiom_vocabulary(db, ontology)
+                statement = (
+                    select(Element.turtle)
+                    .where(
+                        Element.ontology_id == ontology_id,
+                        Element.kind == "axiom",
+                        Element.status == "active",
+                    )
+                    .limit(remaining)
+                )
+                fragments = await db.stream_scalars(statement)
+                try:
+                    async for batch in fragments.partitions(500):
+                        worker = asyncio.create_task(
+                            asyncio.to_thread(warm_batch, batch, vocabulary)
+                        )
+                        try:
+                            await asyncio.shield(worker)
+                        except asyncio.CancelledError:
+                            # Cancelling to_thread cannot stop a batch already executing.
+                            with suppress(Exception):
+                                await worker
+                            raise
+                finally:
+                    await fragments.close()
+        except Exception:
+            logger.exception("Could not warm axiom cache for ontology %s", ontology_id)
+    return warmed
 
 
 def _matches(element: Element, needle: str) -> bool:
