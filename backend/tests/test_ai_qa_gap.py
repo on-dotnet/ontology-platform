@@ -3,7 +3,7 @@
 import asyncio
 import re
 from unittest.mock import AsyncMock, Mock, call
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from httpx import Response
@@ -20,6 +20,7 @@ from ontology_platform.modules.ai.models import QaQuestionRow
 from ontology_platform.modules.ai.prompts import AssistantOperationOut, AssistantOut
 from ontology_platform.modules.ai.schemas import QaGapProposal, QaQuestion
 from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.jobs import service as jobs
 from ontology_platform.modules.jobs.models import Job
 from ontology_platform.modules.jobs.runner import JobContext, RetryableJobError
 from ontology_platform.modules.ontology import assistant as ontology_assistant
@@ -306,6 +307,22 @@ async def test_gap_caps_operations(qa_demo: QaDemo, q5: QaQuestion, db: AsyncSes
     )
 
 
+async def test_gap_keeps_valid_operation_after_rejected_prefix(
+    qa_demo: QaDemo, q5: QaQuestion, db: AsyncSession
+) -> None:
+    rejected = operation("create", "constraint")
+    output = AssistantOut(reply="", operations=[rejected] * OPERATIONS_MAX + [defect_type()])
+    await start_gap(qa_demo, q5)
+    await execute(qa_demo, q5, output)
+    result = await proposal(qa_demo, q5)
+    assert (result.status, result.dropped) == ("done", OPERATIONS_MAX)
+    assert result.change_set_id is not None
+    items = await db.scalars(
+        select(ChangeItem).where(ChangeItem.change_set_id == result.change_set_id)
+    )
+    assert [(i.proposed["localName"], i.decision) for i in items] == [("Defect", "pending")]
+
+
 @pytest.mark.parametrize("state", ["queued", "running", "answered", "failed", "bindings-only"])
 async def test_gap_requires_unanswerable_and_missing_elements(
     qa_demo: QaDemo, q5: QaQuestion, db: AsyncSession, state: str
@@ -408,7 +425,38 @@ async def test_gap_change_set_rolls_back_if_result_commit_fails(
     finally:
         event.remove(Session, "before_commit", reject_result)
     assert await change_sets(qa_demo) == existing
-    assert (await proposal(qa_demo, q5)).change_set_id is None
+    result = await proposal(qa_demo, q5)
+    assert result.change_set_id is None
+    assert result.status == "failed"
+    assert result.error_code == "internal.error"
+
+
+@pytest.mark.parametrize(("pending", "terminal"), [("running", "failed"), ("queued", "succeeded")])
+async def test_gap_replaces_terminal_job_for_pending_question_once(
+    qa_demo: QaDemo, q5: QaQuestion, pending: str, terminal: str
+) -> None:
+    await start_gap(qa_demo, q5)
+    [original] = await gap_jobs(qa_demo)
+    async with qa_demo.factory.begin() as db:
+        question = await db.get(QaQuestionRow, q5.id)
+        job = await db.get(Job, original.id)
+        assert question is not None
+        assert job is not None
+        # The worker finished its job after the question's status transaction rolled back.
+        question.gap_status = pending
+        job.status = terminal
+        job.attempts = job.max_attempts
+        # Newer jobs for another question or another kind must not mask the terminal job.
+        await jobs.enqueue(db, qa_gap.JOB_KIND, {**job.payload, "questionId": str(uuid4())})
+        await jobs.enqueue(db, "qa.answer", {"questionId": str(q5.id)})
+
+    a, b = await asyncio.gather(post_gap(qa_demo, q5), post_gap(qa_demo, q5))
+    assert sorted([a.status_code, b.status_code]) == [200, 202]
+    assert a.json()["gapProposal"] == b.json()["gapProposal"]
+    assert a.json()["gapProposal"]["status"] == "queued"
+    matching = [j for j in await gap_jobs(qa_demo) if j.payload["questionId"] == str(q5.id)]
+    assert len(matching) == 2
+    assert [j.status for j in matching if j.id != original.id] == ["queued"]
 
 
 async def test_gap_requeues_transient_error_then_succeeds(qa_demo: QaDemo, q5: QaQuestion) -> None:

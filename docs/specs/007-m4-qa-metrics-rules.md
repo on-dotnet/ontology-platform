@@ -340,11 +340,11 @@ class MetricDefinition(CamelModel):
 
 问题以 `unanswerable` 结束且 `gaps.elements` 非空时，界面显示"生成变更提议"按钮（editor 以上可见）。点击后：
 
-1. `POST /api/qa/questions/{id}/gap-proposal` 建一个任务 `qa.gap`（同一问题只能发起一次，重复发起返回已有结果；状态非 `unanswerable` 或没有语义元素缺口时返回 409 `qa.not_unanswerable`）；
+1. `POST /api/qa/questions/{id}/gap-proposal` 为该问题创建一个 `qa.gap` 任务。重复发起返回已有结果。若问题的提议状态仍为 `queued` 或 `running`，但该问题最近的 `qa.gap` 任务已结束，则允许重新入队一次。问题状态非 `unanswerable` 或没有语义元素缺口时返回 409 `qa.not_unanswerable`；
 2. 任务调用 `ontology.assistant.context_for(db, ontology_id, message=…, page="explore", element_id=None)` 取工作版本上下文，`message` 为问题原文加 `gaps.elements` 的中文描述。提问来自探索页，`context_for` 只把 `page` 写进上下文说明；不按页面分支，`element_id=None` 不附选中元素；
 3. 以 `purpose = "qa.gap"`、`instructions = QA_GAP_INSTRUCTIONS`、`schema = AssistantOut` 调用模型；
-4. 来源为 `ai_qa` 时，代码先只保留 `op = create` 且 `kind` 为 `entity_type`、`relation_type`、`property` 的操作。再用 `ai/assistant.py` 的 `to_item` 转为 `ProposedItem`，交给 `ontology.assistant.propose(db, ontology_id, message=…, created_by=user_id, items=…, source="ai_qa", title="问答缺口：<问题前 40 字>")`；
-5. `gapProposal.dropped` 是硬过滤、`to_item` 转换失败与 `propose` 丢弃的总数。返回了 `change_set_id` 时记 `done` 和该 id；返回 `None` 时记 `empty`、`changeSetId = null`，界面用 `qa.gapEmpty` 提示没有可提议的变更。
+4. 来源为 `ai_qa` 时，先只保留 `op = create` 且 `kind` 为 `entity_type`、`relation_type`、`property` 的操作，按原顺序取其中前 `OPERATIONS_MAX` 条。再用 `ai/assistant.py` 的 `to_item` 转为 `ProposedItem`，交给 `ontology.assistant.propose(db, ontology_id, message=…, created_by=user_id, items=…, source="ai_qa", title="问答缺口：<问题前 40 字>")`；
+5. `gapProposal.dropped` 等于模型返回的操作数减去传给 `propose` 的项数，再加上 `propose` 丢弃的项数。返回了 `change_set_id` 时记 `done` 和该 id；返回 `None` 时记 `empty`、`changeSetId = null`，界面用 `qa.gapEmpty` 提示没有可提议的变更。
 
 通过硬过滤的项仍走 `propose` 已有的校验。`QA_GAP_INSTRUCTIONS` 额外要求：只为 `gaps.elements` 里的概念提议。`AssistantOperationOut.kind` 不含 `metric`，所以 M4 的回流只提议类型、关系、属性；缺指标时缺口卡片只给出说明和"新建指标"入口（editor 以上），提议指标留到第 17 节的后续工作。
 
@@ -555,7 +555,7 @@ def register_listener(listener: Callable[[AsyncSession, QaQuestion], Awaitable[N
 
 # modules/ai/qa_gap.py（批次 6 实现）
 JOB_KIND = "qa.gap"
-async def create_gap_proposal(db, question_id: UUID, *, user_id: UUID) -> QaQuestion: ...
+async def enqueue_gap_proposal(db: AsyncSession, question_id: UUID, *, user_id: UUID, settings: Settings) -> tuple[QaQuestion, bool]: ...
 def make_gap_proposer(session_factory, gateway: ModelGateway, model: str) -> Handler: ...
 
 # modules/cq/service.py（新模块，批次 7 实现）

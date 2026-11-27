@@ -1,5 +1,6 @@
 """Change-set proposals for gaps identified in a question."""
 
+from itertools import islice
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -32,13 +33,8 @@ _KINDS = {
 }
 
 
-async def create_gap_proposal(db: AsyncSession, question_id: UUID, *, user_id: UUID) -> QaQuestion:
-    question, _ = await enqueue_gap_proposal(db, question_id, user_id=user_id)
-    return question
-
-
 async def enqueue_gap_proposal(
-    db: AsyncSession, question_id: UUID, *, user_id: UUID, settings: Settings | None = None
+    db: AsyncSession, question_id: UUID, *, user_id: UUID, settings: Settings
 ) -> tuple[QaQuestion, bool]:
     """Return the question and whether this transaction enqueued its proposal."""
     row = await db.get(QaQuestionRow, question_id, with_for_update=True, populate_existing=True)
@@ -47,8 +43,10 @@ async def enqueue_gap_proposal(
     if row.status != "unanswerable" or not (row.gaps or {}).get("elements"):
         raise AppError(409, "qa.not_unanswerable", "The question has no missing semantic elements.")
     created = row.gap_status is None
+    if row.gap_status in ("queued", "running"):
+        created = await jobs.latest_question_job_is_terminal(db, JOB_KIND, question_id)
     if created:
-        if not (settings or Settings()).ai_configured:
+        if not settings.ai_configured:
             raise AppError(409, "ai.not_configured", "No model is configured.")
         row.gap_status = "queued"
         await jobs.enqueue(db, JOB_KIND, {"questionId": str(question_id), "userId": str(user_id)})
@@ -115,12 +113,16 @@ def make_gap_proposer(
                 text=f"{context}\n\n{message}",
                 schema=AssistantOut,
             )
+            allowed = (
+                op
+                for op in output.operations
+                if op.op == "create" and op.kind in ("entity_type", "relation_type", "property")
+            )
             items = []
-            for op in output.operations[:OPERATIONS_MAX]:
-                if op.op == "create" and op.kind in ("entity_type", "relation_type", "property"):
-                    item = to_item(op)
-                    if item is not None:
-                        items.append(item)
+            for op in islice(allowed, OPERATIONS_MAX):
+                item = to_item(op)
+                if item is not None:
+                    items.append(item)
             async with session_factory.begin() as db:
                 # A duplicate delivery may have finished while this model call was in flight.
                 row = await _lock_pending(db, job, question_id)
