@@ -9,7 +9,14 @@ from fastapi import APIRouter, Depends, Query, Request, Response
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import problem_responses
-from ontology_platform.modules.ai import assistant, binding_suggest, qa, qa_gap, schemas
+from ontology_platform.modules.ai import (
+    assistant,
+    binding_suggest,
+    qa,
+    qa_gap,
+    review_assist,
+    schemas,
+)
 from ontology_platform.modules.ai.gateway import ModelGateway, OpenAIGateway
 from ontology_platform.modules.ai.schemas import AiStatus
 from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
@@ -35,6 +42,26 @@ def get_gateway(request: Request) -> ModelGateway:
 Gateway = Annotated[ModelGateway, Depends(get_gateway)]
 AppSettings = Annotated[Settings, Depends(get_settings)]
 Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
+
+
+@router.post(
+    "/change-sets/{id}/review-assist",
+    status_code=202,
+    responses=problem_responses(401, 403, 404, 409, 422, 429, 501),
+)
+async def request_review_assist(
+    id: UUID, body: schemas.AssistRequest, user: Creator, db: DbSession, settings: AppSettings
+) -> schemas.ReviewAssist:
+    return await review_assist.request_assist(
+        db, id, user=user, locale=body.locale, settings=settings
+    )
+
+
+@router.get("/change-sets/{id}/review-assist", responses=problem_responses(401, 404, 422, 501))
+async def get_review_assist(
+    id: UUID, user: CurrentUser, db: DbSession
+) -> schemas.ReviewAssist | None:
+    return await review_assist.latest_assist(db, id)
 
 
 @router.get("/ai/status")

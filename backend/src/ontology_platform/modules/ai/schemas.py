@@ -33,6 +33,97 @@ class AiStatus(CamelModel):
     model: str | None
 
 
+Locale = Literal["zh-CN", "en"]
+AssistStatus = Literal["queued", "running", "done", "partial", "failed"]
+RiskCode = Literal["weak_evidence", "conflict", "duplicate", "naming", "memory"]
+RuleDetail = Literal[
+    "evidence_not_found",
+    "no_evidence",
+    "low_confidence",
+    "possible_duplicate",
+    "undecided_match",
+    "kept_fields",
+    "stale_target",
+    "local_name_style",
+    "missing_label_en",
+    "similar_to_rejected",
+]
+AssistSuggestion = Literal["accept", "reject", "edit", "unsure"]
+
+
+class AssistRisk(CamelModel):
+    code: RiskCode
+    source: Literal["rule", "ai"]
+    detail: RuleDetail | None
+    reason: str | None = Field(max_length=300)
+    related_item_ids: list[UUID] = Field(max_length=5)
+    related_element_ids: list[UUID] = Field(max_length=5)
+    memory_entry_id: UUID | None
+
+
+class AssistRename(CamelModel):
+    label_zh: str | None = None
+    label_en: str | None = None
+    local_name: str | None = None
+
+
+class AssistItem(CamelModel):
+    item_id: UUID
+    stale: bool
+    risks: list[AssistRisk]
+    suggestion: AssistSuggestion | None
+    reason: str | None = Field(max_length=300)
+    rename: AssistRename | None
+
+
+class AssistGroup(CamelModel):
+    title: str = Field(max_length=40)
+    item_ids: list[UUID]
+
+
+class AssistCounts(CamelModel):
+    total: int
+    ai_reviewed: int
+    with_risks: int
+    suggest_reject: int
+    suggest_edit: int
+    stale: int
+    dropped: int
+
+
+class ReviewAssist(CamelModel):
+    id: UUID
+    change_set_id: UUID
+    status: AssistStatus
+    error_code: str | None
+    ai_used: bool
+    truncated: bool
+    locale: Locale
+    requested_by: UUID | None
+    requested_by_name: str | None
+    created_at: datetime
+    finished_at: datetime | None
+    summary: str | None = Field(max_length=600)
+    groups: list[AssistGroup] = Field(max_length=12)
+    items: list[AssistItem]
+    counts: AssistCounts
+
+
+class AssistRequest(CamelModel):
+    locale: Locale
+
+
+class ReviewAssistOut(CamelModel):
+    summary: str
+    groups: list[dict[str, object]]
+    items: list[dict[str, object]]
+
+
+class ReviewAssistSummaryOut(CamelModel):
+    summary: str
+    groups: list[dict[str, object]]
+
+
 # ---------- AI assistant (spec 002 §10) ----------
 
 Message = Annotated[

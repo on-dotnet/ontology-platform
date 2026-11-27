@@ -212,7 +212,7 @@ M1 只比较主名称键。同义词、近似名称不触发 M1，交给提示�
 
 ### 6.4 被挡掉的提议
 
-- `ontology.change_sets` 新增列 `suppressed`，类型 jsonb，not null，默认 `'[]'`。内容是 `SuppressedItem` 数组，最多 200 条，超出的只计数。
+- `ontology.change_sets` 新增列 `suppressed`，类型 jsonb，not null，默认 `'[]'`。内容是 `SuppressedItem` 数组，最多 200 条，超出的只计数；总数存在新列 `suppressed_total`（integer，not null，默认 0），不小于数组长度。
 - `ChangeSetDetail` 新增 `suppressed` 与 `suppressedTotal`。审核页据此提示（第 9 节）。
 - 被挡掉的提议不成为变更项，也不出现在任何写入路径上。
 
@@ -413,7 +413,7 @@ i18n 文件：
 只加不删，上一版程序可以照常运行：
 
 1. `ontology.change_items` 加 `reject_reason text null`，检查约束 `reject_reason is null or reject_reason in ('out_of_scope','incorrect','duplicate','keep_open')`。
-2. `ontology.change_sets` 加 `suppressed jsonb not null default '[]'::jsonb`（服务端默认值，旧程序插入时不需要知道这一列）。
+2. `ontology.change_sets` 加 `suppressed jsonb not null default '[]'::jsonb` 与 `suppressed_total integer not null default 0`（都是服务端默认值，旧程序插入时不需要知道这两列）。
 3. 新表 `ontology.review_memory`（第 5.3 节），带唯一约束与部分索引。
 4. 新表 `ai.review_assists`：
    - `id uuid PK`；

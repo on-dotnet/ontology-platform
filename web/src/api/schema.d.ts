@@ -151,6 +151,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/review-memory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Review Memory */
+        get: operations["list_review_memory_api_ontologies__id__review_memory_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/review-memory/{entryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Review Memory */
+        delete: operations["delete_review_memory_api_ontologies__id__review_memory__entryId__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/review-memory/{entryId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore Review Memory */
+        post: operations["restore_review_memory_api_ontologies__id__review_memory__entryId__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/review-memory/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear Review Memory */
+        post: operations["clear_review_memory_api_ontologies__id__review_memory_clear_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ontologies": {
         parameters: {
             query?: never;
@@ -763,6 +831,24 @@ export interface paths {
         put?: never;
         /** Retry Document */
         post: operations["retry_document_api_documents__id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/change-sets/{id}/review-assist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Review Assist */
+        get: operations["get_review_assist_api_change_sets__id__review_assist_get"];
+        put?: never;
+        /** Request Review Assist */
+        post: operations["request_review_assist_api_change_sets__id__review_assist_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1476,6 +1562,87 @@ export interface components {
             /** Model */
             model: string | null;
         };
+        /** AssistCounts */
+        AssistCounts: {
+            /** Total */
+            total: number;
+            /** Aireviewed */
+            aiReviewed: number;
+            /** Withrisks */
+            withRisks: number;
+            /** Suggestreject */
+            suggestReject: number;
+            /** Suggestedit */
+            suggestEdit: number;
+            /** Stale */
+            stale: number;
+            /** Dropped */
+            dropped: number;
+        };
+        /** AssistGroup */
+        AssistGroup: {
+            /** Title */
+            title: string;
+            /** Itemids */
+            itemIds: string[];
+        };
+        /** AssistItem */
+        AssistItem: {
+            /**
+             * Itemid
+             * Format: uuid
+             */
+            itemId: string;
+            /** Stale */
+            stale: boolean;
+            /** Risks */
+            risks: components["schemas"]["AssistRisk"][];
+            /** Suggestion */
+            suggestion: ("accept" | "reject" | "edit" | "unsure") | null;
+            /** Reason */
+            reason: string | null;
+            rename: components["schemas"]["AssistRename"] | null;
+        };
+        /** AssistRename */
+        AssistRename: {
+            /** Labelzh */
+            labelZh?: string | null;
+            /** Labelen */
+            labelEn?: string | null;
+            /** Localname */
+            localName?: string | null;
+        };
+        /** AssistRequest */
+        AssistRequest: {
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "zh-CN" | "en";
+        };
+        /** AssistRisk */
+        AssistRisk: {
+            /**
+             * Code
+             * @enum {string}
+             */
+            code: "weak_evidence" | "conflict" | "duplicate" | "naming" | "memory";
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "rule" | "ai";
+            /** Detail */
+            detail: ("evidence_not_found" | "no_evidence" | "low_confidence" | "possible_duplicate" | "undecided_match" | "kept_fields" | "stale_target" | "local_name_style" | "missing_label_en" | "similar_to_rejected") | null;
+            /** Reason */
+            reason: string | null;
+            /** Relateditemids */
+            relatedItemIds: string[];
+            /** Relatedelementids */
+            relatedElementIds: string[];
+            /** Memoryentryid */
+            memoryEntryId: string | null;
+        };
         /**
          * AssistantContext
          * @description Where the user was when they asked: the page and the element they had selected.
@@ -1653,6 +1820,8 @@ export interface components {
              * @enum {string}
              */
             decision: "pending" | "accepted" | "rejected";
+            /** Rejectreason */
+            rejectReason?: ("out_of_scope" | "incorrect" | "duplicate" | "keep_open") | null;
         };
         /**
          * CascadeChange
@@ -1827,6 +1996,8 @@ export interface components {
              * @enum {string}
              */
             decision: "pending" | "accepted" | "rejected";
+            /** Rejectreason */
+            rejectReason: ("out_of_scope" | "incorrect" | "duplicate" | "keep_open") | null;
             /** Confidence */
             confidence: number | null;
             /** Rationale */
@@ -1886,6 +2057,10 @@ export interface components {
             mergedAt: string | null;
             /** Items */
             items: components["schemas"]["ChangeItem"][];
+            /** Suppressed */
+            suppressed: components["schemas"]["SuppressedItem"][];
+            /** Suppressedtotal */
+            suppressedTotal: number;
             /** Resolutiontoken */
             resolutionToken: string;
         };
@@ -3074,6 +3249,8 @@ export interface components {
         ItemDecisionPatch: {
             /** Decision */
             decision?: ("pending" | "accepted" | "rejected") | null;
+            /** Rejectreason */
+            rejectReason?: ("out_of_scope" | "incorrect" | "duplicate" | "keep_open") | null;
             edited?: components["schemas"]["ElementFields"] | null;
             /** Note */
             note?: string | null;
@@ -3161,6 +3338,19 @@ export interface components {
              * @enum {string}
              */
             check: "ok" | "missing_table" | "missing_column" | "type_mismatch" | "catalog_unavailable";
+        };
+        /** KeptApartMemoryDetail */
+        KeptApartMemoryDetail: {
+            /**
+             * Kind
+             * @default kept_apart
+             * @constant
+             */
+            kind: "kept_apart";
+            /** Otherlabel */
+            otherLabel: string;
+            /** Otherelementid */
+            otherElementId: string | null;
         };
         /** KeySet */
         KeySet: {
@@ -4063,6 +4253,23 @@ export interface components {
             /** Lang */
             lang?: string | null;
         };
+        /** RejectedMemoryDetail */
+        RejectedMemoryDetail: {
+            /**
+             * Kind
+             * @default rejected
+             * @constant
+             */
+            kind: "rejected";
+            /** Reason */
+            reason: ("out_of_scope" | "incorrect" | "duplicate" | "keep_open") | null;
+            /** Labelen */
+            labelEn: string | null;
+            /** Domain */
+            domain: string | null;
+            /** Range */
+            range: string | null;
+        };
         /** RelationBindingView */
         RelationBindingView: {
             /**
@@ -4165,6 +4372,131 @@ export interface components {
              */
             createdAt: string;
         };
+        /** RenamedMemoryDetail */
+        RenamedMemoryDetail: {
+            /**
+             * Kind
+             * @default renamed
+             * @constant
+             */
+            kind: "renamed";
+            /** Tolabelzh */
+            toLabelZh: string;
+            /** Tolabelen */
+            toLabelEn: string | null;
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+        };
+        /** ReviewAssist */
+        ReviewAssist: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Changesetid
+             * Format: uuid
+             */
+            changeSetId: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "done" | "partial" | "failed";
+            /** Errorcode */
+            errorCode: string | null;
+            /** Aiused */
+            aiUsed: boolean;
+            /** Truncated */
+            truncated: boolean;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "zh-CN" | "en";
+            /** Requestedby */
+            requestedBy: string | null;
+            /** Requestedbyname */
+            requestedByName: string | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Finishedat */
+            finishedAt: string | null;
+            /** Summary */
+            summary: string | null;
+            /** Groups */
+            groups: components["schemas"]["AssistGroup"][];
+            /** Items */
+            items: components["schemas"]["AssistItem"][];
+            counts: components["schemas"]["AssistCounts"];
+        };
+        /** ReviewMemoryClear */
+        ReviewMemoryClear: {
+            /** Cleared */
+            cleared: number;
+        };
+        /** ReviewMemoryEntry */
+        ReviewMemoryEntry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Ontologyid
+             * Format: uuid
+             */
+            ontologyId: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "rejected" | "renamed" | "kept_apart";
+            /**
+             * Elementkind
+             * @enum {string}
+             */
+            elementKind: "entity_type" | "relation_type" | "property";
+            /** Label */
+            label: string;
+            /** Detail */
+            detail: components["schemas"]["RejectedMemoryDetail"] | components["schemas"]["RenamedMemoryDetail"] | components["schemas"]["KeptApartMemoryDetail"];
+            /** Sourcechangesetid */
+            sourceChangeSetId: string | null;
+            /** Sourceitemid */
+            sourceItemId: string | null;
+            /** Decidedby */
+            decidedBy: string | null;
+            /** Decidedbyname */
+            decidedByName: string | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Hits */
+            hits: number;
+            /** Lasthitat */
+            lastHitAt: string | null;
+        };
+        /** ReviewMemoryPage */
+        ReviewMemoryPage: {
+            /** Items */
+            items: components["schemas"]["ReviewMemoryEntry"][];
+            /** Nextcursor */
+            nextCursor: string | null;
+            /** Total */
+            total: number;
+            /** Max */
+            max: number;
+        };
         /**
          * Role
          * @enum {string}
@@ -4254,6 +4586,27 @@ export interface components {
             column: string;
             /** Value */
             value: string;
+        };
+        /** SuppressedItem */
+        SuppressedItem: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "entity_type" | "relation_type" | "property";
+            /** Labelzh */
+            labelZh: string | null;
+            /** Labelen */
+            labelEn: string | null;
+            /**
+             * Cause
+             * @enum {string}
+             */
+            cause: "memory" | "depends_on_suppressed";
+            /** Memoryentryid */
+            memoryEntryId: string | null;
+            /** Dependson */
+            dependsOn: string | null;
         };
         /** Synonym */
         Synonym: {
@@ -4741,6 +5094,261 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    list_review_memory_api_ontologies__id__review_memory_get: {
+        parameters: {
+            query?: {
+                kind?: ("rejected" | "renamed" | "kept_apart") | null;
+                q?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewMemoryPage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_review_memory_api_ontologies__id__review_memory__entryId__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    restore_review_memory_api_ontologies__id__review_memory__entryId__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewMemoryEntry"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    clear_review_memory_api_ontologies__id__review_memory_clear_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewMemoryClear"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -6660,6 +7268,153 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_review_assist_api_change_sets__id__review_assist_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewAssist"] | null;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    request_review_assist_api_change_sets__id__review_assist_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewAssist"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };

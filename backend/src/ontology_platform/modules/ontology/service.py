@@ -27,7 +27,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from ontology_platform.errors import AppError
+from ontology_platform.errors import AppError, not_implemented
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.identity import service as identity
 from ontology_platform.modules.ontology import (
@@ -63,6 +63,7 @@ from ontology_platform.modules.ontology.rdf.axiom_categories import (
     classify_axiom,
     declared_annotations,
 )
+from ontology_platform.modules.ontology.review_memory import ReviewMemory
 from ontology_platform.modules.ontology.schemas import ReviewMode
 from ontology_platform.modules.ontology.turtle import OntologyHeader, export_turtle
 
@@ -74,11 +75,57 @@ RESOLUTION_CHANGED = "changeset.resolution_changed"
 NO_MATCH = "changeset.no_match"
 # The kinds M1's AI extraction aligns its proposals with.
 _ALIGNMENT_KINDS = ("entity_type", "relation_type", "property")
+# A change set keeps this many suppressed proposals; `suppressed_total` counts the rest too.
+SUPPRESSED_MAX = 200
 
 TITLE_MAX_LENGTH = 300
 _KEY = re.compile(schemas.KEY_PATTERN)
 _KEY_ALPHABET = string.ascii_lowercase + string.digits
 _RANDOM_KEY_ATTEMPTS = 5
+
+
+# ---------- review memory (spec 008; batch 2 replaces the stubs) ----------
+
+
+async def review_memory_for(db: AsyncSession, ontology_id: UUID) -> ReviewMemory:
+    # Empty until batch 2: extraction must keep working if batch 3 lands first.
+    return ReviewMemory(ontology_id=ontology_id, entries=())
+
+
+async def record_memory_hits(
+    db: AsyncSession, ontology_id: UUID, entry_ids: Sequence[UUID]
+) -> None:
+    pass
+
+
+async def list_review_memory(
+    db: AsyncSession,
+    ontology_id: UUID,
+    *,
+    kind: str | None,
+    q: str | None,
+    limit: int,
+    cursor: str | None,
+) -> schemas.ReviewMemoryPage:
+    raise not_implemented("Review memory listing")
+
+
+async def delete_review_memory(
+    db: AsyncSession, ontology_id: UUID, entry_id: UUID, *, actor: UUID
+) -> None:
+    raise not_implemented("Review memory deletion")
+
+
+async def restore_review_memory(
+    db: AsyncSession, ontology_id: UUID, entry_id: UUID, *, actor: UUID
+) -> schemas.ReviewMemoryEntry:
+    raise not_implemented("Review memory restoration")
+
+
+async def clear_review_memory(
+    db: AsyncSession, ontology_id: UUID, *, actor: UUID
+) -> schemas.ReviewMemoryClear:
+    raise not_implemented("Review memory clearing")
 
 
 class InvalidProposalError(AppError):
@@ -349,6 +396,8 @@ async def create_change_set(
     created_by: UUID | None,
     items: list[schemas.ProposedItem],
     token_id: UUID | None = None,
+    suppressed: Sequence[schemas.SuppressedItem] = (),
+    suppressed_total: int | None = None,
 ) -> UUID:
     """Add an open change set with `items` (in order) to the caller's transaction.
 
@@ -405,6 +454,10 @@ async def create_change_set(
         status="open",
         created_by=created_by,
         token_id=token_id,
+        suppressed=[
+            item.model_dump(mode="json", by_alias=True) for item in suppressed[:SUPPRESSED_MAX]
+        ],
+        suppressed_total=max(suppressed_total or 0, len(suppressed)),
         created_at=_now(),
     )
     db.add(change_set)
@@ -1624,6 +1677,7 @@ async def _items_out(
                     "edited": edited,
                     "before": _before(target) if target else None,
                     "decision": item.decision,
+                    "reject_reason": item.reject_reason,
                     "confidence": item.confidence,
                     "rationale": item.rationale,
                     "flags": item.flags,
@@ -1735,6 +1789,8 @@ async def _detail(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetD
         {
             **data,
             "items": await _items_out(db, change_set, items, resolutions, links),
+            "suppressed": change_set.suppressed,
+            "suppressed_total": change_set.suppressed_total,
             "resolution_token": token,
         }
     )
@@ -1749,6 +1805,8 @@ async def get_change_set(db: AsyncSession, change_set_id: UUID) -> schemas.Chang
 
 def _decide(item: ChangeItem, decision: Decision, actor: UUID, now: datetime) -> None:
     item.decision = decision
+    if decision != "rejected":
+        item.reject_reason = None
     if decision == "pending":
         item.decided_by = None
         item.decided_at = None
@@ -1909,6 +1967,8 @@ async def update_item(
     )
     if item is None:
         raise _change_set_not_found()
+    if patch.reject_reason is not None and (patch.decision or item.decision) != "rejected":
+        raise AppError(422, "changeset.invalid_reason", "A reject reason requires rejection.")
     if "edited" in given:
         if item.kind == "metric" and change_set.source != "manual":
             raise InvalidProposalError("Metric changes require a manual edit.")
@@ -1931,6 +1991,8 @@ async def update_item(
         item.match_decision = patch.match_decision
     if patch.decision is not None:
         _decide(item, patch.decision, actor, _now())
+    if "reject_reason" in given:
+        item.reject_reason = patch.reject_reason
     if "note" in given:
         item.note = rules.clean_text(patch.note)
     await db.commit()
@@ -1966,6 +2028,8 @@ async def decide_items(
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
     _ensure_not_own(change_set, actor, review_mode)
+    if body.reject_reason is not None and body.decision != "rejected":
+        raise AppError(422, "changeset.invalid_reason", "A reject reason requires rejection.")
     item_ids = set(body.item_ids)
     if item_ids:
         items = [item for item in await _items(db, change_set) if item.id in item_ids]
@@ -1974,6 +2038,8 @@ async def decide_items(
         now = _now()
         for item in items:
             _decide(item, body.decision, actor, now)
+            if body.decision == "rejected" and "reject_reason" in body.model_fields_set:
+                item.reject_reason = body.reject_reason
         await db.commit()
     return await _detail(db, change_set)
 

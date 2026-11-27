@@ -130,6 +130,7 @@ export function itemFixture(overrides: Partial<ChangeItem> = {}): ChangeItem {
     edited: null,
     before: null,
     decision: 'pending',
+    rejectReason: null,
     confidence: 0.92,
     rationale: '原文多次出现并给出了定义。',
     flags: [],
@@ -158,6 +159,8 @@ export function changeSetFixture(items: ChangeItem[], overrides: Partial<ChangeS
     createdAt: CREATED_AT,
     mergedAt: null,
     items,
+    suppressed: [],
+    suppressedTotal: 0,
     resolutionToken: 'token-1',
     ...overrides,
   };

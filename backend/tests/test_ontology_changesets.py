@@ -48,6 +48,7 @@ ITEM_FIELDS = {
     "axiomCategory",
     "axiomNote",
     "decision",
+    "rejectReason",
     "confidence",
     "rationale",
     "flags",

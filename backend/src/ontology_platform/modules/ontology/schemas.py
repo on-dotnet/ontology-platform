@@ -538,6 +538,7 @@ class ChangeItem(CamelModel):
     axiom_category: AxiomCategory | None = None
     axiom_note: str | None = None
     decision: Decision
+    reject_reason: Literal["out_of_scope", "incorrect", "duplicate", "keep_open"] | None
     confidence: float | None
     rationale: str | None
     flags: list[ItemFlag]
@@ -576,6 +577,8 @@ class ChangeSetSummary(CamelModel):
 
 class ChangeSetDetail(ChangeSetSummary):
     items: list[ChangeItem]
+    suppressed: list["SuppressedItem"]
+    suppressed_total: int
     # Digest of the items' resolutions; a merge sends it back (see `MergeRequest`).
     resolution_token: str
 
@@ -584,6 +587,7 @@ class ItemDecisionPatch(CamelModel):
     """Only the given keys change; `edited: null` drops the reviewer's edit."""
 
     decision: Decision | None = None
+    reject_reason: Literal["out_of_scope", "incorrect", "duplicate", "keep_open"] | None = None
     edited: ElementFields | None = None
     note: str | None = Field(default=None, max_length=2000)
     # The reviewer's conclusion about the item's alignment record; null clears it.
@@ -593,6 +597,64 @@ class ItemDecisionPatch(CamelModel):
 class BulkDecision(CamelModel):
     item_ids: list[UUID] = Field(max_length=5000)
     decision: Decision
+    reject_reason: Literal["out_of_scope", "incorrect", "duplicate", "keep_open"] | None = None
+
+
+class SuppressedItem(CamelModel):
+    kind: Literal["entity_type", "relation_type", "property"]
+    label_zh: str | None
+    label_en: str | None
+    cause: Literal["memory", "depends_on_suppressed"]
+    memory_entry_id: UUID | None
+    depends_on: str | None
+
+
+class RejectedMemoryDetail(CamelModel):
+    kind: Literal["rejected"] = "rejected"
+    reason: Literal["out_of_scope", "incorrect", "duplicate", "keep_open"] | None
+    label_en: str | None
+    domain: str | None
+    range: str | None
+
+
+class RenamedMemoryDetail(CamelModel):
+    kind: Literal["renamed"] = "renamed"
+    to_label_zh: str
+    to_label_en: str | None
+    element_id: UUID
+
+
+class KeptApartMemoryDetail(CamelModel):
+    kind: Literal["kept_apart"] = "kept_apart"
+    other_label: str
+    other_element_id: UUID | None
+
+
+class ReviewMemoryEntry(CamelModel):
+    id: UUID
+    ontology_id: UUID
+    kind: Literal["rejected", "renamed", "kept_apart"]
+    element_kind: Literal["entity_type", "relation_type", "property"]
+    label: str
+    detail: RejectedMemoryDetail | RenamedMemoryDetail | KeptApartMemoryDetail
+    source_change_set_id: UUID | None
+    source_item_id: UUID | None
+    decided_by: UUID | None
+    decided_by_name: str | None
+    created_at: datetime
+    hits: int
+    last_hit_at: datetime | None
+
+
+class ReviewMemoryPage(CamelModel):
+    items: list[ReviewMemoryEntry]
+    next_cursor: str | None
+    total: int
+    max: int
+
+
+class ReviewMemoryClear(CamelModel):
+    cleared: int
 
 
 class MergeRequest(CamelModel):

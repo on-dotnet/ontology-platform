@@ -34,6 +34,7 @@ from ontology_platform.modules.ontology import (
     service,
 )
 from ontology_platform.modules.ontology.models import ChangeSetStatus, Kind
+from ontology_platform.modules.ontology.review_memory import MemoryKind
 from ontology_platform.settings import Settings, get_settings
 
 Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
@@ -44,6 +45,54 @@ AppSettings = Annotated[Settings, Depends(get_settings)]
 ExportFormat = Annotated[Literal["turtle"], Query(alias="format")]
 REVIEWER_ROLES = frozenset({Role.ADMIN, Role.REVIEWER})
 _COMPARE_TARGET = r"^(working|[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})$"
+router = APIRouter(prefix="/api", tags=["ontology"])
+
+
+@router.get("/ontologies/{id}/review-memory", responses=problem_responses(401, 422, 501))
+async def list_review_memory(
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+    kind: MemoryKind | None = None,
+    q: Annotated[str | None, Query(max_length=100)] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    cursor: str | None = None,
+) -> schemas.ReviewMemoryPage:
+    return await service.list_review_memory(db, id, kind=kind, q=q, limit=limit, cursor=cursor)
+
+
+@router.delete(
+    "/ontologies/{id}/review-memory/{entryId}",
+    status_code=204,
+    responses=problem_responses(401, 403, 404, 422, 501),
+)
+async def delete_review_memory(
+    id: UUID,
+    entryId: UUID,  # noqa: N803 (the path names it in camelCase)
+    user: Reviewer,
+    db: DbSession,
+) -> None:
+    await service.delete_review_memory(db, id, entryId, actor=user.id)
+
+
+@router.post(
+    "/ontologies/{id}/review-memory/{entryId}/restore",
+    responses=problem_responses(401, 403, 404, 409, 422, 501),
+)
+async def restore_review_memory(
+    id: UUID,
+    entryId: UUID,  # noqa: N803 (the path names it in camelCase)
+    user: Reviewer,
+    db: DbSession,
+) -> schemas.ReviewMemoryEntry:
+    return await service.restore_review_memory(db, id, entryId, actor=user.id)
+
+
+@router.post(
+    "/ontologies/{id}/review-memory/clear", responses=problem_responses(401, 403, 422, 501)
+)
+async def clear_review_memory(id: UUID, user: Reviewer, db: DbSession) -> schemas.ReviewMemoryClear:
+    return await service.clear_review_memory(db, id, actor=user.id)
 
 
 def _may_review_own(user: Principal, settings: Settings) -> bool:
@@ -66,9 +115,6 @@ class TurtleResponse(Response):
 def _turtle(text: str, filename: str) -> Response:
     disposition = f'attachment; filename="{filename}"'
     return TurtleResponse(content=text, headers={"Content-Disposition": disposition})
-
-
-router = APIRouter(prefix="/api", tags=["ontology"])
 
 
 # ---------- ontologies and the working version ----------
