@@ -48,7 +48,7 @@ _COMPARE_TARGET = r"^(working|[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}
 router = APIRouter(prefix="/api", tags=["ontology"])
 
 
-@router.get("/ontologies/{id}/review-memory", responses=problem_responses(401, 422, 501))
+@router.get("/ontologies/{id}/review-memory", responses=problem_responses(401, 404, 422))
 async def list_review_memory(
     id: UUID,
     user: CurrentUser,
@@ -64,7 +64,7 @@ async def list_review_memory(
 @router.delete(
     "/ontologies/{id}/review-memory/{entryId}",
     status_code=204,
-    responses=problem_responses(401, 403, 404, 422, 501),
+    responses=problem_responses(401, 403, 404, 422),
 )
 async def delete_review_memory(
     id: UUID,
@@ -77,7 +77,7 @@ async def delete_review_memory(
 
 @router.post(
     "/ontologies/{id}/review-memory/{entryId}/restore",
-    responses=problem_responses(401, 403, 404, 409, 422, 501),
+    responses=problem_responses(401, 403, 404, 409, 422),
 )
 async def restore_review_memory(
     id: UUID,
@@ -89,7 +89,7 @@ async def restore_review_memory(
 
 
 @router.post(
-    "/ontologies/{id}/review-memory/clear", responses=problem_responses(401, 403, 422, 501)
+    "/ontologies/{id}/review-memory/clear", responses=problem_responses(401, 403, 404, 422)
 )
 async def clear_review_memory(id: UUID, user: Reviewer, db: DbSession) -> schemas.ReviewMemoryClear:
     return await service.clear_review_memory(db, id, actor=user.id)

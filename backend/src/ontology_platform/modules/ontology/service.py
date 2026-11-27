@@ -9,6 +9,7 @@ Change sets are the only way the working version changes (AGENTS.md, "AI 不直�
 """
 
 import asyncio
+import base64
 import logging
 import re
 import secrets
@@ -23,11 +24,11 @@ from typing import Any, Literal, cast
 from uuid import UUID, uuid4
 
 from pydantic import ValidationError
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from ontology_platform.errors import AppError, not_implemented
+from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.identity import service as identity
 from ontology_platform.modules.ontology import (
@@ -56,6 +57,7 @@ from ontology_platform.modules.ontology.models import (
     Kind,
     Ontology,
     Release,
+    ReviewMemoryRow,
 )
 from ontology_platform.modules.ontology.rdf import axiom_categories
 from ontology_platform.modules.ontology.rdf.axiom_categories import (
@@ -63,9 +65,10 @@ from ontology_platform.modules.ontology.rdf.axiom_categories import (
     classify_axiom,
     declared_annotations,
 )
-from ontology_platform.modules.ontology.review_memory import ReviewMemory
+from ontology_platform.modules.ontology.review_memory import MemoryEntry, ReviewMemory
 from ontology_platform.modules.ontology.schemas import ReviewMode
 from ontology_platform.modules.ontology.turtle import OntologyHeader, export_turtle
+from ontology_platform.settings import Settings
 
 STALE_TARGET = "changeset.stale_target"
 DEPENDENCY_SKIPPED = "changeset.dependency_skipped"
@@ -88,14 +91,94 @@ _RANDOM_KEY_ATTEMPTS = 5
 
 
 async def review_memory_for(db: AsyncSession, ontology_id: UUID) -> ReviewMemory:
-    # Empty until batch 2: extraction must keep working if batch 3 lands first.
-    return ReviewMemory(ontology_id=ontology_id, entries=())
+    rows = (
+        await db.scalars(
+            select(ReviewMemoryRow).where(
+                ReviewMemoryRow.ontology_id == ontology_id, ReviewMemoryRow.deleted_at.is_(None)
+            )
+        )
+    ).all()
+    entries = tuple(
+        MemoryEntry(
+            id=row.id,
+            kind=cast(Any, row.kind),
+            element_kind=cast(Any, row.element_kind),
+            key=row.key,
+            label=row.label,
+            reason=row.detail.get("reason"),
+            label_en=row.detail.get("labelEn"),
+            domain=row.detail.get("domain"),
+            range=row.detail.get("range"),
+            to_label_zh=row.detail.get("toLabelZh"),
+            to_label_en=row.detail.get("toLabelEn"),
+            element_id=UUID(str(value))
+            if (value := row.detail.get("elementId") or row.detail.get("otherElementId"))
+            else None,
+            other_label=row.detail.get("otherLabel"),
+            created_at=row.created_at,
+            last_hit_at=row.last_hit_at,
+        )
+        for row in rows
+    )
+    return ReviewMemory(ontology_id, entries)
 
 
 async def record_memory_hits(
     db: AsyncSession, ontology_id: UUID, entry_ids: Sequence[UUID]
 ) -> None:
-    pass
+    if entry_ids:
+        await db.execute(
+            update(ReviewMemoryRow)
+            .where(
+                ReviewMemoryRow.ontology_id == ontology_id,
+                ReviewMemoryRow.id.in_(set(entry_ids)),
+                ReviewMemoryRow.deleted_at.is_(None),
+            )
+            .values(hits=ReviewMemoryRow.hits + 1, last_hit_at=_now())
+        )
+
+
+async def _evict_review_memory(db: AsyncSession, ontology_id: UUID, now: datetime) -> None:
+    rows = (
+        await db.scalars(
+            select(ReviewMemoryRow)
+            .where(ReviewMemoryRow.ontology_id == ontology_id, ReviewMemoryRow.deleted_at.is_(None))
+            .order_by(
+                func.coalesce(ReviewMemoryRow.last_hit_at, ReviewMemoryRow.created_at),
+                ReviewMemoryRow.id,
+            )
+        )
+    ).all()
+    excess = len(rows) - Settings().review_memory_max
+    for row in rows[: max(excess, 0)]:
+        row.deleted_at = now
+        row.deleted_reason = "evicted"
+        row.deleted_by = None
+
+
+def _memory_not_found() -> AppError:
+    return AppError(404, "review_memory.not_found", "Review memory entry not found.")
+
+
+async def _memory_entry(db: AsyncSession, row: ReviewMemoryRow) -> schemas.ReviewMemoryEntry:
+    names = await identity.display_names(db, {row.decided_by} if row.decided_by else set())
+    return schemas.ReviewMemoryEntry.model_validate(
+        {
+            "id": row.id,
+            "ontology_id": row.ontology_id,
+            "kind": row.kind,
+            "element_kind": row.element_kind,
+            "label": row.label,
+            "detail": {"kind": row.kind, **row.detail},
+            "source_change_set_id": row.source_change_set_id,
+            "source_item_id": row.source_item_id,
+            "decided_by": row.decided_by,
+            "decided_by_name": names.get(row.decided_by) if row.decided_by else None,
+            "created_at": row.created_at,
+            "hits": row.hits,
+            "last_hit_at": row.last_hit_at,
+        }
+    )
 
 
 async def list_review_memory(
@@ -107,25 +190,144 @@ async def list_review_memory(
     limit: int,
     cursor: str | None,
 ) -> schemas.ReviewMemoryPage:
-    raise not_implemented("Review memory listing")
+    await _ontology_or_404(db, ontology_id)
+    base = select(ReviewMemoryRow).where(
+        ReviewMemoryRow.ontology_id == ontology_id, ReviewMemoryRow.deleted_at.is_(None)
+    )
+    total = (
+        await db.scalar(
+            select(func.count())
+            .select_from(ReviewMemoryRow)
+            .where(ReviewMemoryRow.ontology_id == ontology_id, ReviewMemoryRow.deleted_at.is_(None))
+        )
+        or 0
+    )
+    if kind is not None:
+        base = base.where(ReviewMemoryRow.kind == kind)
+    if q:
+        pattern = f"%{q.replace('%', r'\%').replace('_', r'\_')}%"
+        base = base.where(
+            or_(
+                ReviewMemoryRow.label.ilike(pattern, escape="\\"),
+                ReviewMemoryRow.detail["toLabelZh"].astext.ilike(pattern, escape="\\"),
+                ReviewMemoryRow.detail["otherLabel"].astext.ilike(pattern, escape="\\"),
+            )
+        )
+    try:
+        offset = int(base64.urlsafe_b64decode(cursor.encode()).decode()) if cursor else 0
+        if offset < 0:
+            raise ValueError
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise AppError(422, "review_memory.invalid_cursor", "Invalid cursor.") from exc
+    rows = (
+        await db.scalars(
+            base.order_by(ReviewMemoryRow.created_at.desc(), ReviewMemoryRow.id.desc())
+            .offset(offset)
+            .limit(limit + 1)
+        )
+    ).all()
+    next_cursor = (
+        base64.urlsafe_b64encode(str(offset + limit).encode()).decode()
+        if len(rows) > limit
+        else None
+    )
+    return schemas.ReviewMemoryPage(
+        items=[await _memory_entry(db, row) for row in rows[:limit]],
+        next_cursor=next_cursor,
+        total=total,
+        max=Settings().review_memory_max,
+    )
 
 
 async def delete_review_memory(
     db: AsyncSession, ontology_id: UUID, entry_id: UUID, *, actor: UUID
 ) -> None:
-    raise not_implemented("Review memory deletion")
+    await _ontology_or_404(db, ontology_id, lock=True)
+    row = await db.scalar(
+        select(ReviewMemoryRow)
+        .where(
+            ReviewMemoryRow.ontology_id == ontology_id,
+            ReviewMemoryRow.id == entry_id,
+            ReviewMemoryRow.deleted_at.is_(None),
+        )
+        .with_for_update()
+    )
+    if row is None:
+        raise _memory_not_found()
+    row.deleted_at = _now()
+    row.deleted_reason = "deleted"
+    row.deleted_by = actor
+    audit.record(
+        db,
+        "review_memory.deleted",
+        actor_id=actor,
+        target_type="review_memory",
+        target_id=str(entry_id),
+        detail={"count": 1},
+    )
+    await db.commit()
 
 
 async def restore_review_memory(
     db: AsyncSession, ontology_id: UUID, entry_id: UUID, *, actor: UUID
 ) -> schemas.ReviewMemoryEntry:
-    raise not_implemented("Review memory restoration")
+    await _ontology_or_404(db, ontology_id, lock=True)
+    row = await db.scalar(
+        select(ReviewMemoryRow)
+        .where(ReviewMemoryRow.ontology_id == ontology_id, ReviewMemoryRow.id == entry_id)
+        .with_for_update()
+    )
+    if row is None:
+        raise _memory_not_found()
+    if row.deleted_at is not None:
+        if row.deleted_reason != "deleted":
+            raise AppError(409, "review_memory.not_restorable", "Entry cannot be restored.")
+        now = _now()
+        row.deleted_at = None
+        row.deleted_reason = None
+        row.deleted_by = None
+        row.created_at = now
+        row.last_hit_at = None
+        await db.flush()
+        await _evict_review_memory(db, ontology_id, now)
+        audit.record(
+            db,
+            "review_memory.restored",
+            actor_id=actor,
+            target_type="review_memory",
+            target_id=str(entry_id),
+            detail={"count": 1},
+        )
+        await db.commit()
+    return await _memory_entry(db, row)
 
 
 async def clear_review_memory(
     db: AsyncSession, ontology_id: UUID, *, actor: UUID
 ) -> schemas.ReviewMemoryClear:
-    raise not_implemented("Review memory clearing")
+    await _ontology_or_404(db, ontology_id, lock=True)
+    rows = (
+        await db.scalars(
+            select(ReviewMemoryRow).where(
+                ReviewMemoryRow.ontology_id == ontology_id, ReviewMemoryRow.deleted_at.is_(None)
+            )
+        )
+    ).all()
+    now = _now()
+    for row in rows:
+        row.deleted_at = now
+        row.deleted_reason = "cleared"
+        row.deleted_by = actor
+    audit.record(
+        db,
+        "review_memory.cleared",
+        actor_id=actor,
+        target_type="ontology",
+        target_id=str(ontology_id),
+        detail={"count": len(rows)},
+    )
+    await db.commit()
+    return schemas.ReviewMemoryClear(cleared=len(rows))
 
 
 class InvalidProposalError(AppError):
