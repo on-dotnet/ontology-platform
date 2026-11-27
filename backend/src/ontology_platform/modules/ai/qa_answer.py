@@ -26,11 +26,16 @@ _NOT_IN_CLAUSE = r"[^，,；;。！？!?\n]"
 _DENIAL = re.compile(
     rf"(?:无法|不能|未能|没法|难以|不便){_NOT_IN_CLAUSE}{{0,8}}(?:列出|列举|罗列)"
     rf"|(?:未|没有|并未|尚未){_NOT_IN_CLAUSE}{{0,2}}(?:列出|列举|罗列)"
-    rf"|(?:无法|不能|未能|没法|难以|不便|未|没有|并未|不)"
+    # No bare 不, and 未 only right before the verb: 不合格 and 未包含 state facts.
+    rf"|(?:(?:无法|不能|未能|没法|难以|不便|没有|并未|尚未|不会|不再|不予)"
     rf"{_NOT_IN_CLAUSE}{{0,6}}(?:提供|给出|列出|展示|显示|包含)"
+    rf"|未(?:提供|给出|展示|显示))"
     rf"{_NOT_IN_CLAUSE}{{0,12}}(?:编号|名单|清单|列表|明细)"
 )
-_CLAUSE_END = re.compile(r"(?<=[，,；;。！？!?\n])(?![，,；;。！？!?\n])")
+# A comma between digits is a thousands separator, not a clause end.
+_CLAUSE_END = re.compile(
+    r"(?:(?<=[，；;。！？!?\n])|(?<=(?<!\d),)|(?<=,)(?!\d))(?![，,；;。！？!?\n])"
+)
 _SENTENCE_ENDS = "。！？!?\n"
 _CLAUSE_JOINS = "，,；;"
 
@@ -262,6 +267,8 @@ async def answer(
     text = readable(output.answer)
     if text is None:
         result.notes.append("answer_unavailable")
+        if readable.unknown:
+            result.notes.append("cited_unknown")
         return result
     result.text = text
     result.counterpoints = [c for c in map(readable, output.counterpoints) if c is not None]

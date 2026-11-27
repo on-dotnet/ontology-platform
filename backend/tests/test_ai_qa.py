@@ -299,7 +299,17 @@ async def test_a_conclusion_made_only_of_unknown_row_refs_is_not_shown(qa_demo: 
     assert result.answer.counterpoints == []
     assert result.answer.cited_keys == []
     assert "answer_unavailable" in result.answer.notes
+    assert "cited_unknown" in result.answer.notes
     assert result.answer.facts.count == 2
+
+
+async def test_a_thousands_separator_does_not_split_a_clause(qa_demo: QaDemo) -> None:
+    answer = QaAnswerOut(answer="K9 共 1,200 次，K1 合格。", cited_keys=["K1"], counterpoints=[])
+    result = await qa_demo.run("Q2", answer=answer)
+    assert result.answer is not None
+    assert result.evidence is not None
+    assert result.answer.text == f"{_name(result.evidence.rows[0])} 合格。"
+    assert result.answer.notes == ["cited_unknown"]
 
 
 @pytest.mark.parametrize(
@@ -320,6 +330,9 @@ async def test_a_conclusion_made_only_of_unknown_row_refs_is_not_shown(qa_demo: 
             "共有 18 个炉次；结果不包含具体的缺陷位置。",
             "共有 18 个炉次；结果不包含具体的缺陷位置。",
         ),
+        # Facts about the objects are not denials of the list.
+        ("检验不合格的炉次已列出清单。", "检验不合格的炉次已列出清单。"),
+        ("有 2 个炉次未包含在检验清单中。", "有 2 个炉次未包含在检验清单中。"),
         ("结果中没有给出炉次的编号清单。", None),
     ],
 )
