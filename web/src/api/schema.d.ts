@@ -2097,6 +2097,8 @@ export interface components {
             warnings: "account_can_write"[];
             /** Serverversion */
             serverVersion: string | null;
+            /** Schemas */
+            schemas: string[] | null;
         };
         /**
          * ConnectionTestRequest

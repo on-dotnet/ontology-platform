@@ -602,10 +602,12 @@ async def test_saved_connection_persists_test_result_without_changing_revision(
     assert result["reason"] is None
     assert result["serverVersion"]
     assert result["warnings"] == ["account_can_write"]
+    assert "mes" in result["schemas"]
     data = (await client.get(url)).json()
     assert data["revision"] == source["revision"]
     row = await _stored(db, source)
     last = data["lastTest"]
+    assert "schemas" not in last
     assert datetime.fromisoformat(last["at"]) == row.last_test_at
     assert last["ok"] is True
     assert last["code"] is None
@@ -632,6 +634,7 @@ async def test_failed_saved_connection_returns_reason_and_records_safe_result(
         "reason": "auth_failed",
         "warnings": [],
         "serverVersion": None,
+        "schemas": None,
     }
     assert marker not in response.text
     assert external_source.reader not in response.text
@@ -669,6 +672,7 @@ async def test_unsaved_tests_use_submitted_settings_and_only_borrow_the_password
         assert result["code"] is None
         assert result["reason"] is None
         assert result["warnings"] == []
+        assert "mes" in result["schemas"]
         assert external_source.reader_password not in response.text
 
     marker = "wrong-override-" + uuid4().hex

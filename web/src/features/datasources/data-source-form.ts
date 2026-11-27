@@ -8,6 +8,17 @@ type TestRequest = components['schemas']['ConnectionTestRequest'];
 
 export const sslModes = ['disable', 'prefer', 'require', 'verify-full'] as const satisfies readonly Create['sslMode'][];
 
+interface SchemaRow {
+  id: number;
+  name: string;
+  exact?: boolean;
+}
+
+// PostgreSQL identifiers can contain surrounding spaces. Only trim free-text input.
+export function schemaName(row: SchemaRow) {
+  return row.exact ? row.name : row.name.trim();
+}
+
 export function initialForm(source?: DataSource) {
   const connection = source?.connection;
   const schemas = connection?.schemas.length ? connection.schemas : [''];
@@ -19,7 +30,7 @@ export function initialForm(source?: DataSource) {
     username: connection?.username ?? '',
     password: '',
     sslMode: connection?.sslMode ?? 'prefer',
-    schemas: schemas.map((name, id) => ({ id, name })),
+    schemas: schemas.map((name, id): SchemaRow => ({ id, name, exact: true })),
     allowSamples: source?.allowSamples ?? false,
   };
 }
@@ -47,7 +58,7 @@ function connectionFields(form: SourceForm) {
     database: form.database.trim(),
     username: form.username.trim(),
     sslMode: form.sslMode,
-    schemas: form.schemas.map((row) => row.name.trim()).filter((name) => name.length > 0),
+    schemas: form.schemas.map(schemaName).filter((name) => name.length > 0),
   };
 }
 

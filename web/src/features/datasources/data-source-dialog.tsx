@@ -11,12 +11,14 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
+import { Pagination } from '@/components/ui/pagination';
 import { useErrorMessage } from '@/i18n/error-message';
+import { usePagination } from '@/lib/pagination';
 
 import type { DataSource } from './api';
 import { ConnectionTestResult } from './connection-test-result';
 import {
-  createRequest, initialForm, patchRequest, sslModes, testRequest, validationErrors,
+  createRequest, initialForm, patchRequest, schemaName, sslModes, testRequest, validationErrors,
   type Operation, type SourceForm, type TextField,
 } from './data-source-form';
 
@@ -28,6 +30,7 @@ interface DataSourceDialogProps {
 }
 
 const maxLengths = { name: 100, host: 255, database: 128, username: 128, password: 1024 };
+const maxSchemas = 50;
 
 function focusPassword(input: HTMLInputElement | null) {
   input?.focus();
@@ -48,6 +51,10 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
   const [pending, setPending] = useState<Operation | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [result, setResult] = useState<components['schemas']['ConnectionTest'] | null>(null);
+  const visibleSchemas = (result?.ok && result.schemas) || [];
+  const schemaPage = usePagination(visibleSchemas.length, visibleSchemas.length ? 'visible' : '');
+  const selectedNames = new Set(form.schemas.map(schemaName));
+  const emptyRow = form.schemas.find((row) => row.name === '');
   const nextRowId = useRef(form.schemas.length);
   const formRef = useRef<HTMLFormElement>(null);
   const controller = useRef<AbortController | null>(null);
@@ -56,7 +63,17 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
   function change<K extends keyof SourceForm>(field: K, value: SourceForm[K]) {
     setForm((current) => ({ ...current, [field]: value }));
     setError(null);
-    if (!initial || (field !== 'name' && field !== 'allowSamples')) setResult(null);
+    if (field !== 'schemas' && (!initial || (field !== 'name' && field !== 'allowSamples'))) setResult(null);
+  }
+
+  function toggleSchema(name: string, checked: boolean) {
+    if (!checked) {
+      change('schemas', form.schemas.filter((row) => schemaName(row) !== name));
+    } else if (emptyRow) {
+      change('schemas', form.schemas.map((row) => row.id === emptyRow.id ? { ...row, name, exact: true } : row));
+    } else if (form.schemas.length < maxSchemas) {
+      change('schemas', [...form.schemas, { id: nextRowId.current++, name, exact: true }]);
+    }
   }
 
   async function run(operation: Operation) {
@@ -175,6 +192,26 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
             </div>
             <fieldset className="min-w-0 space-y-2 sm:col-span-2">
               <legend className="text-sm font-medium">{t('datasources.fields.schemas')}</legend>
+              {visibleSchemas.length > 0 && (
+                <fieldset className="min-w-0 rounded-lg border border-border px-2">
+                  <legend className="px-1 text-sm text-muted-foreground">{t('datasources.form.availableSchemas')}</legend>
+                  <div className="grid max-h-48 gap-x-2 overflow-y-auto sm:grid-cols-2">
+                    {visibleSchemas.slice(schemaPage.start, schemaPage.end).map((name) => {
+                      const checked = selectedNames.has(name);
+                      return (
+                        <label key={name} className="flex min-h-10 items-center gap-2 rounded-md px-2 text-sm hover:bg-muted">
+                          <input type="checkbox" checked={checked}
+                            disabled={!checked && !emptyRow && form.schemas.length >= maxSchemas}
+                            className="size-4 shrink-0 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                            onChange={(event) => toggleSchema(name, event.target.checked)} />
+                          <span className="whitespace-pre-wrap break-all font-mono">{name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <Pagination state={schemaPage} total={visibleSchemas.length} />
+                </fieldset>
+              )}
               {form.schemas.map((row, index) => {
                 const removeLabel = t('datasources.form.removeSchema', { index: index + 1 });
                 return (
@@ -184,7 +221,7 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
                       value={row.name}
                       maxLength={128}
                       onChange={(event) => change('schemas', form.schemas.map((item) =>
-                        item.id === row.id ? { ...item, name: event.target.value } : item))}
+                        item.id === row.id ? { id: item.id, name: event.target.value } : item))}
                     />
                     <Button variant="ghost" size="icon" aria-label={removeLabel} title={removeLabel}
                       onClick={() => change('schemas', form.schemas.filter((item) => item.id !== row.id))}>
@@ -193,7 +230,7 @@ export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: D
                   </div>
                 );
               })}
-              <Button variant="secondary" size="sm" disabled={form.schemas.length >= 50}
+              <Button variant="secondary" size="sm" disabled={form.schemas.length >= maxSchemas}
                 onClick={() => change('schemas', [...form.schemas, { id: nextRowId.current++, name: '' }])}>
                 <Plus aria-hidden />{t('datasources.form.addSchema')}
               </Button>

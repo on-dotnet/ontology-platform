@@ -131,6 +131,7 @@ class ConnectionTest(CamelModel):
     reason: Literal["unreachable", "auth_failed", "database_missing", "ssl", "timeout"] | None
     warnings: list[TestWarning]
     server_version: str | None
+    schemas: list[str] | None
 
 
 class CatalogColumn(CamelModel):
