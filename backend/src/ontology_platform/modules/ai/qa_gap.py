@@ -20,6 +20,7 @@ from ontology_platform.modules.jobs.runner import (
     RetryableJobError,
 )
 from ontology_platform.modules.ontology import assistant as ontology_assistant
+from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.settings import Settings
 
 JOB_KIND = "qa.gap"
@@ -66,6 +67,22 @@ def _message(question: str, gaps: QaGaps) -> str:
     return "\n".join(lines)
 
 
+async def _gap_context(db: AsyncSession, ontology_id: UUID, message: str) -> str:
+    context = await ontology_assistant.context_for(
+        db, ontology_id, message=message, page="explore", element_id=None
+    )
+    bindings = await ontology_service.list_elements(db, ontology_id, kind="type_binding", q=None)
+    bound_types = {str(binding.subject_id) for binding in bindings if binding.subject_id}
+    # Annotate only the types already in the summary, including when context_for truncates it.
+    lines = []
+    for line in context.splitlines():
+        ref, _, fields = line.partition(" | ")
+        if ref in bound_types and fields.startswith("entity_type | "):
+            line += " primary_key_bound=yes"
+        lines.append(line)
+    return "\n".join(lines)
+
+
 async def _lock_pending(
     db: AsyncSession, job: JobContext, question_id: UUID
 ) -> QaQuestionRow | None:
@@ -90,9 +107,7 @@ def make_gap_proposer(
                 question, ontology_id = row.question, row.ontology_id
                 message = _message(question, QaGaps.model_validate(row.gaps))
             async with session_factory() as db:
-                context = await ontology_assistant.context_for(
-                    db, ontology_id, message=message, page="explore", element_id=None
-                )
+                context = await _gap_context(db, ontology_id, message)
             output = await gateway.structured(
                 purpose=JOB_KIND,
                 model=model,

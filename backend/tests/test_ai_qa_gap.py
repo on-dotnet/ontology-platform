@@ -180,7 +180,45 @@ async def test_q5_gap_creates_only_pending_changes(
         ("create", "relation_type", "pending"),
     ]
     assert all(i.applied_element_id is None and i.decided_by is None for i in items)
+    entity = next(i for i in items if i.kind == "entity_type")
+    relation = next(i for i in items if i.kind == "relation_type")
+    assert entity.temp_ref == "new:defect"
+    assert relation.proposed["domainRef"] == coil
+    assert relation.proposed["rangeRef"] == entity.temp_ref
+    assert relation.proposed["multiple"] is True
     assert await working_version(db, q5.ontology_id) == before
+
+
+async def test_gap_prompt_models_records_even_when_plan_suggests_property(
+    qa_demo: QaDemo, db: AsyncSession
+) -> None:
+    await sign_in(qa_demo.client, db, Role.EDITOR)
+    qa_demo.scripts["Q5"]["plan"]["missing"] = [
+        {
+            "kind": "property",
+            "label_zh": "表面缺陷明细",
+            "description": "没有可关联的缺陷记录。",
+            "near": ["T2"],
+        }
+    ]
+    question = await qa_demo.run("Q5")
+    await start_gap(qa_demo, question)
+    await execute(qa_demo, question, AssistantOut(reply="", operations=[]))
+    gap = qa_demo.gateway.calls[-1]
+    assert gap.purpose == "qa.gap"
+    assert "表面缺陷明细（属性）" in gap.text
+    instructions = " ".join(gap.instructions.split())
+    assert "each X has several fields" in instructions
+    assert "create an entity_type for X" in instructions
+    assert "properties of X" in instructions
+    assert "relation_type from the existing type to X with multiple=true" in instructions
+    assert "a single string property" in instructions
+    assert "only a single-valued field is missing" in instructions
+    assert "a bound primary key already identifies each object" in instructions
+    assert "do not propose another identifier property" in instructions
+    coil = qa_demo.steel.ids["Coil"]
+    coil_line = next(line for line in gap.text.splitlines() if line.startswith(f"{coil} |"))
+    assert "primary_key_bound=yes" in coil_line
 
 
 async def test_gap_mixed_operations_count_every_drop(
