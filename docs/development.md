@@ -113,7 +113,7 @@ M3 的数据绑定与查询用一套人工合成的冶金 MES 数据作外部数
 
 1. 运行 `./dev.ps1 init-env`，在生成的本机配置文件里填 `OP_OPENAI_API_KEY`。
 2. Docker 主机访问不了 OpenAI 时，填 `OP_AI_PROXY=http://用户:口令@本机IP:端口`，指向本机已有的代理（例如 Clash Verge 的 mixed-port，需开启"允许局域网连接"并设置认证）。代理只作用于模型调用，不影响数据库、依赖下载等其他流量。
-3. `./dev.ps1 ai-check`：对 `OP_AI_MODEL`、`OP_AI_REASONING_MODEL` 各发一次最小的结构化调用，带上识别时用的推理强度（`OP_AI_EFFORT`、`OP_AI_REASONING_EFFORT`），只输出"可用 / 不可用"、模型、强度和错误类型，不打印 Key 和代理。兼容服务不认 `reasoning.effort` 时，这里会报 HTTP 400，把两个强度设为 `default` 即可。
+3. `./dev.ps1 ai-check`：对 `OP_AI_MODEL`、`OP_AI_REASONING_MODEL` 各发一次最小的结构化调用，带上识别时用的推理强度（`OP_AI_EFFORT`、`OP_AI_REASONING_EFFORT`），只输出"可用 / 不可用"、模型、强度和错误类型，不打印 Key 和代理。兼容服务不认 `reasoning.effort` 时，这里会报 HTTP 400，把两个强度设为 `default` 即可。若兼容服务因不支持 `store` 参数而返回 HTTP 400，设置 `OP_AI_NO_STORE=false` 即可省略该参数。
 4. `./dev.ps1 eval [案例]` 的使用方法见[识别评测](#识别评测)。
 
 未配置 Key 时平台照常运行，资料可以上传，但识别会以 `ai.not_configured` 失败；配置好后在资料页重试即可。

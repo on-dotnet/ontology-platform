@@ -115,6 +115,25 @@ async def test_not_configured_raises_without_calling_out(settings: Settings) -> 
     assert await gateway.ping() is False
 
 
+@pytest.mark.parametrize("use_provider_default", [False, True], ids=["default", "compatible"])
+async def test_store_in_model_request(settings: Settings, use_provider_default: bool) -> None:
+    model_settings = configured(settings)
+    if use_provider_default:
+        model_settings.ai_no_store = False
+    seen: list[dict[str, Any]] = []
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        seen.append(json.loads(request.content))
+        return stream('{"value": 1}')
+
+    async with client_with(handler) as client:
+        await call(OpenAIGateway(model_settings, http_client=client))
+    if use_provider_default:
+        assert "store" not in seen[0]
+    else:
+        assert seen[0]["store"] is False
+
+
 async def test_parses_structured_output_and_records_the_run(settings: Settings, app: Any) -> None:
     factory: async_sessionmaker[AsyncSession] = app.state.session_factory
     seen: list[dict[str, Any]] = []

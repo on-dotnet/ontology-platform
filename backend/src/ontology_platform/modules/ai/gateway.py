@@ -194,6 +194,8 @@ class OpenAIGateway:
         started = time.monotonic()
         usage: Any = None
         extra: dict[str, Any] = {}
+        if self._settings.ai_no_store:
+            extra["store"] = False
         if call.effort is not None:
             extra["reasoning"] = {"effort": call.effort}
         try:
