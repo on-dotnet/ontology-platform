@@ -1,9 +1,15 @@
 """Reviewer decisions supplied as data only when relevant to a model call."""
 
+from __future__ import annotations
+
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from ontology_platform.modules.ai.candidates import THRESHOLD, Names, main_name, score
 from ontology_platform.modules.ontology.review_memory import MemoryEntry, ReviewMemory
+
+if TYPE_CHECKING:
+    from ontology_platform.modules.ai.extraction import KnownElement
 
 MEMORY_TYPES_RULES = (
     "Earlier reviewer decisions are authoritative for repeated proposals. "
@@ -14,7 +20,8 @@ MEMORY_TYPES_RULES = (
 
 MEMORY_RELATIONS_RULES = (
     "Earlier reviewer decisions are authoritative for repeated relations and properties. "
-    "Do not propose listed rejected names or close variants unless the source clearly "
+    "For the same pair of entity types, do not propose the listed rejected relation or "
+    "property, or close variants of that relation or property, unless the source clearly "
     "defines a distinct business concept. These decisions are not source text and "
     "never count as evidence."
 )
@@ -27,16 +34,21 @@ def _recent(entries: Sequence[MemoryEntry], limit: int) -> list[MemoryEntry]:
 
 
 def type_rows(
-    memory: ReviewMemory | None, terms: Sequence[str], limit: int = PROMPT_MAX
+    memory: ReviewMemory | None,
+    terms: Sequence[str],
+    limit: int = PROMPT_MAX,
+    known: Sequence[KnownElement] | None = None,
 ) -> list[str]:
     if memory is None or not terms:
         return []
     keys = [main_name(term, None) for term in terms]
+    known_ids = {element.id for element in known} if known is not None else None
     selected = [
         entry
         for entry in memory.entries
         if entry.element_kind == "entity_type"
         and entry.kind in ("rejected", "renamed")
+        and (entry.kind != "renamed" or known_ids is None or entry.element_id in known_ids)
         and any(
             key
             and (
@@ -63,13 +75,14 @@ def relation_rows(
 ) -> list[str]:
     if memory is None or not catalog:
         return []
-    keys = {main_name(name, None) for name in catalog}
+    # An empty key would match every entry without a range, i.e. every property.
+    keys = {main_name(name, None) for name in catalog} - {""}
     selected = [
         e
         for e in memory.entries
         if e.kind == "rejected"
         and e.element_kind in ("relation_type", "property")
-        and (e.domain in keys or e.range in keys)
+        and (main_name(e.domain or "", None) in keys or main_name(e.range or "", None) in keys)
     ]
     return [
         f"- rejected {'relation' if e.element_kind == 'relation_type' else 'property'}: "

@@ -22,6 +22,7 @@ from ontology_platform.modules.ai.candidates import (
     THRESHOLD,
     Names,
     Score,
+    main_name,
     same_main_name,
     score,
     shortlist,
@@ -87,6 +88,8 @@ RESOLVE_BATCH = 40
 # Names of a candidate's relations and properties shown to the resolve call.
 RESOLVE_MEMBERS = 5
 REASON_MAX = 200
+# Keep the response cap aligned with ontology.service.SUPPRESSED_MAX.
+SUPPRESSED_MAX = 200
 _PASCAL = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _CAMEL = re.compile(r"^[a-z][A-Za-z0-9]*$")
 # A cited sentence number, "3.12" (chunk 3, sentence 12), with or without brackets.
@@ -217,7 +220,7 @@ def _suppress(
     outcome.suppressed_total += 1
     if entry is not None:
         outcome.memory_hits.add(entry.id)
-    if len(outcome.suppressed) < 200:
+    if len(outcome.suppressed) < SUPPRESSED_MAX:
         outcome.suppressed.append(
             SuppressedItem(
                 kind=kind,
@@ -617,7 +620,7 @@ class Extractor:
             instructions, prompt_text = with_rows(
                 TYPES_INSTRUCTIONS,
                 f"Document: {title}\n\n" + "\n".join(lines),
-                type_rows(memory, [term.name for term in group], self.memory_prompt_max),
+                type_rows(memory, [term.name for term in group], self.memory_prompt_max, known),
                 MEMORY_TYPES_RULES,
             )
             result = await self.gateway.structured(
@@ -702,7 +705,7 @@ class Extractor:
                 f"Document: {title}\n\n{header}\n\n{render_sentences(group)}",
                 relation_rows(
                     memory,
-                    [line[0].split(" | ")[1] for line in lines],
+                    [line[3] for line in lines],
                     self.memory_prompt_max,
                 ),
                 MEMORY_RELATIONS_RULES,
@@ -772,9 +775,9 @@ def types_context(
     return list(chosen.values())[:TYPES_CONTEXT_MAX]
 
 
-# One line of the relations stage's catalog of types, with the normalized names it goes by and
-# whether the type belongs to this document.
-CatalogLine = tuple[str, frozenset[str], bool]
+# One line of the relations stage's catalog of types, with the normalized names it goes by,
+# whether the type belongs to this document, and its main name (to select review memory).
+CatalogLine = tuple[str, frozenset[str], bool, str]
 
 
 def relations_catalog(
@@ -794,6 +797,7 @@ def relations_catalog(
             f"- {shown(t.ref)} | {t.label_zh} | {', '.join(t.synonyms)} | {t.definition_zh or ''}",
             frozenset(_mention_keys([t.label_zh, t.label_en or "", *t.synonyms])),
             True,
+            main_name(t.label_zh, t.label_en),
         )
         for t in types
     ]
@@ -804,6 +808,7 @@ def relations_catalog(
             f"{element.definition_zh or ''}",
             frozenset(_mention_keys([element.label_zh, element.label_en or "", *element.synonyms])),
             False,
+            main_name(element.label_zh, element.label_en),
         )
         for element in known
         if element.kind == "entity_type" and str(element.id) not in refs
@@ -1060,6 +1065,13 @@ def resolve_requests(
         and memory is not None
         and memory.find("rejected", type_key(item.label_zh, item.label_en)) is not None
     }
+    labels: dict[CandidateKey, str] = {}
+    if memory is not None and any(e.kind == "kept_apart" for e in memory.entries):
+        labels = {
+            **{("element", str(e.id)): main_name(e.label_zh, e.label_en) for e in known},
+            **{("item", str(p.item_id)): main_name(p.label_zh, p.label_en) for p in pending},
+            **{("run", str(j)): main_name(t.label_zh, t.label_en) for j, t in enumerate(types)},
+        }
     requests: list[ResolveRequest] = []
     for index, (item, fate) in enumerate(zip(types, fates, strict=True)):
         if fate.kind != "new" or fate.pending is not None or index in rejected:
@@ -1080,22 +1092,14 @@ def resolve_requests(
             if not any(candidate.key == key for candidate in found[:PER_TYPE]):
                 found = [c for c in found if c.key != key][: PER_TYPE - 1]
                 found.append(Candidate(key, score(names, _known_names(nominated), threshold), True))
-        found = found[:PER_TYPE]
-        if memory is not None:
-            labels: dict[CandidateKey, str] = {
-                **{("element", str(e.id)): type_key(e.label_zh, e.label_en)[2:] for e in known},
-                **{("item", str(p.item_id)): type_key(p.label_zh, p.label_en)[2:] for p in pending},
-                **{
-                    ("run", str(j)): type_key(t.label_zh, t.label_en)[2:]
-                    for j, t in enumerate(types)
-                },
-            }
-            own = type_key(item.label_zh, item.label_en)[2:]
+        if labels:
+            own = main_name(item.label_zh, item.label_en)
             found = [
                 candidate
                 for candidate in found
                 if not _kept_apart(memory, own, labels[candidate.key], outcome)
             ]
+        found = found[:PER_TYPE]
         if found:
             requests.append(ResolveRequest(index, tuple(found)))
     return requests
@@ -1565,7 +1569,7 @@ def build_proposals(
     new_types: list[tuple[EntityTypeOut, Proposal]] = []
     proposal_of: dict[int, Proposal] = {}  # index of a type -> the new type it is part of
     mistaken: set[str] = set()  # existing ids given to types of another main name
-    suppressed_refs: set[str] = set()
+    suppressed_refs: dict[str, tuple[str, MemoryEntry]] = {}
 
     def root_of(index: int) -> CandidateKey:
         """Where a type of the types stage lands, as a candidate key."""
@@ -1606,8 +1610,14 @@ def build_proposals(
         if fate.element is not None:
             became.append((item, str(fate.element.id)))
             op: Literal["update", "restore"] = "update" if fate.kind == "existing" else "restore"
-            renamed = (
-                memory.find("renamed", type_key(item.label_zh, item.label_en)) if memory else None
+            old_names = (
+                {
+                    e.key[2:]
+                    for e in memory.entries
+                    if e.kind == "renamed" and e.element_id == fate.element.id
+                }
+                if memory
+                else set()
             )
             _maybe_update(
                 builder,
@@ -1615,29 +1625,30 @@ def build_proposals(
                 item,
                 (evidence, found),
                 op=op,
-                omit_label=renamed is not None and renamed.element_id == fate.element.id,
+                omit_names=old_names,
             )
-            continue
-        rejected = (
-            memory.find("rejected", type_key(item.label_zh, item.label_en)) if memory else None
-        )
-        if rejected is not None:
-            suppressed_refs.add(item.ref)
-            _suppress(outcome, "entity_type", item.label_zh, item.label_en, "memory", rejected)
             continue
         if fate.kind == "run" and fate.root not in proposal_of:
             # Its root was suppressed: an English-only twin of a rejected type goes with it.
             suppressed_root = types[fate.root]
-            suppressed_refs.add(item.ref)
+            root_name, root_entry = suppressed_refs[suppressed_root.ref]
+            suppressed_refs[item.ref] = (root_name, root_entry)
             _suppress(
                 outcome,
                 "entity_type",
                 item.label_zh,
                 item.label_en,
                 "depends_on_suppressed",
-                None,
-                depends_on=suppressed_root.label_zh or suppressed_root.label_en,
+                root_entry,
+                depends_on=root_name,
             )
+            continue
+        rejected = (
+            memory.find("rejected", type_key(item.label_zh, item.label_en)) if memory else None
+        )
+        if rejected is not None:
+            suppressed_refs[item.ref] = (item.label_zh or item.label_en or "", rejected)
+            _suppress(outcome, "entity_type", item.label_zh, item.label_en, "memory", rejected)
             continue
         if fate.kind == "run":
             _join(proposal_of[fate.root], item, evidence if found else None)
@@ -1736,24 +1747,55 @@ def build_proposals(
         names_of.setdefault(target_ref, set()).update(
             _mention_keys([item.label_zh, item.label_en or "", *item.synonyms])
         )
+    for item in types:
+        if item.ref in suppressed_refs:
+            names_of.setdefault(item.ref, set()).update(
+                _mention_keys([item.label_zh, item.label_en or "", *item.synonyms])
+            )
 
     seen_relations: set[tuple[str, str, str]] = set()
     main_names = {
-        str(element.id): type_key(element.label_zh, element.label_en)[2:]
+        str(element.id): main_name(element.label_zh, element.label_en)
         for element in known
         if element.kind == "entity_type"
     }
     for item, ref in became:
-        main_names.setdefault(ref, type_key(item.label_zh, item.label_en)[2:])
+        main_names.setdefault(ref, main_name(item.label_zh, item.label_en))
     for relation in relations.relations:
         if relation.domain in suppressed_refs or relation.range in suppressed_refs:
+            domain = (
+                relation.domain if relation.domain in suppressed_refs else resolve(relation.domain)
+            )
+            range_ = (
+                relation.range if relation.range in suppressed_refs else resolve(relation.range)
+            )
+            if domain is None or range_ is None:
+                continue
+            key = (domain, range_, normalize(relation.label_zh))
+            if key in seen_relations:
+                continue
+            cited = builder.cite_run(relation.sentence)
+            ends = names_of.get(domain, set()), names_of.get(range_, set())
+            stated = cited is not None and builder.states_link([cited], *ends)
+            if not stated and cited is not None:
+                table = builder.table_context(cited)
+                stated = (
+                    table is not None
+                    and bool(table.names)
+                    and builder.states_link([cited], *ends, table.names)
+                )
+            if not stated:
+                continue
+            seen_relations.add(key)
+            dependency = suppressed_refs.get(relation.domain) or suppressed_refs[relation.range]
             _suppress(
                 outcome,
                 "relation_type",
                 relation.label_zh,
                 _label_en(relation.local_name),
                 "depends_on_suppressed",
-                None,
+                dependency[1],
+                depends_on=dependency[0],
             )
             continue
         domain = resolve(relation.domain)
@@ -1794,7 +1836,7 @@ def build_proposals(
         rejected = (
             memory.find(
                 "rejected",
-                relation_key(domain_name, type_key(relation.label_zh, None)[2:], range_name),
+                relation_key(domain_name, main_name(relation.label_zh, None), range_name),
             )
             if memory
             else None
@@ -1836,13 +1878,21 @@ def build_proposals(
     seen_properties: set[tuple[str, str]] = set()
     for prop in relations.properties:
         if prop.domain in suppressed_refs:
+            # Unlike relations, a property without evidence is still proposed (flagged), so it
+            # counts as suppressed whatever its evidence.
+            prop_key = (prop.domain, normalize(prop.label_zh))
+            if prop_key in seen_properties:
+                continue
+            seen_properties.add(prop_key)
+            dependency = suppressed_refs[prop.domain]
             _suppress(
                 outcome,
                 "property",
                 prop.label_zh,
                 _label_en(prop.local_name),
                 "depends_on_suppressed",
-                None,
+                dependency[1],
+                depends_on=dependency[0],
             )
             continue
         domain = resolve(prop.domain)
@@ -1864,7 +1914,7 @@ def build_proposals(
             continue
         domain_name = main_names.get(domain, "")
         rejected = (
-            memory.find("rejected", property_key(domain_name, type_key(prop.label_zh, None)[2:]))
+            memory.find("rejected", property_key(domain_name, main_name(prop.label_zh, None)))
             if memory
             else None
         )
@@ -1925,7 +1975,7 @@ def mark_late_candidates(
             if same_main_name(label_zh, label_en, other_zh, other_en):
                 continue
             if _kept_apart(
-                memory, type_key(label_zh, label_en)[2:], type_key(other_zh, other_en)[2:], outcome
+                memory, main_name(label_zh, label_en), main_name(other_zh, other_en), outcome
             ):
                 continue
             value = score(names, other, threshold).value
@@ -2000,7 +2050,7 @@ def _maybe_update(
     item: EntityTypeOut,
     cited: tuple[ProposedEvidence | None, bool],
     op: Literal["update", "restore"] = "update",
-    omit_label: bool = False,
+    omit_names: AbstractSet[str] = frozenset(),
 ) -> None:
     """Propose adding synonyms or a missing definition to an existing type; nothing otherwise.
 
@@ -2017,10 +2067,8 @@ def _maybe_update(
         known |= {normalize(s["text"]) for s in previous.fields.get("synonyms", [])}
     added = [
         s
-        for s in _synonyms(
-            [*([] if omit_label else [item.label_zh]), *item.synonyms], element.label_zh
-        )
-        if normalize(s["text"]) not in known
+        for s in _synonyms([item.label_zh, *item.synonyms], element.label_zh)
+        if normalize(s["text"]) not in known and main_name(s["text"], None) not in omit_names
     ]
     fields: dict[str, Any] = {}
     if added:

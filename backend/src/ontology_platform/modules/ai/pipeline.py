@@ -7,6 +7,7 @@ line): nothing reaches the ontology until a reviewer merges the change set.
 """
 
 import base64
+import logging
 from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, cast
 from uuid import UUID
@@ -45,6 +46,7 @@ from ontology_platform.modules.ontology.schemas import (
 from ontology_platform.modules.ontology.schemas import ProposedMatch as ProposedMatchIn
 
 TITLE = "识别：{filename}"
+logger = logging.getLogger(__name__)
 QUOTE_MAX = 500
 SYNONYMS_MAX = 100
 SYNONYM_MAX = 200
@@ -230,6 +232,7 @@ def make_extractor(
         async with session_factory() as db:
             document = await documents.get(db, document_id)
             if document.change_set_id is not None:
+                # A replay has no new memory hits to record (spec 008, 6.1).
                 return document.change_set_id
             ontology_id, filename = document.ontology_id, document.filename
             uploaded_by = document.uploaded_by
@@ -274,12 +277,19 @@ def make_extractor(
             if document.change_set_id is not None:
                 return document.change_set_id
             await documents.set_progress(db, document_id, "changeset", 1, 1)
+            # Merges lock the ontology before memory rows; keep the same lock order here.
+            await ontology.lock_ontology(db, ontology_id)
             if not proposals:
                 await ontology.record_memory_hits(db, ontology_id, tuple(outcome.memory_hits))
+                if outcome.suppressed_total:
+                    logger.info(
+                        "Document %s: all %s proposals suppressed",
+                        document_id,
+                        outcome.suppressed_total,
+                    )
                 return None
             # Under the ontology's lock, merges and other change sets wait: what appeared
             # since the identification started is checked once more, without a model.
-            await ontology.lock_ontology(db, ontology_id)
             now = await ontology.list_alignment_candidates(db, ontology_id)
             mark_late_candidates(
                 proposals, late_candidates(candidates, now), memory=memory, outcome=outcome

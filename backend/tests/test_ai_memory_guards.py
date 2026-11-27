@@ -22,6 +22,7 @@ from ontology_platform.modules.ai.extraction import (
     ProposedMatch,
     build_proposals,
     mark_late_candidates,
+    relations_catalog,
     resolve_requests,
 )
 from ontology_platform.modules.ai.gateway import InputFile
@@ -34,6 +35,8 @@ from ontology_platform.modules.ai.memory_prompts import (
 )
 from ontology_platform.modules.ai.pipeline import make_extractor
 from ontology_platform.modules.ai.prompts import (
+    RELATIONS_INSTRUCTIONS,
+    TYPES_INSTRUCTIONS,
     EntityTypeOut,
     PropertyOut,
     RelationOut,
@@ -197,6 +200,22 @@ def test_m2_current_element_and_deleted_element() -> None:
     assert [(p.op, p.kind) for p in deleted] == [("create", "entity_type")]
 
 
+def test_m2_does_not_add_old_name_from_model_synonyms() -> None:
+    existing = KnownElement(uuid4(), "entity_type", "LadleCarrier", "钢包运输车")
+    renamed = entry("renamed", type_key("钢包车", None), "钢包车", existing.id)
+    proposals = build_proposals(
+        [],
+        [existing],
+        [entity("钢包运输车", synonyms=["钢包车"])],
+        RelationsOut(relations=[], properties=[]),
+        memory=ReviewMemory(uuid4(), (renamed,)),
+    )
+    assert all(
+        "钢包车" not in [s["text"] for s in proposal.fields.get("synonyms", [])]
+        for proposal in proposals
+    )
+
+
 def test_m3_resolve_and_late_candidates() -> None:
     known = KnownElement(uuid4(), "entity_type", "Cart", "Cart")
     apart = entry("kept_apart", "k:car||cart", "Car")
@@ -219,6 +238,21 @@ def test_m3_resolve_and_late_candidates() -> None:
     assert proposal.match is None
     assert "possible_duplicate" not in proposal.flags
     assert outcome.memory_hits == {apart.id}
+
+
+def test_m3_build_proposals_does_not_mark_kept_apart_candidate() -> None:
+    known = KnownElement(uuid4(), "entity_type", "Cart", "Cart")
+    apart = entry("kept_apart", "k:car||cart", "Car")
+    proposals = build_proposals(
+        [],
+        [known],
+        [entity("Car")],
+        RelationsOut(relations=[], properties=[]),
+        memory=ReviewMemory(uuid4(), (apart,)),
+    )
+    assert len(proposals) == 1
+    assert proposals[0].match is None
+    assert "possible_duplicate" not in proposals[0].flags
 
 
 def test_prompt_selection_and_empty_input() -> None:
@@ -246,6 +280,75 @@ def test_prompt_rows_are_recent_first_and_limited() -> None:
     assert type_rows(memory, ["Boiler"], limit=1) == ["- renamed type: Boilers -> New name"]
 
 
+def test_last_hit_at_takes_priority_over_created_at() -> None:
+    now = datetime.now(UTC)
+    hit = replace(
+        entry("rejected", type_key("Boiler", None), "Boiler"),
+        created_at=now - timedelta(days=3),
+        last_hit_at=now,
+    )
+    created = replace(
+        entry("renamed", type_key("Boilers", None), "Boilers"), created_at=now - timedelta(days=1)
+    )
+    assert type_rows(ReviewMemory(uuid4(), (created, hit)), ["Boiler"], limit=1) == [
+        "- rejected type: Boiler (reason: incorrect)"
+    ]
+
+
+def test_deleted_renamed_entry_is_not_sent_to_type_stage() -> None:
+    deleted_id = uuid4()
+    renamed = entry("renamed", type_key("Old name", None), "Old name", deleted_id)
+    assert (
+        type_rows(
+            ReviewMemory(uuid4(), (renamed,)),
+            ["Old name"],
+            known=[KnownElement(uuid4(), "entity_type", "Current", "Current")],
+        )
+        == []
+    )
+
+
+def test_relation_rows_use_main_names_and_skip_unrelated_properties() -> None:
+    # A property entry has no range; an English-only type must not select it through an
+    # empty Chinese label.
+    rejected = replace(
+        entry("rejected", "p:other|code", "code"),
+        element_kind="property",
+        domain="Other",
+    )
+    memory = ReviewMemory(uuid4(), (rejected,))
+    english_only = EntityTypeOut(
+        ref="new:Scrap",
+        label_zh=" ",
+        label_en="Scrap",
+        definition_zh=None,
+        synonyms=[],
+        parent=None,
+        confidence=1,
+        sentence=None,
+    )
+    lines, _ = relations_catalog([english_only, entity("Boiler")], [])
+    assert [line[3] for line in lines] == ["scrap", "boiler"]
+    assert relation_rows(memory, [line[3] for line in lines]) == []
+    assert relation_rows(memory, [""]) == []
+    assert relation_rows(memory, ["other"]) == [
+        "- rejected property: Other | code (reason: incorrect)"
+    ]
+
+
+def test_chinese_memory_labels_remain_in_data_only() -> None:
+    rejected = entry("rejected", type_key("炉渣颜色", None), "炉渣颜色")
+    instructions, text = with_rows(
+        TYPES_INSTRUCTIONS,
+        "source",
+        type_rows(ReviewMemory(uuid4(), (rejected,)), ["炉渣颜色"]),
+        MEMORY_TYPES_RULES,
+    )
+    assert "炉渣颜色" in text
+    assert "炉渣颜色" not in instructions
+    assert all(not ("\u4e00" <= char <= "\u9fff") for char in instructions)
+
+
 def test_m1_suppresses_dependent_relation_and_property() -> None:
     rejected = entry("rejected", type_key("Gone", None), "Gone")
     relation = RelationOut(
@@ -257,7 +360,7 @@ def test_m1_suppresses_dependent_relation_and_property() -> None:
         multiple=False,
         definition_zh=None,
         confidence=1,
-        sentence=None,
+        sentence="0.1",
     )
     prop = PropertyOut(
         label_zh="code",
@@ -269,24 +372,42 @@ def test_m1_suppresses_dependent_relation_and_property() -> None:
         multiple=False,
         definition_zh=None,
         confidence=1,
-        sentence=None,
+        sentence="0.2",
     )
     outcome = MemoryOutcome()
     proposals = build_proposals(
-        [],
+        [ChunkText(uuid4(), 0, "Gone link Child. Gone code.")],
         [],
         [entity("Gone"), entity("Child")],
-        RelationsOut(relations=[relation], properties=[prop]),
+        RelationsOut(
+            relations=[
+                relation,
+                relation.model_copy(),
+                relation.model_copy(update={"sentence": None}),
+            ],
+            properties=[
+                prop,
+                prop.model_copy(),
+                # A property without evidence would still be proposed (flagged), so it counts.
+                prop.model_copy(update={"label_zh": "weight", "sentence": None}),
+            ],
+        ),
         memory=ReviewMemory(uuid4(), (rejected,)),
         outcome=outcome,
     )
     assert [(p.kind, p.fields["labelZh"]) for p in proposals] == [("entity_type", "Child")]
-    assert [s.cause for s in outcome.suppressed] == [
-        "memory",
-        "depends_on_suppressed",
-        "depends_on_suppressed",
+    assert [(s.cause, s.label_zh) for s in outcome.suppressed] == [
+        ("memory", "Gone"),
+        ("depends_on_suppressed", "link"),
+        ("depends_on_suppressed", "code"),
+        ("depends_on_suppressed", "weight"),
     ]
-    assert outcome.suppressed_total == 3
+    assert outcome.suppressed_total == 4
+    assert [(s.memory_entry_id, s.depends_on) for s in outcome.suppressed[1:]] == [
+        (rejected.id, "Gone"),
+        (rejected.id, "Gone"),
+        (rejected.id, "Gone"),
+    ]
 
 
 @pytest.mark.parametrize("verdicts", [None, {"Other": ("Gone", "same")}])
@@ -343,6 +464,7 @@ def test_m1_an_english_only_twin_of_a_suppressed_type_goes_with_it() -> None:
         ("memory", None),
         ("depends_on_suppressed", "废钢"),
     ]
+    assert outcome.suppressed[1].memory_entry_id == rejected.id
 
 
 def test_m1_suppresses_rejected_relation_and_property_keys() -> None:
@@ -477,6 +599,10 @@ async def test_empty_and_unrelated_memory_leave_every_model_input_identical() ->
         )
         captured.append(gateway.inputs)
     assert captured[0] == captured[1] == captured[2]
+    for calls in captured:
+        assert next(i for p, i, _ in calls if p == "extract.types") == TYPES_INSTRUCTIONS
+        assert next(i for p, i, _ in calls if p == "extract.relations") == RELATIONS_INSTRUCTIONS
+        assert all("Reviewer decisions" not in t for _, _, t in calls)
 
 
 async def test_relevant_memory_appends_rules_and_data() -> None:
@@ -484,8 +610,8 @@ async def test_relevant_memory_appends_rules_and_data() -> None:
     rejected_relation = replace(
         entry("rejected", "r:boiler|link|boiler", "link"),
         element_kind="relation_type",
-        domain="boiler",
-        range="boiler",
+        domain="Boiler",
+        range="Boiler",
     )
     memory = ReviewMemory(uuid4(), (rejected_type, rejected_relation))
     gateway = CapturingGateway()
@@ -507,17 +633,18 @@ async def test_relevant_memory_appends_rules_and_data() -> None:
     assert calls["extract.relations"][0].endswith(MEMORY_RELATIONS_RULES)
     assert "- rejected relation:" in calls["extract.relations"][1]
     assert relation_rows(memory, ["Boiler"], limit=1) == [
-        "- rejected relation: boiler | link | boiler (reason: incorrect)"
+        "- rejected relation: Boiler | link | Boiler (reason: incorrect)"
     ]
 
 
 async def test_the_extractor_caps_memory_rows_at_its_setting() -> None:
     # The worker passes `review_memory_prompt_max`; the default is the module's PROMPT_MAX.
+    existing = KnownElement(uuid4(), "entity_type", "Boilers", "Boilers")
     memory = ReviewMemory(
         uuid4(),
         (
             entry("rejected", type_key("Boiler", None), "Boiler"),
-            entry("renamed", type_key("Boilers", None), "Boilers"),
+            entry("renamed", type_key("Boilers", None), "Boilers", existing.id),
         ),
     )
 
@@ -531,7 +658,7 @@ async def test_the_extractor_caps_memory_rows_at_its_setting() -> None:
             document_id=uuid4(),
             title="doc",
             chunks=[ChunkText(uuid4(), 0, "Boiler")],
-            known=[],
+            known=[existing],
             progress=progress,
             memory=memory,
         )
@@ -554,6 +681,12 @@ async def test_pipeline_persists_suppression_and_records_hits(
     rejected = entry("rejected", type_key("炉次", None), "炉次")
     memory = ReviewMemory(ontology.id, (rejected,))
     hits: list[tuple[UUID, ...]] = []
+    events: list[str] = []
+    original_lock = ontology_service.lock_ontology
+
+    async def lock_ontology(session: AsyncSession, target_id: UUID) -> None:
+        await original_lock(session, target_id)
+        events.append("lock")
 
     async def get_memory(_db: AsyncSession, _ontology_id: object) -> ReviewMemory:
         return memory
@@ -563,8 +696,10 @@ async def test_pipeline_persists_suppression_and_records_hits(
         _ontology_id: object,
         entry_ids: Sequence[UUID],
     ) -> None:
+        events.append("hits")
         hits.append(tuple(entry_ids))
 
+    monkeypatch.setattr(ontology_service, "lock_ontology", lock_ontology)
     monkeypatch.setattr(ontology_service, "review_memory_for", get_memory)
     monkeypatch.setattr(ontology_service, "record_memory_hits", record_hits)
     canned = outputs(grade)
@@ -574,6 +709,7 @@ async def test_pipeline_persists_suppression_and_records_hits(
     extractor = make_extractor(factory(app), gateway, ExtractionModels("std", "deep"))
     change_set_id = await extractor(document.id, held)
     assert hits == [(rejected.id,)]
+    assert events == ["lock", "hits"]
     if early:
         assert change_set_id is None
     else:
