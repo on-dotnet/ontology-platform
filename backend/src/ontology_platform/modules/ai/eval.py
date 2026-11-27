@@ -442,7 +442,9 @@ def merge_counts(
 
     Duplicate types are groups of the expected list with several types: by main name (the
     same Chinese label), marked (a member was proposed as a possible duplicate or with an
-    alignment record) or unmarked.
+    alignment record) or unmarked. A type joins a group by its main names only (Chinese and
+    English label, local name): a generic synonym such as 缺陷 on 板坯表面缺陷 would put a
+    distinct type into another type's group.
     Duplicate relations have the ends and the label of an earlier one.
     """
     codes = Counter(skipped)
@@ -469,7 +471,7 @@ def merge_counts(
     for element in version.elements:
         if element.kind != "entity_type":
             continue
-        names = _names(element)
+        names = _main_names(element)
         group = next((i for i, g in enumerate(groups) if names & g), None)
         if group is not None:
             members.setdefault(group, []).append(element)
@@ -526,11 +528,13 @@ def load_elements(saved: Sequence[dict[str, Any]]) -> list[KnownElement]:
     ]
 
 
-def _names(element: KnownElement) -> set[str]:
-    values = {element.label_zh, element.local_name, *element.synonyms}
-    if element.label_en:
-        values.add(element.label_en)
+def _main_names(element: KnownElement) -> set[str]:
+    values = {element.label_zh, element.local_name, element.label_en}
     return {normalize(value) for value in values if value}
+
+
+def _names(element: KnownElement) -> set[str]:
+    return _main_names(element) | {normalize(value) for value in element.synonyms if value}
 
 
 def _ratio(hits: int, total: int) -> float | None:
