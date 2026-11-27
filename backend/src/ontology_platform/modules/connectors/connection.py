@@ -393,6 +393,18 @@ _CAN_WRITE = text(
     """
 )
 _SERVER_VERSION = text("SELECT current_setting('server_version')")
+_VISIBLE_SCHEMAS = text(
+    """
+    SELECT n.nspname
+    FROM pg_catalog.pg_namespace n
+    WHERE pg_catalog.has_schema_privilege(n.oid, 'USAGE')
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+      AND NOT pg_catalog.starts_with(n.nspname, 'pg_toast_temp_')
+      AND NOT pg_catalog.starts_with(n.nspname, 'pg_temp_')
+    ORDER BY n.nspname
+    LIMIT 200
+    """
+)
 
 
 def _deadline(*, statements: int) -> float:
@@ -402,15 +414,21 @@ def _deadline(*, statements: int) -> float:
 
 
 async def test_connection(db: AsyncSession, params: ConnectionParams) -> schemas.ConnectionTest:
-    """Connect, read the server version and whether the account may write.
+    """Connect, check the version and write privileges, then list visible schemas if possible.
 
     A failed connection is a result (`ok` false, `code` "datasource.connect_failed", `reason`),
     not an exception. Raises PlatformDatabaseError.
     """
+    visible_schemas: list[str] | None = None
+    listing_schemas = False
     try:
-        async with asyncio.timeout(_deadline(statements=3)), connect(db, params) as conn:
+        async with asyncio.timeout(_deadline(statements=4)), connect(db, params) as conn:
             version = (await conn.execute(_SERVER_VERSION)).scalar()
             can_write = bool((await conn.execute(_CAN_WRITE)).scalar())
+            # Run this last so a failed lookup can roll back without losing the checks above.
+            listing_schemas = True
+            visible_schemas = list((await conn.execute(_VISIBLE_SCHEMAS)).scalars())
+            listing_schemas = False
     except ConnectFailedError as exc:
         return schemas.ConnectionTest(
             ok=False,
@@ -418,31 +436,28 @@ async def test_connection(db: AsyncSession, params: ConnectionParams) -> schemas
             reason=exc.reason,  # type: ignore[arg-type]
             warnings=[],
             server_version=None,
-        )
-    except (QueryTimeoutError, TimeoutError):
-        return schemas.ConnectionTest(
-            ok=False,
-            code="datasource.connect_failed",
-            reason="timeout",
-            warnings=[],
-            server_version=None,
+            schemas=None,
         )
     except PlatformDatabaseError:
         raise
-    except ConnectorError:
-        return schemas.ConnectionTest(
-            ok=False,
-            code="datasource.connect_failed",
-            reason="unreachable",
-            warnings=[],
-            server_version=None,
-        )
+    except (ConnectorError, TimeoutError) as exc:
+        if not listing_schemas:
+            timed_out = isinstance(exc, (QueryTimeoutError, TimeoutError))
+            return schemas.ConnectionTest(
+                ok=False,
+                code="datasource.connect_failed",
+                reason="timeout" if timed_out else "unreachable",
+                warnings=[],
+                server_version=None,
+                schemas=None,
+            )
     return schemas.ConnectionTest(
         ok=True,
         code=None,
         reason=None,
         warnings=["account_can_write"] if can_write else [],
         server_version=str(version) if version is not None else None,
+        schemas=visible_schemas,
     )
 
 

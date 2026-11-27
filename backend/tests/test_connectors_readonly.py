@@ -436,6 +436,42 @@ async def test_a_connection_test_past_its_deadline_is_a_timeout(
     assert await _gone(external_source)
 
 
+async def test_connection_lists_only_schemas_with_usage(
+    db: AsyncSession, external_source: ExternalSource, scratch: str
+) -> None:
+    params = reader_params(external_source)
+    visible = await connection.test_connection(db, params)
+
+    assert visible.ok
+    assert visible.schemas is not None
+    assert visible.schemas == sorted(visible.schemas)
+    assert scratch in visible.schemas
+    assert not {"pg_catalog", "information_schema", "pg_toast"}.intersection(visible.schemas)
+    assert not any(name.startswith(("pg_toast_temp_", "pg_temp_")) for name in visible.schemas)
+
+    admin_rows(
+        external_source, f'REVOKE USAGE ON SCHEMA "{scratch}" FROM "{external_source.reader}"'
+    )
+    restricted = await connection.test_connection(db, params)
+
+    assert restricted.ok
+    assert restricted.schemas == [name for name in visible.schemas if name != scratch]
+
+
+async def test_schema_lookup_error_preserves_the_connection_result(
+    db: AsyncSession, external_source: ExternalSource, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(connection, "_VISIBLE_SCHEMAS", text("SELECT 1 / 0"), raising=False)
+    result = await connection.test_connection(db, writer_params(external_source))
+
+    assert result.ok
+    assert result.code is None
+    assert result.reason is None
+    assert result.server_version
+    assert result.warnings == ["account_can_write"]
+    assert result.schemas is None
+
+
 async def test_reading_a_source_leaves_an_idle_platform_session_idle(
     app: Any, external_source: ExternalSource, monkeypatch: pytest.MonkeyPatch
 ) -> None:

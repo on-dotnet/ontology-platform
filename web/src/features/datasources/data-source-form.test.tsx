@@ -139,6 +139,80 @@ describe('data source dialog', () => {
     },
   );
 
+  it('saves the selected and manually entered schemas and tests the new source once', async () => {
+    const saved = makeSource({ id: 'new-schema-source', name: '质检库' });
+    const savedTestPath = `${collection}/${saved.id}/test`;
+    const { form, user, api } = await openForm('create', {
+      [`POST ${testPath}`]: () => ({ ...success, schemas: [' quality ', 'archive', 'mes'] }),
+      [`POST ${collection}`]: () => saved,
+      [`POST ${savedTestPath}`]: () => success,
+      [`GET ${collection}/:id`]: () => saved,
+    });
+    await user.type(form.getByRole('textbox', { name: '名称' }), saved.name);
+    await user.type(form.getByRole('textbox', { name: '主机' }), 'db.test');
+    await user.type(form.getByRole('textbox', { name: '数据库' }), 'db');
+    await user.type(form.getByRole('textbox', { name: '用户名' }), 'reader');
+    await user.type(form.getByLabelText(/^口令/), newPassword);
+    await user.type(form.getByRole('textbox', { name: '模式名 1' }), ' mes ');
+    await user.click(form.getByRole('button', { name: '测试连接' }));
+
+    const mes = await form.findByRole('checkbox', { name: 'mes' });
+    expect(mes).toBeChecked();
+    await user.click(mes);
+    expect(form.queryByDisplayValue(' mes ')).not.toBeInTheDocument();
+    await user.click(form.getByRole('button', { name: '添加模式' }));
+    await user.type(form.getByRole('textbox', { name: '模式名 1' }), 'legacy');
+    await user.click(form.getByRole('checkbox', { name: 'archive' }));
+    await user.click(form.getByRole('checkbox', { name: 'quality' }));
+    expect(form.getByRole('textbox', { name: '模式名 2' })).toHaveValue('archive');
+    expect(form.getByRole('textbox', { name: '模式名 3' })).toHaveValue(' quality ');
+    await user.click(form.getByRole('checkbox', { name: 'archive' }));
+    expect(form.queryByDisplayValue('archive')).not.toBeInTheDocument();
+    expect(form.getByRole('checkbox', { name: 'archive' })).not.toBeChecked();
+    expect(form.getByText(/连接成功/)).toBeVisible();
+    await user.click(form.getByRole('button', { name: '保存数据源' }));
+    await screen.findByRole('heading', { name: saved.name });
+    expect(api.calls('POST', collection).map((call) => call.body))
+      .toEqual([expect.objectContaining({ schemas: ['legacy', ' quality '] })]);
+    expect(api.calls('POST', savedTestPath)).toHaveLength(1);
+  });
+
+  it('keeps the picker and enforces the 50-row scope when editing', async () => {
+    const source = makeSource();
+    const names = Array.from({ length: 50 }, (_, index) => `schema_${index}`);
+    const full = { ...source, connection: { ...source.connection, schemas: names } };
+    const { form, user } = await openForm('edit', {
+      [`GET ${collection}/:id`]: () => full,
+      [`POST ${testPath}`]: () => ({ ...success, schemas: [...names, 'extra'] }),
+    });
+    await user.click(form.getByRole('button', { name: '测试连接' }));
+    await user.click(await form.findByRole('button', { name: '下一页' }));
+    expect(form.getByRole('checkbox', { name: 'extra' })).toBeDisabled();
+    await user.click(form.getByRole('button', { name: '上一页' }));
+    const first = form.getByRole('checkbox', { name: 'schema_0' });
+    expect(first).toBeChecked();
+    await user.click(first);
+    await user.click(form.getByRole('button', { name: '下一页' }));
+    const extra = form.getByRole('checkbox', { name: 'extra' });
+    expect(extra).toBeEnabled();
+    await user.click(extra);
+    expect(form.getByRole('textbox', { name: '模式名 50' })).toHaveValue('extra');
+    expect(form.getByRole('button', { name: '添加模式' })).toBeDisabled();
+    expect(form.getByText(/连接成功/)).toBeVisible();
+  });
+
+  it.each([{ schemas: null }, { schemas: [] }])('keeps manual scope entry with $schemas', async ({ schemas }) => {
+    const { form, user } = await openForm('edit', {
+      [`POST ${testPath}`]: () => ({ ...success, schemas }),
+    });
+    await user.click(form.getByRole('button', { name: '测试连接' }));
+    expect(await form.findByText(/连接成功/)).toBeVisible();
+    expect(form.queryByRole('checkbox')).not.toBeInTheDocument();
+    await user.click(form.getByRole('button', { name: '添加模式' }));
+    await user.type(form.getByRole('textbox', { name: '模式名 2' }), 'manual');
+    expect(form.getByText(/连接成功/)).toBeVisible();
+  });
+
   it('validates on blur and blocks invalid requests with a summary', async () => {
     const { form, user, api } = await openForm('create');
     const port = form.getByRole('spinbutton', { name: '端口' });
