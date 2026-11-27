@@ -1,6 +1,6 @@
 """Plan a read using the active bindings and detached catalog metadata."""
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator, Sequence, Set
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -137,9 +137,14 @@ def _relation_steps(model: BoundModel, origin: UUID | None) -> Iterator[Relation
 
 
 def relations(
-    model: BoundModel, origin: UUID | None = None
+    model: BoundModel, origin: UUID | None = None, unusable: Set[UUID] = frozenset()
 ) -> dict[UUID, list[schemas.ObjectRelation]]:
-    outgoing = {(r.relation_id, r.source_type_id, r.target_type_id) for r in model.relations}
+    """`unusable` holds binding ids that cannot stand in for their inverse's reverse reading."""
+    outgoing = {
+        (r.relation_id, r.source_type_id, r.target_type_id)
+        for r in model.relations
+        if r.binding_id not in unusable
+    }
     result: dict[UUID, list[schemas.ObjectRelation]] = {}
     for step in _relation_steps(model, origin):
         relation = step.relation
@@ -237,6 +242,30 @@ def hop_join(
         tuple(zip(target.bound.key_columns, target_columns, strict=True)),
     )
     return join, origin_columns
+
+
+async def unusable_inverses(
+    catalog: Catalog, model: BoundModel, origin: UUID | None = None
+) -> set[UUID]:
+    """Bound inverses whose own join columns are missing from the catalog cache.
+
+    The two types are shared with the relation read backwards, so only the join can differ.
+    """
+    inverses = {relation.inverse_id for relation in model.relations}
+    unusable = set()
+    for step in _relation_steps(model, origin):
+        if step.direction != "out" or step.relation.relation_id not in inverses:
+            continue
+        source = await catalog.table(step.origin)
+        target = await catalog.table(step.other)
+        join, names = hop_join(source, target, step.relation, step.direction)
+        joined = await catalog.table_columns(target.bound.data_source_id, join.table)
+        if not (
+            all(name in joined and joined[name].family != "other" for name in names)
+            and all(main in target.columns and other in joined for main, other in join.on)
+        ):
+            unusable.add(step.relation.binding_id)
+    return unusable
 
 
 def joined_key(

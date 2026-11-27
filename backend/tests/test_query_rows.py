@@ -138,20 +138,53 @@ async def test_paging_preserves_a_long_sort_value(monkeypatch: pytest.MonkeyPatc
     assert second.next_cursor is None
 
 
-async def test_clipped_sort_value_never_becomes_a_continuation(
-    monkeypatch: pytest.MonkeyPatch,
+@pytest.mark.parametrize(
+    ("text", "clipped"),
+    [
+        # The connector cut the value, so the next page cannot be located from it.
+        ("a" * 2000, True),
+        # The whole value arrived, but it does not compress into a cursor.
+        ("".join(chr(0x4E00 + index) for index in range(2000)), False),
+    ],
+    ids=["clipped", "incompressible"],
+)
+async def test_a_sort_value_too_long_to_continue_from_is_reported_as_such(
+    monkeypatch: pytest.MonkeyPatch, text: str, clipped: bool
 ) -> None:
     model = published_table(monkeypatch)
     target = model.types[0]
 
     async def read(db: AsyncSession, query: SelectQuery) -> Rows:
         projected = [c.name for c in query.columns]
-        record: dict[str, int | str] = {"id": 17, "note": "a" * 2000}
+        record: dict[str, int | str] = {"id": 17, "note": text}
         return Rows(
             (tuple(record[name] for name in projected),),
             has_more=True,
-            truncated=frozenset({(0, projected.index("note"))}),
+            truncated=frozenset({(0, projected.index("note"))} if clipped else ()),
         )
+
+    monkeypatch.setattr(connectors, "select", read)
+    body = schemas.ObjectSearch(
+        type_id=target.type_id,
+        limit=1,
+        sort=[schemas.Sort(property_id=target.properties[0].property_id)],
+    )
+    with pytest.raises(AppError) as error:
+        await service.search(Mock(spec=AsyncSession), model.ontology_id, body)
+    assert (error.value.status, error.value.code) == (422, "query.sort_value_too_long")
+
+
+async def test_a_key_too_long_on_a_sorted_page_is_still_a_source_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    model = published_table(monkeypatch)
+    target = model.types[0]
+    # Distinct characters, so that compression cannot bring the key within its limit.
+    key = "".join(chr(0x4E00 + index) for index in range(2000))
+
+    async def read(db: AsyncSession, query: SelectQuery) -> Rows:
+        record: dict[str, int | str] = {"id": key, "note": "b"}
+        return Rows((tuple(record[col.name] for col in query.columns),), has_more=True)
 
     monkeypatch.setattr(connectors, "select", read)
     body = schemas.ObjectSearch(

@@ -59,7 +59,7 @@ def _release(model: bindings.BoundModel) -> schemas.ReleaseRef:
 async def list_types(db: AsyncSession, ontology_id: UUID) -> schemas.ObjectTypeList:
     model = await _model(db, ontology_id)
     catalog = planner.Catalog(db)
-    relations = planner.relations(model)
+    relations = planner.relations(model, unusable=await planner.unusable_inverses(catalog, model))
     items = []
     for bound in model.types:
         table = await catalog.table(bound)
@@ -142,7 +142,8 @@ async def get_object(
     key: str,
 ) -> schemas.ObjectDetail:
     model = await _model(db, ontology_id)
-    table = await planner.Catalog(db).table(planner.bound_type(model, type_id))
+    catalog = planner.Catalog(db)
+    table = await catalog.table(planner.bound_type(model, type_id))
     table.require_available()
     key_specs = table.key_specs()
     parts = tokens.decode_key(key, key_specs)
@@ -159,10 +160,11 @@ async def get_object(
     if result.has_more:
         raise errors.source_mismatch()
     (row,) = rows.objects(table, query, result)
+    unusable = await planner.unusable_inverses(catalog, model, type_id)
     return schemas.ObjectDetail(
         **row.model_dump(),
         release=_release(model),
-        relations=planner.relations(model, type_id).get(type_id, []),
+        relations=planner.relations(model, type_id, unusable).get(type_id, []),
     )
 
 

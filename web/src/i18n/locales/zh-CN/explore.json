@@ -19,6 +19,7 @@
   "noRows": "这个类型还没有数据",
   "noMatches": "没有符合条件的对象",
   "clearFilters": "清除筛选",
+  "clearSort": "清除排序",
   "nextPage": "下一页",
   "firstPage": "回到第一页",
   "primaryKey": "主键",
@@ -60,16 +61,23 @@
     "property": "选择属性",
     "operator": "选择运算符",
     "value": "筛选值",
-    "dateExample": "2024-02-29",
-    "dateTimeExample": "2024-02-29T08:30:00+08:00",
     "values": "筛选值（每行一个）",
+    "date": "日期",
+    "time": "时间",
+    "timeHint": "如 08:30、08:30:00 或 08:30:00+08:00",
+    "optionalTimeHint": "只记录日期的数据请留空时间，其他数据必须填写，如 08:30、08:30:00 或 08:30:00+08:00",
+    "datePosition": "第 {{position}} 个日期",
+    "timePosition": "第 {{position}} 个时间",
+    "addValue": "添加值",
+    "removeValue": "删除第 {{position}} 个值",
     "cancel": "取消",
     "remove": "移除筛选：{{filter}}",
     "limit": "最多可添加 10 条筛选条件",
     "required": "请输入筛选值",
     "tooManyValues": "最多可输入 100 个值，请减少后重试",
     "invalidInteger": "请输入整数",
-    "invalidDate": "请输入有效日期，格式为 YYYY-MM-DD",
+    "invalidDate": "请输入有效日期",
+    "invalidTime": "请输入有效时间，如 08:30、08:30:00 或 08:30:00+08:00",
     "invalidDecimal": "请输入有效的小数"
   },
   "op": {
@@ -96,6 +104,7 @@
     "invalid_cursor": "当前分页位置已失效",
     "object_not_found": "找不到这个对象，请返回列表重新选择。",
     "type_not_bound": "这个类型的绑定已变更，请重新查询。",
+    "sort_value_too_long": "排序值过长，无法分页。请清除排序，或增加筛选条件。",
     "other": "查询失败，请检查网络连接后重试。"
   }
 }

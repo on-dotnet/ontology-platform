@@ -9,6 +9,9 @@ import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 
+import { checkDateValue, isCalendarDate, joinDateValue } from './date-value';
+import { DateValueFields } from './date-value-fields';
+
 type Property = components['schemas']['ObjectProperty'];
 type Filter = components['schemas']['Filter'];
 type Scalar = components['schemas']['FilterValue'];
@@ -18,6 +21,8 @@ interface FilterEditorProps {
   filters: Filter[];
   onChange: (filters: Filter[]) => void;
   onExpandedChange?: (expanded: boolean) => void;
+  /** Lets a dateTime value be a date alone, for properties bound to date columns. */
+  optionalTime?: boolean;
 }
 
 const maxFilters = 10;
@@ -30,17 +35,12 @@ function draftFor(property: Property, op = property.ops[0]) {
 
 type Parsed = { filter: Filter } | { error: string };
 
-function isCalendarDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000-')) return false;
-  const date = new Date(value);
-  // Date normalizes some impossible days into the next month.
-  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
-}
-
-function parseFilter(property: Property, op: Filter['op'], raw: string): Parsed {
+function parseFilter(property: Property, op: Filter['op'], raw: string, optionalTime: boolean): Parsed {
   const condition = { propertyId: property.propertyId, op };
   if (op === 'isNull' || op === 'notNull') return { filter: condition };
-  const entries = op === 'in' ? raw.split(/\r?\n/).filter((line) => line !== '') : [raw];
+  // Blank text lines are ignored, but every date row counts: a half-typed date also reads as empty.
+  const temporal = property.datatype === 'date' || property.datatype === 'dateTime';
+  const entries = op === 'in' ? raw.split(/\r?\n/).filter((line) => temporal || line !== '') : [raw];
   if (!entries.length || raw === '') return { error: 'explore.filter.required' };
   if (entries.length > maxValues) return { error: 'explore.filter.tooManyValues' };
 
@@ -67,6 +67,13 @@ function parseFilter(property: Property, op: Filter['op'], raw: string): Parsed 
         if (!isCalendarDate(entry)) return { error: 'explore.filter.invalidDate' };
         values.push(entry);
         break;
+      case 'dateTime': {
+        const { date, clock, badDate, badTime } = checkDateValue(entry, true, !optionalTime);
+        if (badDate) return { error: 'explore.filter.invalidDate' };
+        if (badTime) return { error: 'explore.filter.invalidTime' };
+        values.push(joinDateValue(date, clock));
+        break;
+      }
       default:
         values.push(entry);
     }
@@ -74,7 +81,7 @@ function parseFilter(property: Property, op: Filter['op'], raw: string): Parsed 
   return { filter: { ...condition, value: op === 'in' ? values : values[0] } };
 }
 
-export function FilterEditor({ properties, filters, onChange, onExpandedChange }: FilterEditorProps) {
+export function FilterEditor({ properties, filters, onChange, onExpandedChange, optionalTime = false }: FilterEditorProps) {
   const { t, i18n } = useTranslation();
   const id = useId();
   const toggle = useRef<HTMLButtonElement>(null);
@@ -85,7 +92,7 @@ export function FilterEditor({ properties, filters, onChange, onExpandedChange }
   const atLimit = filters.length >= maxFilters;
   const expanded = !!draft && !!selected && selected.ops.includes(draft.op) && !atLimit;
   useEffect(() => { onExpandedChange?.(expanded); }, [expanded, onExpandedChange]);
-  const parsed = expanded ? parseFilter(selected, draft.op, draft.raw) : null;
+  const parsed = expanded ? parseFilter(selected, draft.op, draft.raw, optionalTime) : null;
   const error = touched && parsed && 'error' in parsed ? parsed.error : null;
   const valueId = `${id}-value`;
   const errorId = `${id}-error`;
@@ -108,9 +115,7 @@ export function FilterEditor({ properties, filters, onChange, onExpandedChange }
     'aria-describedby': error ? errorId : undefined,
     onBlur: () => setTouched(true),
   };
-  const datatype = selected?.datatype;
-  const placeholder = datatype === 'date' || datatype === 'dateTime'
-    ? t(`explore.filter.${datatype}Example`) : undefined;
+  const temporal = selected?.datatype === 'date' || selected?.datatype === 'dateTime';
   function setValue(raw: string) {
     if (draft) setDraft({ ...draft, raw });
   }
@@ -189,21 +194,24 @@ export function FilterEditor({ properties, filters, onChange, onExpandedChange }
                 {selected.ops.map((op) => <option key={op} value={op}>{t(`explore.op.${op}`)}</option>)}
               </NativeSelect>
             </div>
-            {draft.op !== 'isNull' && draft.op !== 'notNull' && (
+            {draft.op === 'isNull' || draft.op === 'notNull' ? null : temporal ? (
+              <DateValueFields
+                key={`${selected.propertyId}-${draft.op}`} value={draft.raw} onChange={setValue}
+                onBlur={() => setTouched(true)} multiple={draft.op === 'in'} withTime={selected.datatype === 'dateTime'}
+                timeRequired={!optionalTime} maxValues={maxValues} invalid={!!error} errorId={errorId}
+              />
+            ) : (
               <div className="grid min-w-0 flex-auto gap-1">
                 <Label htmlFor={valueId} required>{t(draft.op === 'in' ? 'explore.filter.values' : 'explore.filter.value')}</Label>
                 {draft.op === 'in' ? (
-                  <Textarea {...valueProps} name="value" placeholder={placeholder} onChange={(event) => setValue(event.target.value)} />
+                  <Textarea {...valueProps} name="value" onChange={(event) => setValue(event.target.value)} />
                 ) : selected.datatype === 'boolean' ? (
                   <NativeSelect {...valueProps} name="value" onChange={(event) => setValue(event.target.value)}>
                     <option value="true">{t('explore.yes')}</option>
                     <option value="false">{t('explore.no')}</option>
                   </NativeSelect>
                 ) : (
-                  <Input
-                    {...valueProps} name="value" type="text" placeholder={placeholder}
-                    onChange={(event) => setValue(event.target.value)}
-                  />
+                  <Input {...valueProps} name="value" type="text" onChange={(event) => setValue(event.target.value)} />
                 )}
               </div>
             )}

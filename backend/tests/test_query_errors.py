@@ -223,11 +223,23 @@ def test_malformed_filter_raises_app_error_for_direct_callers() -> None:
     assert (error.value.status, error.value.code) == (422, "query.invalid_filter")
 
 
-def test_sort_value_exceeding_the_cursor_limit_raises_source_mismatch() -> None:
+@pytest.mark.parametrize(
+    ("context", "expected"),
+    [
+        ({"sort": [["note", "asc"]]}, (422, "query.sort_value_too_long")),
+        # Without a requested sort only keys can overflow, so changing the sort would not help.
+        ({"sort": []}, (409, "query.source_mismatch")),
+        ({"origin": "coil"}, (409, "query.source_mismatch")),
+    ],
+    ids=["sorted", "unsorted", "hop"],
+)
+def test_position_exceeding_the_cursor_limit_names_the_cause(
+    context: dict[str, object], expected: tuple[int, str]
+) -> None:
     text = "".join(chr(0x4E00 + index) for index in range(2000))
     with pytest.raises(AppError) as error:
-        encode_page(uuid4(), {}, [text])
-    assert (error.value.status, error.value.code) == (409, "query.source_mismatch")
+        encode_page(uuid4(), context, [text])
+    assert (error.value.status, error.value.code) == expected
 
 
 async def test_invalid_filters_are_rejected_before_external_sql(

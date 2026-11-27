@@ -85,8 +85,9 @@ def next_cursor(
     for sort in query.order_by:
         i = slots[sort.column]
         # Continuing from a clipped sort value can repeat the previous page indefinitely.
+        # A clipped key never gets here (it fails while mapping the row), so this is the sort.
         if (len(result.rows) - 1, i) in result.truncated:
-            raise errors.source_mismatch()
+            raise errors.sort_value_too_long()
         position.append(None if last[i] is None else values.string_value(last[i]))
     return cursor.encode_page(release, context, position)
 

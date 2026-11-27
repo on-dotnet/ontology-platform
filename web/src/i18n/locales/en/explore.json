@@ -19,6 +19,7 @@
   "noRows": "No data for this object type yet",
   "noMatches": "No objects match these filters",
   "clearFilters": "Clear filters",
+  "clearSort": "Clear sort",
   "nextPage": "Next page",
   "firstPage": "Back to first page",
   "primaryKey": "Primary key",
@@ -60,16 +61,23 @@
     "property": "Select property",
     "operator": "Select operator",
     "value": "Filter value",
-    "dateExample": "2024-02-29",
-    "dateTimeExample": "2024-02-29T08:30:00+08:00",
     "values": "Filter values (one per line)",
+    "date": "Date",
+    "time": "Time",
+    "timeHint": "For example 08:30, 08:30:00 or 08:30:00+08:00",
+    "optionalTimeHint": "Leave the time empty for data that records only dates; otherwise enter one, for example 08:30, 08:30:00 or 08:30:00+08:00",
+    "datePosition": "Date {{position}}",
+    "timePosition": "Time {{position}}",
+    "addValue": "Add value",
+    "removeValue": "Remove value {{position}}",
     "cancel": "Cancel",
     "remove": "Remove filter: {{filter}}",
     "limit": "You can add up to 10 filters",
     "required": "Enter a filter value",
     "tooManyValues": "Enter at most 100 values",
     "invalidInteger": "Enter a whole number",
-    "invalidDate": "Enter a valid date in YYYY-MM-DD format",
+    "invalidDate": "Enter a valid date",
+    "invalidTime": "Enter a valid time, for example 08:30, 08:30:00 or 08:30:00+08:00",
     "invalidDecimal": "Enter a valid decimal number"
   },
   "op": {
@@ -96,6 +104,7 @@
     "invalid_cursor": "This page position has expired",
     "object_not_found": "This object could not be found. Return to the list and select another object.",
     "type_not_bound": "The bindings for this type have changed. Run the query again.",
+    "sort_value_too_long": "A sort value is too long to page through. Clear the sort, or add filters.",
     "other": "The query failed. Check your connection and try again."
   }
 }
