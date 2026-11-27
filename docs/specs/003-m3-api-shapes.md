@@ -229,7 +229,7 @@ type ElementInfo = ElementBrief & {
   hasData?: boolean;                     // 生效版本里是否绑定了数据
 };
 // type、relation 参数可以用元素 id、IRI 或局部名；筛选与排序里的 propertyId 同样。
-// propose_changes 的 operations 结构同 AI 助手的操作（002 第 10 节），最多 50 个，kind 只能是
+// propose_changes 的 operations 结构同 AI 助手的操作（002 第 10 节），最多 50 个，其中新建或修改公理的操作最多 10 个，kind 只能是
 // entity_type、relation_type、property、axiom。
 // 工具执行失败时结果的 isError 为 true，结构化内容为 { code, message }，code 用下面的错误码。
 ```

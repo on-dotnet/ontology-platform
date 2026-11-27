@@ -572,10 +572,13 @@ async def check_rules(ctx: Context, arguments: CheckRulesArguments) -> dict[str,
 
 # ---------- proposing changes (spec 003, 9.4) ----------
 
-# Per access token and hour, and open at a time per owner.
+# Dropped calls make no change set, so count calls separately from proposals.
+CALLS_PER_HOUR = 60
 PROPOSALS_PER_HOUR = 10
 OPEN_PROPOSALS_MAX = 20
 OPERATIONS_MAX = 50
+# Each axiom check exports and re-reads the ontology while holding its row lock.
+AXIOMS_MAX = 10
 RATIONALE_MAX_LENGTH = 2000
 PROPOSAL_TITLE_PREFIX = "MCP："
 PROPOSAL_TITLE_LENGTH = 60
@@ -635,6 +638,12 @@ class ProposeChangesArguments(OntologyArguments):
         str, StringConstraints(strip_whitespace=True, min_length=1, max_length=300)
     ] = Field(description="What the change set is about.")
     operations: list[ProposedOperation] = Field(min_length=1, max_length=OPERATIONS_MAX)
+
+    @model_validator(mode="after")
+    def limit_axiom_checks(self) -> "ProposeChangesArguments":
+        if sum(op.kind == "axiom" and op.op != "delete" for op in self.operations) > AXIOMS_MAX:
+            raise ValueError(f"At most {AXIOMS_MAX} axiom create or update operations per call.")
+        return self
 
 
 _RENAMED = {
@@ -707,14 +716,26 @@ async def propose_changes(ctx: Context, arguments: ProposeChangesArguments) -> d
     # One owner's proposals one at a time, so that two calls cannot both pass the limits.
     await ctx.db.execute(select(func.pg_advisory_xact_lock(_lock_key(owner))))
     since = datetime.now(UTC) - timedelta(hours=1)
+    calls = await audit.count(
+        ctx.db,
+        action="mcp.tool_called",
+        actor_id=owner,
+        target_type="access_token",
+        target_id=str(ctx.token.token_id),
+        since=since,
+        detail_equals={"tool": "propose_changes"},
+        detail_not_equals={"code": "mcp.rate_limited"},
+    )
     if (
-        await ontology.count_mcp_change_sets(ctx.db, ctx.token.token_id, since=since)
+        calls >= CALLS_PER_HOUR
+        or await ontology.count_mcp_change_sets(ctx.db, ctx.token.token_id, since=since)
         >= PROPOSALS_PER_HOUR
         or await ontology.count_open_mcp_change_sets(ctx.db, owner) >= OPEN_PROPOSALS_MAX
     ):
         raise ToolError(
             "mcp.rate_limited",
-            f"At most {PROPOSALS_PER_HOUR} change sets per token and hour, and "
+            f"At most {CALLS_PER_HOUR} calls and {PROPOSALS_PER_HOUR} change sets "
+            "per token and hour, and "
             f"{OPEN_PROPOSALS_MAX} open ones per user; try again later.",
         )
     items = [_proposed_item(operation) for operation in arguments.operations]
@@ -859,8 +880,9 @@ TOOLS: dict[str, Tool] = {
             "one change set that people review; nothing changes until they merge it. Operations "
             "that fail the checks of a manual edit are left out and counted; deletes take along "
             "what depends on them. Bindings to data cannot be proposed. At most "
-            f"{PROPOSALS_PER_HOUR} change sets per token and hour, {OPEN_PROPOSALS_MAX} open "
-            "per user.",
+            f"{CALLS_PER_HOUR} calls and {PROPOSALS_PER_HOUR} change sets per token and hour, "
+            f"{OPEN_PROPOSALS_MAX} open per user; at most {AXIOMS_MAX} axiom create or update "
+            "operations per call.",
             "changes:propose",
             ProposeChangesArguments,
             propose_changes,
