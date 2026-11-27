@@ -323,7 +323,6 @@ async def test_batch_6_gap_requires_unanswerable(
     assert_problem(response, 409, "qa.not_unanswerable")
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 7: editors can create and list competency questions")
 async def test_batch_7_competency_question(client: AsyncClient, db: AsyncSession) -> None:
     ontology = await add_ontology(db)
     await sign_in(client, db, Role.EDITOR)

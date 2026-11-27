@@ -1,12 +1,15 @@
 {
   "title": "Competency questions",
   "empty": "Use competency questions to record what the ontology should answer and check the answers after a release.",
+  "emptyTitle": "No competency questions yet",
   "create": "Create question",
   "edit": "Edit question",
   "archive": "Archive question",
+  "archiveConfirm": "Archiving “{{text}}” hides it from this list and excludes it from future bulk checks.",
   "moveUp": "Move up",
   "moveDown": "Move down",
   "import": "Import from file",
+  "importFile": "Choose a competency question TOML file",
   "importResult": "Imported {{created}} questions and skipped {{skipped}}.",
   "text": "Question",
   "expectation": "Expected answer",
@@ -16,21 +19,33 @@
     "number": "A number"
   },
   "type": "Object type",
+  "selectType": "Select an object type",
+  "objectCount_one": "{{count}} object ({{type}})",
+  "objectCount_other": "{{count}} objects ({{type}})",
   "keys": "Object keys (one per line)",
+  "keyFormat": "Enter up to 100 keys. Separate composite key columns with “ · ”. If a value contains the separator, paste a JSON array of strings.",
   "number": "Expected value",
+  "numberRange": "{{value}} ± {{tolerance}}",
   "tolerance": "Tolerance",
   "note": "Note",
   "check": "Check question",
   "checkAll": "Check all",
+  "checkingAll": "Checking all questions",
   "lastCheck": "Latest result",
   "version": "Version v{{version}}",
+  "oldVersion": "Older version",
+  "unchecked": "Not checked",
+  "differences": "Show differences",
+  "actual": "Actual value: {{value}}",
+  "missing": "Missing keys: {{keys}}",
+  "extra": "Extra keys: {{keys}}",
   "staleVersion": "This result is from an older version. Check again against the current version.",
   "result": {
-    "pending": "Pending",
+    "pending": "Checking",
     "pass": "Passed",
-    "fail": "Did not match",
+    "fail": "Failed",
     "unanswerable": "Unanswerable",
-    "error": "Check failed"
+    "error": "Error"
   },
   "coverage": {
     "title": "Coverage",
@@ -43,8 +58,18 @@
     "cq": {
       "not_found": "This competency question could not be found. Refresh the list.",
       "stale": "Someone else changed this question. Refresh before editing.",
+      "no_number": "The answer did not include a number or an object count.",
+      "type_mismatch": "The answer returned a different object type than expected.",
       "check_running": "A check of all questions is in progress. Wait for it to finish.",
       "invalid_import": "Check the TOML file format. It can contain up to 50 questions and must be 64 KB or smaller."
     }
+  },
+  "validation": {
+    "text": "Enter a question between 1 and 500 characters long.",
+    "note": "Keep the note to 1,000 characters or fewer.",
+    "type": "Select a valid object type.",
+    "keys": "Enter up to 100 object keys, one per line.",
+    "number": "Enter a valid expected number.",
+    "tolerance": "Enter a tolerance greater than or equal to zero."
   }
 }

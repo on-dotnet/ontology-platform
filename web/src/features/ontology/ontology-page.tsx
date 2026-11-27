@@ -12,6 +12,7 @@ import {
   FilePlus,
   FileUp,
   List,
+  ListChecks,
   Network,
   Plus,
   ShieldCheck,
@@ -40,6 +41,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip } from '@/components/ui/tooltip';
 import { usePublishAssistantSelection } from '@/features/assistant/assistant-selection';
 import { usePermissions } from '@/features/auth/permissions';
+import { QuestionsPanel } from '@/features/cq/questions-panel';
 import { exportOntologyTurtle, useGraph, type OntologySummary } from '@/features/ontologies/api';
 import { CreateOntologyDialog, type CreateMethod } from '@/features/ontologies/create-ontology-dialog';
 import { ImportOwlDialog } from '@/features/ontologies/import-owl';
@@ -79,6 +81,8 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
   const message = useErrorMessage();
   const { canUpload } = usePermissions();
   const { query, ontologies, selected } = useSelectedOntology(ontologyId);
+  const [cqFrom, setCqFrom] = useState<OntologyView | null>(null);
+  const showCq = cqFrom === view;
   const [elementId, setElementId] = useState<string | null>(null);
   // Which create method the "new ontology" dialog opens with; null while it is closed.
   const [creating, setCreating] = useState<CreateMethod | null>(null);
@@ -125,15 +129,19 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
           selected && ontologies ? (
             <>
               <OntologySelector ontologies={ontologies} value={selected.id} onValueChange={switchOntology} />
-              <SegmentedControl
+              <SegmentedControl<OntologyView | 'cq'>
                 legend={t('ontologyPage.viewLabel')}
                 hideLegend
-                value={view}
-                onValueChange={onViewChange}
+                value={showCq ? 'cq' : view}
+                onValueChange={(next) => {
+                  setCqFrom(next === 'cq' ? view : null);
+                  if (next !== 'cq') onViewChange(next);
+                }}
                 options={[
                   { value: 'graph', label: t('ontologyPage.viewGraph'), icon: <Workflow aria-hidden /> },
                   { value: 'list', label: t('ontologyPage.viewList'), icon: <List aria-hidden /> },
                   { value: 'turtle', label: t('ontologyPage.viewTurtle'), icon: <FileCode aria-hidden /> },
+                  { value: 'cq', label: t('cq.title'), icon: <ListChecks aria-hidden /> },
                 ]}
               />
               <DropdownMenu>
@@ -218,7 +226,9 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
           ) : (
             <div className="space-y-4">
               <OntologyStats ontology={selected} />
-              {view === 'turtle' ? (
+              {showCq ? (
+                <QuestionsPanel key={selected.id} ontologyId={selected.id} releaseId={selected.activeReleaseId} canEdit={canUpload} />
+              ) : view === 'turtle' ? (
                 <TurtleView key={selected.id} ontology={selected} />
               ) : view === 'list' ? (
                 <ElementList key={selected.id} ontologyId={selected.id} onSelect={selectElement} />

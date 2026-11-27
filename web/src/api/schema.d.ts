@@ -1590,6 +1590,11 @@ export interface components {
             /** Typeids */
             typeIds?: string[] | null;
         };
+        /** Body_archive_competency_question_api_competency_questions__id__archive_post */
+        Body_archive_competency_question_api_competency_questions__id__archive_post: {
+            /** Revision */
+            revision?: number | null;
+        };
         /** Body_import_into_ontology_api_ontologies__id__import_post */
         Body_import_into_ontology_api_ontologies__id__import_post: {
             /** File */
@@ -8774,6 +8779,7 @@ export interface operations {
             /** @description Successful Response */
             200: {
                 headers: {
+                    "X-Cq-Check-Running"?: boolean;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8814,15 +8820,6 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
-                };
-            };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -8885,15 +8882,6 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
-                };
-            };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -8967,15 +8955,6 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
                 };
             };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
         };
     };
     archive_competency_question_api_competency_questions__id__archive_post: {
@@ -8987,7 +8966,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["Body_archive_competency_question_api_competency_questions__id__archive_post"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -9025,6 +9008,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
             /** @description Unprocessable Content */
             422: {
                 headers: {
@@ -9032,15 +9024,6 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
-                };
-            };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -9110,15 +9093,6 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
                 };
             };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
         };
     };
     check_competency_question_api_competency_questions__id__check_post: {
@@ -9184,15 +9158,6 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
-                };
-            };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -9262,15 +9227,6 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
                 };
             };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
         };
     };
     competency_question_coverage_api_ontologies__id__competency_questions_coverage_get: {
@@ -9320,6 +9276,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
             /** @description Unprocessable Content */
             422: {
                 headers: {
@@ -9327,15 +9292,6 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
-                };
-            };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };

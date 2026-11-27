@@ -206,17 +206,20 @@ async def test_the_session_default_holds_without_the_read_only_transaction(
 
 async def test_a_flow_sends_only_selects(db: AsyncSession, external_source: ExternalSource) -> None:
     row = await add_source(db, external_source, allow_samples=True)
+    # Read the id now: the first external call in a process may roll back the idle
+    # session to load the platform identity, which expires `row`.
+    source_id = row.id
     for table in ("heat", "casting_sequence"):
-        await cache_table(db, row.id, external_source, "mes", table)
+        await cache_table(db, source_id, external_source, "mes", table)
 
     with external_statements() as seen:
         assert (await connection.test_connection(db, reader_params(external_source))).ok
         tables = await connection.read_catalog(db, reader_params(external_source), ["mes"])
-        await service.sample_values(db, row.id, TableRef("mes", "heat"), ("heat_no", "site_id"))
+        await service.sample_values(db, source_id, TableRef("mes", "heat"), ("heat_no", "site_id"))
         listed = await service.select(
             db,
             SelectQuery(
-                row.id,
+                source_id,
                 TableRef("mes", "heat"),
                 (ColumnRef("heat_no"), ColumnRef("site_id")),
                 where=(Condition(ColumnRef("site_id"), "not_null"),),
@@ -228,7 +231,7 @@ async def test_a_flow_sends_only_selects(db: AsyncSession, external_source: Exte
         await service.select(
             db,
             SelectQuery(
-                row.id,
+                source_id,
                 TableRef("mes", "heat"),
                 (ColumnRef("heat_no"),),
                 where=(Condition(ColumnRef("heat_no"), "eq", first),),
@@ -237,7 +240,7 @@ async def test_a_flow_sends_only_selects(db: AsyncSession, external_source: Exte
         await service.select(
             db,
             SelectQuery(
-                row.id,
+                source_id,
                 TableRef("mes", "heat"),
                 (ColumnRef("cast_no", "joined"),),
                 join=Join(TableRef("mes", "casting_sequence"), (("cast_no", "cast_no"),)),
