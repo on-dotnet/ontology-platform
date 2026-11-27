@@ -18,10 +18,10 @@ import { elementName, useElements, type EditItem, type Element } from '@/feature
 import { useSaveEdits, useSaveErrorMessage } from '@/features/ontology/edit-actions';
 
 import {
-  bindingKeys, canBeKey, columnFits, useBindingViews, useCatalogTable,
+  bindingKeys, canBeKey, columnFits, tableName, useBindingViews, useCatalogTable,
   type CatalogTable, type DataSource, type TypeBindingView,
 } from './api';
-import { bindingEdits, bindingModel, defaultChoices, joinProblem, replacementChanged, withKeys, type BindingModel, type Choices } from './binding-edits';
+import { bindingEdits, bindingModel, defaultChoices, joinProblem, replacementChanged, unbindEdits, withKeys, type BindingModel, type Choices } from './binding-edits';
 import { CatalogTablePicker, type TableChoice } from './catalog-table-picker';
 import { RelationJoinEditor } from './relation-join-editor';
 
@@ -146,6 +146,10 @@ function BindingForm({ type, all, view, views, sources, propertyBindings, relati
   const [submitted, setSubmitted] = useState(false);
   const [touchedSource, setTouchedSource] = useState(false);
   const [touchedKeys, setTouchedKeys] = useState(false);
+  const [confirmUnbind, setConfirmUnbind] = useState(false);
+  const unbindItems = unbindEdits(model);
+  const propertyCount = unbindItems.filter((item) => item.kind === 'property_binding').length;
+  const relationCount = unbindItems.filter((item) => item.kind === 'relation_binding').length;
   const source = activeSources.find((item) => item.id === sourceId);
   // The list is newer than the view when the data page archives the source while this dialog is open.
   const bound = model.original?.dataSource;
@@ -263,9 +267,25 @@ function BindingForm({ type, all, view, views, sources, propertyBindings, relati
       )}
       <DialogDescription>{t(apply ? 'bindings.form.appliesAtOnce' : 'bindings.form.submitsForReview')}</DialogDescription>
       <div className="flex justify-end gap-2">
+        {model.original && <Button variant="destructive" className="mr-auto" disabled={pending} onClick={() => setConfirmUnbind(true)}>{t('bindings.form.unbind')}</Button>}
         <DialogClose disabled={pending} className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
         <Button type="submit" loading={pending} disabled={Boolean(source && (!ready || (selected && !table)))}>{t('bindings.form.save')}</Button>
       </div>
+      <Dialog open={confirmUnbind} onOpenChange={(next) => { if (!pending) setConfirmUnbind(next); }}>
+        <DialogContent closeLabel={t('common.close')}>
+          <DialogTitle>{t('bindings.form.unbindConfirm.title')}</DialogTitle>
+          <DialogDescription>{t('bindings.form.unbindConfirm.description', {
+            table: model.original ? tableName(model.original.schema, model.original.table) : '', properties: propertyCount, relations: relationCount,
+          })}</DialogDescription>
+          <p className="mt-3 text-sm text-muted-foreground">{t(apply ? 'bindings.form.appliesAtOnce' : 'bindings.form.submitsForReview')}</p>
+          <div className="mt-6 flex justify-end gap-2">
+            <DialogClose disabled={pending} className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
+            <Button variant="destructive" loading={pending} onClick={() => { setConfirmUnbind(false); void onSave(unbindItems, model); }}>
+              {t('bindings.form.unbind')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }
