@@ -8,12 +8,14 @@ from rdflib import Literal, URIRef
 from rdflib.namespace import DC, DCTERMS, OWL, RDF, RDFS, SKOS
 
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError, parse_fragment
-from ontology_platform.modules.ontology.rdf.vocab import SH, SH_NAMESPACE
+from ontology_platform.modules.ontology.rdf.vocab import SH, SH_NAMESPACE, is_builtin
 from ontology_platform.modules.ontology.schemas import AxiomCategory
 
 type Prefixes = tuple[tuple[str, str], ...]
 
 _LOGIC_PREDICATES = {
+    RDFS.domain,
+    RDFS.range,
     RDFS.subPropertyOf,
     OWL.onProperty,
     OWL.onProperties,
@@ -68,6 +70,10 @@ _ANNOTATIONS = {
     RDFS.seeAlso,
     RDFS.isDefinedBy,
     OWL.versionInfo,
+    OWL.versionIRI,
+    OWL.priorVersion,
+    OWL.backwardCompatibleWith,
+    OWL.incompatibleWith,
     OWL.deprecated,
     SKOS.prefLabel,
     SKOS.altLabel,
@@ -173,13 +179,16 @@ def declared_annotations(fragments: Iterable[str], prefixes: Prefixes) -> frozen
 
 
 def classify_axiom(
-    turtle: str, prefixes: Prefixes, annotations: frozenset[str] = frozenset()
+    turtle: str,
+    prefixes: Prefixes,
+    annotations: frozenset[str] = frozenset(),
+    properties: frozenset[str] = frozenset(),
 ) -> tuple[AxiomCategory, str | None]:
     info = fragment_info(turtle, prefixes)
-    if (
-        info.category == "other"
-        and info.unknown_predicates
-        and info.unknown_predicates <= annotations
-    ):
-        return "annotation", info.note
+    unknown = info.unknown_predicates
+    if info.category == "other" and unknown:
+        if unknown <= annotations:
+            return "annotation", info.note
+        if not any(is_builtin(iri) for iri in unknown):
+            return ("annotation" if unknown.isdisjoint(properties) else "individual"), info.note
     return info.category, info.note

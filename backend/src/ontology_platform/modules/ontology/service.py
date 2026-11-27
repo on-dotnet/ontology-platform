@@ -833,9 +833,9 @@ def element_out(element: Element, base_iri: str) -> schemas.Element:
     return schemas.SnapshotElement.model_validate(_element_data(element, base_iri))
 
 
-async def _annotation_vocabulary(
-    db: AsyncSession, ontology: Ontology, proposals: Sequence[str] = ()
-) -> tuple[Prefixes, frozenset[str]]:
+async def _axiom_vocabulary(
+    db: AsyncSession, ontology: Ontology, items: Sequence[ChangeItem] = ()
+) -> tuple[Prefixes, frozenset[str], frozenset[str]]:
     prefixes = tuple(sorted(header_of(ontology).prefix_map().items()))
     stored = await db.scalars(
         select(Element.turtle).where(
@@ -847,14 +847,38 @@ async def _annotation_vocabulary(
         )
     )
     annotations = declared_annotations((text for text in stored if text), prefixes)
-    return prefixes, annotations | declared_annotations(proposals, prefixes)
+    stored_properties = await db.scalars(
+        select(func.coalesce(Element.iri, ontology.base_iri + Element.local_name)).where(
+            Element.ontology_id == ontology.id,
+            Element.kind.in_(("property", "relation_type")),
+            Element.status == "active",
+        )
+    )
+    properties = {iri for iri in stored_properties if iri is not None}
+    proposals: list[str] = []
+    for item in items:
+        if item.kind == "axiom":
+            turtle = (item.edited or {}).get("turtle", item.proposed.get("turtle"))
+            if isinstance(turtle, str):
+                proposals.append(turtle)
+        elif item.op == "create" and item.kind in ("property", "relation_type"):
+            fields = item.proposed | (item.edited or {})
+            if isinstance(iri := fields.get("iri"), str):
+                properties.add(iri)
+            elif isinstance(local_name := fields.get("localName"), str) and local_name:
+                properties.add(ontology.base_iri + local_name)
+    return prefixes, annotations | declared_annotations(proposals, prefixes), frozenset(properties)
 
 
 def _axiom_fields(
-    kind: str, turtle: str | None, prefixes: Prefixes, annotations: frozenset[str]
+    kind: str,
+    turtle: str | None,
+    prefixes: Prefixes,
+    annotations: frozenset[str],
+    properties: frozenset[str],
 ) -> dict[str, str | None]:
     category, note = (
-        classify_axiom(turtle, prefixes, annotations)
+        classify_axiom(turtle, prefixes, annotations, properties)
         if kind == "axiom" and turtle
         else (None, None)
     )
@@ -895,9 +919,9 @@ async def list_elements(
     if needle:
         elements = [element for element in elements if _matches(element, needle)]
     vocabulary = (
-        await _annotation_vocabulary(db, ontology)
+        await _axiom_vocabulary(db, ontology)
         if any(element.kind == "axiom" for element in elements)
-        else ((), frozenset())
+        else ((), frozenset(), frozenset())
     )
     return [
         schemas.Element.model_validate(
@@ -943,7 +967,7 @@ async def get_element(
     ]
     data = _element_data(element, ontology.base_iri)
     if element.kind == "axiom":
-        vocabulary = await _annotation_vocabulary(db, ontology)
+        vocabulary = await _axiom_vocabulary(db, ontology)
         data.update(_axiom_fields(element.kind, element.turtle, *vocabulary))
     return schemas.ElementDetail.model_validate({**data, "provenance": provenance})
 
@@ -1510,18 +1534,12 @@ async def _items_out(
         found = await db.scalars(select(Element).where(Element.id.in_(target_ids)))
         targets = {element.id: element for element in found}
     out: list[schemas.ChangeItem] = []
-    vocabulary: tuple[Prefixes, frozenset[str]] = ((), frozenset())
+    vocabulary: tuple[Prefixes, frozenset[str], frozenset[str]] = ((), frozenset(), frozenset())
     if any(item.kind == "axiom" for item in items):
         ontology = await _ontology_or_404(db, change_set.ontology_id)
-        proposals = [
-            text
-            for row in (all_items if all_items is not None else items)
-            if row.kind == "axiom"
-            and isinstance(
-                text := (row.edited or {}).get("turtle", row.proposed.get("turtle")), str
-            )
-        ]
-        vocabulary = await _annotation_vocabulary(db, ontology, proposals)
+        vocabulary = await _axiom_vocabulary(
+            db, ontology, all_items if all_items is not None else items
+        )
     for item in items:
         target = targets.get(item.target_element_id) if item.target_element_id else None
         edited = None if item.edited is None else _review_fields(item.kind, item.edited)
