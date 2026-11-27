@@ -16,7 +16,6 @@ import { BindingSection } from '@/features/bindings/binding-section';
 import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
 import {
   elementName,
-  turtleSummary,
   useElementDetail,
   useElements,
   type Element,
@@ -28,7 +27,7 @@ import { cn } from '@/lib/cn';
 
 import { AxiomFormDialog } from './axiom-form-dialog';
 import { useRestoreElement } from './edit-actions';
-import { ConstraintRules, TurtleBlock } from './element-content';
+import { AxiomBadge, AxiomFragment, ConstraintRules } from './element-content';
 import { isFormKind } from './element-form';
 import { ElementFormDialog } from './element-form-dialog';
 import { DeleteElementDialog, ReferencedBy } from './element-impact';
@@ -147,7 +146,7 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
     <div className="space-y-4">
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
+          {isAxiom ? <AxiomBadge category={element.axiomCategory} /> : <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>}
           {element.status === 'deprecated' ? <Badge tone="warning">{t('ontologyPage.detail.deprecated')}</Badge> : null}
           {element.flags.includes('non_standard') ? (
             <WarnTip label={t('review.flags.non_standard.label')}>{t('review.flags.non_standard.description')}</WarnTip>
@@ -437,10 +436,11 @@ function RelatedAxioms({ element, all, onSelect }: { element: ElementDetail; all
           <button
             type="button"
             onClick={() => onSelect(axiom.id)}
-            className="min-w-0 flex-1 truncate rounded text-left font-mono text-xs text-primary-strong hover:underline"
+            className="min-w-0 rounded text-left text-primary-strong hover:underline"
           >
-            {turtleSummary(axiom.turtle)}
+            <AxiomBadge category={axiom.axiomCategory} />
           </button>
+          {axiom.axiomNote ? <span className="text-sm">{axiom.axiomNote}</span> : null}
           {axiom.flags.includes('non_standard') ? (
             <WarnTip label={t('review.flags.non_standard.label')}>{t('review.flags.non_standard.description')}</WarnTip>
           ) : null}
@@ -455,9 +455,10 @@ function AxiomSections({ element, related, onSelect, language }: Omit<KindSectio
   const { t } = useTranslation();
   return (
     <>
-      <Section title={t('ontologyPage.detail.turtle')}>
-        <TurtleBlock turtle={element.turtle ?? ''} />
-      </Section>
+      <div>
+        {element.axiomNote ? <p className="text-sm">{element.axiomNote}</p> : null}
+        <AxiomFragment turtle={element.turtle} />
+      </div>
       <Section title={t('ontologyPage.detail.subject')}>
         {element.subjectId ? (
           <QueryState query={related} loading={<Skeleton className="h-5 w-32 rounded" />}>

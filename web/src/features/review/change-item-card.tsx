@@ -6,8 +6,8 @@ import { InlineNotice } from '@/components/feedback/inline-notice';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
-import { DATATYPES, turtleSummary } from '@/features/ontologies/api';
-import { ConstraintRules, TurtleBlock } from '@/features/ontology/element-content';
+import { DATATYPES } from '@/features/ontologies/api';
+import { AxiomBadge, AxiomFragment, ConstraintRules } from '@/features/ontology/element-content';
 import { cn } from '@/lib/cn';
 
 import { isAiSource, type ChangeItem, type ChangeSetSource, type Decision, type ElementFields, type MatchDecision } from './api';
@@ -82,7 +82,7 @@ export function ChangeItemCard({
   const mergedMetric = merged && item.kind === 'metric';
   const fields = mergedMetric ? patch : shownFields(item);
   const isBinding = isBindingKind(item.kind);
-  const label = isBinding ? bindingSentence(t, item, context) : itemLabel(mergedMetric ? { ...item, before: null } : item, context);
+  const label = isBinding ? bindingSentence(t, item, context) : itemLabel(mergedMetric ? { ...item, before: null } : item, context, t);
   const isAxiom = item.kind === 'axiom';
   const localName = isAxiom || isBinding ? null : fields.localName;
   // Delete and restore show what the target holds now, so the reviewer sees what goes away or comes back.
@@ -120,10 +120,11 @@ export function ChangeItemCard({
         id={titleId}
         className={cn(
           'mt-2 flex flex-wrap items-baseline gap-x-2 text-base font-semibold text-foreground',
-          isAxiom && 'min-w-0 break-all font-mono text-sm font-medium',
         )}
       >
-        <span className={cn(item.decision === 'rejected' && 'text-muted-foreground line-through')}>{label}</span>
+        <span className={cn(item.decision === 'rejected' && 'text-muted-foreground line-through')}>
+          {isAxiom ? <AxiomBadge category={item.axiomCategory} /> : label}
+        </span>
         {localName ? <span className="font-mono text-xs font-normal text-muted-foreground">{localName}</span> : null}
       </h3>
 
@@ -233,11 +234,12 @@ function ItemFacts({ item, fields, context }: { item: ChangeItem; fields: Elemen
   const unknownType = t('review.unknownType');
 
   if (item.kind === 'axiom') {
-    const turtle = fields.turtle ?? '';
-    // The heading already shows a one-line fragment in full; a delete or restore still shows it
-    // under "will delete / restore", which would otherwise lead nowhere.
-    const shownInHeading = turtle.trim() === turtleSummary(turtle) && item.op !== 'delete' && item.op !== 'restore';
-    return turtle && !shownInHeading ? <TurtleBlock turtle={turtle} className="mt-2" /> : null;
+    return (
+      <>
+        {item.axiomNote ? <p className="mt-1.5 text-sm text-foreground">{item.axiomNote}</p> : null}
+        <AxiomFragment turtle={fields.turtle} />
+      </>
+    );
   }
 
   if (item.kind === 'constraint') {

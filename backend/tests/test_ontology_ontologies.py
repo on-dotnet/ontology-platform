@@ -68,6 +68,8 @@ ELEMENT_FIELDS = {
     "autoShape",
     "rules",
     "turtle",
+    "axiomCategory",
+    "axiomNote",
     "subjectId",
     "flags",
     "status",

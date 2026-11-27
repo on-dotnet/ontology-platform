@@ -849,7 +849,7 @@ describe('deleting and restoring elements', () => {
       '关系盛装',
       '属性温度',
       '约束钢水校验',
-      '高级公理steel:MoltenSteel owl:disjointWith steel:Slag .',
+      '其他语句steel:MoltenSteel owl:disjointWith steel:Slag .',
     ]);
     const changed = within(dialog).getByRole('list', { name: '清除引用（3）' });
     expect(within(changed).getAllByRole('listitem').map((item) => item.textContent)).toEqual([

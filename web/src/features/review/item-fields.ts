@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import type { Datatype, Element, ElementKind, Synonym } from '@/features/ontologies/api';
 import { DATATYPES, displayName, elementName, turtleSummary } from '@/features/ontologies/api';
 
@@ -57,8 +59,9 @@ function bindingLabel(fields: ElementFields, context: RefContext): string | unde
   return `${subject} → ${place}`;
 }
 
-/** Display name of an item: its proposed or current name; axioms are named by their Turtle, bindings by what they bind. */
-export function itemLabel(item: ChangeItem, context: RefContext): string {
+/** A readable name for cards, evidence and merge notices. */
+export function itemLabel(item: ChangeItem, context: RefContext, t: TFunction): string {
+  if (item.kind === 'axiom') return item.axiomNote || t(`statement.category.${item.axiomCategory ?? 'other'}`);
   const fields = shownFields(item);
   const own = fieldsLabel(fields, context.language) ?? bindingLabel(fields, context);
   if (own) return own;

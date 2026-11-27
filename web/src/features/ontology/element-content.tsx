@@ -2,8 +2,25 @@ import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { WarnTip } from '@/components/feedback/hint-tip';
-import { DATATYPES, type ConstraintRule, type ConstraintRuleFields, type LangText, type RdfValue } from '@/features/ontologies/api';
+import { Badge } from '@/components/ui/badge';
+import { DATATYPES, type ConstraintRule, type ConstraintRuleFields, type Element, type LangText, type RdfValue } from '@/features/ontologies/api';
 import { cn } from '@/lib/cn';
+
+export function AxiomBadge({ category }: { category: Element['axiomCategory'] }) {
+  const { t } = useTranslation();
+  return <Badge tone="neutral">{t(`statement.category.${category ?? 'other'}`)}</Badge>;
+}
+
+export function AxiomFragment({ turtle }: { turtle: string | null | undefined }) {
+  const { t } = useTranslation();
+  if (!turtle) return null;
+  return (
+    <details className="mt-1 min-w-0 text-sm">
+      <summary className="w-fit cursor-pointer rounded text-primary-strong">{t('ontologyPage.axiom.fragment')}</summary>
+      <TurtleBlock turtle={turtle} className="mt-1" />
+    </details>
+  );
+}
 
 /** A Turtle fragment (an axiom) as written, in a monospace block that wraps instead of widening the page. */
 export function TurtleBlock({ turtle, className }: { turtle: string; className?: string }) {

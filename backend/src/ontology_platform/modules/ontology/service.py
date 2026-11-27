@@ -55,6 +55,11 @@ from ontology_platform.modules.ontology.models import (
     Ontology,
     Release,
 )
+from ontology_platform.modules.ontology.rdf.axiom_categories import (
+    Prefixes,
+    classify_axiom,
+    declared_annotations,
+)
 from ontology_platform.modules.ontology.schemas import ReviewMode
 from ontology_platform.modules.ontology.turtle import OntologyHeader, export_turtle
 
@@ -825,7 +830,31 @@ def _element_data(element: Element, base_iri: str) -> dict[str, Any]:
 
 
 def element_out(element: Element, base_iri: str) -> schemas.Element:
-    return schemas.Element.model_validate(_element_data(element, base_iri))
+    return schemas.SnapshotElement.model_validate(_element_data(element, base_iri))
+
+
+async def _annotation_vocabulary(
+    db: AsyncSession, ontology: Ontology, proposals: Sequence[str] = ()
+) -> tuple[Prefixes, frozenset[str]]:
+    prefixes = tuple(sorted(header_of(ontology).prefix_map().items()))
+    stored = await db.scalars(
+        select(Element.turtle).where(
+            Element.ontology_id == ontology.id, Element.kind == "axiom", Element.status == "active"
+        )
+    )
+    annotations = declared_annotations((text for text in stored if text), prefixes)
+    return prefixes, annotations | declared_annotations(proposals, prefixes)
+
+
+def _axiom_fields(
+    kind: str, turtle: str | None, prefixes: Prefixes, annotations: frozenset[str]
+) -> dict[str, str | None]:
+    category, note = (
+        classify_axiom(turtle, prefixes, annotations)
+        if kind == "axiom" and turtle
+        else (None, None)
+    )
+    return {"axiom_category": category, "axiom_note": note}
 
 
 def _matches(element: Element, needle: str) -> bool:
@@ -861,7 +890,20 @@ async def list_elements(
     needle = (q or "").strip().casefold()
     if needle:
         elements = [element for element in elements if _matches(element, needle)]
-    return [element_out(element, ontology.base_iri) for element in elements]
+    vocabulary = (
+        await _annotation_vocabulary(db, ontology)
+        if any(element.kind == "axiom" for element in elements)
+        else ((), frozenset())
+    )
+    return [
+        schemas.Element.model_validate(
+            {
+                **_element_data(element, ontology.base_iri),
+                **_axiom_fields(element.kind, element.turtle, *vocabulary),
+            }
+        )
+        for element in elements
+    ]
 
 
 async def get_element(
@@ -896,6 +938,9 @@ async def get_element(
         for item, change_set in sources
     ]
     data = _element_data(element, ontology.base_iri)
+    if element.kind == "axiom":
+        vocabulary = await _annotation_vocabulary(db, ontology)
+        data.update(_axiom_fields(element.kind, element.turtle, *vocabulary))
     return schemas.ElementDetail.model_validate({**data, "provenance": provenance})
 
 
@@ -1450,6 +1495,8 @@ async def _items_out(
     items: Sequence[ChangeItem],
     resolutions: Mapping[UUID, schemas.ItemResolution],
     links: _Links,
+    *,
+    all_items: Sequence[ChangeItem] | None = None,
 ) -> list[schemas.ChangeItem]:
     evidence = await _evidence_by_item(db, [item.id for item in items])
     matches = await _matches_out(db, items, links)
@@ -1459,9 +1506,25 @@ async def _items_out(
         found = await db.scalars(select(Element).where(Element.id.in_(target_ids)))
         targets = {element.id: element for element in found}
     out: list[schemas.ChangeItem] = []
+    vocabulary: tuple[Prefixes, frozenset[str]] = ((), frozenset())
+    if any(item.kind == "axiom" for item in items):
+        ontology = await _ontology_or_404(db, change_set.ontology_id)
+        proposals = [
+            text
+            for row in (all_items if all_items is not None else items)
+            if row.kind == "axiom"
+            and isinstance(
+                text := (row.edited or {}).get("turtle", row.proposed.get("turtle")), str
+            )
+        ]
+        vocabulary = await _annotation_vocabulary(db, ontology, proposals)
     for item in items:
         target = targets.get(item.target_element_id) if item.target_element_id else None
         edited = None if item.edited is None else _review_fields(item.kind, item.edited)
+        proposed = _review_fields(item.kind, item.proposed)
+        turtle = (
+            edited.turtle if edited and "turtle" in edited.model_fields_set else proposed.turtle
+        )
         out.append(
             schemas.ChangeItem.model_validate(
                 {
@@ -1471,7 +1534,8 @@ async def _items_out(
                     "kind": item.kind,
                     "target_element_id": item.target_element_id,
                     "temp_ref": item.temp_ref,
-                    "proposed": _review_fields(item.kind, item.proposed),
+                    "proposed": proposed,
+                    **_axiom_fields(item.kind, turtle, *vocabulary),
                     "edited": edited,
                     "before": _before(target) if target else None,
                     "decision": item.decision,
@@ -1788,7 +1852,7 @@ async def update_item(
     # The plan covers the whole change set: editing one item can change how others resolve.
     items = await _items(db, change_set)
     resolutions, _, links = await _resolutions(db, change_set, items)
-    return (await _items_out(db, change_set, [item], resolutions, links))[0]
+    return (await _items_out(db, change_set, [item], resolutions, links, all_items=items))[0]
 
 
 async def _has_match(db: AsyncSession, item: ChangeItem) -> bool:
