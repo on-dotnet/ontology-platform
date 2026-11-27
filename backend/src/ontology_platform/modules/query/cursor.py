@@ -51,7 +51,7 @@ def _decode(token: str, limit: int) -> object:
 
 
 def encode_key(parts: list[str]) -> str:
-    return _encode(parts, schemas.KEY_MAX_LENGTH, errors.source_mismatch)
+    return _encode(parts, schemas.KEY_MAX_LENGTH, errors.key_too_long)
 
 
 def decode_key(token: str, columns: Sequence[CatalogColumn]) -> tuple[Value, ...]:

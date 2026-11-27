@@ -191,19 +191,22 @@ async def test_an_unusable_bound_inverse_keeps_the_other_relations_reverse_entry
 
     # The coil still reaches its inspections through the working relation, read backwards.
     working = (str(catalog.inspected_coil.id), "in")
-    broken = (str(catalog.inspections.id), "out")
-    assert entries(types[str(catalog.coil.id)]["relations"]) == {working, broken}
+    assert entries(types[str(catalog.coil.id)]["relations"]) == {working}
+    assert [item["label"] for item in types[str(catalog.coil.id)]["relations"]] == [
+        catalog.inspections.label_zh
+    ]
     first = await search(client, catalog, catalog.coil, limit=1)
     assert first.status_code == 200, first.text
     [row] = first.json()["items"]
     obj = f"{catalog.url}/{catalog.coil.id}/{row['key']}"
     detail = await client.get(obj)
     assert detail.status_code == 200, detail.text
-    assert entries(detail.json()["relations"]) == {working, broken}
+    assert entries(detail.json()["relations"]) == {working}
     related = await client.get(
         f"{obj}/related", params={"relationId": working[0], "direction": working[1]}
     )
     assert related.status_code == 200, related.text
+    assert related.json()["items"]
     # From the inspection side the working relation already covers the broken one read backwards.
     assert entries(types[str(catalog.inspection.id)]["relations"]) == {
         (str(catalog.inspected_coil.id), "out")

@@ -174,7 +174,7 @@ async def test_a_sort_value_too_long_to_continue_from_is_reported_as_such(
     assert (error.value.status, error.value.code) == (422, "query.sort_value_too_long")
 
 
-async def test_a_key_too_long_on_a_sorted_page_is_still_a_source_mismatch(
+async def test_a_key_too_long_on_a_sorted_page_has_a_specific_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     model = published_table(monkeypatch)
@@ -194,7 +194,7 @@ async def test_a_key_too_long_on_a_sorted_page_is_still_a_source_mismatch(
     )
     with pytest.raises(AppError) as error:
         await service.search(Mock(spec=AsyncSession), model.ontology_id, body)
-    assert (error.value.status, error.value.code) == (409, "query.source_mismatch")
+    assert (error.value.status, error.value.code) == (422, "query.key_too_long")
 
 
 @pytest.mark.parametrize("use_alias", [False, True], ids=["bound-id", "inverse-alias"])
@@ -270,6 +270,43 @@ def test_explicit_binding_wins_over_its_inverse_alias(monkeypatch: pytest.Monkey
         for direction in directions:
             step = planner.resolve_relation(model, origin, bound.relation_id, direction)
             assert (step.relation, step.direction) == (bound, direction)
+
+
+def test_two_unusable_inverse_bindings_keep_the_outgoing_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    model = published_table(monkeypatch)
+    origin = model.types[0]
+    other = replace(origin, type_id=uuid4(), binding_id=uuid4())
+    first_id, second_id = uuid4(), uuid4()
+    first = bindings.BoundRelation(
+        first_id,
+        uuid4(),
+        "first",
+        "First",
+        origin.type_id,
+        other.type_id,
+        bindings.ForeignKeyHop("source", ("missing_first",), ("id",)),
+        second_id,
+        "Second",
+    )
+    second = bindings.BoundRelation(
+        second_id,
+        uuid4(),
+        "second",
+        "Second",
+        other.type_id,
+        origin.type_id,
+        bindings.ForeignKeyHop("source", ("missing_second",), ("id",)),
+        first_id,
+        "First",
+    )
+    model = replace(model, types=(origin, other), relations=(first, second))
+    listed = planner.relations(model, origin.type_id, {first.binding_id, second.binding_id})
+    assert {(item.relation_id, item.direction) for item in listed[origin.type_id]} == {
+        (first_id, "out"),
+        (second_id, "in"),
+    }
 
 
 def test_missing_relation_endpoints_do_not_hide_valid_relations(

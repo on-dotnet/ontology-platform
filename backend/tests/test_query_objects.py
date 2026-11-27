@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
 from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.metrics import service as metrics_service
 from support import csrf_headers
 from test_connectors_support import (
     admin_rows,
@@ -15,17 +16,106 @@ from test_connectors_support import (
     external_statements,
     scratch_fixture,  # noqa: F401  (registers the fixture)
 )
-from test_ontology_bindings_support import property_binding, save
+from test_ontology_bindings_support import property_binding, save, table, type_binding
+from test_ontology_editing import create
+from test_ontology_editing import save as save_edit
 from test_ontology_support import (
     accept_and_merge,
     add_elements,
     add_ontology,
     change_set_items,
     element,
+    elements_by_name,
     publish,
     sign_in,
 )
 from test_query_support import QueryCatalog, assert_problem, make_catalog, publish_bindings, search
+
+
+async def test_datetime_property_on_date_column_filters_search_and_metric(
+    client: AsyncClient, db: AsyncSession, external_source: ExternalSource, scratch: str
+) -> None:
+    catalog = await make_catalog(client, db, external_source)
+    target = f'"{scratch}".dated_coil'
+    admin_rows(external_source, f"CREATE TABLE {target} (coil_no text PRIMARY KEY, made date)")
+    admin_rows(external_source, f'GRANT SELECT ON {target} TO "{external_source.reader}"')
+    for key, day in (("A", "2026-01-01"), ("B", "2026-01-02")):
+        admin_rows(external_source, f"INSERT INTO {target} VALUES (%s, %s)", key, day)  # noqa: S608
+    await cache_table(db, catalog.source.id, external_source, scratch, "dated_coil")
+    made = element(
+        catalog.ontology,
+        "property",
+        "madeAt",
+        "日期时间",
+        domain_id=catalog.coil.id,
+        datatype="dateTime",
+    )
+    await add_elements(db, made)
+    saved = await save_edit(
+        client,
+        catalog.ontology,
+        create(
+            "metric",
+            "firstDayCount",
+            "首日数量",
+            subjectRef=str(catalog.coil.id),
+            metric={
+                "aggregate": "count",
+                "filters": [
+                    {"propertyRef": str(made.id), "op": "eq", "value": "2026-01-01T00:00:00"}
+                ],
+            },
+        ),
+        create(
+            "metric",
+            "firstDayUtcCount",
+            "首日 UTC 数量",
+            subjectRef=str(catalog.coil.id),
+            metric={
+                "aggregate": "count",
+                "filters": [
+                    {"propertyRef": str(made.id), "op": "eq", "value": "2026-01-01T02:00:00+02:00"}
+                ],
+            },
+        ),
+    )
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["merged"]
+    bound_table = table(catalog.source, "dated_coil", ["coil_no"])
+    bound_table["schema"] = scratch
+    await publish_bindings(
+        client,
+        catalog,
+        [type_binding(catalog.coil, bound_table, "coil"), property_binding(made, "coil", "made")],
+    )
+    for raw in ("2026-01-01T00:00:00", "2026-01-01T00:00:00Z", "2026-01-01"):
+        page = await search(
+            client,
+            catalog,
+            catalog.coil,
+            filters=[{"propertyId": str(made.id), "op": "eq", "value": raw}],
+        )
+        assert page.status_code == 200, page.text
+        assert [row["source"]["key"][0]["value"] for row in page.json()["items"]] == ["A"]
+    # The time of day counts: a date is that day's midnight, not the whole day.
+    for op, raw, expected in (
+        ("ge", "2026-01-01T10:00:00", ["B"]),
+        ("eq", "2026-01-01T10:00:00", []),
+        ("lt", "2026-01-01T10:00:00+02:00", ["A"]),
+    ):
+        page = await search(
+            client,
+            catalog,
+            catalog.coil,
+            filters=[{"propertyId": str(made.id), "op": op, "value": raw}],
+        )
+        assert page.status_code == 200, page.text
+        keys = [row["source"]["key"][0]["value"] for row in page.json()["items"]]
+        assert keys == expected, (op, raw)
+    metrics = await elements_by_name(db, catalog.ontology)
+    for name in ("firstDayCount", "firstDayUtcCount"):
+        result = await metrics_service.evaluate(db, catalog.ontology.id, metrics[name].id)
+        assert (result.population, result.value) == (1, "1")
 
 
 async def test_nothing_is_queried_before_a_release(client: AsyncClient, db: AsyncSession) -> None:
