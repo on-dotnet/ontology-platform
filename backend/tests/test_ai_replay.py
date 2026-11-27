@@ -113,9 +113,16 @@ def test_every_input_of_a_call_is_part_of_its_key(change: dict[str, Any]) -> Non
 
 
 async def test_recordings_survive_a_round_trip_through_files() -> None:
-    recorder = ReplayGateway({}, CountingGateway(), labels={"doc-a": "docs/a.md"})
+    emitted: list[tuple[str, str]] = []
+    recorder = ReplayGateway(
+        {},
+        CountingGateway(),
+        labels={"doc-a": "docs/a.md"},
+        on_record=lambda name, content: emitted.append((name, content)),
+    )
     original = await recorder.structured(**ask())
     files = recorder.recording_files()
+    assert emitted == files
 
     assert [name for name, _ in files] == [f"{call_key(**_key_fields(ask()))}.json"]
     record = json.loads(files[0][1])

@@ -10,7 +10,7 @@ import secrets
 import sys
 import time
 import tomllib
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import ExitStack, contextmanager
 from typing import Any
 from uuid import NAMESPACE_URL, UUID, uuid5
@@ -34,9 +34,11 @@ from ontology_platform.modules.ai.qa_scoring import parse_plan, score_plan
 from ontology_platform.modules.ai.replay import (
     STAGE_COUNTS,
     MeteredGateway,
+    RecordingStream,
     ReplayGateway,
     ReplayMissError,
     load_recordings,
+    write_json_line,
 )
 from ontology_platform.modules.ai.schemas import QaQuestion
 from ontology_platform.modules.connectors import jobs as catalog_jobs
@@ -549,7 +551,12 @@ async def _run(
         await engine.dispose()
 
 
-def evaluate(bundle: Json, admin_url: str, inner: ModelGateway | None = None) -> tuple[Json, int]:
+def evaluate(
+    bundle: Json,
+    admin_url: str,
+    inner: ModelGateway | None = None,
+    write_line: Callable[[dict[str, Any]], None] = write_json_line,
+) -> tuple[Json, int]:
     settings = Settings()
     mode = bundle["mode"]
     if mode not in ("record", "replay"):
@@ -561,7 +568,10 @@ def evaluate(bundle: Json, admin_url: str, inner: ModelGateway | None = None) ->
         inner = None
     elif inner is None:
         inner = MeteredGateway(settings)
-    replay = ReplayGateway(load_recordings(bundle.get("recordings", [])), inner)
+    stream = RecordingStream(json.dumps({"model": model}), write_line)
+    replay = ReplayGateway(
+        load_recordings(bundle.get("recordings", [])), inner, on_record=stream.on_record
+    )
     reply: Json = {}
     try:
         files = {k: base64.b64decode(v) for k, v in bundle["files"].items()}
@@ -576,10 +586,7 @@ def evaluate(bundle: Json, admin_url: str, inner: ModelGateway | None = None) ->
     except Exception as exc:
         # Driver and validation messages may include connection details.
         reply["error"] = type(exc).__name__
-    recordings = [{"name": n, "content": c} for n, c in replay.recording_files()]
-    if recordings:
-        recordings.append({"name": "models.json", "content": json.dumps({"model": model})})
-    reply["files"] = recordings
+    reply["type"] = "error" if "error" in reply else "result"
     return reply, int("error" in reply)
 
 
@@ -589,5 +596,5 @@ if __name__ == "__main__":
         lambda record: not (record.exc_info and isinstance(record.exc_info[1], EvaluationError))
     )
     output, code = evaluate(json.load(sys.stdin), os.environ["OP_QA_EVAL_ADMIN_URL"])
-    print(json.dumps(output, ensure_ascii=False))
+    write_json_line(output)
     sys.exit(code)

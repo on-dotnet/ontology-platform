@@ -583,13 +583,15 @@ def _bundle(files: dict[str, bytes], **extra: Any) -> dict[str, Any]:
 
 
 def test_a_failed_run_still_returns_the_calls_it_paid_for() -> None:
-    output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=2))
+    lines: list[dict[str, Any]] = []
+    output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=2), lines.append)
     assert code == 1
+    assert output["type"] == "error"
     assert output["error"] == "AiUnavailableError: Model call failed: InternalServerError"
-    names = [file["name"] for file in output["files"]]
+    names = [line["name"] for line in lines if line["type"] == "file"]
     assert len(names) == 3  # two recordings and the models
-    assert names[-1] == "models.json"
-    models = json.loads(output["files"][-1]["content"])["models"]
+    assert names[0] == "models.json"
+    models = json.loads(lines[0]["content"])["models"]
     assert models == {
         "standard": Settings().ai_model,
         "reasoning": Settings().ai_reasoning_model,
@@ -599,9 +601,57 @@ def test_a_failed_run_still_returns_the_calls_it_paid_for() -> None:
 
 
 def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:
-    output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=0))
+    lines: list[dict[str, Any]] = []
+    output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=0), lines.append)
     assert code == 1
-    assert output["files"] == []
+    assert output["type"] == "error"
+    assert lines == []
+
+
+def test_interrupt_keeps_recordings_before_run_finishes() -> None:
+    class Interrupted(FailsAfter):
+        async def structured[T: BaseModel](self, **call: Any) -> T:
+            if self.calls >= self.good:
+                raise KeyboardInterrupt
+            return await ModelStandIn.structured(self, **call)
+
+    lines: list[dict[str, Any]] = []
+    with pytest.raises(KeyboardInterrupt):
+        evaluate(_bundle(CASE_FILES), Interrupted(good=2), lines.append)
+    assert [line["type"] for line in lines] == ["file"] * 3
+    assert lines[0]["name"] == "models.json"
+    assert all(line["name"].endswith(".json") for line in lines[1:])
+
+
+def test_streamed_recordings_match_files_and_replay() -> None:
+    model = ModelStandIn()
+    lines: list[dict[str, Any]] = []
+    output, code = evaluate(_bundle(CASE_FILES, scenarios=["sequential"]), model, lines.append)
+    assert code == 0, output.get("error")
+    records = [line for line in lines if line["name"] != "models.json"]
+    assert len(records) == model.calls
+    loaded = load_recordings(line["content"] for line in records)
+    assert len(loaded) == len(records)
+    assert [(line["name"], line["content"]) for line in records] == [
+        (f"{key}.json", json.dumps(record, ensure_ascii=False, indent=1, sort_keys=True))
+        for key, record in loaded.items()
+    ]
+    replay_lines: list[dict[str, Any]] = []
+    replay, replay_code = evaluate(
+        _bundle(
+            CASE_FILES,
+            mode="replay",
+            scenarios=["sequential"],
+            recordings=[line["content"] for line in records],
+            manifest=lines[0]["content"],
+        ),
+        write_line=replay_lines.append,
+    )
+    assert replay_code == 0, replay.get("error")
+    assert replay_lines == []
+    result = json.loads(replay["result"])
+    assert result["usage"]["total"]["replayed"] == len(records)
+    assert result["usage"]["total"]["calls"] == 0
 
 
 def test_scenarios_must_be_a_list_of_names() -> None:
