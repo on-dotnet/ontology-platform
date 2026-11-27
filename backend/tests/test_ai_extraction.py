@@ -2010,6 +2010,17 @@ def test_the_types_prompt_keeps_lines_and_results_that_are_tracked_one_by_one() 
     assert "equipment, places and materials that the work is done with or on are not held" in rules
 
 
+def test_a_name_that_only_adds_a_design_is_the_same_type() -> None:
+    # #166: the steel run kept "converter" and "combined-blown converter" (and the caster and
+    # the slab caster) as two types, although the plant has no converter of another design.
+    types = " ".join(TYPES_INSTRUCTIONS.split())
+    assert "reuse the existing type and add the name to its synonyms" in types
+    assert "keeps track of things of more than one such kind and treats them differently" in types
+    resolve = " ".join(RESOLVE_INSTRUCTIONS.split())
+    assert "a name that adds the design or method of the things when the context" in resolve
+    assert "when the context shows other kinds as well" in resolve
+
+
 def test_the_prompts_give_examples_in_generic_words_only() -> None:
     cjk = re.compile(r"[一-鿿]")
     for prompt in (TYPES_INSTRUCTIONS, RESOLVE_INSTRUCTIONS, RELATIONS_INSTRUCTIONS):

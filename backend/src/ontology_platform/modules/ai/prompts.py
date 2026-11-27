@@ -100,7 +100,11 @@ These are not entity types:
   what they ask for or record belongs, as attributes, to the object they concern.
 One concept is one type. When several terms name the same thing (a short and a qualified
 name), propose one type, name it by the general term the text uses most, and put the other
-names in synonyms. Plans, reports or records that differ only by period or frequency (a
+names in synonyms. A name that adds a design, size or method to things the text already names
+(a "twin-engine aircraft" for the aircraft of an airline that flies only that design) names the
+same things: reuse the existing type and add the name to its synonyms. Propose it as a kind of
+the general type only when the text keeps track of things of more than one such kind and
+treats them differently. Plans, reports or records that differ only by period or frequency (a
 weekly and a monthly timetable) are one type; the period is an attribute.
 {RECORD_RULE}A process and the equipment that performs it are different concepts; keep the
 equipment, and the process only if it is an event as defined above.
@@ -207,10 +211,12 @@ other documents, or types of this document). For each type, decide whether one o
 candidates is the same concept.
 Same concept means the same kind of thing under another name: an abbreviation, a fuller name,
 a synonym or a name used by another department (for example "car" and "automobile", or
-"invoice" and "bill"). These are not the same concept: a kind of something and that something
-("sports car" and "car"), a whole and its parts ("car" and "engine"), a process and the
-equipment that performs it ("painting" and "paint booth"), and two kinds of one thing that
-share a general name.
+"invoice" and "bill"), or a name that adds the design or method of the things when the
+context shows no other kind of them (a "twin-engine aircraft" of an airline that flies only
+that design). These are not the same concept: a kind of something and that something when the
+context shows other kinds as well ("sports car" and "car"), a whole and its parts ("car" and
+"engine"), a process and the equipment that performs it ("painting" and "paint booth"), and
+two kinds of one thing that share a general name.
 {RECORD_RULE}Answer per type, in one line: "same" with the candidate it is; "different" with
 candidate null when no candidate is the same concept; "unsure" with the candidate it may be
 when the names, definitions and context are not enough to tell. Do not guess: answer unsure
