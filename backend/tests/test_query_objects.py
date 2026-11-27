@@ -118,6 +118,56 @@ async def test_datetime_property_on_date_column_filters_search_and_metric(
         assert (result.population, result.value) == (1, "1")
 
 
+async def test_a_timestamp_column_compares_in_utc_whatever_the_source_sessions_zone(
+    client: AsyncClient, db: AsyncSession, external_source: ExternalSource, scratch: str
+) -> None:
+    catalog = await make_catalog(client, db, external_source)
+    target = f'"{scratch}".stamped_coil'
+    admin_rows(external_source, f"CREATE TABLE {target} (coil_no text PRIMARY KEY, made timestamp)")
+    admin_rows(external_source, f'GRANT SELECT ON {target} TO "{external_source.reader}"')
+    for key, moment in (("A", "2026-01-01 00:00:00"), ("B", "2026-01-01 10:00:00")):
+        admin_rows(external_source, f"INSERT INTO {target} VALUES (%s, %s)", key, moment)  # noqa: S608
+    await cache_table(db, catalog.source.id, external_source, scratch, "stamped_coil")
+    made = element(
+        catalog.ontology,
+        "property",
+        "madeAt",
+        "日期时间",
+        domain_id=catalog.coil.id,
+        datatype="dateTime",
+    )
+    await add_elements(db, made)
+    bound_table = table(catalog.source, "stamped_coil", ["coil_no"])
+    bound_table["schema"] = scratch
+    await publish_bindings(
+        client,
+        catalog,
+        [type_binding(catalog.coil, bound_table, "coil"), property_binding(made, "coil", "made")],
+    )
+    reader = f'"{external_source.reader}"'
+    # A source whose sessions default to another zone must not shift what a condition matches.
+    admin_rows(external_source, f"ALTER ROLE {reader} SET TimeZone = 'Asia/Shanghai'")
+    try:
+        for op, raw, expected in (
+            ("eq", "2026-01-01T08:00:00+08:00", ["A"]),
+            ("eq", "2026-01-01T00:00:00Z", ["A"]),
+            ("eq", "2026-01-01T00:00:00", ["A"]),
+            ("ge", "2026-01-01T09:00:00Z", ["B"]),
+            ("lt", "2026-01-01T12:00:00+08:00", ["A"]),
+        ):
+            page = await search(
+                client,
+                catalog,
+                catalog.coil,
+                filters=[{"propertyId": str(made.id), "op": op, "value": raw}],
+            )
+            assert page.status_code == 200, page.text
+            keys = [row["source"]["key"][0]["value"] for row in page.json()["items"]]
+            assert keys == expected, (op, raw)
+    finally:
+        admin_rows(external_source, f"ALTER ROLE {reader} RESET TimeZone")
+
+
 async def test_nothing_is_queried_before_a_release(client: AsyncClient, db: AsyncSession) -> None:
     steel = await add_ontology(db)
     await add_elements(db, element(steel, "entity_type", "Heat", "炉次"))
