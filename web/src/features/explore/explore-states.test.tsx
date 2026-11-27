@@ -84,6 +84,42 @@ describe('explore query states', () => {
     expect(api.calls('POST', searchPath)).toHaveLength(2);
   });
 
+  it('clears the sort, keeping filters, when a sort value is too long to page through', async () => {
+    const api = mockExplore({
+      [`POST ${searchPath}`]: ({ body }) => (body as components['schemas']['ObjectSearch']).sort?.length
+        ? problemResponse(422, 'query.sort_value_too_long') : firstPage,
+    });
+    renderApp('/explore');
+    await screen.findByRole('table', { name: '炉次' });
+    fireEvent.click(screen.getByRole('button', { name: '添加筛选' }));
+    fireEvent.change(screen.getByRole('combobox', { name: '选择运算符' }), { target: { value: 'isNull' } });
+    fireEvent.click(screen.getByRole('button', { name: '应用筛选' }));
+    fireEvent.click(within(await screen.findByRole('table', { name: '炉次' })).getByRole('button', { name: '钢种' }));
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('排序值过长，无法分页');
+    expect(alert).toHaveTextContent('请清除排序，或增加筛选条件');
+    expect(within(alert).queryByRole('button', { name: '重试' })).toBeNull();
+    fireEvent.click(within(alert).getByRole('button', { name: '清除排序' }));
+    expect(await screen.findByRole('table', { name: '炉次' })).toBeVisible();
+    await waitFor(() => expect(api.calls('POST', searchPath).at(-1)?.body).toMatchObject({
+      sort: [], cursor: null, filters: [{ propertyId: 'grade', op: 'isNull' }],
+    }));
+  });
+
+  it('filters a date and time property by date alone', async () => {
+    const castAt: components['schemas']['ObjectProperty'] = {
+      propertyId: 'castAt', label: '浇铸时间', datatype: 'dateTime', unit: null, ops: ['ge'],
+    };
+    const api = mockExplore({ [`GET ${typesPath}`]: () => ({ release, items: [{ ...heatType, properties: [castAt] }] }) });
+    renderApp('/explore');
+    fireEvent.click(await screen.findByRole('button', { name: '添加筛选' }));
+    fireEvent.change(screen.getByLabelText(/^筛选值/), { target: { value: '2024-02-29' } });
+    fireEvent.click(screen.getByRole('button', { name: '应用筛选' }));
+    await waitFor(() => expect(api.calls('POST', searchPath).at(-1)?.body).toMatchObject({
+      filters: [{ propertyId: 'castAt', op: 'ge', value: '2024-02-29' }],
+    }));
+  });
+
   it.each([
     ['release_changed', 409, '本体刚发布了新版本'],
     ['invalid_cursor', 422, '当前分页位置已失效'],

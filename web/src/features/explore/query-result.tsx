@@ -41,7 +41,7 @@ function QueryLoading({ cancel, hasContent = false }: { cancel: () => void; hasC
 
 const queryErrors = new Set([
   'source_unavailable', 'source_mismatch', 'timeout', 'busy', 'source_disabled',
-  'invalid_filter', 'invalid_cursor', 'object_not_found', 'type_not_bound',
+  'invalid_filter', 'invalid_cursor', 'object_not_found', 'type_not_bound', 'sort_value_too_long',
 ]);
 
 type Query<T> = Pick<UseQueryResult<T>, 'fetchStatus' | 'data' | 'error' | 'refetch'> & {
@@ -53,6 +53,7 @@ interface Recovery {
   id?: string;
   onRestart?: () => void;
   onFirstPage?: () => void;
+  onClearSort?: () => void;
 }
 
 export function ReleaseChangedNotice({ onRestart }: { onRestart: () => void }) {
@@ -62,7 +63,7 @@ export function ReleaseChangedNotice({ onRestart }: { onRestart: () => void }) {
   } />;
 }
 
-function QueryFailure({ error, id, retry, onRestart, onFirstPage }: Recovery & { error: Error; retry: () => void }) {
+function QueryFailure({ error, id, retry, onRestart, onFirstPage, onClearSort }: Recovery & { error: Error; retry: () => void }) {
   const { t } = useTranslation();
   if (isForbidden(error)) return <ForbiddenState requiredRole="viewer" />;
   const code = isApiError(error) ? error.code : '';
@@ -77,10 +78,12 @@ function QueryFailure({ error, id, retry, onRestart, onFirstPage }: Recovery & {
   const reason = code.startsWith('query.') ? code.slice('query.'.length) : '';
   const restart = reason === 'invalid_cursor' || reason === 'type_not_bound';
   const recover = reason === 'invalid_cursor' ? onFirstPage ?? onRestart : onRestart;
+  // The same sorted request would fail again, and the failure hides the column headers.
+  const clearSort = reason === 'sort_value_too_long' ? onClearSort : undefined;
   return (
     <InlineNotice tone="error" title={t(`explore.errors.${queryErrors.has(reason) ? reason : 'other'}`)}
-      action={<Button variant="secondary" size="sm" onClick={restart ? recover ?? retry : retry}>
-        {t(restart ? 'explore.restart' : 'explore.retry')}
+      action={<Button variant="secondary" size="sm" onClick={clearSort ?? (restart ? recover ?? retry : retry)}>
+        {t(clearSort ? 'explore.clearSort' : restart ? 'explore.restart' : 'explore.retry')}
       </Button>} />
   );
 }

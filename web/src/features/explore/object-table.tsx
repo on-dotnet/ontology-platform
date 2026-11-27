@@ -53,8 +53,9 @@ export function ObjectTable({ id, releaseId, type, criteria, onChange, onOpen, o
   return (
     <div className="space-y-4">
       <FilterEditor properties={type.properties} filters={filters} onChange={(next) => change({ filters: next, sort })}
-        onExpandedChange={setFilterExpanded} />
-      <QueryResult query={query} id={id} onRestart={onRestart} onFirstPage={cursor !== null ? () => onPage(null) : undefined}>
+        onExpandedChange={setFilterExpanded} optionalTime />
+      <QueryResult query={query} id={id} onRestart={onRestart} onFirstPage={cursor !== null ? () => onPage(null) : undefined}
+        onClearSort={sort.length ? () => change({ filters, sort: [] }) : undefined}>
         {(page) => (
           <>
             {page.items.length ? (

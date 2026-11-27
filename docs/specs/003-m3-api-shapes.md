@@ -199,6 +199,12 @@ type ObjectDetail = ObjectRow & { release: ReleaseRef; relations: ObjectTypeInfo
 //                                                                             → ObjectPage（typeId 是相关对象的类型）
 ```
 
+对象查询的行为约定：
+
+- **出发对象不存在**：走一跳（`…/related`）不单独核对出发对象是否存在。关系是外键绑定时返回空页（200，`items` 为空，`nextCursor` 为 null），不报 `query.object_not_found`；关系绑在连接表上时返回连接表里匹配到的对象，出发对象删除后没有残留行时同样是空页。主键编码不合法，或数据库拒绝主键里的取值（例如已改名的枚举值），返回 404 `query.object_not_found`；连接表的列类型和出发类型的主键列不同、主键值无法无损转换时返回 409 `query.source_mismatch`。MCP 的 `get_related_objects` 相同。
+- **筛选条件不合法**：`Filter` 的 `op` 不是上面列出的运算符，或 `value` 的类型不对时，校验阶段（`model_validate`）直接抛出 `query.invalid_filter`（422）；请求里还有别的字段错误时只报这一个，不返回 `validation.failed` 的字段清单。直接用 `Filter` 模型的调用方（如 MCP 工具）收到的是 `AppError`，不是 pydantic 的 `ValidationError`。
+- **关系列表**：`relations` 列出从这个类型出发的绑定，以及指向它的绑定的反向读法（`direction` 为 `in`）。关系 R 声明的互逆关系 R' 在相同的两端类型之间也有出向绑定、并且这个绑定可用时，不列 R 的反向项；R' 的连接表或连接列在目录缓存里缺失，或用来匹配出发对象主键的列类型不受支持时，保留 R 的反向项，R' 本身仍按出向列出。
+
 ## MCP（批次 6）
 
 端点 `POST /mcp`，JSON-RPC，协议版本 `2026-07-28`，认证为 `Authorization: Bearer <访问令牌>`。字段名与错误码以规范的 schema 原文为准，下面只列工具的输入与结构化输出。
@@ -289,6 +295,7 @@ type ElementInfo = ElementBrief & {
 | `query.object_not_found` | 404 | 没有这个主键的对象 |
 | `query.invalid_filter` | 422 | 属性没有绑定；运算符不适用于它的数据类型或所绑列的类型族；取值的写法不合法（含数据库报的枚举取值不合法） |
 | `query.invalid_cursor` | 422 | 游标与当前请求不符 |
+| `query.sort_value_too_long` | 422 | 还有下一页，但本页最后一行的排序值太长，无法从它继续：文本超过单元格上限被截断，或压缩后仍装不进游标；换一个排序属性，或增加筛选条件 |
 | `query.release_changed` | 409 | 翻页途中生效版本变了，需要从头查询 |
 | `query.timeout` | 504 | 查询超时 |
 | `query.busy` | 503 | 这个数据源上排队的查询太多 |

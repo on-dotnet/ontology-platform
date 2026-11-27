@@ -23,6 +23,12 @@ def invalid_cursor() -> AppError:
     return AppError(422, "query.invalid_cursor", "The cursor is invalid for this request.")
 
 
+def sort_value_too_long() -> AppError:
+    return AppError(
+        422, "query.sort_value_too_long", "A sort value is too long to continue to the next page."
+    )
+
+
 def invalid_value(
     exc: InvalidValueError, key_specs: Sequence[CatalogColumn], filtered: bool
 ) -> AppError:

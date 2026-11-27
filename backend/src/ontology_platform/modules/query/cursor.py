@@ -5,7 +5,7 @@ import hashlib
 import json
 import re
 import zlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from uuid import UUID
 
 from ontology_platform.errors import AppError
@@ -21,16 +21,15 @@ def _bytes(data: object) -> bytes:
     return json.dumps(data, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode()
 
 
-def _encode(data: object, limit: int) -> str:
+def _encode(data: object, limit: int, overflow: Callable[[], AppError]) -> str:
     raw = _bytes(data)
     if len(raw) > _MAX_DECODED:
-        raise errors.source_mismatch()
+        raise overflow()
     if len(raw) * 4 > limit * 3:
         raw = b"\x00" + zlib.compress(raw)
     encoded = base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
     if len(encoded) > limit:
-        # Even compressed, long text sort values can exceed the 2048-character cursor limit.
-        raise errors.source_mismatch()
+        raise overflow()
     return encoded
 
 
@@ -52,7 +51,7 @@ def _decode(token: str, limit: int) -> object:
 
 
 def encode_key(parts: list[str]) -> str:
-    return _encode(parts, schemas.KEY_MAX_LENGTH)
+    return _encode(parts, schemas.KEY_MAX_LENGTH, errors.source_mismatch)
 
 
 def decode_key(token: str, columns: Sequence[CatalogColumn]) -> tuple[Value, ...]:
@@ -79,7 +78,10 @@ def search_context(body: schemas.ObjectSearch) -> dict[str, object]:
 
 
 def encode_page(release: UUID, context: dict[str, object], position: list[str | None]) -> str:
-    return _encode([str(release), context, position], schemas.CURSOR_MAX_LENGTH)
+    # Even compressed, long text sort values can exceed the cursor limit. Keys are bounded by
+    # their own limit, so a request without a sort only overflows when the source's keys do.
+    overflow = errors.sort_value_too_long if context.get("sort") else errors.source_mismatch
+    return _encode([str(release), context, position], schemas.CURSOR_MAX_LENGTH, overflow)
 
 
 def read_page(
