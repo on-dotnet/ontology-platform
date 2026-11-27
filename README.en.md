@@ -11,7 +11,7 @@ An open-source, AI-native ontology platform. Give it your documents and data: AI
 - **AI reads your documents**: upload procedures, standards and reports; AI extracts terms, entity types and hierarchy, relationships and constraints in stages, each suggestion linked to the source text with a confidence level.
 - **Humans approve, AI proposes**: every AI change is a change set that people accept, edit or reject item by item. Every published version can be compared and rolled back.
 - **Standards-based**: import and export W3C ontologies and round-trip with tools such as Protégé.
-- **Connect data**: bind entity types to database tables (PostgreSQL, Oracle, Doris, TDengine, Web APIs) and browse real data through the ontology, read-only.
+- **Connect data**: bind entity types to PostgreSQL tables and browse real data through the ontology, read-only. Oracle, Doris, TDengine and Web API connectors will follow once there is an environment to test them against; see the [roadmap](docs/roadmap.md).
 - **AI analysis**: ask questions in natural language and get answers with data and document citations, hypotheses and counter-evidence.
 - **For agents**: expose the ontology to external AI agents via MCP.
 
