@@ -839,7 +839,11 @@ async def _annotation_vocabulary(
     prefixes = tuple(sorted(header_of(ontology).prefix_map().items()))
     stored = await db.scalars(
         select(Element.turtle).where(
-            Element.ontology_id == ontology.id, Element.kind == "axiom", Element.status == "active"
+            Element.ontology_id == ontology.id,
+            Element.kind == "axiom",
+            Element.status == "active",
+            # Only declarations matter here; reading every fragment is slow on large ontologies.
+            Element.turtle.contains("AnnotationProperty", autoescape=True),
         )
     )
     annotations = declared_annotations((text for text in stored if text), prefixes)

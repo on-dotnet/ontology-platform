@@ -42,6 +42,9 @@ SOURCE = """
         ("ex:A a ex:Code ; rdfs:subClassOf ex:B .", "individual", None),
         ("ex:A a skos:ConceptScheme .", "individual", None),
         ("ex:A a owl:NamedIndividual .", "individual", None),
+        ("ex:A skos:inScheme ex:S .", "individual", None),
+        ('ex:A skos:notation "HEAT" .', "individual", None),
+        ("ex:A skos:broader ex:B .", "individual", None),
         ("ex:A rdfs:subClassOf ex:B .", "parent", None),
         ('ex:A rdfs:isDefinedBy ex:B ; dcterms:source "source" .', "annotation", None),
         ('ex:A rdfs:comment "owl:Restriction sh:message"@en .', "annotation", None),
@@ -126,4 +129,14 @@ async def test_classifies_all_imported_steel_axioms(client: AsyncClient, db: Asy
     assert seconds <= 3
     assert counts == Counter(axiom["axiomCategory"] for axiom in axioms)
     # The steel shapes import as constraints, so what remains covers only these categories.
-    assert counts == Counter({"individual": 2, "annotation": 3, "other": 1})
+    assert counts == Counter({"individual": 3, "annotation": 3})
+
+
+def test_annotation_declarations_skip_fragments_without_them() -> None:
+    key = tuple(sorted(PREFIXES.items()))
+    declaring = "ex:code a owl:AnnotationProperty ."
+    fragment_info.cache_clear()
+    assert declared_annotations(["ex:A rdfs:label 'A' .", declaring], key) == frozenset(
+        {"urn:steel:code"}
+    )
+    assert fragment_info.cache_info().currsize == 1
