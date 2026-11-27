@@ -87,7 +87,8 @@ M3_PATHS = {
 
 ONTOLOGY = "/api/ontologies/{id}"
 CQ = "/competency-questions"
-# What an authorized caller gets from operations that are no longer stubs (nothing released yet).
+# Expected responses for an authorized caller with a working ontology and no release.
+CQ_DETAIL = "/api/competency-questions/{id}"
 QA_LIST = f"{ONTOLOGY}/qa/questions"
 QA_DETAIL = "/api/qa/questions/{id}"
 QA_GAP = f"{QA_DETAIL}/gap-proposal"
@@ -100,6 +101,14 @@ M4_IMPLEMENTED: dict[tuple[str, str], tuple[int, str | None]] = {
     ("get", QA_LIST): (200, None),
     ("get", QA_DETAIL): (200, None),
     ("post", QA_GAP): (409, "qa.not_unanswerable"),
+    ("get", ONTOLOGY + CQ): (200, None),
+    ("post", ONTOLOGY + CQ): (201, None),
+    ("patch", CQ_DETAIL): (200, None),
+    ("post", CQ_DETAIL + "/archive"): (200, None),
+    ("post", ONTOLOGY + CQ + "/import"): (422, "cq.invalid_import"),
+    ("post", CQ_DETAIL + "/check"): (409, "query.no_release"),
+    ("post", ONTOLOGY + CQ + "/check"): (409, "query.no_release"),
+    ("get", ONTOLOGY + CQ + "/coverage"): (200, None),
 }
 M4_OPERATIONS = {
     f"{ONTOLOGY}/objects/traverse": {"post": 200},
@@ -131,9 +140,14 @@ def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) ->
         for method, success in methods.items():
             responses = paths[path][method]["responses"]
             assert "schema" in responses[str(success)]["content"]["application/json"]
-            if path in (QA_LIST, QA_DETAIL, QA_GAP):
+            if CQ in path or path in (QA_LIST, QA_DETAIL, QA_GAP):
                 assert "501" not in responses
                 assert "application/problem+json" in responses["403"]["content"]
+                if CQ in path:
+                    for status in ("401", "404", "422"):
+                        assert "application/problem+json" in responses[status]["content"]
+                    if method == "patch" or path.endswith(("/check", "/archive", "/coverage")):
+                        assert "application/problem+json" in responses["409"]["content"]
                 if path == QA_GAP:
                     for status in ("200", "202"):
                         assert responses[status]["content"]["application/json"]["schema"] == {
@@ -166,7 +180,7 @@ def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) ->
 @pytest.mark.parametrize(
     "caller", ["anonymous", "viewer", "editor", "reviewer", "admin", "token", "limited"]
 )
-async def test_m4_stub_permissions(client: AsyncClient, db: AsyncSession, caller: str) -> None:
+async def test_m4_operation_permissions(client: AsyncClient, db: AsyncSession, caller: str) -> None:
     ontology = await add_ontology(db)
     await sign_in(client, db, Role.EDITOR)
     owner = UUID((await client.get("/api/auth/me")).json()["id"])
@@ -179,6 +193,12 @@ async def test_m4_stub_permissions(client: AsyncClient, db: AsyncSession, caller
     )
     db.add(question)
     await db.commit()
+    cq_body = {"text": "有多少炉次？", "expect": {"kind": "answerable"}}
+    cq_url = f"/api/ontologies/{ontology.id}{CQ}"
+    seed = await client.post(cq_url, json=cq_body, headers=csrf_headers(client))
+    assert seed.status_code == 201
+    cq_id = seed.json()["id"]
+    archive_id = cq_id
     headers = {}
     if caller in ("token", "limited"):
         scope = "objects:read" if caller == "token" else "ontology:read"
@@ -201,7 +221,10 @@ async def test_m4_stub_permissions(client: AsyncClient, db: AsyncSession, caller
     }
     for path, methods in M4_OPERATIONS.items():
         detail = path.startswith("/api/qa/questions/")
-        url = path.format(id=question.id if detail else ontology.id, metricId=type_id)
+        target_id = str(question.id if detail else ontology.id)
+        if path.startswith(CQ_DETAIL):
+            target_id = archive_id if path.endswith("/archive") else cq_id
+        url = path.format(id=target_id, metricId=type_id)
         scoped = "/qa/" not in path and CQ not in path
         for method in methods:
             options: dict[str, Any] = {}
@@ -221,16 +244,32 @@ async def test_m4_stub_permissions(client: AsyncClient, db: AsyncSession, caller
             elif detail and caller in ("viewer", "reviewer"):
                 assert_problem(response, 404, "qa.not_found")
             else:
-                status, code = M4_IMPLEMENTED.get((method, path), (501, "http.not_implemented"))
+                status, code = M4_IMPLEMENTED[method, path]
                 if code is not None:
                     assert_problem(response, status, code)
                 else:
                     assert response.status_code == status, response.text
                     if path == QA_DETAIL:
                         assert response.json()["id"] == str(question.id)
-                    else:
+                    elif path == QA_LIST:
                         expected = [str(question.id)] if caller == "editor" else []
                         assert [q["id"] for q in response.json()["items"]] == expected
+                    elif path == ONTOLOGY + CQ and method == "post":
+                        archive_id = response.json()["id"]
+                        assert response.json()["revision"] == 1
+                    elif path == ONTOLOGY + CQ:
+                        assert [item["id"] for item in response.json()["items"]] == [cq_id]
+                    elif path == CQ_DETAIL:
+                        assert response.json()["revision"] == 2
+                    elif path.endswith("/archive"):
+                        assert response.json()["archivedAt"] is not None
+                    elif path.endswith("/coverage"):
+                        assert response.json() == {
+                            "release": None,
+                            "items": [
+                                {"questionId": cq_id, "status": "never_checked", "elements": []}
+                            ],
+                        }
     if caller in ("viewer", "editor", "reviewer", "admin"):
         response = await client.get(f"/api/ontologies/{ontology.id}/qa/questions?askedBy=all")
         if caller == "admin":

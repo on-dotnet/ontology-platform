@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { QueryState } from '@/components/states/query-state';
 import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAssistantSelection } from '@/features/assistant/assistant-selection';
+import { useQuestions } from '@/features/cq/api';
 
 import type { Question } from './api';
 
@@ -45,13 +48,26 @@ export function RecentQuestions({ items, selected, selectedId, onSelect, onExamp
             })}
           </ul>
         ) : (
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">{t('qa.tryAsking')}</p>
-            <Button variant="secondary" className="h-auto whitespace-normal py-2 text-left"
-              disabled={disabled} onClick={() => onExample(t('qa.example'))}>{t('qa.example')}</Button>
-          </div>
+          <Examples disabled={disabled} onExample={onExample} />
         ))}
       </CardContent>
     </Card>
   );
+}
+
+function Examples({ disabled, onExample }: Pick<Props, 'disabled' | 'onExample'>) {
+  const { t } = useTranslation();
+  const { ontologyId } = useAssistantSelection();
+  const questions = useQuestions(ontologyId);
+  return <QueryState query={questions}>
+    {({ items }) => <div className="space-y-2">
+      <p className="text-sm text-muted-foreground">{t('qa.tryAsking')}</p>
+      <div className="flex flex-wrap gap-2">
+        {(items.length ? items.slice(0, 3) : [{ id: 'example', text: t('qa.example') }]).map(({ id, text }) => (
+          <Button key={id} variant="secondary" className="h-auto whitespace-normal py-2 text-left"
+            disabled={disabled} onClick={() => onExample(text)}>{text}</Button>
+        ))}
+      </div>
+    </div>}
+  </QueryState>;
 }

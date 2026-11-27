@@ -15,6 +15,7 @@ from ontology_platform.modules.ai.gateway import OpenAIGateway
 from ontology_platform.modules.ai.pipeline import make_extractor, make_transcriber
 from ontology_platform.modules.connectors.jobs import register_handlers as register_connector_jobs
 from ontology_platform.modules.connectors.service import register_usage_provider
+from ontology_platform.modules.cq.service import record_result
 from ontology_platform.modules.documents.processing import (
     register_extractor,
     register_handlers,
@@ -47,6 +48,7 @@ async def run() -> None:
             binding_suggest.JOB_KIND,
             binding_suggest.make_handler(session_factory, gateway, settings.ai_model),
         )
+        qa.register_listener(record_result)
         register(qa.JOB_KIND, qa.make_answerer(session_factory, gateway, settings.ai_model))
         register(
             qa_gap.JOB_KIND, qa_gap.make_gap_proposer(session_factory, gateway, settings.ai_model)

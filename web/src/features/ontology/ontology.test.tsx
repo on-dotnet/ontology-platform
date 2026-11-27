@@ -114,6 +114,23 @@ function ontologyServer(extra: Record<string, RouteHandler> = {}) {
 }
 
 describe('ontology list view', () => {
+  it('opens competency questions as the last view and returns to the element list', async () => {
+    const user = userEvent.setup();
+    ontologyServer({
+      'GET /api/ontologies/:id/competency-questions': () => ({ items: [] }),
+      'GET /api/ontologies/:id/competency-questions/coverage': () => ({ release: null, items: [] }),
+    });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+    await screen.findByRole('table', { name: '本体元素' });
+    const tab = screen.getByRole('radio', { name: '能力问题' });
+    expect(within(tab.closest('fieldset')!).getAllByRole('radio').at(-1)).toBe(tab);
+    await user.click(tab);
+    expect(await screen.findByRole('heading', { name: '能力问题' })).toBeVisible();
+    expect(screen.queryByRole('table', { name: '本体元素' })).toBeNull();
+    await user.click(screen.getByRole('radio', { name: '列表' }));
+    expect(await screen.findByRole('table', { name: '本体元素' })).toBeVisible();
+  });
+
   it('filters by kind and searches by name or synonym', async () => {
     const user = userEvent.setup();
     const api = ontologyServer();

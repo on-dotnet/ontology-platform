@@ -1,12 +1,15 @@
 {
   "title": "能力问题",
   "empty": "用能力问题记录本体应该能回答什么，并在发布后检验答案。",
+  "emptyTitle": "还没有能力问题",
   "create": "新建能力问题",
   "edit": "编辑能力问题",
   "archive": "归档问题",
+  "archiveConfirm": "归档“{{text}}”后，列表将隐藏这个问题，全部检验也会跳过它。",
   "moveUp": "上移",
   "moveDown": "下移",
   "import": "从文件导入",
+  "importFile": "选择能力问题 TOML 文件",
   "importResult": "已导入 {{created}} 条，跳过 {{skipped}} 条。",
   "text": "问题",
   "expectation": "期望答案",
@@ -16,21 +19,33 @@
     "number": "一个数"
   },
   "type": "对象类型",
+  "selectType": "选择对象类型",
+  "objectCount_one": "{{count}} 个对象（{{type}}）",
+  "objectCount_other": "{{count}} 个对象（{{type}}）",
   "keys": "对象主键（每行一个）",
+  "keyFormat": "最多 100 个主键。复合主键各列用“ · ”分隔，列值本身含分隔符时可粘贴 JSON 字符串数组。",
   "number": "期望数值",
+  "numberRange": "{{value}} ± {{tolerance}}",
   "tolerance": "允许误差",
   "note": "备注",
   "check": "检验问题",
   "checkAll": "全部检验",
+  "checkingAll": "全部检验进行中",
   "lastCheck": "最近一次结果",
   "version": "版本 v{{version}}",
+  "oldVersion": "旧版本",
+  "unchecked": "未检验",
+  "differences": "查看差异",
+  "actual": "实际值为 {{value}}",
+  "missing": "缺少的主键：{{keys}}",
+  "extra": "多出的主键：{{keys}}",
   "staleVersion": "旧版本的结果，请在当前版本重新检验。",
   "result": {
-    "pending": "等待结果",
+    "pending": "检验中",
     "pass": "通过",
-    "fail": "与期望不符",
+    "fail": "未通过",
     "unanswerable": "答不了",
-    "error": "检验失败"
+    "error": "出错"
   },
   "coverage": {
     "title": "覆盖检查",
@@ -43,8 +58,18 @@
     "cq": {
       "not_found": "找不到这个能力问题，请刷新列表。",
       "stale": "问题已被其他人修改，请刷新后再编辑。",
+      "no_number": "回答未给出数值或对象总数。",
+      "type_mismatch": "回答中的对象类型与期望类型不同。",
       "check_running": "本体的全部检验正在进行，请等它结束。",
       "invalid_import": "请检查 TOML 文件的格式，文件最多 64 KB、50 条问题。"
     }
+  },
+  "validation": {
+    "text": "请输入 1 至 500 字的问题。",
+    "note": "备注最多 1000 字。",
+    "type": "请选择有效的对象类型。",
+    "keys": "对象主键最多 100 个，每行填写一个。",
+    "number": "请输入有效的期望数值。",
+    "tolerance": "允许误差须为大于或等于 0 的数值。"
   }
 }

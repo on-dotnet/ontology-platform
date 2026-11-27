@@ -50,6 +50,7 @@ export const answered: Question = {
 export function qaServer(items: Question[] = [], routes: Record<string, RouteHandler> = {}) {
   return mockApi({
     'GET /api/ontologies': () => [ontologyFixture()],
+    [`GET /api/ontologies/${ONTOLOGY_ID}/competency-questions`]: () => ({ items: [] }),
     [`GET ${listPath}`]: (): components['schemas']['QaQuestionList'] => ({
       items: items.map((q) => ({ ...q, evidence: null })), nextCursor: null,
     }),
