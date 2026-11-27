@@ -209,7 +209,10 @@ async def test_inherited_property_uses_parent_predicate_on_child_map(
     edits = await save(
         client,
         s.ontology,
-        [type_binding(s.heat, table(s.mes), "heat"), property_binding(s.batch_code, "heat", "batch")],
+        [
+            type_binding(s.heat, table(s.mes), "heat"),
+            property_binding(s.batch_code, "heat", "batch"),
+        ],
     )
     assert edits.status_code == 200, edits.text
     released = await publish(client, s.ontology)
@@ -228,7 +231,11 @@ async def test_self_referencing_foreign_key_joins_own_map(
 ) -> None:
     s = await steel(db)
     previous = element(
-        s.ontology, "relation_type", "previousHeat", "上一炉次", domain_id=s.heat.id,
+        s.ontology,
+        "relation_type",
+        "previousHeat",
+        "上一炉次",
+        domain_id=s.heat.id,
         range_id=s.heat.id,
     )
     await add_elements(db, previous)
