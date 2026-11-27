@@ -8,9 +8,11 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ontology_platform.errors import AppError
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import assistant as ontology_assistant
+from ontology_platform.modules.ontology import bindings as ontology_bindings
 from ontology_platform.modules.ontology import service
 from ontology_platform.modules.ontology.schemas import (
     CatalogEvidenceSource,
@@ -178,6 +180,31 @@ async def test_a_type_its_properties_and_relations_are_bound_in_one_save(
         "heat_no",
         "batch",
     }
+
+
+async def test_batch_binding_views_match_the_individual_views(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    s = await steel(db)
+    await sign_in(client, db, Role.ADMIN)
+    await bind(client, s)
+    pending = await save(client, s.ontology, [type_binding(s.batch, table(s.mes))], apply=False)
+    assert pending.status_code == 200, pending.text
+    type_ids = [s.heat.id, s.cast.id, s.batch.id]
+    expected = {}
+    for type_id in type_ids:
+        (expected[type_id],) = await ontology_bindings.binding_views(db, s.ontology.id, type_id)
+
+    views = await ontology_bindings.binding_views_for(db, s.ontology.id, type_ids)
+
+    assert views == expected
+
+
+async def test_batch_binding_views_reject_an_unknown_type(db: AsyncSession) -> None:
+    s = await steel(db)
+    with pytest.raises(AppError) as error:
+        await ontology_bindings.binding_views_for(db, s.ontology.id, [s.heat.id, uuid4()])
+    assert (error.value.status, error.value.code) == (404, "element.not_found")
 
 
 def _heat(s: Steel, **binding: Any) -> list[dict[str, Any]]:

@@ -8,6 +8,7 @@ import tomllib
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
+from unittest.mock import AsyncMock
 from uuid import UUID, uuid4
 
 import pytest
@@ -46,6 +47,7 @@ from ontology_platform.modules.jobs import service as queue
 from ontology_platform.modules.jobs.models import Job
 from ontology_platform.modules.jobs.runner import JobContext, RetryableJobError
 from ontology_platform.modules.ontology import bindings as ontology_bindings
+from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.bindings import ForeignKeyHop, LinkTableHop
 from ontology_platform.modules.ontology.models import (
     ChangeItem,
@@ -244,6 +246,27 @@ def heat_gateway(s: Steel) -> CatalogGateway:
             s.cast.id: ColumnsOut(properties=[column(s.cast_no, "cast_no")], relations=[]),
         },
     )
+
+
+async def test_catalog_loads_all_elements_once_for_three_types(
+    db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    s = await steel(db)
+    await ready(db, s)
+    request = binding_suggest._Request(
+        id=uuid4(),
+        ontology_id=s.ontology.id,
+        data_source_id=s.mes.id,
+        user_id=uuid4(),
+        scope={"schemas": ["mes"]},
+    )
+    reads = AsyncMock(wraps=ontology_service._elements)
+    monkeypatch.setattr(ontology_service, "_elements", reads)
+
+    plan = await binding_suggest._plan(db, request)
+
+    assert [t.element.id for t in plan.types] == [s.batch.id, s.cast.id, s.heat.id]
+    assert sum(1 for call in reads.await_args_list if call.kwargs.get("all_kinds")) == 1
 
 
 async def test_a_suggestion_request_only_queues_work(client: AsyncClient, db: AsyncSession) -> None:
