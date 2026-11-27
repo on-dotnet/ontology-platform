@@ -39,6 +39,28 @@ def test_verdicts_on_what_owl_api_saved(path: Path) -> None:
     assert outcome.passed
 
 
+def test_compare_case_accepts_equivalent_owl_api_spellings() -> None:
+    header = b"""
+        @prefix ex: <urn:t:> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+        ex:A a owl:Class . ex:B a owl:Class . ex:p a owl:ObjectProperty .
+    """
+    original = b"""
+        ex:p rdfs:domain [ a owl:Class ; owl:unionOf ( ex:A ex:B ) ] .
+        ex:A owl:disjointWith ex:B .
+    """
+    saved = b"""
+        ex:p rdfs:domain [ a owl:Class ; owl:unionOf ( ex:B ex:A ) ] .
+        ex:B owl:disjointWith ex:A . xsd:date a rdfs:Datatype .
+    """
+    outcome = owlcheck.compare_case("equivalence", header + original, header + saved)
+
+    assert outcome.status == "same", outcome.detail
+    assert outcome.passed
+
+
 def test_a_real_change_fails() -> None:
     original = (SAMPLES / "owl-features" / "03-subclass.ttl").read_bytes()
     saved = b"@prefix owl: <http://www.w3.org/2002/07/owl#> . <urn:g3:C> a owl:Class ."

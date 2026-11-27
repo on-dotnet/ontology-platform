@@ -8,6 +8,9 @@ from collections import Counter
 from dataclasses import dataclass, field, replace
 from typing import Any, Literal
 
+from rdflib import URIRef
+from rdflib.namespace import RDF, RDFS, XSD
+
 from ontology_platform.modules.ontology.rdf.model import AxiomState, ElementState, OntologyState
 
 ChangeKind = Literal["create", "update", "delete", "restore"]
@@ -140,6 +143,18 @@ def keep_lost_lists(current: OntologyState, target: OntologyState) -> int:
     return restored
 
 
+def _is_xsd_datatype_declaration(axiom: AxiomState) -> bool:
+    if len(axiom.triples) != 1:
+        return False
+    subject, predicate, value = axiom.triples[0]
+    return (
+        predicate == RDF.type
+        and value == RDFS.Datatype
+        and isinstance(subject, URIRef)
+        and subject.startswith(str(XSD))
+    )
+
+
 def diff(current: OntologyState, target: OntologyState) -> Diff:
     result = Diff()
     pairs = (inverses(current), inverses(target))
@@ -167,14 +182,16 @@ def diff(current: OntologyState, target: OntologyState) -> Diff:
         if have.active and (wanted_element is None or not wanted_element.active):
             result.changes.append(Change("delete", have.kind, have))
 
-    remaining = Counter(axiom.key for axiom in current.axioms)
-    for axiom in target.axioms:
+    current_axioms = [a for a in current.axioms if not _is_xsd_datatype_declaration(a)]
+    target_axioms = [a for a in target.axioms if not _is_xsd_datatype_declaration(a)]
+    remaining = Counter(axiom.key for axiom in current_axioms)
+    for axiom in target_axioms:
         if remaining[axiom.key] > 0:
             remaining[axiom.key] -= 1
         else:
             result.changes.append(Change("create", "axiom", axiom=axiom))
-    wanted_keys = Counter(axiom.key for axiom in target.axioms)
-    for axiom in current.axioms:
+    wanted_keys = Counter(axiom.key for axiom in target_axioms)
+    for axiom in current_axioms:
         if wanted_keys[axiom.key] > 0:
             wanted_keys[axiom.key] -= 1
         else:

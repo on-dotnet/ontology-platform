@@ -19,7 +19,12 @@ from ontology_platform.modules.ontology.owlcheck import explained_by_rewrites
 from ontology_platform.modules.ontology.rdf import axioms, reader, writer
 from ontology_platform.modules.ontology.rdf.declarations import implied_declarations
 from ontology_platform.modules.ontology.rdf.diff import diff, keep_lost_lists
-from ontology_platform.modules.ontology.rdf.model import ElementState, Triple, canonical_key
+from ontology_platform.modules.ontology.rdf.model import (
+    ElementState,
+    OntologyState,
+    Triple,
+    canonical_key,
+)
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError, parse_document, read
 from ontology_platform.modules.ontology.rdf.vocab import DECLARATION_TYPES, SH
 
@@ -510,6 +515,121 @@ def test_diff_lists_each_kind_of_change() -> None:
         ("delete", "entity_type", "urn:t:B"),
         ("delete", "axiom", None),
     }
+
+
+def axiom_state(body: str) -> OntologyState:
+    return OntologyState("urn:t:ontology", axioms=axioms.axioms_of(parse(PREFIXES + body)))
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        "unionOf",
+        "intersectionOf",
+        "oneOf",
+        "disjointUnionOf",
+        "members",
+        "distinctMembers",
+        "hasKey",
+    ],
+)
+def test_diff_compares_owl_set_members_with_multiplicity(predicate: str) -> None:
+    def state(members: str) -> OntologyState:
+        return axiom_state(f"ex:S owl:{predicate} ( {members} ) .")
+
+    original = state("ex:A ex:A ex:B")
+    assert diff(original, state("ex:B ex:A ex:A")).changes == []
+    for changed in (state("ex:A ex:A ex:C"), state("ex:A ex:B")):
+        assert [c.op for c in diff(original, changed).changes] == ["create", "delete"]
+
+
+def test_diff_compares_literal_enumerations_by_value() -> None:
+    original = axiom_state('ex:T owl:oneOf ( "01"^^xsd:integer "blue" ) .')
+    reordered = axiom_state('ex:T owl:oneOf ( "blue" "1"^^xsd:integer ) .')
+    assert diff(original, reordered).changes == []
+
+
+def test_diff_compares_restriction_members_by_structure() -> None:
+    restriction = "[ a owl:Restriction ; owl:onProperty ex:p ; owl:someValuesFrom ex:B ]"
+    original = axiom_state(f"ex:S owl:intersectionOf ( ex:A {restriction} ) .")
+    reordered = f"ex:S owl:intersectionOf ( {restriction} ex:A ) ."
+    assert diff(original, axiom_state(reordered)).changes == []
+    changed = axiom_state(reordered.replace("ex:B", "ex:C"))
+    assert [c.op for c in diff(original, changed).changes] == ["create", "delete"]
+
+
+def test_diff_compares_nested_set_lists() -> None:
+    original = axiom_state("ex:S owl:unionOf ( ex:A [ owl:intersectionOf ( ex:B ex:C ) ] ) .")
+    reordered = axiom_state("ex:S owl:unionOf ( [ owl:intersectionOf ( ex:C ex:B ) ] ex:A ) .")
+    assert diff(original, reordered).changes == []
+
+
+@pytest.mark.parametrize("predicate", ["owl:propertyChainAxiom", "owl:withRestrictions", "sh:in"])
+def test_diff_keeps_other_lists_in_order(predicate: str) -> None:
+    body = f"ex:S owl:unionOf ( [ {predicate} ( ex:A ex:B ) ] ex:C ) ."
+    changed = body.replace("ex:A ex:B", "ex:B ex:A")
+    assert [c.op for c in diff(axiom_state(body), axiom_state(changed)).changes] == [
+        "create",
+        "delete",
+    ]
+
+
+@pytest.mark.parametrize(
+    "defect",
+    [
+        "_:tail rdf:rest rdf:nil ; rdf:first ex:extra .",
+        "",
+        "_:tail rdf:rest _:head .",
+        "_:tail rdf:rest rdf:nil . ex:other ex:ref _:tail .",
+    ],
+    ids=["two-firsts", "missing-rest", "cycle", "shared-tail"],
+)
+def test_diff_preserves_malformed_lists(defect: str) -> None:
+    def state(first: str, second: str) -> OntologyState:
+        return axiom_state(
+            f"ex:S owl:unionOf _:head . _:head rdf:first {first} ; rdf:rest _:tail . "
+            f"_:tail rdf:first {second} . {defect}"
+        )
+
+    original = state("ex:A", "ex:B")
+    assert diff(original, state("ex:A", "ex:B")).changes == []
+    assert [c.op for c in diff(original, state("ex:B", "ex:A")).changes] == ["create", "delete"]
+
+
+@pytest.mark.parametrize(
+    "predicate",
+    [
+        "disjointWith",
+        "equivalentClass",
+        "equivalentProperty",
+        "propertyDisjointWith",
+        "sameAs",
+        "differentFrom",
+    ],
+)
+def test_diff_ignores_direction_between_symmetric_iris(predicate: str) -> None:
+    original = axiom_state(f"ex:A owl:{predicate} ex:B .")
+    reversed_pair = axiom_state(f"ex:B owl:{predicate} ex:A .")
+    assert diff(original, reversed_pair).changes == []
+
+
+def test_diff_keeps_direction_for_an_anonymous_equivalent_class() -> None:
+    restriction = "[ a owl:Restriction ; owl:onProperty ex:p ; owl:someValuesFrom ex:B ]"
+    original = axiom_state(f"ex:A owl:equivalentClass {restriction} .")
+    reversed_pair = axiom_state(f"{restriction} owl:equivalentClass ex:A .")
+    assert [c.op for c in diff(original, reversed_pair).changes] == ["create", "delete"]
+
+
+def test_diff_skips_only_xsd_datatype_declarations() -> None:
+    empty = OntologyState("urn:t:ontology")
+    declared = axiom_state("xsd:date a rdfs:Datatype . xsd:gYear a rdfs:Datatype .")
+    assert len(declared.axioms) == 2
+    assert diff(empty, declared).changes == []
+    assert diff(declared, empty).changes == []
+
+    custom = axiom_state("ex:MyType a rdfs:Datatype .")
+    (change,) = diff(empty, custom).changes
+    assert (change.op, change.axiom) == ("create", custom.axioms[0])
 
 
 # ---------- found in review ----------
