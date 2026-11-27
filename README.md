@@ -2,33 +2,39 @@
 
 [English](README.en.md)
 
-AI Native 的开源本体平台。把资料和数据交给平台，AI 识别出业务概念、关系和约束，生成带证据的变更建议；人审核后发布为标准本体（RDF、OWL 2、SHACL、SKOS），再供查询、问答和外部智能体使用。
-
-> 当前状态：**重建中（M0 新地基）**。功能按[路线图](docs/roadmap.md)逐步交付，下文"能做什么"描述的是目标。
+开源的本体平台。用户提交资料和数据，AI 识别业务概念并提出带证据的修改；人审核后发布标准本体，供查询、问答和外部智能体使用。
 
 ## 能做什么
 
-- **AI 识别资料**：上传规程、标准、报告等资料，AI 分阶段识别术语、对象类型与层级、关系与约束，每条建议附原文证据和置信度。
-- **人审核，AI 不越权**：AI 的一切修改都以变更集提交，逐项接受、修改或拒绝后才生效；发布的每个版本都可对比、可回滚。
-- **标准语义，可互通**：本体以 W3C 标准导入导出，可与 Protégé 等工具往返。
-- **连接数据**：把对象类型绑定到 PostgreSQL 数据库的表，按本体浏览和查询真实数据，对业务系统只读。Oracle、Doris、TDengine 和 Web API 连接器等有可实测的环境后再做，见[路线图](docs/roadmap.md)。
-- **AI 分析**：用自然语言提问，回答给出数据与资料出处、假设与反证。
-- **给智能体用**：通过 MCP 把本体作为语义上下文提供给外部 AI 智能体。
+- 上传资料，让 AI 识别术语、对象类型、关系和属性，生成带原文证据的变更集。
+- 逐项审核变更集，把接受的修改合并到工作版本，再发布本体版本。
+- 导入和导出 RDF、OWL 2、SHACL、SKOS 内容，并与 Protégé 往返。
+- 把本体元素绑定到 PostgreSQL 表和列，按本体查询对象、沿关系浏览数据；外部数据源只读。
+- 用访问令牌通过 MCP 读取本体、查询对象，或提交待审核的变更提议。
+- 从已发布的绑定导出 R2RML 映射。
+- 用自然语言提问，查看答案的本体、数据和资料依据。
+- 定义指标与规则，在探索页查看计算和校验结果。
+- 把问答发现的本体缺口生成待审核的变更提议。
+- 记录本体应能回答的能力问题，并在发布后检验答案。
 
-第一个行业案例是钢铁冶金质量分析（炼钢、精炼、连铸、轧制），见 [samples/steel](samples/steel)。平台本身不含行业概念，欢迎贡献其他行业的案例。
+第一个行业案例是[钢铁冶金](samples/steel)。后续计划见[路线图](docs/roadmap.md)。
 
-## 快速开始（开发环境）
+## 快速开始
 
-需要 Docker（含 Compose）与 PowerShell 7。
+需要 Docker（含 Compose）和 PowerShell 7；AI 识别与问答需要模型 API Key。按[快速上手](docs/quickstart.md)了解本机配置，再从仓库根目录运行：
 
 ```powershell
+./dev.ps1 init-env
 ./dev.ps1 up
+./dev.ps1 status
 ```
 
-浏览器打开 `http://<Docker 主机>:28080`，开发账号见 [docs/development.md](docs/development.md)。
+打开 `http://<OP_DEV_HOST>:28080`（端口可由 `OP_WEB_PORT` 覆盖）；开发账号见[开发手册](docs/development.md)。
 
 ## 文档
 
+- [快速上手](docs/quickstart.md)
+- [贡献指南](CONTRIBUTING.md)
 - [架构说明](docs/architecture.md)
 - [界面规范](docs/ui-guidelines.md)
 - [路线图](docs/roadmap.md)

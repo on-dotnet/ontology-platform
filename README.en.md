@@ -2,30 +2,44 @@
 
 [简体中文](README.md)
 
-An open-source, AI-native ontology platform. Give it your documents and data: AI identifies business concepts, relationships and constraints and proposes changes backed by evidence. People review the proposals, and approved changes are published as a standards-based ontology (RDF, OWL 2, SHACL, SKOS) that you can query, ask questions about, and share with external AI agents.
-
-> Status: **rebuilding (M0 foundation)**. Capabilities ship milestone by milestone, see the [roadmap](docs/roadmap.md) (Chinese). The list below describes the target.
+An open-source ontology platform. Users provide documents and data; AI identifies business concepts and proposes evidence-backed changes. People review the changes before publishing a standards-based ontology for queries, questions, and external AI agents.
 
 ## What it does
 
-- **AI reads your documents**: upload procedures, standards and reports; AI extracts terms, entity types and hierarchy, relationships and constraints in stages, each suggestion linked to the source text with a confidence level.
-- **Humans approve, AI proposes**: every AI change is a change set that people accept, edit or reject item by item. Every published version can be compared and rolled back.
-- **Standards-based**: import and export W3C ontologies and round-trip with tools such as Protégé.
-- **Connect data**: bind entity types to PostgreSQL tables and browse real data through the ontology, read-only. Oracle, Doris, TDengine and Web API connectors will follow once there is an environment to test them against; see the [roadmap](docs/roadmap.md).
-- **AI analysis**: ask questions in natural language and get answers with data and document citations, hypotheses and counter-evidence.
-- **For agents**: expose the ontology to external AI agents via MCP.
+- Upload documents so AI can identify terms, entity types, relationships, and properties and create change sets linked to source evidence.
+- Review each change, merge accepted items into the working version, and publish an ontology version.
+- Import and export RDF, OWL 2, SHACL, and SKOS content, including round trips through Protégé.
+- Bind ontology elements to PostgreSQL tables and columns, query objects, and follow relationships; external data sources are read-only.
+- Use access tokens with MCP to read the ontology, query objects, or submit change proposals for review.
+- Export R2RML mappings from published bindings.
+- Ask questions in natural language and inspect the ontology, data, and document evidence behind the answers.
+- Define metrics and rules and inspect their calculations and checks in Explore.
+- Turn ontology gaps found during Q&A into change proposals for review.
+- Record competency questions the ontology should answer and check the answers after publishing.
 
-The first industry case is quality analysis in steelmaking (steelmaking, refining, continuous casting, rolling), see [samples/steel](samples/steel). The platform itself is industry-neutral; contributions of other industry cases are welcome.
+The first industry case is [steelmaking](samples/steel). See the [roadmap](docs/roadmap.md) for future work.
 
-## Quick start (development)
+## Quick start
 
-Requires Docker with Compose and PowerShell 7.
+You need Docker with Compose and PowerShell 7; AI extraction and Q&A require a model API key. Check the [quickstart guide](docs/quickstart.md) for local configuration, then run from the repository root:
 
 ```powershell
+./dev.ps1 init-env
 ./dev.ps1 up
+./dev.ps1 status
 ```
 
-Open `http://<docker-host>:28080`. Development credentials are in [docs/development.md](docs/development.md).
+Open `http://<OP_DEV_HOST>:28080` (override the port with `OP_WEB_PORT`). See the [development guide](docs/development.md) for the development account.
+
+## Documentation
+
+- [Quickstart (Chinese)](docs/quickstart.md)
+- [Contributing (Chinese)](CONTRIBUTING.md)
+- [Architecture (Chinese)](docs/architecture.md)
+- [UI guidelines (Chinese)](docs/ui-guidelines.md)
+- [Roadmap (Chinese)](docs/roadmap.md)
+- [Development guide (Chinese)](docs/development.md)
+- [Collaboration rules (Chinese)](AGENTS.md)
 
 ## License
 
