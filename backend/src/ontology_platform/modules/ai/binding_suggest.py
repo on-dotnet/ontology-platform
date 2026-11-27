@@ -258,6 +258,7 @@ class _Type:
     bound_id: UUID | None
     bound_table: Table | None
     properties: list[Element]
+    bound_columns: list[str]
     relations: list[_Relation]
     # Bound outside the request: only an end of the relations of the requested types.
     anchor: bool = False
@@ -356,6 +357,7 @@ async def _plan(db: AsyncSession, row: _Request) -> _Plan:
                 bound_id=view.table.element_id if view.table is not None else None,
                 bound_table=bound_table,
                 properties=properties if requested else [],
+                bound_columns=sorted({p.column.column for p in view.properties if p.column}),
                 relations=relations if requested else [],
                 anchor=not requested,
             )
@@ -374,6 +376,7 @@ def _definition(element: Element) -> str | None:
 def _element_text(element: Element, plan: _Plan) -> dict[str, Any]:
     shown: dict[str, Any] = {
         "id": str(element.id),
+        "localName": element.local_name,
         "labelZh": element.label_zh,
         "labelEn": element.label_en,
         "synonyms": [synonym.text for synonym in element.synonyms],
@@ -382,6 +385,7 @@ def _element_text(element: Element, plan: _Plan) -> dict[str, Any]:
     if element.kind == "entity_type" and element.parent_id in plan.elements:
         shown["parent"] = str(element.parent_id)
     if element.kind == "property":
+        shown["domainId"] = str(element.domain_id) if element.domain_id is not None else None
         shown["datatype"] = element.datatype
         shown["unit"] = element.unit
     return shown
@@ -477,6 +481,8 @@ def _columns_text(
         "Properties to map:\n" + _dumps([_element_text(p, plan) for p in kind.properties]),
         "Relations to map:\n" + _dumps(shown_relations),
     ]
+    if kind.bound_columns:
+        parts.append("Columns already bound for this type:\n" + _dumps(kind.bound_columns))
     if others:
         parts.append(
             "Other tables the relations may use:\n"
@@ -914,12 +920,11 @@ async def _suggest(
         if samples and not await _samples_allowed(session_factory, row.data_source_id):
             samples = {}  # switched off while the job runs: none sent from here on
         sent = sent or bool(samples.get(_key(table)))
-        shown = _Type(kind.element, kind.bound_id, kind.bound_table, kind.properties, [])
         output = await gateway.structured(
             purpose=COLUMNS_PURPOSE,
             model=model,
             instructions=COLUMNS_INSTRUCTIONS,
-            text=_columns_text(plan, shown, table, list(relations.values()), samples),
+            text=_columns_text(plan, kind, table, list(relations.values()), samples),
             schema=ColumnsOut,
         )
         _take_columns(plan, kind, ref, table, relations, output, samples, draft)
