@@ -56,7 +56,7 @@ export function ScopePicker({ source, disabled, onSubmit }: Props) {
       ? current : { query: search, cursors: [] }), 300);
     return () => clearTimeout(timer);
   }, [search]);
-  const setCursors = (next: string[]) => setPage({ query, cursors: next });
+  const setCursors = (next: string[]) => setPage((current) => ({ ...current, cursors: next }));
   const bySchema = mode === 'schemas';
   const schemas = useQuery({
     queryKey: [...catalogKey(source.id), source.catalog?.refreshedAt, 'schemas'],

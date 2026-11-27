@@ -121,6 +121,22 @@ describe('AI binding suggestions', () => {
       .map((call) => call.query.get('q')).filter(Boolean);
     await waitFor(() => expect(searches()).toEqual(['heat']));
     expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeEnabled();
+
+    // A new search starts again from the first page; clearing it waits the same way.
+    const calls = () => api.calls('GET', `/api/data-sources/${source.id}/catalog/tables`);
+    fireEvent.click(dialog.getByRole('button', { name: i18n.t('pagination.next') }));
+    await waitFor(() => expect(calls().at(-1)?.query.get('cursor')).toBe('page-2'));
+    fireEvent.change(search, { target: { value: 'cast' } });
+    await waitFor(() => expect(calls().at(-1)?.query.get('q')).toBe('cast'));
+    expect(calls().at(-1)?.query.get('cursor')).toBeNull();
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.previous') })).toBeDisabled();
+    const before = calls().length;
+    for (const value of ['cas', 'c', '']) fireEvent.change(search, { target: { value } });
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeDisabled();
+    await waitFor(() => expect(dialog.getByRole('button', { name: i18n.t('pagination.next') })).toBeEnabled());
+    expect(calls().slice(before).map((call) => call.query.get('q'))).not.toContain('cas');
+    expect(calls().slice(before).map((call) => call.query.get('q'))).not.toContain('c');
+    expect(dialog.getByRole('button', { name: i18n.t('pagination.previous') })).toBeDisabled();
   });
 
   it('offers ready active data sources and restricts suggestions to the unbound type', async () => {
