@@ -37,7 +37,10 @@
                     -Sequential 只跑顺序场景（例如同基线场景还没有录制时只回放）；
                     -CodeFrom 用本仓库另一个 worktree 的代码构建镜像来评测，模型配置、录制和结果
                     仍用运行脚本的这个目录的，在主检出目录评测分支不必切换分支
-  eval-qa [-Replay] 在一次性数据库评测钢铁样例的五条问答与缺口提议。已有录制优先回放，-Replay 只回放。
+  eval-qa [-Replay] [-Recordings <目录>] [-CodeFrom <worktree>]
+                    在一次性数据库评测钢铁样例的五条问答与缺口提议。已有录制优先回放，-Replay 只回放。
+                    录制默认在 .verification/eval/recordings/qa-steel/；-Recordings、-CodeFrom 与 eval 相同，
+                    问题、答案与样例数据仍用运行脚本的这个目录的
   owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
                     除已知改写外不得有差异；报告存 .verification/owl-check/
   schema-check      检查 web/src/api/schema.d.ts 与后端当前的 OpenAPI 一致（按 gen-api 的办法生成后比较，
@@ -600,6 +603,20 @@ function Save-EvalStream([string]$RecordingsDir) {
     end { [pscustomobject]@{ Last = $last; Saved = $saved } }
 }
 
+# The code root and image tag an evaluation builds from: this checkout, or with -CodeFrom another
+# worktree of this repository. Only worktrees qualify: the model key must not run code from an
+# arbitrary folder. git still lists a worktree whose folder was deleted, so check the folder too.
+function Resolve-CodeFrom([string]$CodeFrom) {
+    if (-not $CodeFrom) { return $Root, $env:OP_IMAGE_TAG }
+    $codeRoot = [IO.Path]::GetFullPath($CodeFrom, (Get-Location).Path).TrimEnd('\', '/')
+    $workspace = Get-Workspaces | Where-Object { $_.Path -eq (Get-NormalizedPath $codeRoot) } | Select-Object -First 1
+    if (-not $workspace) { Stop-Dev "-CodeFrom 只接受本仓库的 worktree（git worktree list）：$codeRoot" }
+    if (-not (Test-Path -LiteralPath (Join-Path $codeRoot 'compose.yaml') -PathType Leaf)) {
+        Stop-Dev "-CodeFrom 的 worktree 目录不存在或缺少 compose.yaml：$codeRoot"
+    }
+    return $codeRoot, $workspace.Tag
+}
+
 # Scores extraction on a case pack. Rootless Docker cannot bind-mount local folders, so documents
 # and recordings go in as JSON on stdin; results and new recordings return line by line on stdout.
 # A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
@@ -625,16 +642,8 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     $RecordingsDir = $RecordingsDir ? [IO.Path]::GetFullPath($RecordingsDir, (Get-Location).Path) : (Join-Path $Root ".verification/eval/recordings/$Case")
     if ($ReplayOnly -and -not (Test-Path -LiteralPath $RecordingsDir -PathType Container)) { Stop-Dev "只回放需要录制，目录不存在：$RecordingsDir" }
     # -CodeFrom scores another worktree's code with this checkout's model settings, so a branch
-    # can be measured before merging without checking it out here. Only worktrees of this
-    # repository qualify: the model key must not run code from an arbitrary folder.
-    $codeRoot = $Root
-    $codeTag = $env:OP_IMAGE_TAG
-    if ($CodeFrom) {
-        $codeRoot = [IO.Path]::GetFullPath($CodeFrom, (Get-Location).Path).TrimEnd('\', '/')
-        $workspace = Get-Workspaces | Where-Object { $_.Path -eq (Get-NormalizedPath $codeRoot) } | Select-Object -First 1
-        if (-not $workspace) { Stop-Dev "-CodeFrom 只接受本仓库的 worktree（git worktree list）：$codeRoot" }
-        $codeTag = $workspace.Tag
-    }
+    # can be measured before merging without checking it out here.
+    $codeRoot, $codeTag = Resolve-CodeFrom $CodeFrom
     Confirm-BaseImages
     # compose.yaml reads the tag from the environment; the main switch restores the caller's value.
     $env:OP_IMAGE_TAG = $codeTag
@@ -688,12 +697,15 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     Write-Ok "结果已保存到 $outFile"
 }
 
-function Invoke-EvalQa([bool]$ReplayOnly) {
+function Invoke-EvalQa([bool]$ReplayOnly, [string]$RecordingsDir, [string]$CodeFrom) {
     $prefix = New-TempName 'eval-qa'
     $db = "$prefix-db"
     $api = "$prefix-api"
     $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
-    $recordDir = Join-Path $outDir 'recordings/qa-steel'
+    $recordDir = $RecordingsDir ? [IO.Path]::GetFullPath($RecordingsDir, (Get-Location).Path) : (Join-Path $outDir 'recordings/qa-steel')
+    if ($ReplayOnly -and -not (Test-Path -LiteralPath $recordDir -PathType Container)) { Stop-Dev "只回放需要录制，目录不存在：$recordDir" }
+    # Questions, answers and sample data stay this checkout's, as in eval: only the code changes.
+    $codeRoot, $codeTag = Resolve-CodeFrom $CodeFrom
     $inputs = @('samples/steel/qa/ontology.ttl', 'samples/steel/qa/expected-bindings.toml',
         'samples/steel/qa/metrics.toml', 'samples/steel/qa/questions.toml',
         'backend/tests/fixtures/qa/steel/plans.toml',
@@ -714,7 +726,11 @@ function Invoke-EvalQa([bool]$ReplayOnly) {
     $bundle = @{ mode = $mode; recordings = $recordings; manifest = $manifest; files = $files } | ConvertTo-Json -Depth 4 -Compress
     $noModel = $ReplayOnly ? @('-e', 'OP_OPENAI_API_KEY=', '-e', 'OP_AI_PROXY=') : @()
     Confirm-BaseImages
-    Invoke-Compose build api
+    # compose.yaml reads the tag from the environment; the main switch restores the caller's value.
+    $env:OP_IMAGE_TAG = $codeTag
+    $composeArgs = Get-ComposeArgs $codeRoot
+    docker compose @composeArgs build api | Out-Host
+    if ($LASTEXITCODE -ne 0) { Stop-Dev "构建 $codeRoot 的 api 镜像失败，退出码 $LASTEXITCODE" $LASTEXITCODE }
     $overlay = Join-Path $outDir "$prefix.yaml"
     # Compose merges mounts by target. Cover both image VOLUMEs with tmpfs before starting either service.
     $config = @'
@@ -727,7 +743,7 @@ services:
     volumes: [{type: tmpfs, target: /data/documents}]
 volumes: !reset {}
 '@
-    $argsQa = @(Get-ComposeArgs) + @('-f', $overlay, '-p', $prefix)
+    $argsQa = $composeArgs + @('-f', $overlay, '-p', $prefix)
     $password = [Guid]::NewGuid().ToString('N')
     $adminUrl = "postgresql+psycopg://ontology:${password}@postgres:5432/postgres"
     $previousConsole = [Console]::OutputEncoding
@@ -735,7 +751,7 @@ volumes: !reset {}
         [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
         $OutputEncoding = [Text.UTF8Encoding]::new($false)
         Set-Content -LiteralPath $overlay -Value $config -Encoding utf8NoBOM
-        Write-Step "启动问答评测临时环境 $prefix（$($ReplayOnly ? '只回放' : '优先回放')）"
+        Write-Step "启动问答评测临时环境 $prefix（$($ReplayOnly ? '只回放' : '优先回放')，录制目录 $recordDir$($CodeFrom ? "，代码取自 $codeRoot" : '')）"
         docker compose @argsQa run --rm -d --no-deps --use-aliases --name $db -e POSTGRES_DB=postgres -e "POSTGRES_PASSWORD=$password" postgres | Out-Null
         if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $db @('pg_isready', '-h', '127.0.0.1', '-U', 'ontology', '-d', 'postgres'))) { throw '评测临时数据库未就绪' }
         $stream = $bundle | docker compose @argsQa run --rm -T --no-deps @noModel --name $api -e OP_ENV=development -e "OP_DATABASE_URL=$adminUrl" -e "OP_QA_EVAL_ADMIN_URL=$adminUrl" api python -m ontology_platform.qa_eval | Save-EvalStream $recordDir
@@ -756,7 +772,7 @@ volumes: !reset {}
         $detail = $reply.PSObject.Properties['error'] ? $reply.error : "退出码 $code"
         Stop-Dev "问答评测失败：$detail" $code
     }
-    $outFile = Join-Path $outDir "qa-steel$($ReplayOnly ? '-replay' : '')-$(Get-Date -Format 'yyyyMMdd-HHmmssfff').json"
+    $outFile = Join-Path $outDir "qa-steel$($ReplayOnly ? '-replay' : '')$($CodeFrom ? "-$codeTag" : '')-$(Get-Date -Format 'yyyyMMdd-HHmmssfff').json"
     Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value $reply.result
     $result = $reply.result | ConvertFrom-Json
     $result.questions | ForEach-Object {
@@ -1024,7 +1040,7 @@ try {
         'seed-steel' { Invoke-SeedSteel }
         'fmt' { Invoke-Fmt $Rest }
         'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent $CodeFrom }
-        'eval-qa' { Invoke-EvalQa $Replay.IsPresent }
+        'eval-qa' { Invoke-EvalQa $Replay.IsPresent $Recordings $CodeFrom }
         'owl-check' { Invoke-OwlCheck }
         'ai-check' {
             Confirm-BaseImages
