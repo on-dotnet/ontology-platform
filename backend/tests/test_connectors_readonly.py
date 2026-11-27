@@ -11,6 +11,7 @@ import inspect
 import logging
 import time
 from typing import Any, get_type_hints
+from unittest.mock import AsyncMock
 
 import psycopg
 import pytest
@@ -445,6 +446,34 @@ async def test_a_connection_test_past_its_deadline_is_a_timeout(
     assert (result.ok, result.reason) == (False, "timeout")
     assert time.monotonic() - started < DEADLINE + 5
     assert await _gone(external_source)
+
+
+async def test_cancelling_a_task_calls_the_connector_cancel(
+    db: AsyncSession, external_source: ExternalSource, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    configure(monkeypatch, query_timeout_seconds=60)
+    cancel = AsyncMock(wraps=connection._cancel)
+    monkeypatch.setattr(connection, "_cancel", cancel)
+
+    async def query() -> None:
+        async with connect(db, reader_params(external_source)) as conn:
+            await conn.execute(text(SLEEP))
+
+    task = asyncio.create_task(query())
+    await _started(external_source, task)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+    cancel.assert_awaited_once()
+    assert await _gone(external_source)
+
+
+def test_ssl_driver_failure_is_classified_without_a_connection(
+    external_source: ExternalSource,
+) -> None:
+    error = psycopg.OperationalError("SSL error: certificate verify failed")
+    failure = connection._connect_failure(error, reader_params(external_source))
+    assert failure.reason == "ssl"
 
 
 async def test_connection_lists_only_schemas_with_usage(

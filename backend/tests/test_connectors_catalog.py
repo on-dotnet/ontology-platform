@@ -18,7 +18,7 @@ from external_source import ExternalSource
 from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.connectors import catalog, config, connection, errors, jobs, service
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
-from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.identity.models import Role, User
 from ontology_platform.modules.jobs import runner
 from ontology_platform.modules.jobs import service as queue
 from ontology_platform.modules.jobs.models import Job
@@ -254,7 +254,8 @@ async def _claim(
     job = await queue.claim(db, "catalog-test")
     assert job is not None
     assert job.kind == jobs.REFRESH_CATALOG
-    assert job.payload == {"dataSourceId": str(source)}
+    assert job.payload["dataSourceId"] == str(source)
+    assert UUID(job.payload["actorId"])
     await db.commit()
     return runner.JobContext(
         job.id, job.payload, worker, attempts=job.attempts, worker_id="catalog-test"
@@ -305,6 +306,14 @@ async def test_refresh_caches_the_steel_sample(
     assert datetime.fromisoformat(info["refreshedAt"]).tzinfo is not None
     assert info["tableCount"] == 9
     assert await _audits(db, source) == [{"tableCount": 9}]
+    editor_id = await db.scalar(select(User.id).where(User.username == "editor-user"))
+    actor_id = await db.scalar(
+        select(AuditEvent.actor_id).where(
+            AuditEvent.action == "datasource.catalog_refreshed",
+            AuditEvent.target_id == str(source),
+        )
+    )
+    assert actor_id == editor_id
     tables = await service.list_catalog_tables_for(db, source)
     assert [(t.schema_name, t.name) for t in tables] == [("mes", n) for n in sorted(PRIMARY_KEYS)]
     for table in tables:
@@ -333,6 +342,37 @@ async def test_refresh_caches_the_steel_sample(
             "refColumns": ["cast_no"],
         }
     ]
+
+
+@pytest.mark.parametrize("extra", [{}, {"actorId": "not-a-uuid"}])
+async def test_a_refresh_without_a_usable_actor_still_records(
+    db: AsyncSession, worker: async_sessionmaker[AsyncSession], source: UUID, extra: dict[str, str]
+) -> None:
+    # Jobs queued before the payload carried the actor have none.
+    payload = {"dataSourceId": str(source), **extra}
+    await db.execute(
+        update(DataSource).where(DataSource.id == source).values(catalog_status="refreshing")
+    )
+    await queue.enqueue(db, jobs.REFRESH_CATALOG, payload)
+    await db.commit()
+    claimed = await queue.claim(db, "catalog-test")
+    assert claimed is not None
+    assert claimed.payload == payload
+    await db.commit()
+    context = runner.JobContext(
+        claimed.id, claimed.payload, worker, attempts=claimed.attempts, worker_id="catalog-test"
+    )
+    await runner._execute(jobs.REFRESH_CATALOG, context, "catalog-test")
+    events = (
+        await db.scalars(
+            select(AuditEvent).where(
+                AuditEvent.action == "datasource.catalog_refreshed",
+                AuditEvent.target_id == str(source),
+            )
+        )
+    ).all()
+    assert len(events) == 1
+    assert events[0].actor_id is None
 
 
 async def test_inspection_includes_special_relations_and_preserves_postgresql_metadata(
@@ -843,8 +883,12 @@ async def test_reading_holds_no_lock_and_a_change_meanwhile_reads_again(
     assert (await _info(client, source))["status"] == "refreshing"
     assert await _audits(db, source) == []
     await db.commit()
-    queued = select(Job.id).where(Job.kind == jobs.REFRESH_CATALOG, Job.status == "queued")
-    assert len(list(await db.scalars(queued))) == 1
+    queued = select(Job.payload).where(Job.kind == jobs.REFRESH_CATALOG, Job.status == "queued")
+    payloads = list(await db.scalars(queued))
+    assert len(payloads) == 1
+    # The refresh read again is still the one the editor asked for.
+    editor_id = await db.scalar(select(User.id).where(User.username == "editor-user"))
+    assert payloads[0]["actorId"] == str(editor_id)
     monkeypatch.setattr(connection, "read_catalog", real_read)
     await _run(db, worker, source)
     assert (await _info(client, source))["status"] == "ready"
