@@ -20,7 +20,13 @@ from pathlib import Path
 from rdflib.namespace import DCTERMS
 
 from ontology_platform.modules.ontology.rdf import reader, writer
-from ontology_platform.modules.ontology.rdf.diff import Change, Diff, diff, keep_lost_lists
+from ontology_platform.modules.ontology.rdf.diff import (
+    Change,
+    Diff,
+    diff,
+    keep_lost_axiom_lists,
+    keep_lost_lists,
+)
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
 from ontology_platform.modules.ontology.rdf.vocab import is_builtin
 
@@ -120,7 +126,13 @@ def compare_case(case: str, original: bytes, saved: bytes) -> Outcome:
     except RdfInputError as error:
         return Outcome(case, "error", f"the saved copy cannot be read: {error.detail}")
     kept = keep_lost_lists(first.state, copy.state)
-    note = f"{kept} sh:in lists dropped by OWL API, values kept" if kept else ""
+    kept_axioms = keep_lost_axiom_lists(first.state, copy.state)
+    notes = []
+    if kept:
+        notes.append(f"{kept} sh:in lists dropped by OWL API, values kept")
+    if kept_axioms:
+        notes.append(f"{kept_axioms} axioms with SHACL lists dropped by OWL API, values kept")
+    note = "; ".join(notes)
     result = diff(first.state, copy.state)
     changes = result.changes
     if result.kind_changed:

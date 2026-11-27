@@ -201,6 +201,27 @@ async def test_a_copy_saved_by_protege_changes_nothing(
     assert response.json()["warnings"] == []
 
 
+async def test_qualified_in_saved_by_protege_leaves_the_shape_unchanged(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    original = (FIXTURES / "shacl-lists" / "qualified-in.ttl").read_bytes()
+    saved = (FIXTURES / "owlapi" / "shacl-lists" / "qualified-in.ttl").read_bytes()
+    result = await import_and_merge(client, original, filename="qualified-in.ttl")
+
+    response = await upload(client, saved, ontology_id=result["ontology"]["id"])
+
+    assert response.status_code == 200, response.text
+    items = await change_set_items(client, response.json()["changeSetId"])
+    assert [(item["op"], item["kind"], item["proposed"]) for item in items] == [
+        (
+            "create",
+            "axiom",
+            {"turtle": 'ex:ontology dcterms:created "2026-01-01T00:00:00+00:00"^^xsd:dateTime .'},
+        ),
+    ]
+
+
 async def test_importing_changes_into_an_ontology(client: AsyncClient, db: AsyncSession) -> None:
     await sign_in(client, db, Role.ADMIN)
     first = b"""

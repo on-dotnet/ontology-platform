@@ -37,6 +37,7 @@ from ontology_platform.modules.ontology.rdf.diff import (
     Change,
     Diff,
     diff,
+    keep_lost_axiom_lists,
     keep_lost_lists,
 )
 from ontology_platform.modules.ontology.rdf.model import ElementState, OntologyState
@@ -455,6 +456,8 @@ async def compare_into(
         include_deleted=True,
     )
     restored = keep_lost_lists(current, result.state)
+    if source == "import":
+        keep_lost_axiom_lists(current, result.state)
     proposed = await _propose(
         db,
         ontology,

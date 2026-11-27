@@ -8,6 +8,9 @@ from rdflib.namespace import RDF, SH, XSD
 from rdflib.term import Node
 
 from ontology_platform.modules.ontology import owlcheck
+from ontology_platform.modules.ontology.rdf.diff import diff, keep_lost_axiom_lists
+from ontology_platform.modules.ontology.rdf.model import OntologyState
+from ontology_platform.modules.ontology.rdf.reader import parse_document, read
 
 FIXTURES = Path(__file__).parent / "fixtures" / "ontology"
 EX = Namespace("urn:synthetic:shacl-lists:")
@@ -31,8 +34,82 @@ def test_round_trip_reports_a_change(stem: str) -> None:
 
     outcome = owlcheck.compare_case(stem, original, saved)
 
-    assert not outcome.passed, outcome.detail
-    assert outcome.status == "changed", outcome.detail
+    if stem in {"qualified-in", "alternative-path"}:
+        assert outcome.passed, outcome.detail
+        assert outcome.status == "same", outcome.detail
+        assert "axiom" in outcome.detail, outcome.detail
+    else:
+        assert not outcome.passed, outcome.detail
+        assert outcome.status == "changed", outcome.detail
+
+
+def _state(body: str) -> OntologyState:
+    source = "@prefix ex: <urn:test:> . @prefix sh: <http://www.w3.org/ns/shacl#> .\n"
+    return read(parse_document((source + body).encode())).state
+
+
+@pytest.mark.parametrize(
+    ("name", "original", "saved"),
+    [
+        (
+            "ambiguous",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in (ex:a) ] ] ; "
+            "sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in (ex:b) ] ] .",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in [ ] ] ] .",
+        ),
+        (
+            "sibling_changed",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedMinCount 1 ; "
+            "sh:qualifiedValueShape [ sh:in (ex:a) ] ] .",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedMinCount 2 ; "
+            "sh:qualifiedValueShape [ sh:in [ ] ] ] .",
+        ),
+        (
+            "rdf_nil",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in (ex:a) ] ] .",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in ( ) ] ] .",
+        ),
+        (
+            "predicate_removed",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in (ex:a) ] ] .",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ ] ] .",
+        ),
+        (
+            "partial_loss",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in (ex:a) ] ; "
+            "sh:node [ sh:in (ex:b) ] ] .",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in [ ] ] ; "
+            "sh:node [ sh:in (ex:b) ] ] .",
+        ),
+        (
+            "blank_has_edges",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in (ex:a) ] ] .",
+            "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in [ ex:x 1 ] ] ] .",
+        ),
+    ],
+)
+def test_lost_axiom_lists_leave_other_edits_for_review(
+    name: str, original: str, saved: str
+) -> None:
+    current, target = _state(original), _state(saved)
+    if name == "ambiguous":
+        prefix = "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in "
+        current.axioms = [
+            *_state(prefix + "(ex:a) ] ] .").axioms,
+            *_state(prefix + "(ex:b) ] ] .").axioms,
+        ]
+
+    assert keep_lost_axiom_lists(current, target) == 0, name
+    assert diff(current, target).changes, name
+
+
+def test_lost_axiom_lists_restore_a_unique_match() -> None:
+    prefix = "ex:Shape sh:property [ sh:path ex:p ; sh:qualifiedValueShape [ sh:in "
+    current = _state(prefix + "(ex:a) ] ] .")
+    target = _state(prefix + "[ ] ] ] .")
+
+    assert keep_lost_axiom_lists(current, target) == 1
+    assert not diff(current, target).changes
 
 
 def _saved_property(stem: str) -> tuple[Graph, BNode]:
