@@ -97,6 +97,9 @@ pwsh -NoProfile -File ontologies/steel/check/check.ps1 -Build
 - 类、属性与代码的标签、定义、来源及模块归属。
 - 扩展层的下沉理由、各层的引用方向和代码方案归属。
 - 每层的 SHACL 正例与反例，包括预期违例的节点、形状、组件和次数。
+- 各层形状和分发图中的形状只允许平台可恢复的 RDF 列表。平台仅能恢复结构化节点形状直属 `sh:property` 空白节点上的 `sh:in`。钢铁包要求具名形状带 `rdfs:comment`，平台会将带此注释的形状保留为公理，因此本包形状均使用无列表写法。
+- 各模块和分发图的 `owl:unionOf`、`owl:intersectionOf`、`owl:oneOf` 成员按完整 IRI 升序排列，`owl:disjointWith` 从较小 IRI 指向较大 IRI，与 OWL API 的另存顺序一致。
+- OWL 2 数据类型表以外的类型在本体中显式声明为 `rdfs:Datatype`，包括标准生效日期用的 `xsd:date` 和出版年份用的 `xsd:gYear`。
 - 能力问题的查询结果与期望 CSV，包括特钢追溯查询预期的空结果。
 - 分发图与模块并集的一致性。去掉本体头后两图须同构，单文件须在 5 MB、50,000 个三元组以内。
 

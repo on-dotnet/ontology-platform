@@ -115,6 +115,9 @@ stl:applicableStandard a owl:ObjectProperty ; rdfs:range stl:StandardEdition ;
     rdfs:label "适用标准版次"@zh, "Applicable standard edition"@en ; skos:prefLabel "适用标准版次"@zh, "Applicable standard edition"@en ;
     skos:definition "指明订货、判定或交付采用的标准及其确切版次。"@zh, "Identifies the exact standard edition governing a specification, decision or delivery."@en ;
     dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+xsd:date a rdfs:Datatype ;
+    rdfs:comment "xsd:date 未列入 OWL 2 数据类型表。显式声明可避免 Protégé 另存时补写声明。"@zh .
+
 stl:editionEffectiveOn a owl:DatatypeProperty ; rdfs:domain stl:StandardEdition ; rdfs:range xsd:date ;
     rdfs:label "版次实施日期"@zh, "Edition effective date"@en ; skos:prefLabel "版次实施日期"@zh, "Edition effective date"@en ;
     skos:definition "记录该标准版次开始实施的日历日期以核对订货依据。"@zh, "Gives the calendar date from which the cited edition takes effect."@en ;
@@ -129,21 +132,21 @@ stl:numericDesignation a owl:DatatypeProperty ; rdfs:domain stl:StandardGrade ; 
     dcterms:source <std/gbt-17616-2025> ; rdfs:isDefinedBy <ontology/core/specification> .
 
 # Independent grade classification axes
-stl:steelClassByComposition a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelGrade stl:StandardGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-composition> ;
+stl:steelClassByComposition a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:StandardGrade stl:SteelGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-composition> ;
     rdfs:label "按化学成分分类"@zh, "Steel class by composition"@en ; skos:prefLabel "按化学成分分类"@zh, "Steel class by composition"@en ;
     skos:definition "按化学成分将内部钢种或标准牌号归入钢分类体系中的类别。"@zh, "Classifies an internal steel grade or standard designation on the chemical composition axis."@en ;
     dcterms:source <std/gbt-13304-1-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
-stl:steelQualityClass a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelGrade stl:StandardGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-quality> ;
+stl:steelQualityClass a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:StandardGrade stl:SteelGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-quality> ;
     rdfs:label "质量等级类别"@zh, "Steel quality class"@en ; skos:prefLabel "质量等级类别"@zh, "Steel quality class"@en ;
     skos:definition "按主要质量等级将内部钢种或标准牌号归类，用于区分不同层次的冶金质量要求。"@zh, "Classifies an internal steel grade or standard designation by the main quality class applicable to it."@en ;
     dcterms:source <std/gbt-13304-2-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
-stl:steelUseClass a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelGrade stl:StandardGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-use> ;
+stl:steelUseClass a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:StandardGrade stl:SteelGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-use> ;
     rdfs:label "用途类别"@zh, "Steel use class"@en ; skos:prefLabel "用途类别"@zh, "Steel use class"@en ;
     skos:definition "按主要使用特性或用途将内部钢种或标准牌号归类。"@zh, "Classifies an internal steel grade or standard designation by its main application characteristics or intended use."@en ;
     dcterms:source <std/gbt-13304-2-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
 
 # Delivery and inspection criteria
-stl:deliveryCondition a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MaterialSpecification stl:DeliveryCondition ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/delivery-condition> ;
+stl:deliveryCondition a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:DeliveryCondition stl:MaterialSpecification ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/delivery-condition> ;
     rdfs:label "要求交货状态"@zh, "Required delivery condition"@en ; skos:prefLabel "要求交货状态"@zh, "Required delivery condition"@en ;
     skos:definition "以交货状态代码标明规格或交货条款要求材料具备的加工或热处理状态。"@zh, "Identifies the processing or treatment condition called for by the specification or delivery provision."@en ;
     dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .

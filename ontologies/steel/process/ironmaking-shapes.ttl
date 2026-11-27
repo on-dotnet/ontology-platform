@@ -19,7 +19,9 @@ stl:HotMetalTapShape a sh:PropertyShape ; sh:targetClass stl:HotMetal ;
     sh:severity sh:Violation ; rdfs:comment "按铁次建批的铁水应指向生成该批的唯一出铁作业；同一铁次可以分罐接收。"@zh .
 
 stl:TapBlastFurnaceShape a sh:PropertyShape ; sh:targetClass stl:BlastFurnaceTapping ;
-    sh:path ( stl:performedOn stl:equipmentType ) ; sh:hasValue <code/equipment-type/BF> ;
+    sh:path stl:performedOn ;
+    sh:qualifiedValueShape [ sh:property [ sh:path stl:equipmentType ; sh:hasValue <code/equipment-type/BF> ] ] ;
+    sh:qualifiedMinCount 1 ;
     sh:severity sh:Violation ; rdfs:comment "每个铁次应能沿执行设备及其类型找到高炉，以便追溯铁水来源。"@zh .
 
 stl:TappedHotMetalMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:tappedHotMetalMass ;

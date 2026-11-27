@@ -8,7 +8,7 @@ from pathlib import Path
 
 import rdflib
 from pyshacl import validate
-from rdflib import DCTERMS, Graph, Literal, Namespace, OWL, PROV, RDF, RDFS, SH, SKOS, URIRef, XSD
+from rdflib import BNode, DCTERMS, Graph, Literal, Namespace, OWL, PROV, RDF, RDFS, SH, SKOS, URIRef, XSD
 from rdflib.compare import isomorphic, to_canonical_graph
 from rdflib.paths import Path as RDFPath
 from rdflib.plugins.sparql import prepareQuery
@@ -33,6 +33,16 @@ VOCAB = (
 PROPERTIES = (OWL.ObjectProperty, OWL.DatatypeProperty, OWL.AnnotationProperty)
 TERMS = (OWL.Class, *PROPERTIES, RDFS.Datatype, SKOS.ConceptScheme)
 SHAPES = (SH.NodeShape, SH.PropertyShape)
+# OWL 2 Structural Specification, section 4 (Datatype Maps).
+OWL2_DATATYPES = {
+    RDFS.Literal, RDF.XMLLiteral, RDF.PlainLiteral, OWL.real, OWL.rational,
+    *(XSD[t] for t in """
+        decimal integer nonNegativeInteger nonPositiveInteger positiveInteger negativeInteger
+        long int short byte unsignedLong unsignedInt unsignedShort unsignedByte double float
+        string normalizedString token language Name NCName NMTOKEN boolean hexBinary base64Binary
+        anyURI dateTime dateTimeStamp
+    """.split()),
+}
 REQUIRED_CQS = {"core": range(1, 9), "process": range(1, 7), "plain": range(1, 3), "special": range(1, 6)}
 PROCESS_BATCHES = (
     ({"ironmaking", "steelmaking", "casting"}, {1, 2, 3, 5}),
@@ -182,7 +192,10 @@ def check_modules(modules, layers, errors):
         for s in set(graph.subjects()):
             if not isinstance(s, URIRef):
                 continue
-            if not s.startswith(STL):
+            external_datatype = (s.startswith(str(XSD)) and s not in OWL2_DATATYPES
+                                 and set(graph.objects(s, RDF.type)) == {RDFS.Datatype}
+                                 and set(graph.predicates(s)) <= {RDF.type, RDFS.comment})
+            if not s.startswith(STL) and not external_datatype:
                 errors.append(f"{path} 在本地命名空间外定义 {s}")
             if not any(graph.objects(s, RDF.type)):
                 errors.append(f"{local(s)} 缺少类型声明")
@@ -203,6 +216,104 @@ def check_modules(modules, layers, errors):
         if ROOT / layer / f"{layer}.ttl" not in modules:
             errors.append(f"缺少 {layer} 层汇总")
     return owner
+
+
+def named_roots(graph, node):
+    # Report the property or shape that owns an anonymous expression.
+    roots, seen, pending = set(), set(), [node]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, URIRef):
+            roots.add(node)
+        elif node not in seen:
+            seen.add(node)
+            pending.extend(graph.subjects(None, node))
+    return roots
+
+
+def restorable_cells(graph):
+    cells = set()
+    rule_predicates = {SH.path, SH["in"], SH.message, SH.minCount, SH.maxCount, SH.minLength,
+                       SH.maxLength, SH.datatype, SH["class"], SH.nodeKind, SH.minInclusive,
+                       SH.maxInclusive, SH.minExclusive, SH.maxExclusive, SH.pattern, SH.flags}
+    for rule, head in graph.subject_objects(SH["in"]):
+        parents = list(graph.subject_predicates(rule))
+        if not isinstance(rule, BNode) or len(parents) != 1:
+            continue
+        shape, edge = parents[0]
+        # keep_lost_lists works on structured constraint rules. Standalone property
+        # shapes and constraints with extra annotations stay opaque to the reader.
+        # In particular, steel's required rdfs:comment already rules out this exception.
+        if (edge != SH.property or not isinstance(shape, URIRef)
+                or (shape, RDF.type, SH.NodeShape) not in graph or (None, None, shape) in graph
+                or len(set(graph.objects(shape, SH.targetClass))) != 1
+                or set(graph.predicates(shape)) - {RDF.type, SH.targetClass, SH.property, RDFS.label}):
+            continue
+        if any(not isinstance(child, BNode) or len(list(graph.subject_predicates(child))) != 1
+               or not isinstance(graph.value(child, SH.path), URIRef)
+               or set(graph.predicates(child)) - rule_predicates for child in graph.objects(shape, SH.property)):
+            continue
+        # Shared cells and nested lists cannot be restored from a single rule.
+        chain = set()
+        while isinstance(head, BNode) and head not in chain:
+            if (len(list(graph.subject_predicates(head))) != 1 or len(list(graph.predicate_objects(head))) != 2
+                    or not isinstance(graph.value(head, RDF.first), (Literal, URIRef))):
+                break
+            chain.add(head)
+            head = graph.value(head, RDF.rest)
+        if head == RDF.nil:
+            cells.update(chain)
+    return cells
+
+
+def check_round_trip(path, graph, schema, errors):
+    cells = set(graph.subjects(RDF.first))
+    shape_file = path.stem == "shapes" or path.stem.endswith("-shapes")
+    shapes = named(graph, SHAPES)
+    if shape_file or shapes:
+        offenders = set()
+        for cell in cells - restorable_cells(graph):
+            roots = named_roots(graph, cell)
+            offenders.update((roots or {cell}) if shape_file else (roots & shapes))
+        for shape in sorted(offenders):
+            errors.append(f"{path} {local(shape)} 的 RDF 列表无法在 OWL API 另存后恢复")
+
+    for predicate in (OWL.unionOf, OWL.intersectionOf, OWL.oneOf):
+        for subject, head in graph.subject_objects(predicate):
+            owners = ", ".join(sorted(map(local, named_roots(graph, subject) or {subject})))
+            try:
+                items = list(graph.items(head))
+            except ValueError as exc:
+                errors.append(f"{path} {owners} 的 {predicate.n3(graph.namespace_manager)} 列表无效 {exc}")
+                continue
+            if any(not isinstance(item, URIRef) for item in items) or items != sorted(items, key=str):
+                errors.append(f"{path} {owners} 的 {predicate.n3(graph.namespace_manager)} 成员须按完整 IRI 升序排列")
+    for left, right in graph.subject_objects(OWL.disjointWith):
+        if not isinstance(left, URIRef) or not isinstance(right, URIRef) or str(left) >= str(right):
+            errors.append(f"{path} {local(left)} owl:disjointWith {local(right)} 须从较小 IRI 指向较大 IRI")
+
+    declared = set(schema.subjects(RDF.type, RDFS.Datatype))
+    data_properties = set(schema.subjects(RDF.type, OWL.DatatypeProperty))
+    member = (OWL.unionOf | OWL.intersectionOf) / (RDF.rest * "*") / RDF.first
+    nested_datatype = (member | OWL.datatypeComplementOf | OWL.onDatatype) * "+"
+    missing = defaultdict(set)
+    for subject, predicate, value in graph:
+        datatype = None
+        if isinstance(value, Literal):
+            datatype = value.datatype
+        elif (predicate in (SH.datatype, OWL.onDataRange, OWL.onDatatype)
+              or (predicate == RDFS.range and subject in data_properties)
+              or (predicate in (OWL.allValuesFrom, OWL.someValuesFrom)
+                  and graph.value(subject, OWL.onProperty) in data_properties)):
+            datatype = value
+        datatypes = graph.objects(datatype, nested_datatype) if isinstance(datatype, BNode) else (datatype,)
+        for term in datatypes:
+            if isinstance(term, URIRef) and term not in OWL2_DATATYPES and term not in declared:
+                missing[term].update(named_roots(graph, subject) or {subject})
+    for datatype, subjects in sorted(missing.items()):
+        example = local(min(subjects))
+        usage = example if len(subjects) == 1 else f"{example} 等 {len(subjects)} 个主语"
+        errors.append(f"{path} {usage} 使用的 {datatype} 缺少 rdfs:Datatype 声明")
 
 
 def check_refs(path, graph, owner, allowed_layers, sources, qudt, versions, errors, *, example=False):
@@ -559,6 +670,7 @@ def audit(layers, modules, graphs, errors):
             if line and not line.startswith("#")}
     for path in modules:
         layer = path.parent.name
+        check_round_trip(path, modules[path], ontology, errors)
         check_refs(path, modules[path], owner, {layer, *LAYERS[layer]}, sources, qudt, versions, errors)
     root_aggregate = ROOT / "steel.ttl"
     if root_aggregate in graphs:
@@ -582,6 +694,7 @@ def audit(layers, modules, graphs, errors):
         errors.append("缺少 dist/steel.ttl，请运行 check.ps1 -Build")
     else:
         dist = graphs[path]
+        check_round_trip(path, dist, dist, errors)
         check_header(path, dist, RELEASE, errors, comment=False)
         if any(dist.triples((None, OWL.imports, None))):
             errors.append("dist/steel.ttl 含 owl:imports")

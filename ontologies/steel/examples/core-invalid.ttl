@@ -5,15 +5,21 @@
 # Each EXPECT identifies the focus node, the named source shape and the SHACL component.
 
 # EXPECT <urn:synthetic:steel:operation/M90> <https://w3id.org/ontology-platform/steel/CoreEventPlanTimesShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:operation/M90> <https://w3id.org/ontology-platform/steel/CoreEventPlannedEndShape> MaxCountConstraintComponent
 <urn:synthetic:steel:operation/M90> a stl:Operation ;
-    stl:plannedStartAt "2026-11-19T08:00:00+08:00"^^xsd:dateTime .
+    stl:plannedStartAt "2026-11-19T08:00:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-19T09:00:00+08:00"^^xsd:dateTime .
 
 # EXPECT <urn:synthetic:steel:productionorder/W90> <https://w3id.org/ontology-platform/steel/CorePlanActualTimesShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:productionorder/W90> <https://w3id.org/ontology-platform/steel/CorePlanActualStartShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:productionorder/W90> <https://w3id.org/ontology-platform/steel/CorePlanOccurredAtShape> MaxCountConstraintComponent
 <urn:synthetic:steel:productionorder/W90> a stl:ProductionOrder ;
-    stl:actualEndAt "2026-11-19T09:00:00+08:00"^^xsd:dateTime .
+    stl:actualStartAt "2026-11-19T08:00:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-19T09:00:00+08:00"^^xsd:dateTime ;
+    stl:occurredAt "2026-11-19T08:30:00+08:00"^^xsd:dateTime .
 
 # EXPECT <urn:synthetic:steel:event/V90> <https://w3id.org/ontology-platform/steel/CoreInstantShape> DatatypeConstraintComponent
-# EXPECT <urn:synthetic:steel:event/V90> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:event/V90> <https://w3id.org/ontology-platform/steel/CoreOccurredAtShape> PatternConstraintComponent
 <urn:synthetic:steel:event/V90> a stl:Event ;
     stl:recordedAt "2026-11-19T09:00:00+08:00" ; stl:occurredAt "2026-11-19T09:00:00"^^xsd:dateTime .
 
@@ -23,9 +29,12 @@
 
 # EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreMassShape> DatatypeConstraintComponent
 # EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreMassShape> MinInclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreGrossMassShape> MinInclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreTheoreticalMassShape> MinInclusiveConstraintComponent
 # EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreSourceHeatShape> ClassConstraintComponent
 <urn:synthetic:steel:materialpiece/P90> a stl:MaterialPiece ;
-    stl:netMass -1 ; stl:sourceHeat <urn:synthetic:steel:equipment/E90> .
+    stl:netMass -1 ; stl:grossMass -2.0 ; stl:theoreticalMass -3.0 ;
+    stl:sourceHeat <urn:synthetic:steel:equipment/E90> .
 
 # EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionInputShape> MaxCountConstraintComponent
 # EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionInputShape> ClassConstraintComponent
@@ -90,21 +99,21 @@
 <urn:synthetic:steel:tensiletest/T90> a stl:TensileTest ;
     stl:testType <code/judgement-result/PENDING> .
 
-# EXPECT <urn:synthetic:steel:productionorder/TZ01> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:productionorder/TZ01> <https://w3id.org/ontology-platform/steel/CorePlannedStartAtShape> PatternConstraintComponent
 <urn:synthetic:steel:productionorder/TZ01> a stl:ProductionOrder ; stl:plannedStartAt "2026-11-19T10:00:00"^^xsd:dateTime .
-# EXPECT <urn:synthetic:steel:productionorder/TZ02> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:productionorder/TZ02> <https://w3id.org/ontology-platform/steel/CorePlannedEndAtShape> PatternConstraintComponent
 <urn:synthetic:steel:productionorder/TZ02> a stl:ProductionOrder ; stl:plannedEndAt "2026-11-19T10:00:00"^^xsd:dateTime .
-# EXPECT <urn:synthetic:steel:operation/TZ03> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:operation/TZ03> <https://w3id.org/ontology-platform/steel/CoreActualStartAtShape> PatternConstraintComponent
 <urn:synthetic:steel:operation/TZ03> a stl:Operation ; stl:actualStartAt "2026-11-19T10:00:00"^^xsd:dateTime .
-# EXPECT <urn:synthetic:steel:operation/TZ04> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:operation/TZ04> <https://w3id.org/ontology-platform/steel/CoreActualEndAtShape> PatternConstraintComponent
 <urn:synthetic:steel:operation/TZ04> a stl:Operation ; stl:actualEndAt "2026-11-19T10:00:00"^^xsd:dateTime .
-# EXPECT <urn:synthetic:steel:materialpiece/TZ05> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:materialpiece/TZ05> <https://w3id.org/ontology-platform/steel/CoreCreatedAtShape> PatternConstraintComponent
 <urn:synthetic:steel:materialpiece/TZ05> a stl:MaterialPiece ; stl:createdAt "2026-11-19T10:00:00"^^xsd:dateTime .
 # EXPECT <urn:synthetic:steel:event/TZ06> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
 <urn:synthetic:steel:event/TZ06> a stl:Event ; stl:recordedAt "2026-11-19T10:00:00"^^xsd:dateTime .
-# EXPECT <urn:synthetic:steel:sample/TZ07> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:sample/TZ07> <https://w3id.org/ontology-platform/steel/CoreSampledAtShape> PatternConstraintComponent
 <urn:synthetic:steel:sample/TZ07> a stl:Sample ; stl:sampledAt "2026-11-19T10:00:00"^^xsd:dateTime ; stl:sampleOf <urn:synthetic:steel:materialpiece/P90> .
-# EXPECT <urn:synthetic:steel:tensiletest/TZ08> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel:tensiletest/TZ08> <https://w3id.org/ontology-platform/steel/CoreResultAtShape> PatternConstraintComponent
 <urn:synthetic:steel:tensiletest/TZ08> a stl:TensileTest ; stl:resultAt "2026-11-19T10:00:00"^^xsd:dateTime ; stl:methodStandard <std/gbt-228-1-2021> .
 
 # Wrong-scheme values are validated at the code IRI via sh:targetObjectsOf.

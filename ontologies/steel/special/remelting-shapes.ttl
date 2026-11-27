@@ -29,10 +29,18 @@ stl:RemeltInputElectrodeShape a sh:PropertyShape ; sh:targetClass stl:Remelting 
     sh:path stl:inputPiece ; sh:qualifiedValueShape [ sh:class stl:Electrode ] ; sh:qualifiedMinCount 1 ;
     sh:severity sh:Violation ; rdfs:comment "每次重熔作业的投入件中须至少登记一件实际熔入的自耗电极。"@zh .
 
-stl:RemeltOutputShape a sh:PropertyShape ; sh:targetClass stl:Remelting ;
-    sh:path [ sh:alternativePath ( stl:outputPiece [ sh:inversePath stl:producedBy ] ) ] ;
-    sh:qualifiedValueShape [ sh:class stl:RemeltedIngot ] ; sh:qualifiedMinCount 1 ;
-    sh:severity sh:Violation ; rdfs:comment "每次重熔至少产出一件重熔锭，产出关系可由作业或锭记录。"@zh .
+stl:RemeltOutputShape a sh:NodeShape ; sh:targetClass stl:Remelting ;
+    sh:severity sh:Violation ; rdfs:comment "每次重熔至少产出一件重熔锭，产出关系可由作业或锭记录。"@zh ;
+    sh:sparql [ a sh:SPARQLConstraint ; sh:message "本次重熔作业须至少有一件产出锭，可在作业或重熔锭上登记产出关系。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this (stl:outputPiece|^stl:producedBy) ?ingot .
+            ?ingot a/rdfs:subClassOf* stl:RemeltedIngot .
+          }
+        }
+    """ ] .
 
 stl:RemeltedIngotElectrodeShape a sh:PropertyShape ; sh:targetClass stl:RemeltedIngot ;
     sh:path stl:derivedFrom ; sh:qualifiedValueShape [ sh:class stl:Electrode ] ; sh:qualifiedMinCount 1 ;
@@ -64,10 +72,18 @@ stl:MeltingRouteSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:meltingR
     sh:path skos:inScheme ; sh:hasValue <code/melting-route> ;
     sh:severity sh:Violation ; rdfs:comment "实物件引用的冶炼路线代码须属于冶炼路线方案。"@zh .
 
-stl:MeltingRouteDetailShape a sh:PropertyShape ; sh:targetObjectsOf stl:meltingRoute ;
-    sh:path [ sh:oneOrMorePath skos:broader ] ;
-    sh:qualifiedValueShape [ sh:in ( <code/melting-route/REMELT> <code/melting-route/DIRECT> ) ] ; sh:qualifiedMinCount 1 ;
-    sh:severity sh:Violation ; rdfs:comment "实物件须引用能沿上位关系归入含重熔或不含重熔组的具体路线。"@zh .
+stl:MeltingRouteDetailShape a sh:NodeShape ; sh:targetObjectsOf stl:meltingRoute ;
+    sh:severity sh:Violation ; rdfs:comment "实物件须引用能沿上位关系归入含重熔或不含重熔组的具体路线。"@zh ;
+    sh:sparql [ a sh:SPARQLConstraint ; sh:message "冶炼路线代码须沿上位关系归入含重熔组或不含重熔组。"@zh ; sh:select """
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX route: <https://w3id.org/ontology-platform/steel/code/melting-route/>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this skos:broader+ ?group .
+            FILTER (?group IN (route:REMELT, route:DIRECT))
+          }
+        }
+    """ ] .
 
 stl:RemeltedIngotRouteShape a sh:PropertyShape ; sh:targetClass stl:RemeltedIngot ;
     sh:target [ a sh:SPARQLTarget ; sh:select """
