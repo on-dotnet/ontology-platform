@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.identity.models import AccessToken, Role, User
+from ontology_platform.modules.mcp import tools as mcp_tools
 from ontology_platform.modules.ontology import service
 from ontology_platform.modules.ontology.models import ChangeItem, ChangeSet, Element, Ontology
 from ontology_platform.modules.ontology.schemas import ElementFields, ProposedItem
@@ -480,6 +481,100 @@ async def test_an_unknown_ontology_is_a_tool_error(app: FastAPI, setup: Setup) -
 
 
 # ---------- how often ----------
+
+
+async def test_discarded_calls_count_per_token(
+    app: FastAPI,
+    client: AsyncClient,
+    db: AsyncSession,
+    setup: Setup,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(mcp_tools, "CALLS_PER_HOUR", 3)
+    arguments = {
+        "ontology": setup.ontology.key,
+        "title": "重名",
+        "operations": [_create("Coil", "钢卷")],
+    }
+    for _ in range(3):
+        assert _content(await _propose(app, setup.token, arguments))["changeSetId"] is None
+    assert await _change_sets(db) == []
+    tool_error(await _propose(app, setup.token, arguments), "mcp.rate_limited")
+
+    other, other_id = await new_token(client, db, Role.EDITOR, PROPOSE)
+    assert other_id != setup.token_id
+    assert (
+        await db.scalar(select(AccessToken.user_id).where(AccessToken.id == UUID(other_id)))
+        == setup.owner_id
+    )
+    assert _content(await _propose(app, other, arguments))["changeSetId"] is None
+
+
+async def test_rate_limited_calls_do_not_count(
+    app: FastAPI, db: AsyncSession, setup: Setup, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(mcp_tools, "CALLS_PER_HOUR", 1)
+    arguments = {
+        "ontology": setup.ontology.key,
+        "title": "重名",
+        "operations": [_create("Coil", "钢卷")],
+    }
+    assert _content(await _propose(app, setup.token, arguments))["changeSetId"] is None
+    tool_error(await _propose(app, setup.token, arguments), "mcp.rate_limited")
+    monkeypatch.setattr(mcp_tools, "CALLS_PER_HOUR", 2)
+    assert _content(await _propose(app, setup.token, arguments))["changeSetId"] is None
+
+
+async def test_calls_older_than_an_hour_do_not_count(
+    app: FastAPI, db: AsyncSession, setup: Setup, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(mcp_tools, "CALLS_PER_HOUR", 1)
+    arguments = {
+        "ontology": setup.ontology.key,
+        "title": "重名",
+        "operations": [_create("Coil", "钢卷")],
+    }
+    assert _content(await _propose(app, setup.token, arguments))["changeSetId"] is None
+    tool_error(await _propose(app, setup.token, arguments), "mcp.rate_limited")
+    await db.execute(
+        update(AuditEvent)
+        .where(
+            AuditEvent.action == "mcp.tool_called",
+            AuditEvent.target_id == setup.token_id,
+        )
+        .values(occurred_at=datetime.now(UTC) - timedelta(hours=1, minutes=1))
+    )
+    await db.commit()
+    assert _content(await _propose(app, setup.token, arguments))["changeSetId"] is None
+
+
+@pytest.mark.parametrize(
+    ("op", "count", "rejected"),
+    [("create", 11, True), ("create", 10, False), ("delete", 11, False)],
+)
+async def test_axiom_checks_limit(
+    app: FastAPI, db: AsyncSession, setup: Setup, op: str, count: int, rejected: bool
+) -> None:
+    operations = [
+        {
+            "op": op,
+            "kind": "axiom",
+            **({"target": f"missing-{n}"} if op == "delete" else {}),
+            "rationale": "r",
+        }
+        for n in range(count)
+    ]
+    result = await _propose(
+        app,
+        setup.token,
+        {"ontology": setup.ontology.key, "title": "公理", "operations": operations},
+    )
+    if rejected:
+        tool_error(result, "validation.failed")
+        assert "10" in result["structuredContent"]["message"]
+    else:
+        assert _content(result)["changeSetId"] is None
+    assert await _change_sets(db) == []
 
 
 async def test_ten_change_sets_per_token_and_hour(

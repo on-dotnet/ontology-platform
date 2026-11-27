@@ -1,10 +1,11 @@
 """Audit recording. Events join the caller's transaction and persist when it commits."""
 
 from collections.abc import Mapping, Sequence
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.modules.audit.models import AuditEvent
@@ -30,6 +31,31 @@ def record(
         ip=ip,
     )
     db.add(event)
+
+
+async def count(
+    db: AsyncSession,
+    *,
+    action: str,
+    actor_id: UUID,
+    target_type: str,
+    target_id: str,
+    since: datetime,
+    detail_equals: Mapping[str, str] | None = None,
+    detail_not_equals: Mapping[str, str] | None = None,
+) -> int:
+    statement = select(func.count(AuditEvent.id)).where(
+        AuditEvent.action == action,
+        AuditEvent.actor_id == actor_id,
+        AuditEvent.target_type == target_type,
+        AuditEvent.target_id == target_id,
+        AuditEvent.occurred_at >= since,
+    )
+    for key, value in (detail_equals or {}).items():
+        statement = statement.where(AuditEvent.detail[key].astext == value)
+    for key, value in (detail_not_equals or {}).items():
+        statement = statement.where(AuditEvent.detail[key].astext != value)
+    return (await db.execute(statement)).scalar_one()
 
 
 async def recent(
