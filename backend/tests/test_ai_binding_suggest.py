@@ -86,6 +86,7 @@ class CatalogGateway:
         self.matches = matches
         self.columns = columns
         self.texts: list[tuple[str, str]] = []
+        self.instructions: list[str] = []
 
     async def structured[T: BaseModel](
         self,
@@ -100,6 +101,7 @@ class CatalogGateway:
         effort: str | None = None,
     ) -> T:
         self.texts.append((purpose, text))
+        self.instructions.append(instructions)
         if purpose == MATCH_PURPOSE:
             answer: BaseModel = MatchOut(matches=self.matches)
         else:
