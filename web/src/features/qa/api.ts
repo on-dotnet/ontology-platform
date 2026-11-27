@@ -1,4 +1,5 @@
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
 import { api, unwrap } from '@/api/client';
 import type { components } from '@/api/schema';
@@ -7,6 +8,10 @@ import { stopsPolling } from '@/features/assistant/api';
 export type Question = components['schemas']['QaQuestion'];
 type QuestionList = components['schemas']['QaQuestionList'];
 type Create = components['schemas']['QaQuestionCreate'];
+
+// Proposals usually take a minute, so five minutes leaves room for a slow run.
+const GAP_STALE_MS = 5 * 60_000;
+export type GapPolling = { stale: boolean; restart: () => void };
 
 const listKey = (ontologyId: string) => ['qa', 'recent', ontologyId] as const;
 const detailKey = (id: string | undefined) => ['qa', 'question', id] as const;
@@ -30,7 +35,9 @@ export function useRecentQuestions(id: string) {
 
 export function useQuestion(id: string | undefined, summary: Question | undefined) {
   const client = useQueryClient();
-  return useQuery({
+  const [staleId, setStaleId] = useState<string>();
+  const stale = !!id && staleId === id;
+  const detail = useQuery({
     queryKey: detailKey(id),
     enabled: !!id,
     // Active questions and gap proposals can be shown from a summary while detail loads.
@@ -45,13 +52,26 @@ export function useQuestion(id: string | undefined, summary: Question | undefine
       }
       return next;
     },
-    refetchInterval: ({ state }) => !stopsPolling(state.error) && needsPolling(state.data) ? 2000 : false,
+    refetchInterval: ({ state }) => !stopsPolling(state.error)
+      && (isActive(state.data) || (!stale && isGapActive(state.data?.gapProposal))) ? 2000 : false,
     refetchOnWindowFocus: false,
     retry: false,
   });
+  const gapActive = isGapActive(detail.data?.gapProposal);
+  if (staleId && (staleId !== id || !gapActive)) setStaleId(undefined);
+  useEffect(() => {
+    if (!id || !gapActive || stale) return;
+    const timer = window.setTimeout(() => setStaleId(id), GAP_STALE_MS);
+    return () => window.clearTimeout(timer);
+  }, [id, gapActive, stale]);
+  const gapPolling: GapPolling = {
+    stale,
+    restart: () => setStaleId((current) => current === id ? undefined : current),
+  };
+  return { detail, gapPolling };
 }
 
-export function useGapProposal(id: string) {
+export function useGapProposal(id: string, gapPolling: GapPolling) {
   const client = useQueryClient();
   const mutationKey = ['qa', 'gap-proposal', id] as const;
   const pending = useIsMutating({ mutationKey }) > 0;
@@ -64,6 +84,7 @@ export function useGapProposal(id: string) {
       await client.cancelQueries({ queryKey, exact: true });
       client.setQueryData<Question>(queryKey, (current) =>
         current?.gapProposal && !isGapActive(current.gapProposal) ? current : question);
+      if (gapPolling.stale) gapPolling.restart();
     },
     onError: (error) => {
       // A lost response can still mean the server accepted the proposal.
@@ -73,7 +94,8 @@ export function useGapProposal(id: string) {
   return {
     pending, error: mutation.error,
     submit: () => {
-      if (!client.isMutating({ mutationKey }) && !client.getQueryData<Question>(detailKey(id))?.gapProposal) mutation.mutate();
+      const existing = client.getQueryData<Question>(detailKey(id))?.gapProposal;
+      if (!client.isMutating({ mutationKey }) && (!existing || (gapPolling.stale && isGapActive(existing)))) mutation.mutate();
     },
   };
 }
