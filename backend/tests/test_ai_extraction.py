@@ -2004,6 +2004,10 @@ def test_the_types_prompt_keeps_lines_and_results_that_are_tracked_one_by_one() 
     # Paper that only goes with a thing or a handover is not a type of its own.
     assert "Slips, copies, receipts, tags, labels and attachments" in rules
     assert "Being mentioned, kept, handed over or referred to is not enough" in rules
+    # The check is for paper only: a paid steel run lost the ladle furnace and the caster when
+    # it applied to every type, since the text names machines without numbers of their own.
+    assert "Before proposing a new type for a document, form, record" in rules
+    assert "equipment, places and materials that the work is done with or on are not held" in rules
 
 
 def test_the_prompts_give_examples_in_generic_words_only() -> None:

@@ -104,9 +104,10 @@ names in synonyms. Plans, reports or records that differ only by period or frequ
 weekly and a monthly timetable) are one type; the period is an attribute.
 {RECORD_RULE}A process and the equipment that performs it are different concepts; keep the
 equipment, and the process only if it is an event as defined above.
-Before proposing a new type, check that the text shows how each member is identified (a number
-or code of its own) or that the data of every single one is recorded. Being mentioned, kept,
-handed over or referred to is not enough.
+Before proposing a new type for a document, form, record or other piece of paper, check that the
+text shows how each one is identified (a number or code of its own) or that the data of every
+single one is recorded. Being mentioned, kept, handed over or referred to is not enough. The
+equipment, places and materials that the work is done with or on are not held to this check.
 Existing entity types are listed with short ids (E1, E2, ...); reuse them instead of proposing
 duplicates (refer to an existing type by its id). Refer to a new type as "new:<Name>", where
 <Name> is a PascalCase English name. Give a concise English label, and a definition of one
