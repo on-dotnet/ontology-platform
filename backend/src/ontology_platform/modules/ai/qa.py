@@ -154,6 +154,10 @@ async def get_question(db: AsyncSession, question_id: UUID, *, actor: Principal)
     row = await db.get(QaQuestionRow, question_id, populate_existing=True)
     if row is None:
         raise AppError(404, "qa.not_found", "Question not found.")
+    return await question_detail(db, row)
+
+
+async def question_detail(db: AsyncSession, row: QaQuestionRow) -> QaQuestion:
     return _question(row, await display_names(db, [row.asked_by]))
 
 

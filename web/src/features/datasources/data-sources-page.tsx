@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { Database, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { usePermissions } from '@/features/auth/permissions';
+import { SuggestBindingsDialog } from '@/features/bindings/suggest/suggest-bindings-dialog';
 import { usePagination } from '@/lib/pagination';
 
 import { rememberSource, useSourceList, type DataSource } from './api';
@@ -23,7 +24,11 @@ import { SourceStatus } from './source-status';
 export function DataSourcesPage() {
   const { t } = useTranslation();
   const query = useSourceList();
-  const { canManageDataSources, canBrowseCatalog } = usePermissions();
+  const { canManageDataSources, canBrowseCatalog, canEditBindings } = usePermissions();
+  const search = useRouterState({ select: (state) => state.location.searchStr });
+  const params = new URLSearchParams(search);
+  const ontologyId = params.get('ontologyId')?.trim();
+  const typeIds = params.get('typeIds')?.split(',').map((id) => id.trim()).filter(Boolean) ?? [];
   const [creating, setCreating] = useState(false);
   const client = useQueryClient();
   const navigate = useNavigate();
@@ -45,6 +50,15 @@ export function DataSourcesPage() {
           </Card>
         )}
       </QueryState>
+      {canEditBindings && ontologyId && typeIds.length > 0 && (
+        <SuggestBindingsDialog key={[ontologyId, ...typeIds].join(',')} open ontologyId={ontologyId} typeIds={typeIds}
+          onOpenChange={(open) => {
+            if (open) return;
+            params.delete('ontologyId');
+            params.delete('typeIds');
+            void navigate({ href: params.size ? `/data?${params}` : '/data', replace: true });
+          }} />
+      )}
       {creating && canManageDataSources && (
         <DataSourceDialog onClose={() => setCreating(false)} onSaved={async (source) => {
           await rememberSource(client, source);

@@ -121,6 +121,26 @@ describe('change set list', () => {
 });
 
 describe('change set review', () => {
+  it('labels QA gap proposals in the list and reviews their items as AI suggestions', async () => {
+    const user = userEvent.setup();
+    const changeSet = changeSetFixture([itemFixture({ rationale: '问题中缺少钢包类型。' })], {
+      title: '问答缺口：钢包有多少个？', source: 'ai_qa', documentId: null,
+    });
+    reviewServer({ initial: changeSet, user: userWithRole('reviewer') });
+    renderApp('/review');
+
+    const row = within(await screen.findByRole('row', { name: /问答缺口：钢包有多少个/ }));
+    expect(row.getByText('问答缺口')).toBeVisible();
+    await user.click(row.getByRole('link', { name: changeSet.title }));
+    const item = within(await screen.findByRole('article', { name: /钢包/ }));
+    expect(screen.getByText('问答缺口')).toBeVisible();
+    expect(item.getByText('AI 建议')).toBeVisible();
+    expect(item.getByText('置信度高')).toBeVisible();
+    expect(item.getByText('理由：问题中缺少钢包类型。')).toBeVisible();
+    expect(item.getByRole('button', { name: '接受' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: /^接受全部（/ })).not.toBeInTheDocument();
+  });
+
   it('accepts and rejects single items and keeps the AI label, confidence and flags visible', async () => {
     const user = userEvent.setup();
     const api = reviewServer();

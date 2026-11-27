@@ -1,4 +1,4 @@
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -8,6 +8,47 @@ import { sourceKey } from './api';
 import { makeSource } from './test-fixtures';
 
 describe('data source list', () => {
+  it.each(['editor', 'reviewer', 'admin'] as const)('opens binding suggestions for the linked ontology and types as %s', async (role) => {
+    const user = userEvent.setup();
+    const source = makeSource({ catalog: { status: 'ready', refreshedAt: null, tableCount: 1, errorCode: null } });
+    const path = '/api/ontologies/onto-steel/binding-suggestions';
+    const api = mockApi({
+      'GET /api/data-sources': () => [source],
+      'GET /api/data-sources/:id/catalog/schemas': () => [{ name: 'steel', tableCount: 1 }],
+      [`POST ${path}`]: () => ({
+        id: 'suggestion-1', ontologyId: 'onto-steel', dataSourceId: source.id, status: 'succeeded', step: null,
+        proposed: 0, dropped: 0, changeSetId: null, samplesSent: false, errorCode: null,
+        createdAt: source.createdAt, finishedAt: source.createdAt,
+      }),
+    }, { user: userWithRole(role) });
+    const { router } = renderApp('/data?ontologyId=onto-steel&typeIds=type-heat,type-ladle&ontology=onto-other');
+    const dialog = within(await screen.findByRole('dialog', { name: 'AI 建议绑定' }));
+    await user.selectOptions(await dialog.findByRole('combobox', { name: '数据源' }), source.id);
+    expect(await dialog.findByRole('checkbox', { name: 'steel' })).toBeChecked();
+    expect(api.calls('POST', path)).toHaveLength(0);
+    await user.click(dialog.getByRole('button', { name: '生成绑定建议' }));
+    await waitFor(() => expect(api.calls('POST', path).map((call) => call.body)).toEqual([{
+      dataSourceId: source.id, schemas: ['steel'], typeIds: ['type-heat', 'type-ladle'],
+    }]));
+    await user.click(dialog.getByRole('button', { name: '关闭' }));
+    await waitFor(() => expect(router.state.location.searchStr).toBe('?ontology=onto-other'));
+    expect(await screen.findByRole('link', { name: source.name })).toBeVisible();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['viewer', '?ontologyId=onto-steel&typeIds=type-heat,type-ladle'],
+    ['editor', '?ontologyId=onto-steel'],
+    ['editor', '?typeIds=type-heat'],
+    ['editor', '?ontologyId=onto-steel&typeIds=,'],
+  ] as const)('keeps the data list visible for %s with %s', async (role, search) => {
+    const source = makeSource();
+    mockApi({ 'GET /api/data-sources': () => [source] }, { user: userWithRole(role) });
+    renderApp(`/data${search}`);
+    expect(await screen.findByRole('link', { name: source.name })).toBeVisible();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it.each(['editor', 'viewer'] as const)('shows the columns available to %s', async (role) => {
     const source = makeSource();
     mockApi({ 'GET /api/data-sources': () => [source] }, { user: userWithRole(role) });

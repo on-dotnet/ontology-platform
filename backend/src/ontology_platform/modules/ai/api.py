@@ -2,14 +2,13 @@
 
 import asyncio
 import time
-from collections.abc import Awaitable
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query, Request, Response
 
 from ontology_platform.db import DbSession
-from ontology_platform.errors import not_implemented, problem_responses
+from ontology_platform.errors import problem_responses
 from ontology_platform.modules.ai import assistant, binding_suggest, qa, qa_gap, schemas
 from ontology_platform.modules.ai.gateway import ModelGateway, OpenAIGateway
 from ontology_platform.modules.ai.schemas import AiStatus
@@ -148,14 +147,6 @@ async def list_binding_suggestions(
     return await binding_suggest.list_requests(db, id, user_id=user.id, limit=limit)
 
 
-async def _qa_response(operation: Awaitable[schemas.QaQuestion]) -> schemas.QaQuestion:
-    # HTTP exposes a problem response for the same stub that internal callers invoke directly.
-    try:
-        return await operation
-    except NotImplementedError as exc:
-        raise not_implemented("Question answering") from exc
-
-
 @router.post(
     "/ontologies/{id}/qa/questions",
     status_code=202,
@@ -196,9 +187,16 @@ async def get_qa_question(id: UUID, user: CurrentUser, db: DbSession) -> schemas
     status_code=202,
     responses={
         200: {"model": schemas.QaQuestion},
-        **problem_responses(401, 403, 404, 409, 422, 501),
+        **problem_responses(401, 403, 404, 409, 422),
     },
 )
-async def create_qa_gap_proposal(id: UUID, user: Creator, db: DbSession) -> schemas.QaQuestion:
+async def create_qa_gap_proposal(
+    id: UUID, user: Creator, db: DbSession, settings: AppSettings, response: Response
+) -> schemas.QaQuestion:
     await qa.require_visible(db, id, user)
-    return await _qa_response(qa_gap.create_gap_proposal(db, id, user_id=user.id))
+    question, created = await qa_gap.enqueue_gap_proposal(
+        db, id, user_id=user.id, settings=settings
+    )
+    if not created:
+        response.status_code = 200
+    return question
