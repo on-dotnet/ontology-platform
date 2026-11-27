@@ -1,7 +1,10 @@
 """Build authoritative facts and project only permitted business values into answer prose."""
 
 import json
+import re
+from collections.abc import Mapping
 from itertools import chain, islice
+from typing import NamedTuple
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,8 +14,62 @@ from ontology_platform.modules.ai.qa_prompts import QA_ANSWER_INSTRUCTIONS, QaAn
 from ontology_platform.modules.ai.qa_run import ROW_LIMIT
 from ontology_platform.modules.connectors import service as connectors
 from ontology_platform.modules.ontology.qa_context import QaContext
+from ontology_platform.modules.query.schemas import PathRow
 
 _VALUE_LIMIT = 200
+
+# Row refs the answer call uses for rows (K1 to K50); readers know objects by their keys.
+_REF = re.compile(r"(?<![0-9A-Za-z])K\d+(?![0-9A-Za-z])")
+_REF_SEP = r"\s*(?:[、,，;；/~\uff5e\-\u2013\u2014]|和|及|与|至|到)\s*"
+_REF_GROUP = re.compile(rf"\s*[（(]\s*K\d+(?:{_REF_SEP}K\d+)*\s*[）)]")
+# Saying the objects cannot be listed contradicts the complete list shown with the answer.
+_DENIAL = re.compile(
+    r"(?:无法|不能|未能|没法|难以)[^。！？!?]{0,8}(?:列出|列举|罗列)"
+    r"|(?:未|没有|并未|不)(?:提供|给出|包含|列出)[^。！？!?]{0,12}(?:编号|名单|清单|列表|明细|具体)"
+)
+_SENTENCE_END = re.compile(r"(?<=[。！？!?；;\n])")
+
+
+class _Prompt(NamedTuple):
+    text: str
+    refs: dict[str, str]
+    names: dict[str, str]
+    # Ref-shaped business words, such as a grade, that the answer may repeat as they are.
+    literals: set[str]
+    truncated: bool
+
+
+def _name(row: PathRow) -> str:
+    return " / ".join(k.value for k in row.source.key)
+
+
+def _resolve(text: str, names: Mapping[str, str], literals: set[str]) -> str | None:
+    """Name the objects behind row refs; None if the text refers to a row it was not given."""
+
+    def known(ref: str) -> bool:
+        return ref in names and ref not in literals
+
+    def group(match: re.Match[str]) -> str:
+        return "" if all(known(ref) for ref in _REF.findall(match[0])) else match[0]
+
+    unknown = False
+
+    def bare(match: re.Match[str]) -> str:
+        nonlocal unknown
+        ref = match[0]
+        if ref in literals:
+            return ref
+        if ref in names:
+            return names[ref]
+        unknown = True
+        return ref
+
+    resolved = _REF.sub(bare, _REF_GROUP.sub(group, text))
+    return None if unknown else resolved
+
+
+def _without_denials(text: str) -> str:
+    return "".join(s for s in _SENTENCE_END.split(text) if not _DENIAL.search(s)).strip()
 
 
 def _facts(
@@ -28,9 +85,7 @@ def _facts(
     objects = []
     if plan.intent == "objects":
         objects = [
-            schemas.QaFactObject(
-                type_id=row.type_id, key=row.key, label=" / ".join(k.value for k in row.source.key)
-            )
+            schemas.QaFactObject(type_id=row.type_id, key=row.key, label=_name(row))
             for row in evidence.rows
         ]
     return schemas.QaFacts(
@@ -69,9 +124,11 @@ def _prompt(
     context: QaContext,
     evidence: schemas.QaEvidence,
     facts: schemas.QaFacts,
-) -> tuple[str, dict[str, str], bool]:
+) -> _Prompt:
     rows = []
     refs: dict[str, str] = {}
+    names: dict[str, str] = {}
+    words = [question, plan.description]
     answer_refs = {row.key: f"K{i}" for i, row in enumerate(evidence.rows, start=1)}
     truncated = evidence.truncated or len(evidence.rows) + len(evidence.tail) > ROW_LIMIT
     for i, row in enumerate(islice(chain(evidence.rows, evidence.tail), ROW_LIMIT), start=1):
@@ -80,6 +137,9 @@ def _prompt(
         bound = context.model.type(row.type_id)
         if bound is None:
             raise ValueError("A result row has no type in the checked model.")
+        name = _name(row)[:_VALUE_LIMIT]
+        names[ref] = name
+        words.append(name)
         values = []
         truncated |= bool(row.truncated)
         for prop in bound.properties:
@@ -89,8 +149,13 @@ def _prompt(
                     truncated = True
                     value = value[:_VALUE_LIMIT]
                 values.append({"label": prop.label, "value": value})
+                if isinstance(value, str):
+                    words.append(value)
         parent = answer_refs.get(row.via[plan.target]) if i > len(evidence.rows) else None
-        rows.append({"ref": ref, "type": bound.label, "values": values, "answerRef": parent})
+        # The key values name the object; the key columns stay out of the prompt (spec 007 5.5).
+        rows.append(
+            {"ref": ref, "type": bound.label, "name": name, "values": values, "answerRef": parent}
+        )
     metric = evidence.metric
     rule_counts = []
     if evidence.rules is not None:
@@ -119,7 +184,8 @@ def _prompt(
         "truncated": truncated,
         "limit": ROW_LIMIT,
     }
-    return json.dumps(payload, ensure_ascii=False), refs, truncated
+    literals = {ref for word in words for ref in _REF.findall(word)}
+    return _Prompt(json.dumps(payload, ensure_ascii=False), refs, names, literals, truncated)
 
 
 async def answer(
@@ -140,15 +206,16 @@ async def answer(
         if evidence.truncated:
             result.notes.append("rows_truncated")
         return result
-    text, refs, truncated = _prompt(question, plan, context, evidence, result.facts)
-    if truncated:
+    prompt = _prompt(question, plan, context, evidence, result.facts)
+    refs = prompt.refs
+    if prompt.truncated:
         result.notes.append("rows_truncated")
     try:
         output = await gateway.structured(
             purpose="qa.answer",
             model=model,
             instructions=QA_ANSWER_INSTRUCTIONS,
-            text=text,
+            text=prompt.text,
             schema=QaAnswerOut,
         )
     except AiError as exc:
@@ -156,8 +223,21 @@ async def answer(
             raise
         result.notes.append("answer_unavailable")
         return result
-    result.text = output.answer
-    result.counterpoints = output.counterpoints
+    # The platform, not the prompt alone, keeps row refs and denials of the shown list out.
+    listed = bool(result.facts.objects) and result.facts.count == len(result.facts.objects)
+
+    def readable(text: str) -> str | None:
+        resolved = _resolve(text, prompt.names, prompt.literals)
+        if resolved is not None and listed:
+            resolved = _without_denials(resolved)
+        return resolved or None
+
+    text = readable(output.answer)
+    if text is None:
+        result.notes.append("answer_unavailable")
+        return result
+    result.text = text
+    result.counterpoints = [c for c in map(readable, output.counterpoints) if c is not None]
     result.cited_keys = [refs[ref] for ref in output.cited_keys if ref in refs]
     if any(ref not in refs for ref in output.cited_keys):
         result.notes.append("cited_unknown")

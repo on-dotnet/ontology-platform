@@ -1,4 +1,5 @@
 import asyncio
+import re
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 from uuid import UUID, uuid4
@@ -22,7 +23,7 @@ from ontology_platform.modules.jobs.models import Job
 from ontology_platform.modules.jobs.runner import RetryableJobError
 from ontology_platform.modules.query import cursor, scan
 from ontology_platform.modules.query import service as query
-from ontology_platform.modules.query.schemas import ObjectTypeList
+from ontology_platform.modules.query.schemas import ObjectTypeList, PathRow
 from ontology_platform.settings import Settings
 from qa_support import (
     GatewayCall,
@@ -244,6 +245,92 @@ async def test_answer_preserves_facts_and_maps_citations(qa_demo: QaDemo, case: 
         )
     purposes = ["qa.plan"] if case == "samples-off" else ["qa.plan", "qa.answer"]
     assert [c.purpose for c in qa_demo.gateway.calls] == purposes
+
+
+def _name(row: PathRow) -> str:
+    return " / ".join(k.value for k in row.source.key)
+
+
+async def test_the_conclusion_names_objects_instead_of_row_refs(qa_demo: QaDemo) -> None:
+    # #128: with a real model the conclusion called the objects K1, K2, which readers cannot
+    # follow; the platform puts the object names back.
+    answer = QaAnswerOut(
+        answer="检验不合格的钢卷有 K1 和 K2（K1、K2）。K1 有两次检验不合格（K3\u2013K4）。",
+        cited_keys=["K1", "K2"],
+        counterpoints=["K1 有两次检验都不合格（见 K3）。"],
+    )
+    result = await qa_demo.run("Q2", answer=answer)
+    assert result.answer is not None
+    assert result.evidence is not None
+    first, second = (_name(row) for row in result.evidence.rows)
+    assert result.answer.text == (
+        f"检验不合格的钢卷有 {first} 和 {second}。{first} 有两次检验不合格。"
+    )
+    assert result.answer.counterpoints == [
+        f"{first} 有两次检验都不合格（见 {_name(result.evidence.tail[0])}）。"
+    ]
+    for text in [result.answer.text, *result.answer.counterpoints]:
+        assert not re.search(r"(?<![A-Za-z0-9])K\d+(?![A-Za-z0-9])", text)
+    assert result.answer.notes == []
+
+
+async def test_a_conclusion_with_an_unknown_row_ref_is_not_shown(qa_demo: QaDemo) -> None:
+    answer = QaAnswerOut(
+        answer="检验不合格的钢卷有 K1 和 K9。", cited_keys=["K1"], counterpoints=["K7 需要复查。"]
+    )
+    result = await qa_demo.run("Q2", answer=answer)
+    assert result.answer is not None
+    assert result.answer.text is None
+    assert result.answer.counterpoints == []
+    assert "answer_unavailable" in result.answer.notes
+    assert result.answer.facts.count == 2
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            "牌号 Q235B 的炉次共有 18 个。结果未提供具体炉次编号，无法逐一列出。",
+            "牌号 Q235B 的炉次共有 18 个。",
+        ),
+        ("结果中没有给出炉次的编号清单。", None),
+    ],
+)
+async def test_the_conclusion_does_not_deny_the_listed_objects(
+    qa_demo: QaDemo, text: str, expected: str | None
+) -> None:
+    # #128: the facts listed all 18 heats while the conclusion said it could not list them.
+    answer = QaAnswerOut(
+        answer=text, cited_keys=[], counterpoints=["无法列出每个炉次。", "炉次分属两个工厂。"]
+    )
+    result = await qa_demo.run("Q1", answer=answer)
+    assert result.answer is not None
+    assert len(result.answer.facts.objects) == result.answer.facts.count == 18
+    assert result.answer.text == expected
+    # A conclusion that says nothing else is not shown, like a failed answer call.
+    assert result.answer.counterpoints == (["炉次分属两个工厂。"] if expected else [])
+    assert ("answer_unavailable" in result.answer.notes) == (expected is None)
+
+
+async def test_a_truncated_list_may_say_it_is_not_complete(
+    qa_demo: QaDemo, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    heats = [f"H{i:07}" for i in range(60)]
+
+    async def large_page(session: AsyncSession, statement: SelectQuery) -> Rows:
+        rows = []
+        for key in heats:
+            values = {"heat_no": key, "steel_grade": "Q235B", "org_id": "ORG01", "site_id": "S1"}
+            rows.append(tuple(values[column.name] for column in statement.columns))
+        return Rows(tuple(rows), has_more=False)
+
+    monkeypatch.setattr(connectors, "select", large_page)
+    text = "共有 60 个炉次。结果只展示前 50 个，无法全部列出。"
+    result = await qa_demo.run(
+        "Q1", answer=QaAnswerOut(answer=text, cited_keys=[], counterpoints=[])
+    )
+    assert result.answer is not None
+    assert result.answer.text == text
 
 
 async def test_one_statement_budget_across_two_reads(
