@@ -141,10 +141,9 @@ def collect(source: ChangeSetSource, items: Sequence[DecidedItem]) -> MemoryDelt
             continue
         label = item.proposed_label_zh or item.proposed_label_en or ""
         proposed_name = _main_name(item.proposed_label_zh, item.proposed_label_en)
-        if not proposed_name:
-            continue
         if (
-            item.decision == "rejected"
+            proposed_name
+            and item.decision == "rejected"
             and item.reject_reason in (None, "out_of_scope", "incorrect")
             and item.match_kind is None
         ):
@@ -171,7 +170,8 @@ def collect(source: ChangeSetSource, items: Sequence[DecidedItem]) -> MemoryDelt
             )
             upserts[(entry.kind, kind, rejected_key)] = entry
         if (
-            item.decision == "accepted"
+            proposed_name
+            and item.decision == "accepted"
             and kind == "entity_type"
             and item.created_element_id is not None
             and item.final_label_zh is not None

@@ -97,6 +97,20 @@ def test_empty_names_and_into_do_not_create_memory() -> None:
     assert collect("ai_extraction", [into]).upserts == ()
 
 
+def test_empty_proposed_name_still_collects_kept_apart() -> None:
+    item = _item(
+        proposed_label_zh=" ",
+        final_label_zh="新炉次",
+        match_kind="possible",
+        match_decision="different",
+        match_other_label="钢卷",
+    )
+    delta = collect("ai_extraction", [item])
+    assert [(entry.kind, entry.key) for entry in delta.upserts] == [
+        ("kept_apart", "k:新炉次||钢卷")
+    ]
+
+
 def test_collect_same_key_keeps_last_item() -> None:
     first = _item(reject_reason="out_of_scope")
     last = _item(reject_reason="incorrect")
@@ -438,6 +452,82 @@ async def test_merge_collects_rename_and_kept_apart(client: AsyncClient, db: Asy
     ).all()
     assert {row.kind for row in rows} == {"renamed", "kept_apart"}
     assert next(row for row in rows if row.kind == "kept_apart").detail["otherLabel"] == "钢卷"
+
+
+async def test_merge_into_existing_does_not_rename_or_supersede(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    existing = element(ontology, "entity_type", "Converter", "转炉")
+    await add_elements(db, existing)
+    rejected = ReviewMemoryRow(
+        id=uuid4(),
+        ontology_id=ontology.id,
+        kind="rejected",
+        element_kind="entity_type",
+        key="t:转炉",
+        label="转炉",
+        detail={"reason": None, "labelEn": None, "domain": None, "range": None},
+        created_at=datetime.now(UTC),
+        hits=0,
+    )
+    db.add(rejected)
+    await db.commit()
+    change_set = await open_change_set(
+        db,
+        ontology,
+        [proposal("create", "entity_type", local_name="Bof", label_zh="钢水转炉")],
+    )
+    await sign_in(client, db, Role.REVIEWER)
+    item_id = (await change_set_items(client, change_set))[0]["id"]
+    item = await db.get(ChangeItem, UUID(item_id))
+    assert item is not None
+    item.match_kind = "possible"
+    item.match_decision = "same"
+    item.match_element_id = existing.id
+    await db.commit()
+    assert (await decide(client, change_set, [item_id], "accepted")).status_code == 200
+    assert (await merge(client, change_set)).status_code == 200
+    await db.refresh(rejected)
+    assert rejected.deleted_at is None
+    assert rejected.deleted_reason != "superseded"
+    rows = (
+        await db.scalars(select(ReviewMemoryRow).where(ReviewMemoryRow.ontology_id == ontology.id))
+    ).all()
+    assert rows == [rejected]
+
+
+async def test_update_rename_supersedes_rejected_memory(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    existing = element(ontology, "entity_type", "Converter", "旧转炉")
+    await add_elements(db, existing)
+    rejected = ReviewMemoryRow(
+        id=uuid4(),
+        ontology_id=ontology.id,
+        kind="rejected",
+        element_kind="entity_type",
+        key="t:新转炉",
+        label="新转炉",
+        detail={"reason": None, "labelEn": None, "domain": None, "range": None},
+        created_at=datetime.now(UTC),
+        hits=0,
+    )
+    db.add(rejected)
+    await db.commit()
+    change_set = await open_change_set(
+        db,
+        ontology,
+        [proposal("update", "entity_type", target=existing.id, label_zh="新转炉")],
+    )
+    await sign_in(client, db, Role.REVIEWER)
+    item_id = (await change_set_items(client, change_set))[0]["id"]
+    assert (await decide(client, change_set, [item_id], "accepted")).status_code == 200
+    assert (await merge(client, change_set)).status_code == 200
+    await db.refresh(rejected)
+    assert rejected.deleted_at is not None
+    assert rejected.deleted_reason == "superseded"
 
 
 async def test_merge_keeps_last_duplicate_and_evicts(

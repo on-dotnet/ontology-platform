@@ -72,6 +72,10 @@ async def test_memory_list_delete_restore_clear(client: AsyncClient, db: AsyncSe
         "review_memory.restored",
         "review_memory.cleared",
     }
+    assert all(event.ip == "127.0.0.1" for event in events)
+    for event in events:
+        if event.action in ("review_memory.deleted", "review_memory.restored"):
+            assert event.detail["ontologyId"] == str(ontology.id)
     cleared_event = next(event for event in events if event.action == "review_memory.cleared")
     assert cleared_event.detail["count"] == 2
     await db.refresh(row)
@@ -96,6 +100,20 @@ async def test_hits_ignore_deleted(client: AsyncClient, db: AsyncSession) -> Non
     await db.commit()
     await db.refresh(row)
     assert row.hits == 1
+
+
+async def test_review_memory_for_orders_by_created_at_then_id(db: AsyncSession) -> None:
+    ontology = await add_ontology(db)
+    rows = [await _entry(db, ontology.id, label) for label in ("甲", "乙", "丙", "丁")]
+    now = datetime.now(UTC)
+    rows[0].created_at = now - timedelta(days=2)
+    rows[1].created_at = now - timedelta(days=1)
+    rows[2].created_at = now - timedelta(days=1)
+    rows[3].created_at = now
+    await db.commit()
+    memory = await service.review_memory_for(db, ontology.id)
+    tied = sorted((rows[1].id, rows[2].id))
+    assert [entry.id for entry in memory.entries] == [rows[0].id, *tied, rows[3].id]
 
 
 async def test_memory_pagination_and_token(client: AsyncClient, db: AsyncSession) -> None:
