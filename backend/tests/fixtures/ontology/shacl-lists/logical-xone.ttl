@@ -1,0 +1,17 @@
+@prefix ex: <urn:synthetic:shacl-lists:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:ontology a owl:Ontology .
+ex:Item a owl:Class .
+ex:p a owl:DatatypeProperty .
+
+ex:LogicalXoneShape a sh:NodeShape ;
+    rdfs:label "Exclusive disjunction"@en ;
+    sh:targetClass ex:Item ;
+    sh:property [
+        sh:path ex:p ;
+        sh:xone ( [ sh:datatype xsd:string ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:boolean ] )
+    ] .

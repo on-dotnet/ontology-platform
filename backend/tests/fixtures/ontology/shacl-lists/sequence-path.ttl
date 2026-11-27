@@ -1,0 +1,17 @@
+@prefix ex: <urn:synthetic:shacl-lists:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+ex:ontology a owl:Ontology .
+ex:Item a owl:Class .
+ex:p a owl:ObjectProperty .
+ex:q a owl:ObjectProperty .
+
+ex:SequencePathShape a sh:NodeShape ;
+    rdfs:label "Sequence path"@en ;
+    sh:targetClass ex:Item ;
+    sh:property [
+        sh:path ( ex:p ex:q ) ;
+        sh:minCount 1
+    ] .
