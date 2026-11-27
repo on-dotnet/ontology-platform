@@ -7,6 +7,7 @@ between elements are IRIs here, never database ids.
 
 import hashlib
 import logging
+from collections import Counter, defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from functools import cached_property
@@ -15,7 +16,7 @@ from typing import Any
 import rdflib
 from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.compare import to_canonical_graph
-from rdflib.namespace import XSD
+from rdflib.namespace import OWL, RDF, RDFS, XSD
 from rdflib.term import Node
 
 # Keep literals exactly as written ("01"^^xsd:integer stays "01"): imports must not lose content.
@@ -23,6 +24,28 @@ rdflib.NORMALIZE_LITERALS = False
 
 Triple = tuple[Node, Node, Node]
 Term = URIRef | Literal
+
+_SET_LIST_PREDICATES = frozenset(
+    {
+        OWL.unionOf,
+        OWL.intersectionOf,
+        OWL.oneOf,
+        OWL.disjointUnionOf,
+        OWL.members,
+        OWL.distinctMembers,
+        OWL.hasKey,
+    }
+)
+_SYMMETRIC_PREDICATES = frozenset(
+    {
+        OWL.disjointWith,
+        OWL.equivalentClass,
+        OWL.equivalentProperty,
+        OWL.propertyDisjointWith,
+        OWL.sameAs,
+        OWL.differentFrom,
+    }
+)
 
 
 class _IllTypedLiterals(logging.Filter):
@@ -113,6 +136,42 @@ def canonical_key(triples: Iterable[Triple], *, exact: bool = False) -> str:
             graph.add(triple)
         lines = sorted(f"{s.n3()} {p.n3()} {o.n3()}" for s, p, o in to_canonical_graph(graph))
     return hashlib.sha256("\n".join(lines).encode()).hexdigest()
+
+
+def _unordered_list_key(triples: tuple[Triple, ...], lists: list[Triple]) -> str | None:
+    """Compare each list as sibling cells, so canonical_key sorts their complete subtrees.
+
+    Each occurrence keeps its own cell, even when two members have the same value.
+    Inspect the original edges throughout, including when the lists are nested.
+    """
+    below: dict[Node, list[tuple[Node, Node]]] = defaultdict(list)
+    references: Counter[Node] = Counter()
+    for subject, predicate, value in triples:
+        if isinstance(subject, BNode):
+            below[subject].append((predicate, value))
+        if isinstance(value, BNode):
+            references[value] += 1
+
+    unordered = set(triples)
+    for subject, predicate, head in lists:
+        group = BNode()
+        unordered.remove((subject, predicate, head))
+        unordered.add((subject, predicate, group))
+        cell = head
+        while cell != RDF.nil:
+            # A reachable rest cycle also gives its entry cell a second incoming edge.
+            if not isinstance(cell, BNode) or references[cell] != 1:
+                return None
+            pairs = below[cell]
+            arcs = dict(pairs)
+            if len(pairs) != 2 or RDF.first not in arcs or RDF.rest not in arcs:
+                return None
+            tail = arcs[RDF.rest]
+            unordered.remove((cell, RDF.rest, tail))
+            unordered.add((group, RDFS.member, cell))
+            cell = tail
+    # A malformed input graph could literally contain the sibling representation.
+    return "unordered:" + canonical_key(unordered)
 
 
 def term_json(term: Term) -> dict[str, Any]:
@@ -239,6 +298,21 @@ class AxiomState:
 
     @cached_property
     def key(self) -> str:
+        if len(self.triples) == 1:
+            subject, predicate, value = self.triples[0]
+            if (
+                predicate in _SYMMETRIC_PREDICATES
+                and isinstance(subject, URIRef)
+                and isinstance(value, URIRef)
+                and str(subject) > str(value)
+            ):
+                return canonical_key(((value, predicate, subject),))
+        else:
+            lists = [t for t in self.triples if t[1] in _SET_LIST_PREDICATES and t[2] != RDF.nil]
+            if lists:
+                key = _unordered_list_key(self.triples, lists)
+                if key is not None:
+                    return key
         return canonical_key(self.triples)
 
     @cached_property
