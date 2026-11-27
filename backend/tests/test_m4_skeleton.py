@@ -278,7 +278,6 @@ async def test_batch_4_metric_list(
     )
 
 
-@pytest.mark.xfail(strict=True, reason="Batch 5a: submitting a question queues it for the asker")
 async def test_batch_5a_queue_question(
     app: FastAPI,
     client: AsyncClient,
