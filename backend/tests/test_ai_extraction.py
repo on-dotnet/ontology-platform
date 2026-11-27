@@ -31,6 +31,7 @@ from ontology_platform.modules.ai.extraction import (
     sentences_of,
 )
 from ontology_platform.modules.ai.gateway import InputFile
+from ontology_platform.modules.ai.memory_prompts import MEMORY_RELATIONS_RULES, MEMORY_TYPES_RULES
 from ontology_platform.modules.ai.prompts import (
     RECORD_RULE,
     RELATIONS_INSTRUCTIONS,
@@ -2044,7 +2045,13 @@ def test_kinds_of_a_thing_told_apart_by_purpose_or_position_are_one_type() -> No
 
 def test_the_prompts_give_examples_in_generic_words_only() -> None:
     cjk = re.compile(r"[一-鿿]")
-    for prompt in (TYPES_INSTRUCTIONS, RESOLVE_INSTRUCTIONS, RELATIONS_INSTRUCTIONS):
+    for prompt in (
+        TYPES_INSTRUCTIONS,
+        RESOLVE_INSTRUCTIONS,
+        RELATIONS_INSTRUCTIONS,
+        MEMORY_TYPES_RULES,
+        MEMORY_RELATIONS_RULES,
+    ):
         assert not cjk.search(prompt)
 
 
