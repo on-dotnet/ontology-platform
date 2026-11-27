@@ -1,5 +1,6 @@
 """R2RML downloads from published bindings (spec 003, section 10)."""
 
+from typing import Any
 from uuid import uuid4
 
 from httpx import AsyncClient
@@ -182,7 +183,7 @@ async def test_property_datatype_and_untyped_property(
     [heat] = graph.subjects(RDF.type, RR.TriplesMap)
     typed = _object_map(graph, heat, URIRef(s.ontology.base_iri + "weight"))
     assert list(graph.objects(typed, RR.datatype)) == [XSD.decimal]
-    untyped_snapshot = [
+    untyped_snapshot: list[dict[str, Any]] = [
         {"kind": "entity_type", "id": "type", "iri": "https://vocab.example/Heat"},
         {"kind": "property", "id": "prop", "iri": "https://vocab.example/remark", "datatype": None},
         {"kind": "type_binding", "id": "map", "subjectId": "type", "binding": table(s.mes)},
