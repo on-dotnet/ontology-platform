@@ -47,9 +47,11 @@ import {
   type ItemMatch,
   type ItemPatch,
   type MergeResult,
+  type RejectReason,
 } from './api';
 import { BINDING_KINDS, bindingSentence, CatalogEvidenceList, isBindingKind } from './binding-item';
-import { ChangeItemCard } from './change-item-card';
+import { ChangeItemCard, RejectSplitButton } from './change-item-card';
+import { SuppressedNotice } from './suppressed-notice';
 import { ChangeItemEditDialog } from './change-item-edit-dialog';
 import { buildRefContext, itemLabel, type RefContext } from './item-fields';
 import { DocumentName, SourceBadge, SubmitterName } from './review-list-page';
@@ -216,6 +218,14 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
       await Promise.all([refreshDetail(), markListStale()]);
     },
   });
+  const bulkReject = useMutation({
+    mutationFn: ({ itemIds, reason }: { itemIds: string[]; reason?: RejectReason }) => decideItems(changeSet.id, itemIds, 'rejected', reason),
+    onSuccess: async () => { await Promise.all([refreshDetail(), markListStale()]); },
+    onError: async (error) => {
+      toast.error(t('review.decideFailed'), message(error instanceof PartialDecisionError ? error.reason : error));
+      if (error instanceof PartialDecisionError) await Promise.all([refreshDetail(), markListStale()]);
+    },
+  });
 
   const merge = useMutation({
     mutationFn: () => mergeChangeSet(changeSet.id, changeSet.resolutionToken),
@@ -254,6 +264,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                   {t(isAi ? 'review.acceptHighConfidence' : 'review.acceptAll', { count: bulkItems.length })}
                 </Button>
               ) : null}
+              {pendingCount > 0 ? <RejectSplitButton disabled={bulkReject.isPending} onReject={() => bulkReject.mutate({ itemIds: pending.map((item) => item.id) })}
+                onReason={(reason) => bulkReject.mutate({ itemIds: pending.map((item) => item.id), reason })} /> : null}
               {sameConceptItems.length > 0 ? (
                 <Button variant="secondary" disabled={bulk.isPending} onClick={() => setMergingSame(true)}>
                   <Combine aria-hidden />
@@ -311,6 +323,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
         {changeSet.source === 'mcp' ? <SubmitterName name={changeSet.createdByName} /> : null}
         <span className="tabular-nums">{t('review.countsSummary', { ...changeSet.counts })}</span>
       </div>
+
+      <SuppressedNotice items={changeSet.suppressed} total={changeSet.suppressedTotal} ontologyId={changeSet.ontologyId} />
 
       <div className="space-y-4">
         {mergeResult ? <MergeResultNotice result={mergeResult} items={changeSet.items} context={context} /> : null}
@@ -371,8 +385,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                       onSelect={() => setSelectedId((current) => (!wide && current === item.id ? null : item.id))}
                       evidencePanelId={wide ? undefined : evidencePanelId}
                       canDecide={canDecide}
-                      busy={busyItemId === item.id || bulk.isPending || merge.isPending}
-                      onDecide={(decision) => decide.mutate({ itemId: item.id, patch: { decision } })}
+                      busy={busyItemId === item.id || bulk.isPending || bulkReject.isPending || merge.isPending}
+                      onDecide={(decision, rejectReason) => decide.mutate({ itemId: item.id, patch: { decision, ...(rejectReason ? { rejectReason } : {}) } })}
                       onDecideMatch={(matchDecision) => decide.mutate({ itemId: item.id, patch: { matchDecision } })}
                       onEdit={() => setEditing(item)}
                       impactOntologyId={isOpen ? changeSet.ontologyId : undefined}

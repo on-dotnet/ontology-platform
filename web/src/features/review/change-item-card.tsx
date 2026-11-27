@@ -1,18 +1,19 @@
-import { ArrowRight, Check, Pencil, Quote, Waypoints, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Pencil, Quote, Waypoints, X } from 'lucide-react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip } from '@/components/ui/tooltip';
 import { DATATYPES } from '@/features/ontologies/api';
 import { AxiomBadge, AxiomFragment, ConstraintRules } from '@/features/ontology/element-content';
 import { cn } from '@/lib/cn';
 
-import { isAiSource, type ChangeItem, type ChangeSetSource, type Decision, type ElementFields, type MatchDecision } from './api';
+import { isAiSource, type ChangeItem, type ChangeSetSource, type Decision, type ElementFields, type MatchDecision, type RejectReason } from './api';
 import { BindingComparison, BindingNotices, bindingSentence, isBindingKind } from './binding-item';
-import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge } from './item-badges';
+import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge, RejectReasonBadge } from './item-badges';
 import { ItemImpact } from './item-impact';
 import { MatchNotice } from './match-notice';
 import { MetricItem } from './metric-item';
@@ -44,7 +45,7 @@ interface ChangeItemCardProps {
   /** Accept / reject / edit are offered (reviewer role, change set still open). */
   canDecide: boolean;
   busy: boolean;
-  onDecide: (decision: Decision) => void;
+  onDecide: (decision: Decision, rejectReason?: RejectReason) => void;
   /** The reviewer's conclusion on the item's alignment record; null clears it. */
   onDecideMatch: (decision: MatchDecision) => void;
   onEdit: () => void;
@@ -114,6 +115,7 @@ export function ChangeItemCard({
         <FlagTips flags={flags} />
         {item.edited ? <Badge tone="neutral">{t('review.edited')}</Badge> : null}
         {!canDecide ? <DecisionBadge decision={item.decision} /> : null}
+        {item.decision === 'rejected' && item.rejectReason ? <RejectReasonBadge reason={item.rejectReason} /> : null}
       </div>
 
       <h3
@@ -171,17 +173,7 @@ export function ChangeItemCard({
               <Check aria-hidden />
               {t('review.accept')}
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              aria-pressed={item.decision === 'rejected'}
-              disabled={busy}
-              onClick={() => toggle('rejected')}
-              className="aria-pressed:border-error/50 aria-pressed:bg-error-soft aria-pressed:text-error-strong"
-            >
-              <X aria-hidden />
-              {t('review.reject')}
-            </Button>
+            <RejectSplitButton disabled={busy} pressed={item.decision === 'rejected'} onReject={() => toggle('rejected')} onReason={(reason) => onDecide('rejected', reason)} />
             {isEditable(item, context) ? (
               <Tooltip content={t('review.editItem')}>
                 <Button variant="ghost" size="icon-sm" aria-label={t('review.editItemNamed', { name: label })} disabled={busy} onClick={onEdit}>
@@ -226,6 +218,35 @@ export function ChangeItemCard({
         </div>
       ) : null}
     </article>
+  );
+}
+
+const REJECT_REASONS: readonly RejectReason[] = ['out_of_scope', 'incorrect', 'duplicate', 'keep_open'];
+
+export function RejectSplitButton({ disabled, pressed, onReject, onReason }: {
+  disabled: boolean;
+  pressed?: boolean;
+  onReject: () => void;
+  onReason: (reason: RejectReason) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="inline-flex items-center">
+      <Button variant="secondary" size="sm" aria-pressed={pressed} disabled={disabled} onClick={onReject}
+        className="rounded-r-none aria-pressed:border-error/50 aria-pressed:bg-error-soft aria-pressed:text-error-strong">
+        <X aria-hidden />{t('review.reject')}
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger aria-label={t('review.rejectWithReason')} disabled={disabled} className="inline-flex h-8 items-center rounded-r-lg border border-l-0 border-border bg-card px-2 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring">
+          <ChevronDown aria-hidden />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {REJECT_REASONS.map((reason) => (
+            <DropdownMenuItem key={reason} onClick={() => onReason(reason)}>{t(`review.rejectReasons.${reason}`)}</DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 

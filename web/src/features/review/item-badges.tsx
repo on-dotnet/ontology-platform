@@ -6,7 +6,12 @@ import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Tooltip } from '@/components/ui/tooltip';
 import { formatPercent } from '@/lib/format';
 
-import { confidenceTier, type ChangeOp, type ConfidenceTier, type Decision, type ItemFlag } from './api';
+import { confidenceTier, type ChangeOp, type ConfidenceTier, type Decision, type ItemFlag, type RejectReason } from './api';
+
+export function RejectReasonBadge({ reason }: { reason: RejectReason }) {
+  const { t } = useTranslation();
+  return <Badge tone="neutral">{t(`review.rejectReasons.${reason}`)}</Badge>;
+}
 
 /** "✦ AI 建议" in the AI color (ui-guidelines §7). */
 export function AiSuggestionBadge() {
