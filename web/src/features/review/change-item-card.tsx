@@ -173,7 +173,7 @@ export function ChangeItemCard({
               <Check aria-hidden />
               {t('review.accept')}
             </Button>
-            <RejectSplitButton disabled={busy} pressed={item.decision === 'rejected'} onReject={() => toggle('rejected')} onReason={(reason) => onDecide('rejected', reason)} />
+            <RejectSplitButton name={label} disabled={busy} pressed={item.decision === 'rejected'} onReject={() => toggle('rejected')} onReason={(reason) => onDecide('rejected', reason)} />
             {isEditable(item, context) ? (
               <Tooltip content={t('review.editItem')}>
                 <Button variant="ghost" size="icon-sm" aria-label={t('review.editItemNamed', { name: label })} disabled={busy} onClick={onEdit}>
@@ -223,9 +223,11 @@ export function ChangeItemCard({
 
 const REJECT_REASONS: readonly RejectReason[] = ['out_of_scope', 'incorrect', 'duplicate', 'keep_open'];
 
-export function RejectSplitButton({ disabled, pressed, onReject, onReason }: {
+export function RejectSplitButton({ disabled, pressed, name, count, onReject, onReason }: {
   disabled: boolean;
   pressed?: boolean;
+  name?: string;
+  count?: number;
   onReject: () => void;
   onReason: (reason: RejectReason) => void;
 }) {
@@ -234,10 +236,10 @@ export function RejectSplitButton({ disabled, pressed, onReject, onReason }: {
     <div className="inline-flex items-center">
       <Button variant="secondary" size="sm" aria-pressed={pressed} disabled={disabled} onClick={onReject}
         className="rounded-r-none aria-pressed:border-error/50 aria-pressed:bg-error-soft aria-pressed:text-error-strong">
-        <X aria-hidden />{t('review.reject')}
+        <X aria-hidden />{count === undefined ? t('review.reject') : t('review.rejectAllPending', { count })}
       </Button>
       <DropdownMenu>
-        <DropdownMenuTrigger aria-label={t('review.rejectWithReason')} disabled={disabled} className="inline-flex h-8 items-center rounded-r-lg border border-l-0 border-border bg-card px-2 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring">
+        <DropdownMenuTrigger aria-label={name ? t('review.rejectWithReasonNamed', { name }) : t('review.rejectWithReason')} disabled={disabled} className="inline-flex h-8 items-center rounded-r-lg border border-l-0 border-border bg-card px-2 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring">
           <ChevronDown aria-hidden />
         </DropdownMenuTrigger>
         <DropdownMenuContent>

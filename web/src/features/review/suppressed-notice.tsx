@@ -20,8 +20,12 @@ export function SuppressedNotice({ items, total, ontologyId }: { items: Suppress
       {open ? <ul className="mt-2 space-y-2">
         {items.map((item, index) => {
           const name = (i18n.resolvedLanguage ?? i18n.language).startsWith('zh') ? item.labelZh ?? item.labelEn : item.labelEn ?? item.labelZh;
+          const q = item.cause === 'depends_on_suppressed' ? item.dependsOn : name;
           return <li key={`${item.memoryEntryId ?? item.kind}-${index}`}>
-            <Link to="/review/memory" search={{ ontology: ontologyId, ...(item.memoryEntryId ? { q: name ?? '', entry: item.memoryEntryId } : {}) }}
+            <Link to="/review/memory" search={{ ontology: ontologyId, ...(item.memoryEntryId ? {
+              ...(q ? { q } : {}),
+              entry: item.memoryEntryId,
+            } : {}) }}
               className="rounded text-info-strong hover:underline">
               {name ?? t('review.unknownItem')}
             </Link>

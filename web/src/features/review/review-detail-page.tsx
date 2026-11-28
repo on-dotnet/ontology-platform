@@ -146,6 +146,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const canReview = permissions.canReview && !blockedAsSubmitter;
   const [withdrawing, setWithdrawing] = useState(false);
   const [mergingSame, setMergingSame] = useState(false);
+  const [rejectReason, setRejectReason] = useState<RejectReason | null | undefined>(undefined);
   const pendingHintId = useId();
   const wide = useMediaQuery(DESKTOP_QUERY);
   const evidencePanelId = useId();
@@ -183,6 +184,11 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const isAi = isAiSource(changeSet.source);
   const pending = changeSet.items.filter((item) => item.decision === 'pending');
   const pendingCount = pending.length;
+  useEffect(() => {
+    if (pendingCount !== 0 || rejectReason === undefined) return;
+    const timeout = window.setTimeout(() => setRejectReason(undefined), 0);
+    return () => window.clearTimeout(timeout);
+  }, [pendingCount, rejectReason]);
   // AI proposals are bulk-accepted only when confident; imports and manual edits as a whole.
   const bulkItems = acceptsAll(changeSet.source) ? pending : isAi ? highConfidencePending(changeSet.items) : [];
   // Items recorded as concepts already there are accepted on their own, after a list (spec 004, 5.4).
@@ -220,7 +226,11 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   });
   const bulkReject = useMutation({
     mutationFn: ({ itemIds, reason }: { itemIds: string[]; reason?: RejectReason }) => decideItems(changeSet.id, itemIds, 'rejected', reason),
-    onSuccess: async () => { await Promise.all([refreshDetail(), markListStale()]); },
+    onSuccess: async (_, { itemIds }) => {
+      setRejectReason(undefined);
+      toast.success(t('review.bulkRejected', { count: itemIds.length }));
+      await Promise.all([refreshDetail(), markListStale()]);
+    },
     onError: async (error) => {
       toast.error(t('review.decideFailed'), message(error instanceof PartialDecisionError ? error.reason : error));
       if (error instanceof PartialDecisionError) await Promise.all([refreshDetail(), markListStale()]);
@@ -259,13 +269,13 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                 </span>
               ) : null}
               {bulkItems.length > 0 ? (
-                <Button variant="secondary" loading={bulk.isPending} onClick={() => bulk.mutate(bulkItems.map((item) => item.id))}>
+                <Button variant="secondary" loading={bulk.isPending} disabled={bulkReject.isPending} onClick={() => bulk.mutate(bulkItems.map((item) => item.id))}>
                   {bulk.isPending ? null : <CheckCheck aria-hidden />}
                   {t(isAi ? 'review.acceptHighConfidence' : 'review.acceptAll', { count: bulkItems.length })}
                 </Button>
               ) : null}
-              {pendingCount > 0 ? <RejectSplitButton disabled={bulkReject.isPending} onReject={() => bulkReject.mutate({ itemIds: pending.map((item) => item.id) })}
-                onReason={(reason) => bulkReject.mutate({ itemIds: pending.map((item) => item.id), reason })} /> : null}
+              {pendingCount > 0 ? <RejectSplitButton count={pendingCount} disabled={bulkReject.isPending || bulk.isPending}
+                onReject={() => setRejectReason(null)} onReason={setRejectReason} /> : null}
               {sameConceptItems.length > 0 ? (
                 <Button variant="secondary" disabled={bulk.isPending} onClick={() => setMergingSame(true)}>
                   <Combine aria-hidden />
@@ -406,6 +416,19 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
       {canDecide ? (
         <SameConceptDialog changeSet={changeSet} items={sameConceptItems} context={context} open={mergingSame && sameConceptItems.length > 0} onOpenChange={setMergingSame} />
       ) : null}
+
+      <Dialog open={canDecide && pendingCount > 0 && rejectReason !== undefined} onOpenChange={(open) => { if (!open) setRejectReason(undefined); }}>
+        <DialogContent closeLabel={t('common.close')}>
+          <DialogTitle>{t('review.rejectBulkTitle')}</DialogTitle>
+          <DialogDescription>{t('review.rejectBulkDescription', { count: pendingCount })}</DialogDescription>
+          <div className="mt-5 flex justify-end gap-2">
+            <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
+            <Button variant="destructive" loading={bulkReject.isPending} onClick={() => bulkReject.mutate({
+              itemIds: pending.map((item) => item.id), ...(rejectReason ? { reason: rejectReason } : {}),
+            })}>{t('review.rejectBulkConfirm', { count: pendingCount })}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {canWithdraw ? <WithdrawDialog changeSet={changeSet} open={withdrawing} onOpenChange={setWithdrawing} /> : null}
 

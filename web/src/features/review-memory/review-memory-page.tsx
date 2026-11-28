@@ -41,9 +41,9 @@ export function ReviewMemoryPage({ ontologyId, kind, q, entry, onSearchChange }:
   const { query, ontologies, selected } = useSelectedOntology(ontologyId);
   const canManage = usePermissions().canReview;
   const [searchText, setSearchText] = useState(q ?? '');
+  const searchInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    const timeout = window.setTimeout(() => setSearchText(q ?? ''), 0);
-    return () => window.clearTimeout(timeout);
+    if (document.activeElement !== searchInput.current) setSearchText(q ?? '');
   }, [q]);
   useEffect(() => {
     if (searchText === (q ?? '')) return;
@@ -56,13 +56,13 @@ export function ReviewMemoryPage({ ontologyId, kind, q, entry, onSearchChange }:
       {query.isPending ? <LoadingState /> : query.isError ? <ErrorState error={query.error} onRetry={() => void query.refetch()} />
         : <Card><EmptyState icon={Brain} title={t('noOntology')} /></Card>}
     </> : <MemoryContent key={selected.id} ontologyId={selected.id} ontologies={ontologies} kind={kind} q={q} entry={entry} searchText={searchText}
-        onSearchText={setSearchText} onSearchChange={onSearchChange} canManage={canManage} />}
+        onSearchText={setSearchText} searchInput={searchInput} onSearchChange={onSearchChange} canManage={canManage} />}
   </>;
 }
 
-function MemoryContent({ ontologyId, ontologies, kind, q, entry, searchText, onSearchText, onSearchChange, canManage }: {
+function MemoryContent({ ontologyId, ontologies, kind, q, entry, searchText, onSearchText, searchInput, onSearchChange, canManage }: {
   ontologyId: string; kind?: MemoryKind; q?: string; entry?: string; searchText: string;
-  onSearchText: (text: string) => void; onSearchChange: Props['onSearchChange']; canManage: boolean;
+  onSearchText: (text: string) => void; searchInput: React.RefObject<HTMLInputElement | null>; onSearchChange: Props['onSearchChange']; canManage: boolean;
   ontologies: readonly OntologySummary[];
 }) {
   const { t, i18n } = useTranslation('translation', { keyPrefix: 'reviewMemory' });
@@ -74,7 +74,7 @@ function MemoryContent({ ontologyId, ontologies, kind, q, entry, searchText, onS
   const pages = query.data?.pages ?? [];
   const total = pages[0]?.total ?? 0;
   const max = pages[0]?.max ?? 0;
-  const items = pages.flatMap((page) => page.items);
+  const items = pages.flatMap((page) => page.items).filter((item, index, all) => all.findIndex((other) => other.id === item.id) === index);
   const [confirmClear, onConfirmClear] = useState(false);
   const highlighted = useRef<HTMLTableRowElement>(null);
   useEffect(() => highlighted.current?.scrollIntoView?.({ block: 'nearest' }), [entry, items.length]);
@@ -91,7 +91,12 @@ function MemoryContent({ ontologyId, ontologies, kind, q, entry, searchText, onS
       await refresh();
       toast.success(t('deleted'), undefined, { label: t('undo'), onClick: () => window.setTimeout(() => restore.mutate(id), 0) });
     },
-    onError: (error) => toast.error(isForbidden(error) ? t('forbiddenAction') : t('deleteFailed'), message(error)),
+    onError: (error) => {
+      if (isApiError(error) && error.status === 404) {
+        void refresh();
+        toast.error(t('notFound'));
+      } else toast.error(isForbidden(error) ? t('forbiddenAction') : t('deleteFailed'), message(error));
+    },
   });
   const clear = useMutation({
     mutationFn: () => clearMemory(ontologyId),
@@ -102,7 +107,7 @@ function MemoryContent({ ontologyId, ontologies, kind, q, entry, searchText, onS
   return <>
     <PageHeader title={t('title')} actions={<div className="flex items-center gap-3">
       <OntologySelector ontologies={ontologies} value={ontologyId}
-        onValueChange={(ontology) => onSearchChange({ ontology, kind: undefined, q: undefined, entry: undefined })} />
+        onValueChange={(ontology) => { onSearchText(''); onSearchChange({ ontology, kind: undefined, q: undefined, entry: undefined }); }} />
       {canManage ? <Button variant="destructive" disabled={total === 0} onClick={() => onConfirmClear(true)}>{t('clear')}</Button> : null}
     </div>} />
     <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
@@ -116,7 +121,7 @@ function MemoryContent({ ontologyId, ontologies, kind, q, entry, searchText, onS
         </NativeSelect>
       </label>
       <label className="text-sm text-muted-foreground">{t('search')}
-        <Input value={searchText} maxLength={100} onChange={(event) => onSearchText(event.target.value)} className="mt-1 w-64" />
+        <Input ref={searchInput} value={searchText} maxLength={100} onChange={(event) => onSearchText(event.target.value)} className="mt-1 w-64" />
       </label>
     </div>
     {query.isPending ? <LoadingState /> : query.isError ? isForbidden(query.error) ? <ForbiddenState requiredRole="viewer" />
