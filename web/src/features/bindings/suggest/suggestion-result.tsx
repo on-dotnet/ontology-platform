@@ -11,7 +11,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { bindingKeys } from '@/features/bindings/api';
 import { ontologyKeys } from '@/features/ontologies/api';
 import { changeSetKeys } from '@/features/review/api';
-import { codeMessage, useErrorMessage } from '@/i18n/error-message';
+import { codeMessage, lookupText, useErrorMessage } from '@/i18n/error-message';
 
 type Suggestion = components['schemas']['BindingSuggestion'];
 const steps = ['catalog', 'match', 'columns', 'changeset'] as const satisfies readonly NonNullable<Suggestion['step']>[];
@@ -38,7 +38,7 @@ export function SuggestionResult({ initial, retryPending, onClose, onRetry }: Pr
     retry: false,
     refetchInterval: 2_000,
   });
-  const { status, step, proposed, dropped, changeSetId, errorCode, ontologyId } = poll.data;
+  const { status, step, proposed, dropped, droppedReasons, changeSetId, errorCode, ontologyId } = poll.data;
   useEffect(() => {
     if (status !== 'succeeded' || !changeSetId) return;
     void client.invalidateQueries({ queryKey: bindingKeys.all });
@@ -70,11 +70,28 @@ export function SuggestionResult({ initial, retryPending, onClose, onRetry }: Pr
     );
   }
   if (status === 'succeeded') {
+    const reasons = new Map<string, number>();
+    for (const [code, count] of Object.entries(droppedReasons ?? {})) {
+      const reasonKey = `bindings.suggest.reasons.${code}`;
+      const key = lookupText(i18n, reasonKey) ? reasonKey : 'bindings.suggest.reasons.other';
+      reasons.set(key, (reasons.get(key) ?? 0) + count);
+    }
     return (
       <>
         <div role="status" className="space-y-1">
           <p className="font-medium">{changeSetId ? t('bindings.suggest.proposed', { count: proposed }) : t('bindings.suggest.none')}</p>
-          {dropped > 0 && <p className="text-sm text-muted-foreground">{t('bindings.suggest.dropped', { count: dropped })}</p>}
+          {dropped > 0 && (
+            <div className="text-sm text-muted-foreground">
+              <p>{t('bindings.suggest.dropped', { count: dropped })}</p>
+              {reasons.size > 0 && (
+                <ul className="list-disc ps-5">
+                  {[...reasons].sort(([, leftCount], [, rightCount]) => rightCount - leftCount).map(([key, count]) => (
+                    <li key={key}>{t(key, { count })}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
         {changeSetId && (
           <div className="flex justify-end">

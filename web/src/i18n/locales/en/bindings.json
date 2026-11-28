@@ -33,6 +33,22 @@
     "proposed_other": "{{count}} binding suggestions are ready for review",
     "dropped_one": "{{count}} suggestion could not be used and was skipped",
     "dropped_other": "{{count}} suggestions could not be used and were skipped",
+    "reasons": {
+      "suggestion": {
+        "unknown_element": "{{count}} referred to ontology elements outside the candidate set",
+        "not_in_catalog": "{{count}} referred to a table or column missing from the catalog",
+        "repeated": "{{count}} exceeded the candidate limit for a single binding"
+      },
+      "binding": {
+        "invalid": "{{count}} did not meet the binding rules",
+        "duplicate": "{{count}} duplicated an existing binding or another suggestion",
+        "type_mismatch": "{{count}} matched a property to a column with an incompatible data type",
+        "cross_source": "{{count}} linked tables from different data sources",
+        "column_in_use": "{{count}} referred to a column already bound for that object type",
+        "dependency_dropped": "{{count}} depended on a binding suggestion that was skipped"
+      },
+      "other": "Other reasons ({{count}})"
+    },
     "none": "No usable binding suggestions were found",
     "failed": "AI binding suggestions are temporarily unavailable. Existing bindings are unaffected.",
     "manual": "Bind manually",

@@ -1768,6 +1768,10 @@ export interface components {
             proposed: number;
             /** Dropped */
             dropped: number;
+            /** Droppedreasons */
+            droppedReasons: {
+                [key: string]: number;
+            } | null;
             /** Samplessent */
             samplesSent: boolean;
             /** Errorcode */

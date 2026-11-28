@@ -105,6 +105,7 @@ class BindingSuggestion(Base):
     # Suggestions that became change items, and those left out by the checks.
     proposed: Mapped[int] = mapped_column(server_default="0", default=0)
     dropped: Mapped[int] = mapped_column(server_default="0", default=0)
+    dropped_reasons: Mapped[dict[str, int] | None] = mapped_column(JSONB(none_as_null=True))
     # Whether sample values were read and sent to the model for this request.
     samples_sent: Mapped[bool] = mapped_column(default=False, server_default=false())
     error_code: Mapped[str | None] = mapped_column(String(64))

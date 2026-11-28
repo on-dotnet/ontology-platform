@@ -97,6 +97,38 @@ def test_review_learning_migration_and_previous_orm(database_url: str) -> None:
         command.upgrade(config, "head")
 
 
+def test_binding_suggestion_dropped_reasons_migration(database_url: str) -> None:
+    config = alembic_config(database_url)
+    column = (
+        "SELECT data_type, is_nullable, column_default FROM information_schema.columns"
+        " WHERE table_schema = 'ai' AND table_name = 'binding_suggestions'"
+        " AND column_name = 'dropped_reasons'"
+    )
+    previous_insert = (
+        "INSERT INTO ai.binding_suggestions"
+        " (id, ontology_id, data_source_id, user_id, scope, status, dropped)"
+        " VALUES (%s, gen_random_uuid(), gen_random_uuid(), gen_random_uuid(),"
+        " '{}', 'succeeded', 2)"
+    )
+    existing_id, new_id = uuid4(), uuid4()
+    with psycopg.connect(libpq_dsn(database_url), autocommit=True) as conn:
+        command.downgrade(config, "0013")
+        try:
+            conn.execute(previous_insert, (existing_id,))
+            command.upgrade(config, "0014")
+            assert conn.execute(column).fetchone() == ("jsonb", "YES", None)
+            conn.execute(previous_insert, (new_id,))
+            assert conn.execute(
+                "SELECT count(*) FROM ai.binding_suggestions"
+                " WHERE id IN (%s, %s) AND dropped = 2 AND dropped_reasons IS NULL",
+                (existing_id, new_id),
+            ).fetchone() == (2,)
+            command.downgrade(config, "0013")
+            assert conn.execute(column).fetchone() is None
+        finally:
+            command.upgrade(config, "head")
+
+
 def include_name(name: str | None, type_: str, parent_names: object) -> bool:
     return type_ != "schema" or name in SCHEMAS
 
