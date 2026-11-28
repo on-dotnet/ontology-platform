@@ -103,7 +103,7 @@ type Impact = {
 // - create 不能带 iri（显式 IRI 只来自导入），否则 422 changeset.invalid_edit；
 // - 同一次保存里两项指向同一元素，或某项引用、修改的元素会被本次删除（含级联）一并删除，422 changeset.invalid_edit；
 // - 级联按本次修改之后的引用计算：用户在同一次保存里把引用改走的，不再清空或删除；
-// - allowCascade 默认 true。设为 false 时，级联若涉及请求未列出的元素，整次保存失败。
+// - allowCascade 默认 true。设为 false 时，级联若涉及请求未列出的元素，整次保存失败（409 changeset.cascade_changed）；级联只把字段合并进请求已列出的项时不算。
 // - 约束的规则被级联移除光后保留约束（空规则列表合法），不删除；
 // - 公理的 create、update、restore 都做三项校验；同一次保存里重复的公理按 422 axiom.invalid。
 

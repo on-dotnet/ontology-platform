@@ -2773,7 +2773,10 @@ export interface components {
              * @default false
              */
             apply: boolean;
-            /** Allowcascade */
+            /**
+             * Allowcascade
+             * @description Defaults to true. False refuses a save whose deletes take unlisted elements.
+             */
             allowCascade?: boolean;
         };
         /** EditResult */

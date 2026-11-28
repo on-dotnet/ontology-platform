@@ -759,8 +759,12 @@ class EditRequest(CamelModel):
     # Merge at once when the user may review their own changes (spec 002, section 6).
     apply: bool = False
     # Callers that list every dependency can reject the whole save if it affects another element.
-    # A factory keeps the flag optional in generated clients.
-    allow_cascade: bool = Field(default_factory=lambda: True)
+    # A factory, not `= True`: openapi-typescript makes a field with a schema default required,
+    # and existing callers omit this one.
+    allow_cascade: bool = Field(
+        default_factory=lambda: True,
+        description="Defaults to true. False refuses a save whose deletes take unlisted elements.",
+    )
 
 
 class EditResult(CamelModel):
