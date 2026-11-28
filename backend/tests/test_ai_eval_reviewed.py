@@ -67,6 +67,125 @@ def test_oracle_accepts_property_without_expected_list() -> None:
     assert reviewer.review([proposal], "a", None)[1][0].decision == "accepted"
 
 
+def _property_reviewer(domain: str, *groups: list[str]) -> OracleReviewer:
+    return OracleReviewer(
+        {
+            "entity_types": [{"names": [domain]}, {"names": ["其他类型"]}],
+            "relations": [],
+            "properties": [{"domain": domain, "names": names} for names in groups],
+        }
+    )
+
+
+def test_oracle_renames_contained_property_on_renamed_domain() -> None:
+    reviewer = _property_reviewer("订单行", ["公称厚度"])
+    order = create(
+        "entity_type", "new:Line", "订货明细", synonyms=[{"lang": "zh", "text": "订单行"}]
+    )
+    prop = create(
+        "property", "new:Thickness", "订货公称厚度", domainRef="new:Line", labelEn="Gauge"
+    )
+    accepted, (decision, owner) = reviewer.review([prop, order], "a", None)
+    assert accepted[0] == replace(prop, fields={**prop.fields, "labelZh": "公称厚度"})
+    assert (decision.decision, decision.reject_reason) == ("accepted", None)
+    assert (prop.fields["labelZh"], decision.proposed_label_zh, decision.final_label_zh) == (
+        "订货公称厚度",
+        "订货公称厚度",
+        "公称厚度",
+    )
+    assert accepted[1].fields["labelZh"] == owner.final_label_zh == "订单行"
+
+
+def test_oracle_rejects_similar_property_without_containment() -> None:
+    reviewer = _property_reviewer("订单行", ["公称厚度"])
+    order = create("entity_type", "new:Line", "订单行")
+    width = create("property", "new:Width", "公称宽度", domainRef="new:Line")
+    thickness = create("property", "new:Thickness", "订货公称厚度", domainRef="new:Line")
+    accepted, (_, wrong, right) = reviewer.review([order, width, thickness], "a", None)
+    assert (wrong.decision, wrong.reject_reason) == ("rejected", "incorrect")
+    assert [p.fields["labelZh"] for p in accepted] == ["订单行", "公称厚度"]
+    assert right.decision == "accepted"
+
+
+def test_oracle_keeps_highest_scoring_property_in_batch() -> None:
+    reviewer = _property_reviewer("镀锌卷", ["镀层", "镀层种类"])
+    coil = create("entity_type", "new:Coil", "镀锌卷")
+    quality = create("property", "new:Quality", "镀层质量", domainRef="new:Coil")
+    kind = create("property", "new:Kind", "实际镀层种类", domainRef="new:Coil")
+    accepted, (_, lower, higher) = reviewer.review([coil, quality, kind], "a", None)
+    assert (lower.decision, lower.reject_reason) == ("rejected", "duplicate")
+    assert (higher.decision, higher.final_label_zh) == ("accepted", "镀层")
+    assert accepted == [coil, replace(kind, fields={**kind.fields, "labelZh": "镀层"})]
+
+
+def test_oracle_rejects_near_property_already_in_version() -> None:
+    reviewer = _property_reviewer("订单行", ["公称厚度", "标准厚度"])
+    version = WorkingVersion()
+    order = create("entity_type", "new:Line", "订单行")
+    original = create("property", "new:Gauge", "公称厚度", domainRef="new:Line")
+    assert version.merge([order, original]) == []
+    owner = str(version.elements[0].id)
+    variant = create("property", "new:Thickness", "订货公称厚度", domainRef=owner)
+    exact = create("property", "new:Standard", "标准厚度", domainRef=owner)
+    accepted, (duplicate,) = reviewer.review([variant], "b", version)
+    assert accepted == []
+    assert (duplicate.decision, duplicate.reject_reason) == ("rejected", "duplicate")
+    accepted, (hit,) = reviewer.review([exact], "c", version)
+    assert accepted == [exact]
+    assert (hit.decision, hit.final_label_zh) == ("accepted", "标准厚度")
+
+
+@pytest.mark.parametrize("label", ["公称厚度", "规范厚度"], ids=["label", "synonym"])
+def test_oracle_prefers_exact_property_over_earlier_variant(label: str) -> None:
+    reviewer = _property_reviewer("订单行", ["公称厚度"])
+    order = create("entity_type", "new:Line", "订单行")
+    variant = create("property", "new:Variant", "订货公称厚度", domainRef="new:Line")
+    synonyms = [] if label == "公称厚度" else [{"lang": "zh", "text": "公称厚度"}]
+    exact = create("property", "new:Exact", label, domainRef="new:Line", synonyms=synonyms)
+    accepted, (_, duplicate, hit) = reviewer.review([order, variant, exact], "a", None)
+    assert accepted == [order, exact]
+    assert (duplicate.decision, duplicate.reject_reason) == ("rejected", "duplicate")
+    assert (hit.decision, hit.final_label_zh) == ("accepted", label)
+
+
+def test_oracle_requires_exact_match_for_one_character_property() -> None:
+    reviewer = _property_reviewer("库位", ["行"], ["行间距"])
+    location = create("entity_type", "new:Location", "库位")
+    row_no = create("property", "new:RowNo", "库位行号", domainRef="new:Location")
+    row = create("property", "new:Row", "行", domainRef="new:Location")
+    spacing = create("property", "new:Spacing", "库位行间距", domainRef="new:Location")
+    accepted, (_, miss, hit, renamed) = reviewer.review([location, row_no, row, spacing], "a", None)
+    assert (miss.decision, miss.reject_reason) == ("rejected", "incorrect")
+    assert (hit.decision, renamed.decision) == ("accepted", "accepted")
+    assert [p.fields["labelZh"] for p in accepted] == ["库位", "行", "行间距"]
+
+
+def test_oracle_scopes_near_property_and_existing_names_to_domain() -> None:
+    reviewer = _property_reviewer("订单行", ["公称厚度"])
+    version = WorkingVersion()
+    other = create("entity_type", "new:Other", "其他类型")
+    stored = create("property", "new:Stored", "公称厚度", domainRef="new:Other")
+    assert version.merge([other, stored]) == []
+    order = create("entity_type", "new:Line", "订单行")
+    wrong = create("property", "new:Wrong", "订货公称厚度", domainRef=str(version.elements[0].id))
+    right = create("property", "new:Right", "订货公称厚度", domainRef="new:Line")
+    accepted, (_, miss, hit) = reviewer.review([order, wrong, right], "b", version)
+    assert (miss.decision, miss.reject_reason) == ("rejected", "incorrect")
+    assert (hit.decision, hit.final_label_zh) == ("accepted", "公称厚度")
+    assert [p.temp_ref for p in accepted] == ["new:Line", "new:Right"]
+
+
+def test_oracle_breaks_property_score_ties_by_expected_then_proposal_order() -> None:
+    reviewer = _property_reviewer("订单行", ["成品标记总长度"], ["计划长度"], ["实测长度"])
+    order = create("entity_type", "new:Line", "订单行")
+    first = create("property", "new:First", "长 度", domainRef="new:Line")
+    second = create("property", "new:Second", "长度", domainRef="new:Line")
+    accepted, (_, hit, duplicate) = reviewer.review([order, first, second], "a", None)
+    assert (hit.decision, hit.final_label_zh) == ("accepted", "计划长度")
+    assert (duplicate.decision, duplicate.reject_reason) == ("rejected", "duplicate")
+    assert [p.temp_ref for p in accepted] == ["new:Line", "new:First"]
+
+
 def test_oracle_alignment_uses_expected_groups() -> None:
     reviewer = OracleReviewer(
         {

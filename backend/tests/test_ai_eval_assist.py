@@ -276,6 +276,35 @@ def test_property_edit_and_duplicate_require_the_expected_domain() -> None:
         assert metrics[key] == {"numerator": 1, "denominator": 2, "ratio": 0.5}
 
 
+def test_assist_scores_near_property_renames_and_duplicate_rejections() -> None:
+    expected = {
+        **EXPECTED,
+        "properties": [
+            {"domain": "Heat", "names": ["Number", "ID"]},
+            {"domain": "Heat", "names": ["Mass"]},
+        ],
+    }
+    proposals = [
+        create("entity_type", "new:Melt", "Melt"),
+        create("property", "new:Mass", "Batch number", domainRef="new:Melt"),
+        create("property", "new:LongID", "Sample batch number", domainRef="new:Melt"),
+        create("property", "new:Weight", "Batch mass", domainRef="new:Melt"),
+    ]
+    answers = [
+        _answer("a", 2, "edit", rename=schemas.AssistRename(label_en="Number")),
+        _answer("a", 3, "reject", risks=[_duplicate("ai", items=[item_id("a", 2)])]),
+        _answer("a", 4, "reject"),
+    ]
+    metrics = evaluation.assist_metrics(
+        [_step("a", proposals, answers, expected=expected)], expected
+    )
+    hit = {"numerator": 1, "denominator": 1, "ratio": 1.0}
+    assert metrics["editHit"] == hit
+    assert metrics["rejectRecall"] == hit
+    assert metrics["rejectPrecision"] == {"numerator": 1, "denominator": 2, "ratio": 0.5}
+    assert metrics["duplicatePrecision"] == hit
+
+
 def test_context_uses_stored_fields_sequence_evidence_and_open_match_targets() -> None:
     version = WorkingVersion()
     parent = KnownElement(UUID(int=10), "entity_type", "Parent", "Parent")
