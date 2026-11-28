@@ -937,21 +937,20 @@ class OracleReviewer(FlagReviewer):
     ) -> tuple[list[Proposal], list[DecidedItem]]:
         accepted: list[Proposal] = []
         decided: list[DecidedItem] = []
-        accepted_names: dict[str, str] = {}
         known = {str(e.id): e for e in version.elements} if version is not None else {}
-
-        def name(ref: str | None) -> str | None:
-            if not ref:
-                return None
-            if ref in accepted_names:
-                return accepted_names[ref]
-            element = known.get(ref)
-            return (element.label_zh or element.label_en or element.local_name) if element else None
-
+        review_labels = {
+            ref: e.label_zh or e.label_en or e.local_name
+            for ref, e in known.items()
+            if e.kind == "entity_type"
+        }
         groups = self.expected["entity_types"]
         group_of = {
             normalize(n): index for index, group in enumerate(groups) for n in group["names"]
         }
+
+        def expected_group(ref: str | None) -> int | None:
+            return group_of.get(normalize(review_labels.get(ref or "", "")))
+
         for seq, proposal in enumerate(proposals, start=1):
             fields = proposal.fields
             original_zh = fields.get("labelZh")
@@ -978,8 +977,8 @@ class OracleReviewer(FlagReviewer):
                         proposal, fields={**fields, "labelZh": groups[group]["names"][0]}
                     )
             elif proposal.op == "create" and proposal.kind == "relation_type":
-                domain = group_of.get(normalize(name(fields.get("domainRef")) or ""))
-                range_ = group_of.get(normalize(name(fields.get("rangeRef")) or ""))
+                domain = expected_group(fields.get("domainRef"))
+                range_ = expected_group(fields.get("rangeRef"))
                 wanted = {
                     frozenset((group_of[normalize(r["domain"])], group_of[normalize(r["range"])]))
                     for r in self.expected["relations"]
@@ -991,7 +990,7 @@ class OracleReviewer(FlagReviewer):
                 and proposal.kind == "property"
                 and "properties" in self.expected
             ):
-                domain = group_of.get(normalize(name(fields.get("domainRef")) or ""))
+                domain = expected_group(fields.get("domainRef"))
                 if not any(
                     domain == group_of[normalize(p["domain"])]
                     and _proposal_names(proposal) & {normalize(n) for n in p["names"]}
@@ -1001,7 +1000,7 @@ class OracleReviewer(FlagReviewer):
             if decision == "accepted":
                 accepted.append(final)
                 if final.temp_ref and final.kind == "entity_type":
-                    accepted_names[final.temp_ref] = (
+                    review_labels[final.temp_ref] = (
                         final.fields.get("labelZh") or final.fields.get("labelEn") or ""
                     )
             match = proposal.match
@@ -1012,8 +1011,8 @@ class OracleReviewer(FlagReviewer):
                     other_label = other.label_zh
                 elif match.item_id in self.items:
                     other_label = sorted(self.items[match.item_id])[0]
-                elif match.temp_ref in accepted_names:
-                    other_label = accepted_names[match.temp_ref]
+                elif match.temp_ref is not None:
+                    other_label = review_labels.get(match.temp_ref)
             decided.append(
                 DecidedItem(
                     item_id=item_id(label, seq),
@@ -1025,8 +1024,9 @@ class OracleReviewer(FlagReviewer):
                     proposed_label_en=original_en,
                     final_label_zh=final.fields.get("labelZh"),
                     final_label_en=final.fields.get("labelEn"),
-                    domain_label=name(fields.get("domainRef")),
-                    range_label=name(fields.get("rangeRef")),
+                    # Memory keys use the endpoints that the merge actually applied.
+                    domain_label=None,
+                    range_label=None,
                     created_element_id=None,
                     renamed_element_id=None,
                     match_kind=match.kind if match else None,
@@ -1087,7 +1087,9 @@ class _CaptureGateway:
             unique_terms: dict[str, str] = {}
             for term_batch in self.term_batches:
                 for name in term_batch:
-                    unique_terms.setdefault(normalize(name), name)
+                    key = normalize(name)
+                    if key:
+                        unique_terms.setdefault(key, name)
             terms = list(unique_terms.values())
             group = terms[
                 self.type_batch * TYPES_BATCH_TERMS : (self.type_batch + 1) * TYPES_BATCH_TERMS
@@ -1529,11 +1531,10 @@ async def run_case(
 
             def endpoint_names(
                 proposal: Proposal,
-                merged: UUID | None,
+                target: KnownElement | None,
                 elements: Mapping[str, KnownElement],
                 refs: Mapping[str, UUID | None],
             ) -> tuple[str | None, str | None]:
-                target = elements.get(str(merged)) if merged is not None else None
                 domain = (
                     str(target.domain_id)
                     if target and target.domain_id
@@ -1550,7 +1551,8 @@ async def run_case(
                 record = version.recorded[item_id(label, seq)]
                 made = record.merged_into
                 proposal = accepted[seq - 1]
-                domain_label, range_label = endpoint_names(proposal, made, by_id, applied_refs)
+                target = by_id.get(str(made)) if made is not None else None
+                domain_label, range_label = endpoint_names(proposal, target, by_id, applied_refs)
                 match_decision = (
                     cast(Literal["same", "different"] | None, decide(proposal, proposal.match))
                     if proposal.match is not None
@@ -1561,6 +1563,8 @@ async def run_case(
                         decided,
                         item_id=item_id(label, seq),
                         created_element_id=made if made not in old_ids else None,
+                        final_label_zh=target.label_zh if target else decided.final_label_zh,
+                        final_label_en=target.label_en if target else decided.final_label_en,
                         domain_label=domain_label,
                         range_label=range_label,
                         match_decision=match_decision,

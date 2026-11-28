@@ -5,10 +5,16 @@ import json
 from collections.abc import Sequence
 from dataclasses import replace
 from typing import Any, cast
+from unittest.mock import patch
+from uuid import UUID
 
 import pytest
 from pydantic import BaseModel
 
+import ontology_platform.modules.ai.eval as eval_module
+from ontology_platform.modules.ai import extraction
+from ontology_platform.modules.ai.candidates import THRESHOLD, Names
+from ontology_platform.modules.ai.candidates import score as candidate_score
 from ontology_platform.modules.ai.eval import (
     MemoryStep,
     OracleReviewer,
@@ -18,7 +24,7 @@ from ontology_platform.modules.ai.eval import (
     run_case,
     stable_id,
 )
-from ontology_platform.modules.ai.extraction import ProposedMatch
+from ontology_platform.modules.ai.extraction import TYPES_BATCH_TERMS, ProposedMatch, types_context
 from ontology_platform.modules.ai.gateway import InputFile
 from ontology_platform.modules.ai.replay import ReplayGateway
 from ontology_platform.modules.ontology.review_memory import (
@@ -84,8 +90,6 @@ def test_oracle_alignment_uses_expected_groups() -> None:
 
 
 def test_empty_memory_metrics_have_null_ratios() -> None:
-    from uuid import UUID
-
     result = memory_metrics([], ReviewMemory(UUID(int=0), ()), enabled=True)
     for key in (
         "reproposeModel",
@@ -258,38 +262,24 @@ async def test_renamed_name_is_reused_on_next_document() -> None:
     }
 
 
-def test_rejected_relation_uses_merged_renamed_domain() -> None:
-    reviewer = OracleReviewer({"entity_types": [{"names": ["炉次", "Heat"]}], "relations": []})
+@pytest.mark.parametrize("kind", ["relation_type", "property"])
+def test_oracle_reviews_dependents_against_expected_type_groups(kind: str) -> None:
+    reviewer = OracleReviewer({**EXPECTED, "properties": [{"names": ["炉号"], "domain": "炉次"}]})
     version = WorkingVersion()
-    accepted, _ = reviewer.review([create("entity_type", "new:Heat", "Heat")], "a", version)
-    version.merge(accepted, "a")
-    relation = create(
-        "relation_type",
-        "new:R",
-        "无效关系",
-        domainRef=str(version.elements[0].id),
-        rangeRef=str(version.elements[0].id),
-    )
-    _, decided = reviewer.review([relation], "b", version)
-    assert decided[0].domain_label == "炉次"
-    assert decided[0].range_label == "炉次"
-    assert collect("ai_extraction", decided).upserts[0].key == "r:炉次|无效关系|炉次"
-
-
-def test_rejected_type_leaves_dependent_relation_out_of_memory() -> None:
-    reviewer = OracleReviewer(EXPECTED)
-    proposals = [
-        create("entity_type", "new:Noise", "噪声"),
-        create("relation_type", "new:R", "无效关系", domainRef="new:Noise", rangeRef="new:Noise"),
-    ]
-    _, decided = reviewer.review(proposals, "a", WorkingVersion())
-    assert decided[1].domain_label is None
-    assert decided[1].range_label is None
+    version.merge([create("entity_type", "new:Known", "炉次")])
+    heat = create("entity_type", "new:Heat", "冶炼批次", synonyms=[{"lang": "en", "text": "Heat"}])
+    noise = create("entity_type", "new:Noise", "噪声")
+    # Only the accepted type belongs to an expected group. The range is an existing type.
+    fields = {"rangeRef": str(version.elements[0].id)} if kind == "relation_type" else {}
+    wanted = create(kind, "new:Wanted", "炉号", domainRef="new:Heat", **fields)
+    unwanted = create(kind, "new:Unwanted", "炉号", domainRef="new:Noise", **fields)
+    accepted, decided = reviewer.review([heat, noise, wanted, unwanted], "a", version)
+    assert [p.temp_ref for p in accepted] == ["new:Heat", "new:Wanted"]
+    assert [d.decision for d in decided] == ["accepted", "rejected", "accepted", "rejected"]
 
 
 def _entry(kind: str, key: str, label: str, other: str | None = None) -> MemoryEntry:
     from datetime import UTC, datetime
-    from uuid import UUID
 
     return MemoryEntry(
         id=UUID(int=1),
@@ -311,18 +301,16 @@ def _entry(kind: str, key: str, label: str, other: str | None = None) -> MemoryE
 
 
 def test_variant_repropose_counts_similar_new_type() -> None:
-    from uuid import UUID
-
     memory = ReviewMemory(UUID(int=0), (_entry("rejected", "t:钢包车", "钢包车"),))
     variant = create("entity_type", "new:V", "钢包车辆")
+    similarity = candidate_score(Names.of("钢包车辆", None, ()), Names.of("钢包车", None, ()))
+    assert similarity.value >= THRESHOLD
     step = MemoryStep(memory, (variant,), (variant,), ())
     result = memory_metrics([step], memory, enabled=True)
-    assert result["variantRepropose"]["numerator"] == 1
+    assert result["variantRepropose"] == {"numerator": 1, "denominator": 1, "ratio": 1.0}
 
 
 def test_kept_apart_violation_counts_marked_pair() -> None:
-    from uuid import UUID
-
     memory = ReviewMemory(
         UUID(int=0), (_entry("kept_apart", pair_key("炉次", "浇次"), "炉次", "浇次"),)
     )
@@ -331,7 +319,7 @@ def test_kept_apart_violation_counts_marked_pair() -> None:
     second = replace(second, match=ProposedMatch("possible", temp_ref="new:A"))
     step = MemoryStep(memory, (first, second), (first, second), ())
     result = memory_metrics([step], memory, enabled=True)
-    assert result["keptApartViolation"]["numerator"] == 1
+    assert result["keptApartViolation"] == {"numerator": 1, "denominator": 1, "ratio": 1.0}
 
 
 class ExistingTypeLinksModel(RepeatingModel):
@@ -406,24 +394,144 @@ async def test_repeated_link_to_existing_type_counts_model_reproposal(
     assert result["memory"]["reproposeReview"]["numerator"] == int(no_memory)
 
 
-async def test_rejected_type_dependent_link_is_not_collected() -> None:
-    class DependentModel(RepeatingModel):
-        async def structured[T: BaseModel](self, **call: Any) -> T:
-            if call["purpose"] == "extract.relations":
-                self.calls += 1
-                return cast(
-                    T,
-                    call["schema"].model_validate(
-                        {"relations": [_relation("new:Noise", "new:Noise")], "properties": []}
-                    ),
-                )
-            return await super().structured(**call)
+class DocumentModel(ModelStandIn):
+    """Return each document's scripted outputs at the same stages as the extractor."""
 
+    def __init__(self, replies: dict[str, dict[str, list[dict[str, Any]]]]) -> None:
+        super().__init__()
+        self.replies = {stable_id("document", path): reply for path, reply in replies.items()}
+
+    async def structured[T: BaseModel](
+        self, *, purpose: str, schema: type[T], document_id: UUID | None = None, **kwargs: Any
+    ) -> T:
+        assert document_id is not None
+        reply = self.replies[document_id]
+        fields = {
+            "extract.terms": ("terms",),
+            "extract.types": ("entity_types",),
+            "extract.resolve": ("decisions",),
+            "extract.relations": ("relations", "properties"),
+        }[purpose]
+        self.calls += 1
+        return schema.model_validate({key: reply.get(key, []) for key in fields})
+
+
+HEAT_AND_CAST = (
+    'entity_types = [{ names = ["浇次", "Cast"], core = true }, '
+    '{ names = ["炉次", "Heat"], core = true }]\n'
+    'relations = [{ domain = "炉次", range = "浇次", core = true }]\n'
+).encode()
+
+
+@pytest.mark.parametrize("same_document", [False, True])
+async def test_rejected_relation_uses_final_endpoint_name_in_run(same_document: bool) -> None:
+    files = {
+        "docs/a.md": "# 一\n\nHeat 包含 Heat。\n".encode(),
+        "docs/b.md": "# 二\n\n炉次包含炉次。\n".encode(),
+        "eval/expected.toml": HEAT_AND_CAST,
+    }
+    replies = {
+        "docs/a.md": {"entity_types": [_type("new:Heat", "Heat", "Heat")]},
+        "docs/b.md": {"relations": [_relation("E1", "E1")]},
+    }
+    if same_document:
+        replies["docs/a.md"]["relations"] = [_relation("new:Heat", "new:Heat")]
+    else:
+        files["docs/c.md"] = "# 三\n\n炉次包含炉次。\n".encode()
+        replies["docs/c.md"] = {"relations": [_relation("E1", "E1")]}
     result = await run_case(
-        REPEATED_FILES,
-        ReplayGateway({}, DependentModel()),
+        files,
+        ReplayGateway({}, DocumentModel(replies)),
         MODELS,
         ["sequential"],
         reviewed=True,
+        no_memory=True,
     )
+    assert [e["label_zh"] for e in result["elements"]] == ["炉次"]
+    assert result["proposals"] == 3
+    assert result["memory"]["reproposeModel"] == {"numerator": 1, "denominator": 1, "ratio": 1.0}
+
+
+async def test_type_stage_existing_short_id_counts_rename_reuse() -> None:
+    files = {
+        "docs/a.md": b"# Heat\n\nHeat is a type.\n",
+        "docs/b.md": "# 炉次\n\n炉次又称 Heat。\n".encode(),
+        "eval/expected.toml": HEAT_AND_CAST,
+    }
+    # The second label is still the old name. Only its reference can count as reuse.
+    model = DocumentModel(
+        {
+            "docs/a.md": {"entity_types": [_type("new:Heat", "Heat", "Heat")]},
+            "docs/b.md": {"entity_types": [_type("E1", "Heat", "Heat")]},
+        }
+    )
+    result = await run_case(files, ReplayGateway({}, model), MODELS, ["sequential"], reviewed=True)
+    assert result["memory"]["renameReuse"] == {"numerator": 1, "denominator": 1, "ratio": 1.0}
+
+
+async def test_capture_ignores_empty_normalized_term_at_batch_boundary() -> None:
+    names = [f"Type{i}" for i in range(TYPES_BATCH_TERMS + 1)]
+    terms: list[dict[str, Any]] = [
+        {"name": name, "english": None, "definition": None, "category": "entity", "quotes": []}
+        for name in ["   ", *names]
+    ]
+    files = {"docs/a.md": b"# Types\n\nSome terms.\n", "eval/expected.toml": HEAT_AND_CAST}
+    model = DocumentModel({"docs/a.md": {"terms": terms}})
+    with (
+        patch.object(extraction, "types_context", wraps=types_context) as extractor,
+        patch.object(eval_module, "types_context", wraps=types_context) as capture,
+    ):
+        await run_case(files, ReplayGateway({}, model), MODELS, ["sequential"], reviewed=True)
+    batches = [call.args[1] for call in extractor.call_args_list]
+    assert batches == [names[:-1], names[-1:]]
+    assert [call.args[1] for call in capture.call_args_list] == batches
+
+
+async def test_rejected_type_dependent_link_is_not_collected() -> None:
+    files = {"docs/a.md": "# 一\n\n噪声包含噪声。\n".encode(), "eval/expected.toml": HEAT_AND_CAST}
+    model = DocumentModel(
+        {
+            "docs/a.md": {
+                "entity_types": [_type("new:Noise", "噪声", "Noise")],
+                "relations": [_relation("new:Noise", "new:Noise")],
+            }
+        }
+    )
+    result = await run_case(files, ReplayGateway({}, model), MODELS, ["sequential"], reviewed=True)
+    assert result["literalShare"]["relations"] == 1.0
+    assert result["proposals"] == 2
+    assert result["merge"]["skipped"] == 0
+    assert result["elements"] == []
     assert result["memory"]["entries"] == 1
+
+
+async def test_accepted_type_merged_into_existing_uses_target_labels() -> None:
+    files = {
+        "docs/a.md": "# 一\n\n浇次又称 Cast。\n".encode(),
+        "docs/b.md": "# 二\n\nHeat 包含 Heat，资料又称它为浇次。\n".encode(),
+        "eval/expected.toml": HEAT_AND_CAST,
+    }
+    # Heat is renamed to 炉次 by its own group. Its synonym matches the first group for alignment.
+    model = DocumentModel(
+        {
+            "docs/a.md": {"entity_types": [_type("new:Cast", "浇次", "Cast")]},
+            "docs/b.md": {
+                "entity_types": [{**_type("new:Heat", "Heat", "Heat"), "synonyms": ["浇次"]}],
+                "decisions": [{"type": "T1", "candidate": "C1", "verdict": "unsure", "reason": ""}],
+                "relations": [_relation("new:Heat", "new:Heat")],
+            },
+        }
+    )
+    # Merging into an existing element creates no renamed entry. Inspect the input to collection.
+    with patch.object(eval_module, "collect", wraps=collect) as collected:
+        result = await run_case(
+            files, ReplayGateway({}, model), MODELS, ["sequential"], reviewed=True
+        )
+    (target,) = result["elements"]
+    assert (target["label_zh"], target["label_en"]) == ("浇次", "Cast")
+    assert "炉次" in target["synonyms"]
+    item, link = collected.call_args_list[1].args[1]
+    assert (item.op, item.decision, item.match_decision) == ("create", "accepted", "same")
+    assert item.proposed_label_zh == "Heat"
+    assert (item.final_label_zh, item.final_label_en) == (target["label_zh"], target["label_en"])
+    assert (link.decision, link.domain_label, link.range_label) == ("rejected", "浇次", "浇次")
