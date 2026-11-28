@@ -18,7 +18,7 @@
                     带参数时只运行 pytest <参数>（单进程），如 test-api tests/test_ai_pipeline.py -x
   test-web          前端检查：eslint、tsc、vitest
   test              同时运行 test-api、test-web，日志在 .verification/test/
-  e2e               端到端冒烟测试：起一套临时的 postgres、api、web（容器与网络都以 op-tmp-e2e- 开头，
+  e2e               端到端冒烟测试：起一套临时的 postgres、api、worker、web（容器与网络都以 op-tmp-e2e- 开头，
                     库在 tmpfs，不碰开发栈），用 web/e2e/e2e.env 的测试账号跑 Playwright（Chromium），
                     跑完全部删除；失败时截图与 trace 存 .verification/e2e/
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
@@ -273,7 +273,7 @@ function Read-E2eFixture {
     return $values
 }
 
-# End-to-end smoke tests (web/e2e). Postgres, api and web run as op-tmp-e2e-* containers on a
+# End-to-end smoke tests (web/e2e). Postgres, api, worker and web run as op-tmp-e2e-* containers on a
 # network of their own, with the database and documents in tmpfs, so nothing touches the dev stack
 # and nothing is left behind. No port is published: the Playwright container joins that network.
 function Invoke-E2e {
@@ -300,6 +300,7 @@ function Invoke-E2e {
     $prefix = New-TempName 'e2e'
     $db = "$prefix-db"
     $api = "$prefix-api"
+    $worker = "$prefix-worker"
     $web = "$prefix-web"
     $runner = "$prefix-run"
     $out = Join-Path $Root '.verification/e2e'
@@ -310,7 +311,7 @@ function Invoke-E2e {
     $previousConsole = [Console]::OutputEncoding
     try {
         try { [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false) } catch { }
-        Write-Step "启动临时环境 $prefix（postgres、api、web；库在 tmpfs，跑完删除）"
+        Write-Step "启动临时环境 $prefix（postgres、api、worker、web；库在 tmpfs，跑完删除）"
         docker network create $prefix | Out-Null
         if ($LASTEXITCODE -ne 0) { Stop-Dev "创建网络 $prefix 失败" }
         docker run -d --name $db --network $prefix --network-alias postgres --tmpfs /var/lib/postgresql `
@@ -324,6 +325,11 @@ function Invoke-E2e {
             -e OP_DOCUMENTS_DIR=/data/documents -e 'FORWARDED_ALLOW_IPS=*' "ontology/api:$ImageTag" | Out-Null
         $apiProbe = @('python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)")
         if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $api $apiProbe)) { Stop-Dev '临时 api 未就绪' }
+        # Jobs such as review.assist only run in the worker; started after the api has migrated the database.
+        docker run -d --name $worker --network $prefix --tmpfs /data/documents:mode=1777 `
+            -e OP_ENV=development -e "OP_DATABASE_URL=$databaseUrl" -e "OP_SECRET_KEY=$($fixture.E2E_SECRET_KEY)" `
+            -e OP_DOCUMENTS_DIR=/data/documents "ontology/api:$ImageTag" python -m ontology_platform.worker | Out-Null
+        if ($LASTEXITCODE -ne 0) { Stop-Dev '临时 worker 启动失败' }
         docker run -d --name $web --network $prefix --network-alias web "ontology/web:$ImageTag" | Out-Null
         if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $web @('wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:8080/healthz') 60)) { Stop-Dev '临时 web 未就绪' }
 
@@ -337,11 +343,12 @@ function Invoke-E2e {
             New-Item -ItemType Directory -Force -Path $out | Out-Null
             docker cp "${runner}:/app/test-results/artifacts" (Join-Path $out 'artifacts') *> $null
             docker logs --tail 200 $api *> (Join-Path $out 'api.log')
+            docker logs --tail 200 $worker *> (Join-Path $out 'worker.log')
         }
     } finally {
         try { [Console]::OutputEncoding = $previousConsole } catch { }
         # -v: only these containers' anonymous volumes (none while tmpfs covers the image VOLUMEs).
-        docker rm -f -v $runner $web $api $db *> $null
+        docker rm -f -v $runner $web $worker $api $db *> $null
         docker network rm $prefix *> $null
     }
     $counts = @($lines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -match '^\d+ (passed|failed|flaky|skipped|did not run|interrupted)\b' })
