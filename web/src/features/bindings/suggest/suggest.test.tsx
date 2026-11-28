@@ -201,21 +201,23 @@ describe('AI binding suggestions', () => {
     expect(api.calls('GET', pollPath)).toHaveLength(polls);
   });
 
-  it('lists dropped reasons in descending order of count', async () => {
-    const dialog = await openDroppedResult(3, { 'binding.type_mismatch': 1, 'suggestion.not_in_catalog': 2 });
-    expect(await dialog.findByText('有 3 项无法采用，已忽略')).toBeVisible();
+  it('lists dropped reasons in descending order of count, ties by code', async () => {
+    const dialog = await openDroppedResult(4, {
+      'binding.type_mismatch': 1, 'suggestion.not_in_catalog': 2, 'binding.duplicate': 1,
+    });
+    expect(await dialog.findByText('有 4 项无法采用，已忽略')).toBeVisible();
     expect(dialog.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
-      '有 2 项引用了目录里没有的表或列', '有 1 项的属性类型与列类型不匹配',
+      '有 2 项引用了目录里没有的表或列', '有 1 项与已有绑定或其他建议重复', '有 1 项的属性类型与列类型不匹配',
     ]);
   });
 
-  it('groups unknown dropped reasons without exposing their codes', async () => {
+  it('groups unknown dropped reasons last without exposing their codes', async () => {
     const dialog = await openDroppedResult(5, {
       'suggestion.not_in_catalog': 2, 'binding.future_rule': 1, 'suggestion.future_check': 2,
     });
     expect(await dialog.findByText('有 5 项无法采用，已忽略')).toBeVisible();
     expect(dialog.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
-      '其他原因（3 项）', '有 2 项引用了目录里没有的表或列',
+      '有 2 项引用了目录里没有的表或列', '其他原因（3 项）',
     ]);
     expect(dialog.getByRole('status')).not.toHaveTextContent(/binding\.future_rule|suggestion\.future_check/);
   });

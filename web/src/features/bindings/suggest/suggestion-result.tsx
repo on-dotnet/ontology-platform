@@ -70,12 +70,19 @@ export function SuggestionResult({ initial, retryPending, onClose, onRetry }: Pr
     );
   }
   if (status === 'succeeded') {
+    const otherKey = 'bindings.suggest.reasons.other';
     const reasons = new Map<string, number>();
     for (const [code, count] of Object.entries(droppedReasons ?? {})) {
       const reasonKey = `bindings.suggest.reasons.${code}`;
-      const key = lookupText(i18n, reasonKey) ? reasonKey : 'bindings.suggest.reasons.other';
+      const key = lookupText(i18n, reasonKey) ? reasonKey : otherKey;
       reasons.set(key, (reasons.get(key) ?? 0) + count);
     }
+    // Most frequent first; ties by code so the order does not depend on jsonb key order. The
+    // catch-all says the least, so it always comes last.
+    const reasonRows = [...reasons].sort(([leftKey, leftCount], [rightKey, rightCount]) =>
+      Number(leftKey === otherKey) - Number(rightKey === otherKey)
+      || rightCount - leftCount
+      || leftKey.localeCompare(rightKey));
     return (
       <>
         <div role="status" className="space-y-1">
@@ -83,9 +90,9 @@ export function SuggestionResult({ initial, retryPending, onClose, onRetry }: Pr
           {dropped > 0 && (
             <div className="text-sm text-muted-foreground">
               <p>{t('bindings.suggest.dropped', { count: dropped })}</p>
-              {reasons.size > 0 && (
+              {reasonRows.length > 0 && (
                 <ul className="list-disc ps-5">
-                  {[...reasons].sort(([, leftCount], [, rightCount]) => rightCount - leftCount).map(([key, count]) => (
+                  {reasonRows.map(([key, count]) => (
                     <li key={key}>{t(key, { count })}</li>
                   ))}
                 </ul>

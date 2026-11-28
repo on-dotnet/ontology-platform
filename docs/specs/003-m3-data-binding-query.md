@@ -319,7 +319,7 @@
 
 **校验与证据**：
 - 模型给的 id、表、列必须在本体和目录缓存里真实存在，否则丢弃；同一元素只取第一个通过校验的建议；丢弃的条数记在请求上，界面提示"有 N 项无法采用，已忽略"，有原因明细时按条数从多到少列出各原因。
-- 说明（经主会话同意补充）：同一位置（同一元素的同种绑定，属性在同一类型绑定下，关系在同一对两端之间）的建议按模型给出的顺序作为候选，每个位置最多试 3 个，取第一个通过绑定规则的，其余记 `binding.duplicate`；类型的表在匹配属性与关系之前先这样定下。ai 一侧丢弃时的原因码有三个：`suggestion.unknown_element`（id 不在给模型看的候选里）、`suggestion.not_in_catalog`（表、列或连接在目录缓存里没有）、`suggestion.repeated`（同一位置超过 3 个候选）。绑定规则丢弃的用 `binding.*`，因依赖项被丢弃而丢弃的用 `binding.dependency_dropped`。各原因的条数记在审计 `binding.suggestion_finished` 里。
+- 说明（经主会话同意补充）：同一位置（同一元素的同种绑定，属性在同一类型绑定下，关系在同一对两端之间）的建议按模型给出的顺序作为候选，每个位置最多试 3 个，取第一个通过绑定规则的，其余记 `binding.duplicate`；类型的表在匹配属性与关系之前先这样定下。ai 一侧丢弃时的原因码有三个：`suggestion.unknown_element`（id 不在给模型看的候选里）、`suggestion.not_in_catalog`（表、列或连接在目录缓存里没有）、`suggestion.repeated`（同一位置超过 3 个候选）。绑定规则丢弃的用 `binding.*`，因依赖项被丢弃而丢弃的用 `binding.dependency_dropped`。各原因的条数记在审计 `binding.suggestion_finished` 里，同时记在请求的 `dropped_reasons` 列（迁移 v0014，#77），接口字段为 `droppedReasons`。
 - 主键：表有主键时直接用表的主键，不采用模型另选的列；没有主键时（如视图）采用模型的建议并打上 `key_unverified`。
 - 类型族与属性的数据类型不相容的建议丢弃。
 - 工作版本中，同一类型下已绑定给属性的列不再建议给其他属性，模型返回的此类建议计入丢弃数（`binding.column_in_use`）。
