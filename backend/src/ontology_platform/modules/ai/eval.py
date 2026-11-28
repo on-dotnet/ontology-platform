@@ -3,7 +3,7 @@
 Reads a JSON bundle on stdin:
   {"files": {"docs/<name>": "<base64>", "eval/expected.toml": "<base64>"},
    "recordings": ["<text of a recording file>", ...], "manifest": "<models.json text>" | null,
-   "mode": "record" | "replay", "scenarios": ["sequential", "sameBaseline"]}
+   "mode": "record" | "replay", "scenarios": ["sequential", "sameBaseline"], "assist": false}
 Runs the model over every document in order and merges each change set with every item
 accepted, through the merge plan of the ontology module (spec 004, 5.2), so that later
 documents align with what earlier ones produced (the sequential scenario). The same-baseline
@@ -45,6 +45,7 @@ from uuid import UUID, uuid5
 
 from pydantic import BaseModel
 
+from ontology_platform.modules.ai import schemas
 from ontology_platform.modules.ai.candidates import THRESHOLD, Names, group_recall
 from ontology_platform.modules.ai.candidates import score as candidate_score
 from ontology_platform.modules.ai.extraction import (
@@ -79,8 +80,18 @@ from ontology_platform.modules.ai.replay import (
     load_recordings,
     write_json_line,
 )
+from ontology_platform.modules.ai.review_assist import context_elements_max, run_assist
 from ontology_platform.modules.documents.chunking import chunk_pages
 from ontology_platform.modules.documents.parsers import detect_type, parse_document
+from ontology_platform.modules.ontology import rules
+from ontology_platform.modules.ontology.models import ItemFlag
+from ontology_platform.modules.ontology.review_context import (
+    ElementBrief,
+    ReviewContext,
+    ReviewItem,
+    item_fingerprint,
+    related_name,
+)
 from ontology_platform.modules.ontology.review_memory import (
     DecidedItem,
     ReviewMemory,
@@ -160,6 +171,79 @@ class WorkingVersion:
         """The elements as an extraction sees them, object types with their parents."""
         return [replace(e, parent_id=self.parents.get(e.id)) for e in self.elements]
 
+    def plan_change_set(
+        self,
+        proposals: Sequence[Proposal],
+        label: str,
+        *,
+        decide: "Callable[[Proposal, ProposedMatch], str | None] | None" = None,
+        open_items: Mapping[UUID, RecordedItem] | None = None,
+    ) -> tuple[list[RecordedItem], list[PlanItem], dict[UUID, Resolution]]:
+        """Plan without applying. Open change sets use pending decisions and stored labels."""
+        ids = [item_id(label, seq) for seq in range(1, len(proposals) + 1)]
+        by_ref = {
+            proposal.temp_ref: ids[index]
+            for index, proposal in enumerate(proposals)
+            if proposal.op == "create" and proposal.temp_ref
+        }
+        change_set = stable_id("changeset", label)
+        fields = [to_item(p, _EVAL_DOCUMENT).proposed for p in proposals]
+        recorded: list[RecordedItem] = []
+        for seq, proposal in enumerate(proposals, start=1):
+            record = proposal.match
+            decision = decide(proposal, record) if decide is not None and record else None
+            other = None
+            if record is not None:
+                other = record.item_id or (by_ref.get(record.temp_ref) if record.temp_ref else None)
+            recorded.append(
+                RecordedItem(
+                    id=ids[seq - 1],
+                    change_set_id=change_set,
+                    match_kind=record.kind if record else None,
+                    match_element_id=record.element_id if record else None,
+                    match_item_id=other,
+                    match_decision=decision,
+                    label_zh=fields[seq - 1].label_zh
+                    if open_items is not None
+                    else proposal.fields.get("labelZh"),
+                    label_en=fields[seq - 1].label_en
+                    if open_items is not None
+                    else proposal.fields.get("labelEn"),
+                )
+            )
+        # The same resolution of records as the merge's (`ontology.service`), on plain data.
+        here = {item.id: item for item in recorded}
+        wanted = {item.match_item_id for item in recorded if item.match_item_id}
+        others = {**self.recorded, **open_items} if open_items else self.recorded
+        matches, matched_by = link_records(
+            recorded,
+            {key: here.get(key) or others[key] for key in wanted if key in here or key in others},
+            [item for item in self.recorded.values() if item.match_item_id in here],
+        )
+        items: list[PlanItem] = []
+        for seq, proposal in enumerate(proposals, start=1):
+            own = ids[seq - 1]
+            match = matches.get(own)
+            items.append(
+                PlanItem(
+                    id=own,
+                    seq=seq,
+                    op=proposal.op,
+                    kind=proposal.kind,
+                    decision="pending" if open_items is not None else "accepted",
+                    temp_ref=proposal.temp_ref,
+                    target_element_id=proposal.target_element_id,
+                    target_revision=proposal.target_revision,
+                    fields=fields[seq - 1],
+                    edited=False,
+                    match=match,
+                    match_decision=recorded[seq - 1].match_decision,
+                    matched_by=matched_by.get(own, ()),
+                )
+            )
+        plan = plan_merge(items, self._plan_elements(), base_iri=BASE_IRI)
+        return recorded, items, plan
+
     def merge(
         self,
         proposals: Sequence[Proposal],
@@ -173,71 +257,10 @@ class WorkingVersion:
         """
         self._merges += 1
         label = label if label is not None else f"#{self._merges}"
-        ids = [item_id(label, seq) for seq in range(1, len(proposals) + 1)]
-        by_ref = {
-            proposal.temp_ref: ids[index]
-            for index, proposal in enumerate(proposals)
-            if proposal.op == "create" and proposal.temp_ref
-        }
-        change_set = stable_id("changeset", label)
-        decisions: list[str | None] = []
-        recorded: list[RecordedItem] = []
-        for seq, proposal in enumerate(proposals, start=1):
-            record = proposal.match
-            decision = decide(proposal, record) if decide is not None and record else None
-            if record is not None and record.kind == "same" and decision == "different":
-                self.same_kept_apart += 1
-            decisions.append(decision)
-            other = None
-            if record is not None:
-                other = record.item_id or (by_ref.get(record.temp_ref) if record.temp_ref else None)
-            recorded.append(
-                RecordedItem(
-                    id=ids[seq - 1],
-                    change_set_id=change_set,
-                    match_kind=record.kind if record else None,
-                    match_element_id=record.element_id if record else None,
-                    match_item_id=other,
-                    match_decision=decision,
-                    label_zh=proposal.fields.get("labelZh"),
-                    label_en=proposal.fields.get("labelEn"),
-                )
-            )
-        # The same resolution of records as the merge's (`ontology.service`), on plain data.
-        here = {item.id: item for item in recorded}
-        wanted = {item.match_item_id for item in recorded if item.match_item_id}
-        matches, matched_by = link_records(
-            recorded,
-            {
-                key: here.get(key) or self.recorded[key]
-                for key in wanted
-                if key in here or key in self.recorded
-            },
-            [item for item in self.recorded.values() if item.match_item_id in here],
+        recorded, items, plan = self.plan_change_set(proposals, label, decide=decide)
+        self.same_kept_apart += sum(
+            entry.match_kind == "same" and entry.match_decision == "different" for entry in recorded
         )
-        items: list[PlanItem] = []
-        for seq, proposal in enumerate(proposals, start=1):
-            own = ids[seq - 1]
-            match = matches.get(own)
-            decision = decisions[seq - 1]
-            items.append(
-                PlanItem(
-                    id=own,
-                    seq=seq,
-                    op=proposal.op,
-                    kind=proposal.kind,
-                    decision="accepted",
-                    temp_ref=proposal.temp_ref,
-                    target_element_id=proposal.target_element_id,
-                    target_revision=proposal.target_revision,
-                    fields=to_item(proposal, _EVAL_DOCUMENT).proposed,
-                    edited=False,
-                    match=match,
-                    match_decision=decision,
-                    matched_by=matched_by.get(own, ()),
-                )
-            )
-        plan = plan_merge(items, self._plan_elements(), base_iri=BASE_IRI)
         proposal_of = {item.id: proposal for item, proposal in zip(items, proposals, strict=True)}
         creates = {item.temp_ref: item for item in items if item.op == "create" and item.temp_ref}
         by_item = {item.id: item for item in items}
@@ -885,6 +908,124 @@ def _proposal_names(proposal: Proposal) -> set[str]:
     return {normalize(value) for value in values if value}
 
 
+def prepare_assist(
+    label: str,
+    proposals: Sequence[Proposal],
+    version: WorkingVersion,
+    open_items: Mapping[UUID, RecordedItem] | None = None,
+    *,
+    elements_max: int = 400,
+) -> tuple[ReviewContext, list[Proposal]]:
+    """Freeze the same stored fields for the assistant's context and the oracle's proposals."""
+    _, planned, resolutions = version.plan_change_set(proposals, label, open_items=open_items or {})
+    known = {e.id: e for e in version.known()}
+
+    def element_label(ref: UUID | None) -> str | None:
+        element = known.get(ref) if ref else None
+        return (
+            rules.display_label(element.label_zh, element.label_en, element.local_name)
+            if element
+            else None
+        )
+
+    def ref_label(ref: str | None) -> str | None:
+        return (element_label(rules.parse_id(ref)) or ref) if ref else ref
+
+    items: list[ReviewItem] = []
+    stored_proposals: list[Proposal] = []
+    for item, proposal in zip(planned, proposals, strict=True):
+        target = known.get(item.target_element_id) if item.target_element_id else None
+        stored = rules.stored_fields(item.fields)
+        stored_proposals.append(replace(proposal, fields=stored))
+        fields = {
+            "labelZh": target.label_zh if target else None,
+            "labelEn": target.label_en if target else None,
+            "localName": target.local_name if target else None,
+            "definitionZh": target.definition_zh if target else None,
+            **{key: value for key, value in stored.items() if value is not None},
+        }
+        # Extraction evidence belongs to one document. Tied rows yield the same quote.
+        evidence = sorted(
+            proposal.evidence,
+            key=lambda e: (e.chunk_id, e.char_start is None, e.char_start or 0, e.quote),
+        )
+        match = item.match
+        other = None
+        if match is not None:
+            other = (
+                element_label(match.element_id)
+                if match.element_id
+                else match.item_label_zh or match.item_label_en
+            )
+        resolution = resolutions.get(item.id)
+        items.append(
+            ReviewItem(
+                id=item.id,
+                seq=item.seq,
+                fingerprint=item_fingerprint(
+                    item.kind, item.op, item.target_element_id, stored, None
+                ),
+                kind=item.kind,
+                op=item.op,
+                decision="pending",
+                label_zh=fields["labelZh"],
+                label_en=fields["labelEn"],
+                local_name=fields["localName"],
+                definition=fields["definitionZh"] or fields.get("definitionEn"),
+                parent=ref_label(item.fields.parent_ref),
+                domain=ref_label(item.fields.domain_ref),
+                range=ref_label(item.fields.range_ref),
+                flags=cast(tuple[ItemFlag, ...], tuple(dict.fromkeys(proposal.flags))),
+                confidence=proposal.confidence,
+                has_evidence=bool(evidence),
+                quotes=tuple(e.quote[:200] for e in evidence[:2]),
+                match_kind=proposal.match.kind if proposal.match else None,
+                match_decision=None,
+                match_other_label=other,
+                kept_fields=resolution.kept_fields if resolution else (),
+                target_stale=bool(target and item.target_revision not in (None, target.revision)),
+            )
+        )
+    terms = tuple(
+        normalize(name)
+        for item in items
+        for name in (item.label_zh, item.label_en, item.domain, item.range)
+        if name
+    )
+    briefs = [
+        ElementBrief(
+            id=e.id,
+            kind=e.kind,
+            label_zh=e.label_zh,
+            label_en=e.label_en,
+            local_name=e.local_name,
+            parent=element_label(e.parent_id),
+            domain=element_label(e.domain_id),
+            range=element_label(e.range_id),
+            disjoint=(),
+        )
+        for e in known.values()
+    ]
+    briefs.sort(
+        key=lambda e: (
+            not any(
+                related_name(name, terms) for name in (e.label_zh, e.label_en, e.local_name) if name
+            ),
+            e.label_zh or e.label_en or e.local_name,
+        )
+    )
+    ctx = ReviewContext(
+        stable_id("changeset", label),
+        stable_id("eval-ontology"),
+        "open",
+        "ai_extraction",
+        tuple(items),
+        tuple(briefs[:elements_max]),
+        (),
+    )
+    return ctx, stored_proposals
+
+
 class FlagReviewer:
     """The by-flags review (spec 004, section 10): a possible duplicate is merged when the
     other side is in the same expected group and kept apart otherwise; a type the model judged
@@ -1036,6 +1177,170 @@ class OracleReviewer(FlagReviewer):
                 )
             )
         return accepted, decided
+
+
+@dataclass(frozen=True)
+class AssistStep:
+    proposals: Sequence[Proposal]
+    decisions: Sequence[DecidedItem]
+    items: Sequence[schemas.AssistItem]
+    status: Literal["done", "partial", "failed"]
+
+
+def _assist_groups(
+    steps: Sequence[AssistStep], expected: Mapping[str, Any], known: Sequence[KnownElement]
+) -> dict[UUID, tuple[str, ...]]:
+    """Index named expected groups by item or element ID. A property's domain scopes its name."""
+    aliases: dict[tuple[str, ...], tuple[str, ...]] = {}
+    for kind, entries in (
+        ("entity_type", expected["entity_types"]),
+        ("property", expected.get("properties", [])),
+    ):
+        for entry in entries:
+            scope = (kind, normalize(entry["domain"])) if kind == "property" else (kind,)
+            canonical = (*scope, normalize(entry["names"][0]))
+            for name in entry["names"]:
+                aliases[(*scope, normalize(name))] = canonical
+    groups: dict[UUID, tuple[str, ...]] = {}
+
+    def assign_group(own: UUID, item: KnownElement | Proposal, domain: UUID | None = None) -> None:
+        scope: tuple[str, ...] = (item.kind,)
+        if item.kind == "property":
+            if domain is None or domain not in groups:
+                return
+            scope = (item.kind, groups[domain][-1])
+        if isinstance(item, Proposal):
+            fields = item.fields
+            labels = (fields.get("labelZh"), fields.get("labelEn"))
+            synonyms = tuple(s["text"] for s in fields.get("synonyms") or ())
+            local_name = fields.get("localName")
+        else:
+            labels = (item.label_zh, item.label_en)
+            synonyms, local_name = item.synonyms, item.local_name
+        for name in (*labels, *synonyms, local_name):
+            if name and (group := aliases.get((*scope, normalize(name)))):
+                groups[own] = group
+                return
+
+    for kind in ("entity_type", "property"):
+        for element in known:
+            if element.kind == kind:
+                assign_group(element.id, element, element.domain_id)
+    for step in steps:
+        pairs = list(zip(step.proposals, step.decisions, strict=True))
+        refs = {p.temp_ref: d.item_id for p, d in pairs if p.temp_ref}
+        for p, d in pairs:
+            if p.target_element_id is not None and p.target_element_id in groups:
+                groups[d.item_id] = groups[p.target_element_id]
+            if p.kind == "entity_type":
+                assign_group(d.item_id, p)
+        for p, d in pairs:
+            if p.kind == "property" and (domain := p.fields.get("domainRef")):
+                assign_group(d.item_id, p, refs.get(domain) or _uuid(domain))
+    return groups
+
+
+def assist_metrics(
+    steps: Sequence[AssistStep], expected: Mapping[str, Any], known: Sequence[KnownElement] = ()
+) -> dict[str, Any]:
+    """Micro-average suggestions and individual risks over the independently reviewed documents."""
+    groups = _assist_groups(steps, expected, known)
+    checked = rejected = suggested_reject = true_reject = edits = edit_hits = 0
+    statuses = dict.fromkeys(("done", "partial", "failed"), 0)
+    duplicates: Counter[str] = Counter()
+    duplicate_hits: Counter[str] = Counter()
+    duplicate_unscored = 0
+    for step in steps:
+        statuses[step.status] += 1
+        proposals = {d.item_id: p for d, p in zip(step.decisions, step.proposals, strict=True)}
+        refs = {p.temp_ref: own for own, p in proposals.items() if p.temp_ref}
+        oracle_rejected = {d.item_id for d in step.decisions if d.decision == "rejected"}
+        for item in step.items:
+            if item.suggestion is not None:
+                checked += 1
+                rejected += item.item_id in oracle_rejected
+            if item.suggestion == "reject":
+                suggested_reject += 1
+                true_reject += item.item_id in oracle_rejected
+            group = groups.get(item.item_id)
+            if item.suggestion == "edit" and item.rename:
+                name = item.rename.label_zh or item.rename.label_en or item.rename.local_name
+                if name:
+                    edits += 1
+                    edit_hits += group is not None and normalize(name) == group[-1]
+            for risk in item.risks:
+                if risk.code != "duplicate":
+                    continue
+                if proposals[item.item_id].kind == "relation_type":
+                    duplicate_unscored += 1
+                    continue
+                duplicates[risk.source] += 1
+                peers = [*risk.related_item_ids, *risk.related_element_ids]
+                if risk.source == "rule" and (match := proposals[item.item_id].match):
+                    peer = match.element_id or match.item_id or refs.get(match.temp_ref or "")
+                    if peer is not None:
+                        peers.append(peer)
+                duplicate_hits[risk.source] += group is not None and any(
+                    peer != item.item_id and groups.get(peer) == group for peer in peers
+                )
+
+    def metric(n: int, d: int) -> dict[str, int | float | None]:
+        return {"numerator": n, "denominator": d, "ratio": _ratio(n, d)}
+
+    return {
+        "documents": len(steps),
+        "items": sum(len(step.decisions) for step in steps),
+        "aiChecked": checked,
+        "statuses": statuses,
+        "rejectPrecision": metric(true_reject, suggested_reject),
+        "rejectRecall": metric(true_reject, rejected),
+        "editHit": metric(edit_hits, edits),
+        "duplicatePrecision": metric(duplicate_hits.total(), duplicates.total()),
+        "duplicateUnscored": duplicate_unscored,
+        "duplicatePrecisionBySource": {
+            source: metric(duplicate_hits[source], duplicates[source]) for source in ("rule", "ai")
+        },
+    }
+
+
+async def _assist_document(
+    label: str,
+    proposals: Sequence[Proposal],
+    baseline: WorkingVersion,
+    open_items: dict[UUID, RecordedItem],
+    oracle: OracleReviewer,
+    gateway: ReplayGateway,
+    model: str,
+    settings: Settings,
+    locale: schemas.Locale,
+) -> AssistStep:
+    deadline = time.monotonic() + settings.review_assist_timeout_seconds
+    document_id = stable_id("document", label)
+    ctx, proposals = prepare_assist(
+        label, proposals, baseline, open_items, elements_max=context_elements_max(settings)
+    )
+    open_items.update(
+        {
+            item.id: RecordedItem(
+                item.id, ctx.change_set_id, label_zh=item.label_zh, label_en=item.label_en
+            )
+            for item in ctx.items
+            if item.kind == "entity_type" and item.op == "create"
+        }
+    )
+    outcome = await run_assist(
+        ctx,
+        gateway,
+        model,
+        settings,
+        locale,
+        deadline=deadline,
+        document_id=document_id,
+        fail_on_internal_error=True,
+    )
+    _, decisions = oracle.review(proposals, label, baseline)
+    oracle.remember(label, proposals)
+    return AssistStep(proposals, decisions, outcome.items, outcome.status)
 
 
 @dataclass(frozen=True)
@@ -1377,6 +1682,22 @@ def shortlist_recall(expected: Mapping[str, Any]) -> dict[str, Any]:
     return out
 
 
+def _check_assist(assist: object, scenarios: Sequence[str]) -> bool:
+    if not isinstance(assist, bool):
+        raise ValueError(f"assist must be boolean: {assist!r}")
+    if assist and "sameBaseline" not in scenarios:
+        raise ValueError("assist evaluation needs the sameBaseline scenario")
+    return assist
+
+
+def _assist_locale(expected: Mapping[str, Any]) -> schemas.Locale:
+    field = "locale" if "locale" in expected else "language"
+    value = expected.get(field, "zh-CN")
+    if value not in ("zh-CN", "en"):
+        raise ExpectedError(f"eval/expected.toml {field} must be 'zh-CN' or 'en', got {value!r}")
+    return cast(schemas.Locale, value)
+
+
 async def run_case(
     files: Mapping[str, bytes],
     gateway: ReplayGateway,
@@ -1385,6 +1706,7 @@ async def run_case(
     *,
     reviewed: bool = False,
     no_memory: bool = False,
+    assist: bool = False,
 ) -> dict[str, Any]:
     """Runs a case; without eval/expected.toml it only counts what was found (`scored` false).
 
@@ -1398,6 +1720,7 @@ async def run_case(
     documents see.
     """
     # The sequential scenario is the one comparable with the baselines: it always runs.
+    _check_assist(assist, scenarios)
     if "sequential" not in scenarios or set(scenarios) - set(SCENARIOS):
         raise ValueError(f"Scenarios must be sequential and optionally sameBaseline: {scenarios}")
     answers = files.get("eval/expected.toml")
@@ -1405,6 +1728,11 @@ async def run_case(
     expected = parse_expected(answers.decode("utf-8")) if answers is not None else None
     if reviewed and expected is None:
         raise ExpectedError("reviewed evaluation needs eval/expected.toml")
+    locale: schemas.Locale = "zh-CN"
+    if assist:
+        if expected is None:
+            raise ExpectedError("assist evaluation needs eval/expected.toml")
+        locale = _assist_locale(expected)
     documents = _documents(files)
     extractor = Extractor(gateway, models)
     pairs: dict[str, list[JudgedPair]] = {}
@@ -1626,6 +1954,10 @@ async def run_case(
     if "sameBaseline" in scenarios:
         baseline = WorkingVersion()
         identified: list[tuple[str, list[Proposal]]] = []
+        assist_steps: list[AssistStep] = []
+        open_items: dict[UUID, RecordedItem] = {}
+        oracle = OracleReviewer(expected) if assist and expected is not None else None
+        assist_settings = Settings() if assist else None
         for document in documents:
             label = _SAME_BASELINE.format(name=document.name)
             pending = [
@@ -1635,6 +1967,20 @@ async def run_case(
             ]
             proposals = await identify(document, label, baseline, "sameBaseline", pending)
             identified.append((label, proposals))
+            if oracle is not None and assist_settings is not None:
+                assist_steps.append(
+                    await _assist_document(
+                        label,
+                        proposals,
+                        baseline,
+                        open_items,
+                        oracle,
+                        gateway,
+                        models.standard,
+                        assist_settings,
+                        locale,
+                    )
+                )
         labels = [label for label, _ in identified]
         reviews = REVIEWS if expected is not None else REVIEWS[:1]
         outcomes: dict[str, tuple[WorkingVersion, list[str]]] = {}
@@ -1661,6 +2007,8 @@ async def run_case(
         if "byFlags" in outcomes and expected is not None:
             version, skipped = outcomes["byFlags"]
             same["byFlags"] = _review(version, skipped, expected, None)
+        if assist and expected is not None:
+            same["assist"] = assist_metrics(assist_steps, expected, baseline.elements)
         result["sameBaseline"] = same
     result["models"] = asdict(models)
     return result
@@ -1740,7 +2088,12 @@ def evaluate(
     if mode not in {"record", "replay"}:
         raise ValueError(f"Unknown mode: {mode}")
     settings = Settings()
-    scenarios = bundle.get("scenarios") or SCENARIOS
+    raw_assist = bundle.get("assist", False)
+    scenarios = (
+        bundle.get("scenarios", SCENARIOS)
+        if raw_assist is True
+        else bundle.get("scenarios") or SCENARIOS
+    )
     if not isinstance(scenarios, list | tuple) or not all(isinstance(s, str) for s in scenarios):
         raise ValueError(f"Scenarios must be a list of names: {scenarios!r}")
     reviewed = bundle.get("reviewed", False)
@@ -1749,6 +2102,7 @@ def evaluate(
         raise ValueError(f"reviewed must be boolean: {reviewed!r}")
     if not isinstance(no_memory, bool):
         raise ValueError(f"noMemory must be boolean: {no_memory!r}")
+    assist = _check_assist(raw_assist, scenarios)
     models = _models(settings, mode, bundle.get("manifest"))
     files = {path: base64.b64decode(value) for path, value in bundle["files"].items()}
     if mode == "replay":
@@ -1763,7 +2117,15 @@ def evaluate(
     gateway = ReplayGateway(recordings, inner, on_record=stream.on_record)
     try:
         result = asyncio.run(
-            run_case(files, gateway, models, scenarios, reviewed=reviewed, no_memory=no_memory)
+            run_case(
+                files,
+                gateway,
+                models,
+                scenarios,
+                reviewed=reviewed,
+                no_memory=no_memory,
+                assist=assist,
+            )
         )
     except (AiError, ReplayMissError, ExpectedError) as exc:
         error = f"{type(exc).__name__}: {exc}"

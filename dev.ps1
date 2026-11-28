@@ -25,7 +25,7 @@
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里对 OP_AI_MODEL、OP_AI_REASONING_MODEL 各发一次最小的结构化调用（带识别时用的推理强度），
                     只显示可用与否、模型、强度和错误类型，不显示地址与 Key
-  eval [案例|目录] [-Replay] [-Recordings <目录>] [-Sequential] [-Reviewed [-NoMemory]] [-CodeFrom <worktree>]
+  eval [案例|目录] [-Replay] [-Recordings <目录>] [-Sequential] [-Reviewed [-NoMemory]] [-Assist] [-CodeFrom <worktree>]
                     识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/。
                     也可给一个结构相同的目录（带 / 或 \，如 .verification/private-docs/<名称>），
                     结果与录制以 dir-<目录名> 命名；没有 eval/expected.toml 时只识别、不打分。
@@ -38,6 +38,9 @@
                     -Reviewed 只跑顺序场景，每份资料的变更集按期望答案审核（规格 008 第 10.1 节：
                     不在期望里的拒绝、名称不对的改名），审核结果记入审核记忆，再识别下一份，并报告
                     再提比例、改名沿用率等记忆指标；加 -NoMemory 照样审核，但识别时不用记忆，作对照；
+                    -Assist 跑两个场景，并对同基线场景每份资料的变更集跑 AI 预审，与按期望审核的决定对照，
+                    报告建议拒绝的准确率与召回率、建议修改的命中率、重复风险的准确率（规格 008 第 10.3 节），
+                    不能与 -Sequential、-Reviewed 同用；
                     -CodeFrom 用本仓库另一个 worktree 的代码构建镜像来评测，模型配置、录制和结果
                     仍用运行脚本的这个目录的，在主检出目录评测分支不必切换分支
   eval-qa [-Replay] [-Recordings <目录>] [-CodeFrom <worktree>]
@@ -74,6 +77,7 @@ param(
     [switch]$Sequential,
     [switch]$Reviewed,
     [switch]$NoMemory,
+    [switch]$Assist,
     [string]$CodeFrom = ''
 )
 
@@ -634,8 +638,10 @@ function Resolve-CodeFrom([string]$CodeFrom) {
 # A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
 # optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
 # must not be committed. Results and recordings of a folder case are named "dir-<folder>".
-function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [bool]$SequentialOnly, [string]$CodeFrom, [bool]$ReviewedRun, [bool]$NoMemoryRun) {
+function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [bool]$SequentialOnly, [string]$CodeFrom, [bool]$ReviewedRun, [bool]$NoMemoryRun, [bool]$AssistRun) {
     if ($NoMemoryRun -and -not $ReviewedRun) { Stop-Dev '-NoMemory 只能和 -Reviewed 一起用' }
+    # Pre-review is scored on the same-baseline change sets (spec 008, 10.3), which those two skip.
+    if ($AssistRun -and ($SequentialOnly -or $ReviewedRun)) { Stop-Dev '-Assist 不能与 -Sequential、-Reviewed 同用' }
     if (-not $Case) { $Case = 'steel' }
     $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path).TrimEnd('\', '/')
     $isFolder = $Case -match '[\\/]'
@@ -679,9 +685,9 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     $mode = $ReplayOnly ? 'replay' : 'record'
     # A reviewed run is a sequential one (spec 008, 10.1).
     $scenarios = ($SequentialOnly -or $ReviewedRun) ? @('sequential') : @('sequential', 'sameBaseline')
-    $bundle = @{ files = $files; recordings = $recordingTexts; manifest = $manifest; mode = $mode; scenarios = $scenarios; reviewed = $ReviewedRun; noMemory = $NoMemoryRun } | ConvertTo-Json -Compress -Depth 4
+    $bundle = @{ files = $files; recordings = $recordingTexts; manifest = $manifest; mode = $mode; scenarios = $scenarios; reviewed = $ReviewedRun; noMemory = $NoMemoryRun; assist = $AssistRun } | ConvertTo-Json -Compress -Depth 4
     $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
-    $reviewTag = $ReviewedRun ? ($NoMemoryRun ? '-reviewed-nomemory' : '-reviewed') : ''
+    $reviewTag = $ReviewedRun ? ($NoMemoryRun ? '-reviewed-nomemory' : '-reviewed') : ($AssistRun ? '-assist' : '')
     $outFile = Join-Path $outDir "$Case$reviewTag$($ReplayOnly ? '-replay' : '')$($CodeFrom ? "-$codeTag" : '')-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
     # Replay never reaches the model: the container gets no key and no proxy.
     $noModel = $ReplayOnly ? @('-e', 'OP_OPENAI_API_KEY=', '-e', 'OP_AI_PROXY=') : @()
@@ -709,7 +715,10 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [
     if (-not $result.scored) { Write-Note '没有答案，未打分；补上 eval/expected.toml 后用 -Replay 重跑即可打分，不再调用模型' }
     Show-EvalScenario ($ReviewedRun ? '顺序场景（按期望审核）' : '顺序场景') $result
     if ($result.PSObject.Properties['memory']) { Show-EvalMemory $result.memory }
-    if ($result.PSObject.Properties['sameBaseline']) { Show-EvalScenario '同基线场景' $result.sameBaseline }
+    if ($result.PSObject.Properties['sameBaseline']) {
+        Show-EvalScenario '同基线场景' $result.sameBaseline
+        if ($result.sameBaseline.PSObject.Properties['assist']) { Show-EvalAssist $result.sameBaseline.assist }
+    }
     Write-Ok "结果已保存到 $outFile"
 }
 
@@ -846,6 +855,25 @@ function Show-EvalMemory($memory) {
         $ratio = $null -eq $m.ratio ? '-' : $m.ratio
         Write-Host ("  {0} {1}（{2} / {3}）" -f $names[$key], $ratio, $m.numerator, $m.denominator)
     }
+}
+
+# Pre-review metrics of an -Assist run (spec 008, 10.3), scored against the oracle's decisions.
+function Show-EvalAssist($assist) {
+    $s = $assist.statuses
+    Write-Host ("  AI 预审：{0} 份资料、{1} 项，模型检查 {2} 项；完成 {3}、部分 {4}、失败 {5}" -f $assist.documents, $assist.items, $assist.aiChecked, $s.done, $s.partial, $s.failed)
+    $names = [ordered]@{
+        rejectPrecision    = '建议拒绝的准确率'
+        rejectRecall       = '建议拒绝的召回率'
+        editHit            = '建议修改的命中率'
+        duplicatePrecision = '重复风险的准确率'
+    }
+    foreach ($key in $names.Keys) {
+        if (-not $assist.PSObject.Properties[$key]) { continue }
+        $m = $assist.$key
+        $ratio = $null -eq $m.ratio ? '-' : $m.ratio
+        Write-Host ("  {0} {1}（{2} / {3}）" -f $names[$key], $ratio, $m.numerator, $m.denominator)
+    }
+    if ($assist.PSObject.Properties['duplicateUnscored']) { Write-Host ("  关系项上的重复风险 {0} 条，不计分" -f $assist.duplicateUnscored) }
 }
 
 # A value from dev/mirrors.cn.env, unless mirrors are switched off.
@@ -1073,7 +1101,7 @@ try {
         'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
         'seed-steel' { Invoke-SeedSteel }
         'fmt' { Invoke-Fmt $Rest }
-        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent $CodeFrom $Reviewed.IsPresent $NoMemory.IsPresent }
+        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent $CodeFrom $Reviewed.IsPresent $NoMemory.IsPresent $Assist.IsPresent }
         'eval-qa' { Invoke-EvalQa $Replay.IsPresent $Recordings $CodeFrom }
         'owl-check' { Invoke-OwlCheck }
         'ai-check' {
