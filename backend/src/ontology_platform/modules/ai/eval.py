@@ -40,24 +40,36 @@ from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime, timedelta
-from typing import Any, cast
+from typing import Any, Literal, cast
 from uuid import UUID, uuid5
 
-from ontology_platform.modules.ai.candidates import group_recall
+from pydantic import BaseModel
+
+from ontology_platform.modules.ai.candidates import THRESHOLD, Names, group_recall
+from ontology_platform.modules.ai.candidates import score as candidate_score
 from ontology_platform.modules.ai.extraction import (
+    TYPES_BATCH_TERMS,
     ChunkText,
     ExtractionModels,
     Extractor,
     JudgedPair,
     KnownElement,
+    MemoryOutcome,
     PendingType,
     Proposal,
     ProposedMatch,
     RunStats,
+    _aliases,
+    _as_uuid,
+    _unalias,
+    merge_types,
     normalize,
+    relations_catalog,
+    types_context,
 )
-from ontology_platform.modules.ai.gateway import AiError, ModelGateway
+from ontology_platform.modules.ai.gateway import AiError, InputFile, ModelGateway
 from ontology_platform.modules.ai.pipeline import to_item
+from ontology_platform.modules.ai.prompts import EntityTypeOut, TermsOut, TypesOut
 from ontology_platform.modules.ai.replay import (
     STAGE_COUNTS,
     MeteredGateway,
@@ -69,6 +81,16 @@ from ontology_platform.modules.ai.replay import (
 )
 from ontology_platform.modules.documents.chunking import chunk_pages
 from ontology_platform.modules.documents.parsers import detect_type, parse_document
+from ontology_platform.modules.ontology.review_memory import (
+    DecidedItem,
+    ReviewMemory,
+    apply_delta,
+    collect,
+    pair_key,
+    property_key,
+    relation_key,
+    type_key,
+)
 from ontology_platform.modules.ontology.schemas import ElementFields
 from ontology_platform.modules.ontology.service import (
     PlanElement,
@@ -903,6 +925,374 @@ class FlagReviewer:
         return decide
 
 
+class OracleReviewer(FlagReviewer):
+    """Decide create items against the expected answers, without a database."""
+
+    def __init__(self, expected: Mapping[str, Any]) -> None:
+        super().__init__(expected)
+        self.expected = expected
+
+    def review(
+        self, proposals: Sequence[Proposal], label: str, version: WorkingVersion | None
+    ) -> tuple[list[Proposal], list[DecidedItem]]:
+        accepted: list[Proposal] = []
+        decided: list[DecidedItem] = []
+        known = {str(e.id): e for e in version.elements} if version is not None else {}
+        review_labels = {
+            ref: e.label_zh or e.label_en or e.local_name
+            for ref, e in known.items()
+            if e.kind == "entity_type"
+        }
+        groups = self.expected["entity_types"]
+        group_of = {
+            normalize(n): index for index, group in enumerate(groups) for n in group["names"]
+        }
+
+        def expected_group(ref: str | None) -> int | None:
+            return group_of.get(normalize(review_labels.get(ref or "", "")))
+
+        for seq, proposal in enumerate(proposals, start=1):
+            fields = proposal.fields
+            original_zh = fields.get("labelZh")
+            original_en = fields.get("labelEn")
+            final = proposal
+            decision: Literal["accepted", "rejected"] = "accepted"
+            if proposal.op == "create" and proposal.kind == "entity_type":
+                candidate_names = [
+                    normalize(value)
+                    for value in (
+                        original_zh or "",
+                        original_en or "",
+                        *(s["text"] for s in fields.get("synonyms") or []),
+                    )
+                    if value
+                ]
+                group = next((group_of[n] for n in candidate_names if n in group_of), None)
+                if group is None:
+                    decision = "rejected"
+                elif normalize(original_zh or original_en or "") != normalize(
+                    groups[group]["names"][0]
+                ):
+                    final = replace(
+                        proposal, fields={**fields, "labelZh": groups[group]["names"][0]}
+                    )
+            elif proposal.op == "create" and proposal.kind == "relation_type":
+                domain = expected_group(fields.get("domainRef"))
+                range_ = expected_group(fields.get("rangeRef"))
+                wanted = {
+                    frozenset((group_of[normalize(r["domain"])], group_of[normalize(r["range"])]))
+                    for r in self.expected["relations"]
+                }
+                if domain is None or range_ is None or frozenset((domain, range_)) not in wanted:
+                    decision = "rejected"
+            elif (
+                proposal.op == "create"
+                and proposal.kind == "property"
+                and "properties" in self.expected
+            ):
+                domain = expected_group(fields.get("domainRef"))
+                if not any(
+                    domain == group_of[normalize(p["domain"])]
+                    and _proposal_names(proposal) & {normalize(n) for n in p["names"]}
+                    for p in self.expected["properties"]
+                ):
+                    decision = "rejected"
+            if decision == "accepted":
+                accepted.append(final)
+                if final.temp_ref and final.kind == "entity_type":
+                    review_labels[final.temp_ref] = (
+                        final.fields.get("labelZh") or final.fields.get("labelEn") or ""
+                    )
+            match = proposal.match
+            other_label = None
+            if match is not None:
+                other = known.get(str(match.element_id)) if match.element_id else None
+                if other is not None:
+                    other_label = other.label_zh
+                elif match.item_id in self.items:
+                    other_label = sorted(self.items[match.item_id])[0]
+                elif match.temp_ref is not None:
+                    other_label = review_labels.get(match.temp_ref)
+            decided.append(
+                DecidedItem(
+                    item_id=item_id(label, seq),
+                    kind=proposal.kind,
+                    op=proposal.op,
+                    decision=decision,
+                    reject_reason="incorrect" if decision == "rejected" else None,
+                    proposed_label_zh=original_zh,
+                    proposed_label_en=original_en,
+                    final_label_zh=final.fields.get("labelZh"),
+                    final_label_en=final.fields.get("labelEn"),
+                    # Memory keys use the endpoints that the merge actually applied.
+                    domain_label=None,
+                    range_label=None,
+                    created_element_id=None,
+                    renamed_element_id=None,
+                    match_kind=match.kind if match else None,
+                    match_decision=None,
+                    match_other_label=other_label,
+                    match_other_element_id=match.element_id if match else None,
+                )
+            )
+        return accepted, decided
+
+
+@dataclass(frozen=True)
+class MemoryStep:
+    before: ReviewMemory
+    model: tuple[Proposal, ...]
+    items: tuple[Proposal, ...]
+    suppressed: tuple[tuple[str, str | None, str | None, UUID | None], ...]
+    known: tuple[KnownElement, ...] = ()
+
+
+class _CaptureGateway:
+    def __init__(self, gateway: ReplayGateway, known: Sequence[KnownElement]) -> None:
+        self.gateway = gateway
+        self.known = known
+        self.outputs: list[Proposal] = []
+        self.term_batches: list[list[str]] = []
+        self.found_types: list[EntityTypeOut] = []
+        self.type_batch = 0
+
+    async def structured[T: BaseModel](
+        self,
+        *,
+        purpose: str,
+        model: str,
+        instructions: str,
+        text: str,
+        schema: type[T],
+        files: Sequence[InputFile] = (),
+        document_id: Any = None,
+        effort: str | None = None,
+    ) -> T:
+        term_index = len(self.term_batches) if purpose == "extract.terms" else None
+        if term_index is not None:
+            self.term_batches.append([])
+        result = await self.gateway.structured(
+            purpose=purpose,
+            model=model,
+            instructions=instructions,
+            text=text,
+            schema=schema,
+            files=files,
+            document_id=document_id,
+            effort=effort,
+        )
+        if term_index is not None:
+            self.term_batches[term_index] = [term.name for term in cast(TermsOut, result).terms]
+        elif purpose == "extract.types":
+            unique_terms: dict[str, str] = {}
+            for term_batch in self.term_batches:
+                for name in term_batch:
+                    key = normalize(name)
+                    if key:
+                        unique_terms.setdefault(key, name)
+            terms = list(unique_terms.values())
+            group = terms[
+                self.type_batch * TYPES_BATCH_TERMS : (self.type_batch + 1) * TYPES_BATCH_TERMS
+            ]
+            context = types_context(self.known, group)
+            aliases = _aliases(
+                [str(element.id) for element in context]
+                + [item.ref for item in self.found_types if _as_uuid(item.ref) is not None]
+            )
+            ids = {alias: value for value, alias in aliases.items()}
+            type_batch_items = [
+                item.model_copy(update={"ref": _unalias(item.ref, ids)})
+                for item in cast(TypesOut, result).entity_types
+            ]
+            self.found_types = merge_types(self.found_types, type_batch_items)
+            self.type_batch += 1
+            for item in type_batch_items:
+                self.outputs.append(
+                    Proposal(
+                        op="update" if _as_uuid(item.ref) is not None else "create",
+                        kind="entity_type",
+                        temp_ref=item.ref,
+                        target_element_id=_as_uuid(item.ref),
+                        fields={"labelZh": item.label_zh, "labelEn": item.label_en},
+                    )
+                )
+        elif purpose == "extract.relations":
+            _, aliases = relations_catalog(self.found_types, self.known)
+            ids = {alias: value for value, alias in aliases.items()}
+            values = result.model_dump()
+            for item in values.get("relations", []):
+                self.outputs.append(
+                    Proposal(
+                        op="create",
+                        kind="relation_type",
+                        fields={
+                            "labelZh": item["label_zh"],
+                            "domainRef": _unalias(item["domain"], ids),
+                            "rangeRef": _unalias(item["range"], ids),
+                        },
+                    )
+                )
+            for item in values.get("properties", []):
+                self.outputs.append(
+                    Proposal(
+                        op="create",
+                        kind="property",
+                        fields={
+                            "labelZh": item["label_zh"],
+                            "domainRef": _unalias(item["domain"], ids),
+                        },
+                    )
+                )
+        return result
+
+    async def ping(self) -> bool:
+        return await self.gateway.ping()
+
+
+def _memory_key(proposal: Proposal, element_kind: str, step: MemoryStep) -> str | None:
+    if proposal.op != "create" or proposal.kind != element_kind:
+        return None
+    fields = proposal.fields
+    if proposal.kind == "entity_type":
+        return type_key(fields.get("labelZh"), fields.get("labelEn"))
+    names = {
+        item.temp_ref: normalize(item.fields.get("labelZh") or item.fields.get("labelEn") or "")
+        for item in step.model
+        if item.kind == "entity_type"
+    }
+    names.update({str(e.id): normalize(e.label_zh or e.label_en or "") for e in step.known})
+    domain = names.get(fields.get("domainRef"), "")
+    label = normalize(fields.get("labelZh") or fields.get("labelEn") or "")
+    if proposal.kind == "relation_type":
+        return relation_key(domain, label, names.get(fields.get("rangeRef"), ""))
+    return property_key(domain, label)
+
+
+def _marked_pair(item: Proposal, step: MemoryStep, key: str) -> bool:
+    if item.kind != "entity_type" or item.match is None:
+        return False
+    target = next((e.label_zh for e in step.known if e.id == item.match.element_id), None)
+    if target is None:
+        target = next(
+            (p.fields.get("labelZh") for p in step.items if p.temp_ref == item.match.temp_ref),
+            None,
+        )
+    own = normalize(item.fields.get("labelZh") or item.fields.get("labelEn") or "")
+    return (
+        item.match.kind in ("possible", "same")
+        and bool(own and target)
+        and pair_key(own, normalize(target or "")) == key
+    )
+
+
+def memory_metrics(
+    steps: Sequence[MemoryStep], memory: ReviewMemory, *, enabled: bool
+) -> dict[str, Any]:
+    """Count opportunities from the memory visible before each later document."""
+    counts: dict[str, list[int]] = {
+        key: [0, 0]
+        for key in (
+            "reproposeModel",
+            "reproposeReview",
+            "variantRepropose",
+            "renameReuse",
+            "keptApartViolation",
+        )
+    }
+    for step in steps:
+        proposed = list(step.model)
+        reviewed = list(step.items)
+        suppressed = list(step.suppressed)
+        for entry in step.before.entries:
+            if entry.kind == "rejected":
+                for metric in ("reproposeModel", "reproposeReview"):
+                    counts[metric][1] += 1
+
+                model_hit = any(
+                    _memory_key(item, entry.element_kind, step) == entry.key for item in proposed
+                )
+                model_hit |= any(
+                    kind == entry.element_kind
+                    and (
+                        memory_id == entry.id
+                        or (kind == "entity_type" and type_key(zh, en) == entry.key)
+                    )
+                    for kind, zh, en, memory_id in suppressed
+                )
+                counts["reproposeModel"][0] += int(model_hit)
+                counts["reproposeReview"][0] += int(
+                    any(
+                        _memory_key(item, entry.element_kind, step) == entry.key
+                        for item in reviewed
+                    )
+                )
+                variants = [
+                    item
+                    for item in reviewed
+                    if item.op == "create"
+                    and item.kind == entry.element_kind
+                    and _memory_key(item, entry.element_kind, step) != entry.key
+                ]
+                counts["variantRepropose"][1] += len(variants)
+                counts["variantRepropose"][0] += sum(
+                    candidate_score(
+                        Names.of(item.fields.get("labelZh"), item.fields.get("labelEn"), ()),
+                        Names.of(entry.label, entry.label_en, ()),
+                    ).value
+                    >= THRESHOLD
+                    for item in variants
+                )
+            elif entry.kind == "renamed":
+                related = [
+                    item
+                    for item in proposed
+                    if item.kind == "entity_type"
+                    and (
+                        type_key(item.fields.get("labelZh"), item.fields.get("labelEn"))
+                        in {entry.key, type_key(entry.to_label_zh, entry.to_label_en)}
+                        or item.target_element_id == entry.element_id
+                        or (item.match is not None and item.match.element_id == entry.element_id)
+                    )
+                ]
+                counts["renameReuse"][1] += len(related)
+                counts["renameReuse"][0] += sum(
+                    type_key(item.fields.get("labelZh"), item.fields.get("labelEn"))
+                    == type_key(entry.to_label_zh, entry.to_label_en)
+                    or item.target_element_id == entry.element_id
+                    or (item.match is not None and item.match.element_id == entry.element_id)
+                    for item in related
+                )
+            elif entry.kind == "kept_apart":
+                names = {
+                    normalize(item.fields.get("labelZh") or item.fields.get("labelEn") or "")
+                    for item in proposed
+                    if item.kind == "entity_type"
+                }
+                known_names = {normalize(item.label_zh) for item in step.known}
+                first = normalize(entry.label)
+                other = normalize(entry.other_label or "")
+                if (
+                    first
+                    and other
+                    and (
+                        (first in names and other in names | known_names)
+                        or (other in names and first in names | known_names)
+                    )
+                ):
+                    counts["keptApartViolation"][1] += 1
+                    counts["keptApartViolation"][0] += int(
+                        any(_marked_pair(item, step, entry.key) for item in reviewed)
+                    )
+    return {
+        "enabled": enabled,
+        "entries": len(memory.entries),
+        **{
+            key: {"numerator": n, "denominator": d, "ratio": _ratio(n, d)}
+            for key, (n, d) in counts.items()
+        },
+    }
+
+
 def resolve_counts(
     pairs: Sequence[JudgedPair], expected: Mapping[str, Any] | None, trimmed: Counter[str]
 ) -> dict[str, Any]:
@@ -992,6 +1382,9 @@ async def run_case(
     gateway: ReplayGateway,
     models: ExtractionModels,
     scenarios: Sequence[str] = SCENARIOS,
+    *,
+    reviewed: bool = False,
+    no_memory: bool = False,
 ) -> dict[str, Any]:
     """Runs a case; without eval/expected.toml it only counts what was found (`scored` false).
 
@@ -1010,6 +1403,8 @@ async def run_case(
     answers = files.get("eval/expected.toml")
     # Checked before paying for any call.
     expected = parse_expected(answers.decode("utf-8")) if answers is not None else None
+    if reviewed and expected is None:
+        raise ExpectedError("reviewed evaluation needs eval/expected.toml")
     documents = _documents(files)
     extractor = Extractor(gateway, models)
     pairs: dict[str, list[JudgedPair]] = {}
@@ -1023,6 +1418,9 @@ async def run_case(
         version: WorkingVersion,
         scenario: str,
         pending: Sequence[PendingType] = (),
+        memory: ReviewMemory | None = None,
+        outcome: MemoryOutcome | None = None,
+        model_output: list[Proposal] | None = None,
     ) -> list[Proposal]:
         document_id = stable_id("document", label)
         gateway.label(document_id, label)
@@ -1036,7 +1434,9 @@ async def run_case(
 
         started = time.monotonic()
         stats = RunStats()
-        proposals = await extractor.run(
+        capture = _CaptureGateway(gateway, version.known()) if model_output is not None else None
+        running_extractor = Extractor(capture, models) if capture is not None else extractor
+        proposals = await running_extractor.run(
             document_id=document_id,
             title=document.name,
             chunks=document.chunks,
@@ -1044,7 +1444,11 @@ async def run_case(
             progress=progress,
             pending=pending,
             stats=stats,
+            memory=memory,
+            outcome=outcome,
         )
+        if capture is not None and model_output is not None:
+            model_output.extend(capture.outputs)
         # From start to finish: with batches called at the same time, less than the sum of the
         # calls' seconds in the usage.
         elapsed[label] = round(time.monotonic() - started, 1)
@@ -1070,18 +1474,155 @@ async def run_case(
             skipped += version.merge(proposals, label, decide)
         return version, skipped, proposed
 
-    version, skipped, proposed = await sequential("acceptAll")
+    async def reviewed_sequential() -> tuple[
+        WorkingVersion, list[str], list[Proposal], dict[str, Any]
+    ]:
+        if expected is None:
+            raise ExpectedError("reviewed evaluation needs eval/expected.toml")
+        version = WorkingVersion()
+        reviewer = OracleReviewer(expected)
+        memory = ReviewMemory(stable_id("eval-memory"), ())
+        steps: list[MemoryStep] = []
+        skipped: list[str] = []
+        proposed: list[Proposal] = []
+        for index, document in enumerate(documents):
+            label = document.name
+            before = memory
+            outcome = MemoryOutcome()
+            model_output: list[Proposal] = []
+            known_before = tuple(version.known())
+            proposals = await identify(
+                document,
+                label,
+                version,
+                "sequential/reviewed",
+                memory=memory if not no_memory else ReviewMemory(memory.ontology_id, ()),
+                outcome=outcome,
+                model_output=model_output,
+            )
+            proposed.extend(proposals)
+            accepted, decisions = reviewer.review(proposals, label, version)
+            reviewer.remember(label, accepted)
+            decide = reviewer.decider(version, accepted)
+            old_ids = {element.id for element in version.elements}
+            skipped += version.merge(accepted, label, decide)
+            accepted_decisions = (d for d in decisions if d.decision == "accepted")
+            completed: list[DecidedItem] = []
+            by_id = {str(element.id): element for element in version.elements}
+            applied_refs = {
+                proposal.temp_ref: version.recorded[item_id(label, seq)].merged_into
+                for seq, proposal in enumerate(accepted, start=1)
+                if proposal.kind == "entity_type" and proposal.temp_ref
+            }
+
+            def ref_name(
+                ref: str | None,
+                elements: Mapping[str, KnownElement],
+                refs: Mapping[str, UUID | None],
+            ) -> str | None:
+                if ref is None:
+                    return None
+                element = elements.get(str(refs.get(ref) or ref))
+                return (
+                    element.label_zh or element.label_en or element.local_name
+                    if element is not None
+                    else None
+                )
+
+            def endpoint_names(
+                proposal: Proposal,
+                target: KnownElement | None,
+                elements: Mapping[str, KnownElement],
+                refs: Mapping[str, UUID | None],
+            ) -> tuple[str | None, str | None]:
+                domain = (
+                    str(target.domain_id)
+                    if target and target.domain_id
+                    else proposal.fields.get("domainRef")
+                )
+                range_ = (
+                    str(target.range_id)
+                    if target and target.range_id
+                    else proposal.fields.get("rangeRef")
+                )
+                return ref_name(domain, elements, refs), ref_name(range_, elements, refs)
+
+            for seq, decided in enumerate(accepted_decisions, start=1):
+                record = version.recorded[item_id(label, seq)]
+                made = record.merged_into
+                proposal = accepted[seq - 1]
+                target = by_id.get(str(made)) if made is not None else None
+                domain_label, range_label = endpoint_names(proposal, target, by_id, applied_refs)
+                match_decision = (
+                    cast(Literal["same", "different"] | None, decide(proposal, proposal.match))
+                    if proposal.match is not None
+                    else None
+                )
+                completed.append(
+                    replace(
+                        decided,
+                        item_id=item_id(label, seq),
+                        created_element_id=made if made not in old_ids else None,
+                        final_label_zh=target.label_zh if target else decided.final_label_zh,
+                        final_label_en=target.label_en if target else decided.final_label_en,
+                        domain_label=domain_label,
+                        range_label=range_label,
+                        match_decision=match_decision,
+                    )
+                )
+            for proposal, decided in zip(proposals, decisions, strict=True):
+                if decided.decision != "rejected":
+                    continue
+                domain_label, range_label = endpoint_names(proposal, None, by_id, applied_refs)
+                if proposal.kind in ("relation_type", "property") and domain_label is None:
+                    continue
+                if proposal.kind == "relation_type" and range_label is None:
+                    continue
+                # Rejected and accepted item ids can coincide; collect uses them only as provenance.
+                completed.append(
+                    replace(decided, domain_label=domain_label, range_label=range_label)
+                )
+            memory = apply_delta(
+                memory,
+                collect("ai_extraction", completed),
+                now=_EPOCH + timedelta(seconds=index),
+                max_entries=500,
+            )
+            steps.append(
+                MemoryStep(
+                    before,
+                    tuple(model_output),
+                    tuple(proposals),
+                    tuple(
+                        (s.kind, s.label_zh, s.label_en, s.memory_entry_id)
+                        for s in outcome.suppressed
+                    ),
+                    known_before,
+                )
+            )
+        return version, skipped, proposed, memory_metrics(steps, memory, enabled=not no_memory)
+
+    if reviewed:
+        version, skipped, proposed, memory_result = await reviewed_sequential()
+    else:
+        version, skipped, proposed = await sequential("acceptAll")
     labels = [document.name for document in documents]
     result = _scenario(version, skipped, proposed, expected, _usage(gateway, labels, elapsed))
-    result["resolve"] = resolve_counts(
-        pairs["sequential/acceptAll"], expected, trimmed["sequential/acceptAll"]
-    )
-    result["literalShare"] = literal_share(literal["sequential/acceptAll"])
+    if reviewed:
+        result["merge"]["review"] = "oracle"
+    scenario_key = "sequential/reviewed" if reviewed else "sequential/acceptAll"
+    result["resolve"] = resolve_counts(pairs[scenario_key], expected, trimmed[scenario_key])
+    result["literalShare"] = literal_share(literal[scenario_key])
+    if reviewed:
+        result["memory"] = memory_result
     if expected is not None:
         result["shortlistRecall"] = shortlist_recall(expected)
-        version, skipped, proposed = await sequential("byFlags")
-        labels = [_BY_FLAGS.format(name=document.name) for document in documents]
-        result["byFlags"] = _review(version, skipped, expected, _usage(gateway, labels, elapsed))
+        if not reviewed:
+            version, skipped, proposed = await sequential("byFlags")
+            labels = [_BY_FLAGS.format(name=document.name) for document in documents]
+            result["byFlags"] = _review(
+                version, skipped, expected, _usage(gateway, labels, elapsed)
+            )
     if "sameBaseline" in scenarios:
         baseline = WorkingVersion()
         identified: list[tuple[str, list[Proposal]]] = []
@@ -1202,6 +1743,12 @@ def evaluate(
     scenarios = bundle.get("scenarios") or SCENARIOS
     if not isinstance(scenarios, list | tuple) or not all(isinstance(s, str) for s in scenarios):
         raise ValueError(f"Scenarios must be a list of names: {scenarios!r}")
+    reviewed = bundle.get("reviewed", False)
+    no_memory = bundle.get("noMemory", False)
+    if not isinstance(reviewed, bool):
+        raise ValueError(f"reviewed must be boolean: {reviewed!r}")
+    if not isinstance(no_memory, bool):
+        raise ValueError(f"noMemory must be boolean: {no_memory!r}")
     models = _models(settings, mode, bundle.get("manifest"))
     files = {path: base64.b64decode(value) for path, value in bundle["files"].items()}
     if mode == "replay":
@@ -1215,7 +1762,9 @@ def evaluate(
     stream = RecordingStream(json.dumps({"models": asdict(models)}, indent=1), write_line)
     gateway = ReplayGateway(recordings, inner, on_record=stream.on_record)
     try:
-        result = asyncio.run(run_case(files, gateway, models, scenarios))
+        result = asyncio.run(
+            run_case(files, gateway, models, scenarios, reviewed=reviewed, no_memory=no_memory)
+        )
     except (AiError, ReplayMissError, ExpectedError) as exc:
         error = f"{type(exc).__name__}: {exc}"
         return {"type": "error", "error": error}, 1
