@@ -37,7 +37,7 @@ import time
 import tomllib
 import traceback
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal, cast
@@ -46,7 +46,7 @@ from uuid import UUID, uuid5
 from pydantic import BaseModel
 
 from ontology_platform.modules.ai import schemas
-from ontology_platform.modules.ai.candidates import THRESHOLD, Names, group_recall
+from ontology_platform.modules.ai.candidates import THRESHOLD, Names, group_recall, similarity
 from ontology_platform.modules.ai.candidates import score as candidate_score
 from ontology_platform.modules.ai.extraction import (
     TYPES_BATCH_TERMS,
@@ -1066,17 +1066,99 @@ class FlagReviewer:
         return decide
 
 
+@dataclass(frozen=True)
+class _PropertyGroup:
+    domain: str
+    label: str
+    names: frozenset[str]
+
+
+def _property_groups(expected: Mapping[str, Any]) -> dict[str, list[_PropertyGroup]]:
+    by_domain: dict[str, list[_PropertyGroup]] = {}
+    for entry in expected.get("properties", []):
+        domain = normalize(entry["domain"])
+        names = entry["names"]
+        group = _PropertyGroup(domain, names[0], frozenset(normalize(n) for n in names))
+        by_domain.setdefault(domain, []).append(group)
+    return by_domain
+
+
+def _nearest_property(
+    names: set[str], groups: Sequence[_PropertyGroup]
+) -> tuple[_PropertyGroup, float] | None:
+    best: tuple[_PropertyGroup, float] | None = None
+    for group in groups:
+        score = max(
+            (
+                similarity(left, right)
+                for left in names
+                for right in group.names
+                if len(left) >= 2 and len(right) >= 2 and (left in right or right in left)
+            ),
+            default=0.0,
+        )
+        if score and (best is None or score > best[1]):
+            best = group, score
+    return best
+
+
+def _review_properties(
+    proposals: list[Proposal],
+    decided: list[DecidedItem],
+    known: Iterable[KnownElement],
+    groups_by_ref: Mapping[str, Sequence[_PropertyGroup]],
+) -> None:
+    covered: set[_PropertyGroup] = set()
+    for element in known:
+        if element.kind == "property" and element.domain_id is not None:
+            names = _names(element)
+            groups = groups_by_ref.get(str(element.domain_id), ())
+            covered.update(group for group in groups if names & group.names)
+
+    matches: dict[_PropertyGroup, list[tuple[int, float]]] = {}
+    for index, proposal in enumerate(proposals):
+        if proposal.op != "create" or proposal.kind != "property":
+            continue
+        groups = groups_by_ref.get(proposal.fields.get("domainRef", ""), ())
+        names = _proposal_names(proposal)
+        exact = [group for group in groups if names & group.names]
+        if exact:
+            covered.update(exact)
+            continue
+        match = _nearest_property(names, groups)
+        if match is None:
+            decided[index] = replace(decided[index], decision="rejected", reject_reason="incorrect")
+        else:
+            group, score = match
+            matches.setdefault(group, []).append((index, score))
+
+    for group, batch in matches.items():
+        winner = None if group in covered else max(batch, key=lambda candidate: candidate[1])[0]
+        for index, _ in batch:
+            if index != winner:
+                decided[index] = replace(
+                    decided[index], decision="rejected", reject_reason="duplicate"
+                )
+            else:
+                proposal = proposals[index]
+                proposals[index] = replace(
+                    proposal, fields={**proposal.fields, "labelZh": group.label}
+                )
+                decided[index] = replace(decided[index], final_label_zh=group.label)
+
+
 class OracleReviewer(FlagReviewer):
     """Decide create items against the expected answers, without a database."""
 
     def __init__(self, expected: Mapping[str, Any]) -> None:
         super().__init__(expected)
         self.expected = expected
+        self.property_groups = _property_groups(expected)
 
     def review(
         self, proposals: Sequence[Proposal], label: str, version: WorkingVersion | None
     ) -> tuple[list[Proposal], list[DecidedItem]]:
-        accepted: list[Proposal] = []
+        finals: list[Proposal] = []
         decided: list[DecidedItem] = []
         known = {str(e.id): e for e in version.elements} if version is not None else {}
         review_labels = {
@@ -1126,24 +1208,11 @@ class OracleReviewer(FlagReviewer):
                 }
                 if domain is None or range_ is None or frozenset((domain, range_)) not in wanted:
                     decision = "rejected"
-            elif (
-                proposal.op == "create"
-                and proposal.kind == "property"
-                and "properties" in self.expected
-            ):
-                domain = expected_group(fields.get("domainRef"))
-                if not any(
-                    domain == group_of[normalize(p["domain"])]
-                    and _proposal_names(proposal) & {normalize(n) for n in p["names"]}
-                    for p in self.expected["properties"]
-                ):
-                    decision = "rejected"
-            if decision == "accepted":
-                accepted.append(final)
-                if final.temp_ref and final.kind == "entity_type":
-                    review_labels[final.temp_ref] = (
-                        final.fields.get("labelZh") or final.fields.get("labelEn") or ""
-                    )
+            finals.append(final)
+            if decision == "accepted" and final.temp_ref and final.kind == "entity_type":
+                review_labels[final.temp_ref] = (
+                    final.fields.get("labelZh") or final.fields.get("labelEn") or ""
+                )
             match = proposal.match
             other_label = None
             if match is not None:
@@ -1176,7 +1245,17 @@ class OracleReviewer(FlagReviewer):
                     match_other_element_id=match.element_id if match else None,
                 )
             )
-        return accepted, decided
+        if "properties" in self.expected:
+            # Property domains can refer to a type renamed later in this batch.
+            groups_by_ref = {
+                ref: self.property_groups.get(normalize(groups[domain]["names"][0]), [])
+                for ref in review_labels
+                if (domain := expected_group(ref)) is not None
+            }
+            _review_properties(finals, decided, known.values(), groups_by_ref)
+        return [
+            p for p, d in zip(finals, decided, strict=True) if d.decision == "accepted"
+        ], decided
 
 
 @dataclass(frozen=True)
@@ -1191,6 +1270,7 @@ def _assist_groups(
     steps: Sequence[AssistStep], expected: Mapping[str, Any], known: Sequence[KnownElement]
 ) -> dict[UUID, tuple[str, ...]]:
     """Index named expected groups by item or element ID. A property's domain scopes its name."""
+    property_groups = _property_groups(expected)
     aliases: dict[tuple[str, ...], tuple[str, ...]] = {}
     for kind, entries in (
         ("entity_type", expected["entity_types"]),
@@ -1236,7 +1316,19 @@ def _assist_groups(
                 assign_group(d.item_id, p)
         for p, d in pairs:
             if p.kind == "property" and (domain := p.fields.get("domainRef")):
-                assign_group(d.item_id, p, refs.get(domain) or _uuid(domain))
+                owner = refs.get(domain) or _uuid(domain)
+                owner_group = groups.get(owner) if owner is not None else None
+                if owner_group and (
+                    d.final_label_zh != d.proposed_label_zh or d.reject_reason == "duplicate"
+                ):
+                    match = _nearest_property(
+                        _proposal_names(p), property_groups.get(owner_group[-1], ())
+                    )
+                    if match is not None:
+                        group, _ = match
+                        groups[d.item_id] = (p.kind, group.domain, normalize(group.label))
+                        continue
+                assign_group(d.item_id, p, owner)
     return groups
 
 
