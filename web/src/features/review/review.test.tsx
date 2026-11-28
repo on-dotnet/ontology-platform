@@ -71,6 +71,7 @@ function reviewServer({ initial = changeSetFixture(items()), extra = {}, user }:
     'GET /api/ontologies': () => [ontologyFixture({ openChangeSetCount: 1 })],
     'GET /api/change-sets': () => [state],
     'GET /api/change-sets/:id': () => state,
+    'GET /api/change-sets/:id/review-assist': () => null,
     'GET /api/ontologies/:id/elements': () => [elementFixture()],
     'GET /api/documents/:id': () => documentFixture(),
     'GET /api/documents/:id/chunks/:chunkId': ({ params }) => ({

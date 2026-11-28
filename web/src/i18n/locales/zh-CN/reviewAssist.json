@@ -1,0 +1,18 @@
+{
+  "run": "✦ AI 预审", "rerun": "重新预审", "stillWorking": "仍在处理", "aiLabel": "✦ AI 建议",
+  "counts": "有风险 {{withRisks}} · 建议拒绝 {{suggestReject}} · 建议修改 {{suggestEdit}}",
+  "staleCount": "预审之后有 {{count}} 项已修改", "staleItem": "预审之后已修改",
+  "rulesOnly": "只做了规则检查", "truncated": "AI 只看了前 400 项，其余只做了规则检查", "partial": "部分项没有完成 AI 检查",
+  "failed": "预审失败，请重试", "retry": "重试", "loadFailed": "无法读取预审结果", "requestFailed": "发起预审失败", "rateLimited": "请在 {{seconds}} 秒后再试",
+  "filters": "预审筛选", "noResults": "没有符合筛选条件的变更项。", "filter": { "risk": "有风险", "reject": "建议拒绝", "edit": "建议修改" },
+  "group": "预审分组", "allGroups": "全部分组", "groupOption": "{{title}}（{{count}} 项）",
+  "risk": { "weak_evidence": "证据弱", "conflict": "冲突", "duplicate": "疑似重复", "naming": "命名不一致", "memory": "与审核记忆相似" },
+  "aiRisk": "✦ {{label}}",
+  "aiRiskLabel": "AI 判断：{{label}}。{{detail}}",
+  "riskLabel": "{{label}}：{{detail}}",
+  "detail": { "evidence_not_found": "未找到证据", "no_evidence": "没有资料证据", "low_confidence": "置信度低", "possible_duplicate": "可能重复", "undecided_match": "尚未决定对齐关系", "kept_fields": "保留字段需要核对", "stale_target": "目标元素已变化", "local_name_style": "局部名格式需要核对", "missing_label_en": "缺少英文名称", "similar_to_rejected": "与先前拒绝的提议相似", "other": "请核对这一项" },
+  "suggestion": "✦ {{kind}}",
+  "suggestionWithReason": "✦ {{kind}}：{{reason}}",
+  "suggestions": { "accept": "建议接受", "reject": "建议拒绝", "edit": "建议修改", "unsure": "AI 拿不准" },
+  "applyRename": "按建议修改", "excluded": "已排除 AI 预审标出风险的 {{count}} 项"
+}

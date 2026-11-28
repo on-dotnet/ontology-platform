@@ -11,7 +11,8 @@ import { DATATYPES } from '@/features/ontologies/api';
 import { AxiomBadge, AxiomFragment, ConstraintRules } from '@/features/ontology/element-content';
 import { cn } from '@/lib/cn';
 
-import { isAiSource, type ChangeItem, type ChangeSetSource, type Decision, type ElementFields, type MatchDecision, type RejectReason } from './api';
+import { isAiSource, type AssistItem as AssistItemData, type AssistRename, type ChangeItem, type ChangeSetSource, type Decision, type ElementFields, type MatchDecision, type RejectReason } from './api';
+import { AssistItem } from './assist-item';
 import { BindingComparison, BindingNotices, bindingSentence, isBindingKind } from './binding-item';
 import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge, RejectReasonBadge } from './item-badges';
 import { ItemImpact } from './item-impact';
@@ -49,6 +50,8 @@ interface ChangeItemCardProps {
   /** The reviewer's conclusion on the item's alignment record; null clears it. */
   onDecideMatch: (decision: MatchDecision) => void;
   onEdit: () => void;
+  assist?: AssistItemData;
+  onApplyRename?: (rename: AssistRename) => void;
   /** Offers the impact summary of updates and deletes, loaded from this ontology when opened. */
   impactOntologyId?: string;
 }
@@ -68,6 +71,8 @@ export function ChangeItemCard({
   onDecide,
   onDecideMatch,
   onEdit,
+  assist,
+  onApplyRename,
   impactOntologyId,
 }: ChangeItemCardProps) {
   const { t } = useTranslation();
@@ -158,6 +163,9 @@ export function ChangeItemCard({
         </section>
       ) : null}
       {item.rationale ? <p className="mt-2 text-xs text-muted-foreground">{t('review.rationale', { text: item.rationale })}</p> : null}
+      {assist ? <AssistItem item={assist} canEdit={canDecide && isEditable(item, context)} onApplyRename={() => {
+        if (assist.rename) onApplyRename?.(assist.rename);
+      }} /> : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {canDecide ? (
