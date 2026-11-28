@@ -1,11 +1,14 @@
-import { test as base, expect, type ConsoleMessage } from '@playwright/test';
+import { test as base, expect, type APIRequestContext, type ConsoleMessage } from '@playwright/test';
 
 export { expect };
 
 export const STORAGE_STATE = 'test-results/.auth/admin.json';
 export const SIGNED_OUT = { cookies: [], origins: [] };
 
-/** Seeded by global-setup.ts; the tests pick the second one so that choosing it is a real switch. */
+/**
+ * Seeded by global-setup.ts. The smoke tests pick B so that choosing it is a real switch, and B
+ * keeps no change sets for the review-list test; the review-assist test adds its change set to A.
+ */
 export const SEEDED_ONTOLOGIES = [
   { key: 'e2e-smoke-a', name: 'E2E 冒烟本体 A' },
   { key: 'e2e-smoke-b', name: 'E2E 冒烟本体 B' },
@@ -16,6 +19,13 @@ export function credentials(): { username: string; password: string } {
   const password = process.env.E2E_PASSWORD;
   if (!username || !password) throw new Error('E2E_USERNAME and E2E_PASSWORD must be set (see e2e/e2e.env)');
   return { username, password };
+}
+
+export async function csrfHeaders(api: APIRequestContext): Promise<Record<string, string>> {
+  const { cookies } = await api.storageState();
+  const csrf = cookies.find((cookie) => cookie.name === 'op_csrf')?.value;
+  if (!csrf) throw new Error('sign-in set no op_csrf cookie');
+  return { 'X-CSRF-Token': csrf };
 }
 
 /** An API answer a test expects to be an error; the browser logs it as a failed load anyway. */
