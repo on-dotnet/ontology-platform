@@ -3,11 +3,13 @@
 import asyncio
 import json
 import time
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from math import ceil
-from typing import cast
+from typing import Any, Literal, cast
 from uuid import UUID, uuid4
 
+from pydantic import ValidationError
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -381,6 +383,189 @@ def _validated(
     return answer, groups, dropped
 
 
+@dataclass(frozen=True)
+class AssistOutcome:
+    status: Literal["done", "partial"]
+    error_code: str | None
+    ai_used: bool
+    truncated: bool
+    dropped: int
+    summary: str | None
+    groups: list[schemas.AssistGroup]
+    items: tuple[schemas.AssistItem, ...]
+
+    def stored_result(self, ctx: ReviewContext) -> dict[str, Any]:
+        return {
+            "summary": self.summary,
+            "groups": [g.model_dump(mode="json", by_alias=True) for g in self.groups],
+            "items": [item.model_dump(mode="json", by_alias=True) for item in self.items],
+            "fingerprints": {str(item.id): item.fingerprint for item in ctx.items},
+        }
+
+
+def context_elements_max(settings: Settings) -> int:
+    return 400 * ceil(settings.review_assist_items_max / settings.review_assist_batch)
+
+
+def _is_model_error(exc: Exception) -> bool:
+    if isinstance(exc, AiError):
+        return exc.code in ("ai.unavailable", "ai.invalid_output")
+    return isinstance(exc, ValidationError)
+
+
+async def run_assist(
+    ctx: ReviewContext,
+    gateway: ModelGateway | None,
+    model: str | None,
+    settings: Settings,
+    locale: schemas.Locale,
+    *,
+    deadline: float,
+    document_id: UUID | None = None,
+    fail_on_internal_error: bool = False,
+) -> AssistOutcome:
+    """Review a frozen change set. With no gateway, only the rules run.
+
+    Evaluations propagate internal errors so that only model failures affect their scores.
+    """
+    batch_size = settings.review_assist_batch
+    max_items = settings.review_assist_items_max
+    risks = rule_risks(ctx)
+    items = {
+        item.id: schemas.AssistItem(
+            item_id=item.id,
+            stale=False,
+            risks=list(risks[item.id]),
+            suggestion=None,
+            reason=None,
+            rename=None,
+        )
+        for item in ctx.items
+    }
+    capped = ctx.items[:max_items]
+    batches = [tuple(capped[i : i + batch_size]) for i in range(0, len(capped), batch_size)]
+    completed: list[tuple[int, str, list[schemas.AssistGroup]]] = []
+    first_error: str | None = None
+    dropped = 0
+    if gateway and model:
+        for batch_number, batch in enumerate(batches, 1):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                first_error = first_error or "review_assist.timeout"
+                break
+            try:
+                chosen = select_batch_context(ctx, batch)
+                output = await asyncio.wait_for(
+                    gateway.structured(
+                        purpose=JOB_KIND,
+                        model=model,
+                        instructions=REVIEW_INSTRUCTIONS,
+                        text=batch_text(chosen, locale),
+                        schema=schemas.ReviewAssistOut,
+                        document_id=document_id,
+                    ),
+                    timeout=remaining,
+                )
+                reviewed, groups, lost = _validated(output, batch, chosen.elements)
+                dropped += lost
+                for item_id, (suggestion, reason, rename, ai_risks) in reviewed.items():
+                    items[item_id].suggestion = suggestion
+                    items[item_id].reason = reason
+                    items[item_id].rename = rename
+                    items[item_id].risks.extend(ai_risks)
+                completed.append((batch_number, output.summary[:600], groups))
+            except TimeoutError:
+                first_error = first_error or "review_assist.timeout"
+                break
+            except (AiError, ValueError, TypeError, KeyError) as exc:
+                if fail_on_internal_error and not _is_model_error(exc):
+                    raise
+                first_error = first_error or (
+                    exc.code if isinstance(exc, AiError) else "ai.invalid_output"
+                )
+    summary = completed[0][1] if completed else None
+    groups = [group for _, _, group_list in completed for group in group_list][:12]
+    if len(completed) > 1 and gateway and model:
+        input_data = [
+            {
+                "batch": batch_number,
+                "summary": summary_text,
+                "groups": [
+                    {"group": j + 1, "title": group.title, "count": len(group.item_ids)}
+                    for j, group in enumerate(group_list)
+                ],
+            }
+            for batch_number, summary_text, group_list in completed
+        ]
+        remaining = deadline - time.monotonic()
+        try:
+            if remaining <= 0:
+                raise TimeoutError
+            summary_output = await asyncio.wait_for(
+                gateway.structured(
+                    purpose="review.assist.summary",
+                    model=model,
+                    instructions=REVIEW_SUMMARY_INSTRUCTIONS,
+                    text=f"language: {locale}\n" + json.dumps(input_data, ensure_ascii=False),
+                    schema=schemas.ReviewAssistSummaryOut,
+                    document_id=document_id,
+                ),
+                timeout=remaining,
+            )
+            summary = summary_output.summary[:600]
+            merged: list[schemas.AssistGroup] = []
+            assigned: set[UUID] = set()
+            for raw_model in summary_output.groups[:12]:
+                raw = raw_model.model_dump(mode="json", by_alias=True)
+                ids: list[UUID] = []
+                sources = raw.get("from", [])
+                for source in sources if isinstance(sources, list) else []:
+                    if isinstance(source, dict):
+                        b, g = source.get("batch"), source.get("group")
+                        if (
+                            isinstance(b, int)
+                            and isinstance(g, int)
+                            and 1 <= b <= len(batches)
+                            and any(
+                                index == b and 1 <= g <= len(group_list)
+                                for index, _, group_list in completed
+                            )
+                        ):
+                            ids.extend(
+                                next(
+                                    group_list[g - 1].item_ids
+                                    for index, _, group_list in completed
+                                    if index == b
+                                )
+                            )
+                unique = [item_id for item_id in dict.fromkeys(ids) if item_id not in assigned]
+                assigned.update(unique)
+                if unique:
+                    merged.append(
+                        schemas.AssistGroup(
+                            title=str(raw.get("title", ""))[:40],
+                            item_ids=unique,
+                        )
+                    )
+            # A summary whose groups all cite unknown sources keeps the batches' groups.
+            groups = merged or groups
+        except TimeoutError:
+            pass
+        except (AiError, ValueError, TypeError, KeyError) as exc:
+            if fail_on_internal_error and not _is_model_error(exc):
+                raise
+    return AssistOutcome(
+        status="partial" if first_error else "done",
+        error_code=first_error,
+        ai_used=bool(completed),
+        truncated=bool(gateway and model) and len(ctx.items) > max_items,
+        dropped=dropped,
+        summary=summary,
+        groups=groups,
+        items=tuple(items.values()),
+    )
+
+
 def make_review_assistant(
     session_factory: async_sessionmaker[AsyncSession],
     gateway: ModelGateway | None,
@@ -406,160 +591,35 @@ def make_review_assistant(
             change_set_id = row.change_set_id
             locale = cast(schemas.Locale, row.locale)
         try:
-            batch_size = settings.review_assist_batch
-            max_items = settings.review_assist_items_max
             async with session_factory() as db:
                 ctx = await review_context(
                     db,
                     change_set_id,
-                    elements_max=400 * ceil(max_items / batch_size),
+                    elements_max=context_elements_max(settings),
                     memory_max=settings.review_memory_max,
                 )
-            risks = rule_risks(ctx)
-            items = {
-                item.id: schemas.AssistItem(
-                    item_id=item.id,
-                    stale=False,
-                    risks=list(risks[item.id]),
-                    suggestion=None,
-                    reason=None,
-                    rename=None,
-                )
-                for item in ctx.items
-            }
-            capped = ctx.items[:max_items]
-            batches = [tuple(capped[i : i + batch_size]) for i in range(0, len(capped), batch_size)]
-            completed: list[tuple[int, str, list[schemas.AssistGroup]]] = []
-            first_error: str | None = None
-            dropped = 0
-            if gateway and model and settings.ai_configured:
-                for batch_number, batch in enumerate(batches, 1):
-                    remaining = deadline - time.monotonic()
-                    if remaining <= 0:
-                        first_error = first_error or "review_assist.timeout"
-                        break
-                    try:
-                        chosen = select_batch_context(ctx, batch)
-                        output = await asyncio.wait_for(
-                            gateway.structured(
-                                purpose=JOB_KIND,
-                                model=model,
-                                instructions=REVIEW_INSTRUCTIONS,
-                                text=batch_text(chosen, locale),
-                                schema=schemas.ReviewAssistOut,
-                            ),
-                            timeout=remaining,
-                        )
-                        reviewed, groups, lost = _validated(output, batch, chosen.elements)
-                        dropped += lost
-                        for item_id, (suggestion, reason, rename, ai_risks) in reviewed.items():
-                            items[item_id].suggestion = suggestion
-                            items[item_id].reason = reason
-                            items[item_id].rename = rename
-                            items[item_id].risks.extend(ai_risks)
-                        completed.append((batch_number, output.summary[:600], groups))
-                    except TimeoutError:
-                        first_error = first_error or "review_assist.timeout"
-                        break
-                    except AiError as exc:
-                        first_error = first_error or exc.code
-                    except (ValueError, TypeError, KeyError):
-                        first_error = first_error or "ai.invalid_output"
-            ai_used = bool(completed)
-            summary = completed[0][1] if completed else None
-            groups = [group for _, _, group_list in completed for group in group_list][:12]
-            if len(completed) > 1 and gateway and model:
-                input_data = [
-                    {
-                        "batch": batch_number,
-                        "summary": summary_text,
-                        "groups": [
-                            {"group": j + 1, "title": group.title, "count": len(group.item_ids)}
-                            for j, group in enumerate(group_list)
-                        ],
-                    }
-                    for batch_number, summary_text, group_list in completed
-                ]
-                remaining = deadline - time.monotonic()
-                try:
-                    if remaining <= 0:
-                        raise TimeoutError
-                    summary_output = await asyncio.wait_for(
-                        gateway.structured(
-                            purpose="review.assist.summary",
-                            model=model,
-                            instructions=REVIEW_SUMMARY_INSTRUCTIONS,
-                            text=f"language: {locale}\n"
-                            + json.dumps(input_data, ensure_ascii=False),
-                            schema=schemas.ReviewAssistSummaryOut,
-                        ),
-                        timeout=remaining,
-                    )
-                    summary = summary_output.summary[:600]
-                    merged: list[schemas.AssistGroup] = []
-                    assigned: set[UUID] = set()
-                    for raw_model in summary_output.groups[:12]:
-                        raw = raw_model.model_dump(mode="json", by_alias=True)
-                        ids: list[UUID] = []
-                        sources = raw.get("from", [])
-                        for source in sources if isinstance(sources, list) else []:
-                            if isinstance(source, dict):
-                                b, g = source.get("batch"), source.get("group")
-                                if (
-                                    isinstance(b, int)
-                                    and isinstance(g, int)
-                                    and 1 <= b <= len(batches)
-                                    and any(
-                                        index == b and 1 <= g <= len(group_list)
-                                        for index, _, group_list in completed
-                                    )
-                                ):
-                                    ids.extend(
-                                        next(
-                                            group_list[g - 1].item_ids
-                                            for index, _, group_list in completed
-                                            if index == b
-                                        )
-                                    )
-                        unique = [
-                            item_id for item_id in dict.fromkeys(ids) if item_id not in assigned
-                        ]
-                        assigned.update(unique)
-                        if unique:
-                            merged.append(
-                                schemas.AssistGroup(
-                                    title=str(raw.get("title", ""))[:40],
-                                    item_ids=unique,
-                                )
-                            )
-                    # A summary whose groups all cite unknown sources keeps the batches' groups.
-                    groups = merged or groups
-                except TimeoutError:
-                    pass
-                except (AiError, ValueError, TypeError, KeyError):
-                    pass
-            result = {
-                "summary": summary,
-                "groups": [g.model_dump(mode="json", by_alias=True) for g in groups],
-                "items": [item.model_dump(mode="json", by_alias=True) for item in items.values()],
-                "fingerprints": {str(item.id): item.fingerprint for item in ctx.items},
-            }
+            outcome = await run_assist(
+                ctx,
+                gateway if settings.ai_configured else None,
+                model,
+                settings,
+                locale,
+                deadline=deadline,
+            )
+            result = outcome.stored_result(ctx)
             async with session_factory.begin() as db:
                 await job.check_lease(db)
                 row = await db.get(ReviewAssistRow, assist_id, with_for_update=True)
                 if row is None or row.status != "running":
                     return
                 row.result = result
-                row.status = "partial" if first_error else "done"
-                row.error_code = first_error
-                row.ai_used = ai_used
-                row.truncated = (
-                    bool(gateway and model and settings.ai_configured)
-                    and len(ctx.items) > max_items
-                )
+                row.status = outcome.status
+                row.error_code = outcome.error_code
+                row.ai_used = outcome.ai_used
+                row.truncated = outcome.truncated
                 row.items_total = len(ctx.items)
-                row.items_ai = sum(item.suggestion is not None for item in items.values())
-                row.dropped = dropped
+                row.items_ai = sum(item.suggestion is not None for item in outcome.items)
+                row.dropped = outcome.dropped
                 row.finished_at = _now()
         except Exception:
             async with session_factory.begin() as db:
