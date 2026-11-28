@@ -497,6 +497,14 @@ async def save_edits(
     own_count = len(checked.items)
     if checked.deletes:
         _add_cascade(ontology, elements, checked)
+    if not body.allow_cascade and len(checked.items) > own_count:
+        added = len(checked.items) - own_count
+        raise AppError(
+            409,
+            "changeset.cascade_changed",
+            f"The deletion would affect {added} additional "
+            f"{'element' if added == 1 else 'elements'} outside this request.",
+        )
     change_set_id = await service.create_change_set(
         db,
         ontology_id=ontology_id,

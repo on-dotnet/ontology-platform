@@ -234,7 +234,7 @@ interface BindingServerOptions {
   /** Answers the data source list instead of `sources`. */
   sourceList?: RouteHandler;
   nextCursor?: string;
-  editError?: string;
+  editError?: Response;
 }
 
 function bindingServer({
@@ -270,7 +270,7 @@ function bindingServer({
         tables.find((table) => params.id === mes.id && params.schema === table.schema && params.table === table.name)
           ?? problemResponse(404, 'catalog.table_not_found'),
       'POST /api/ontologies/:id/edits': ({ body }) => {
-        if (editError) return problemResponse(422, editError);
+        if (editError) return editError.clone();
         const request = body as EditRequest;
         return { changeSetId: 'cs-manual', merged: request.apply, merge: request.apply ? { applied: request.items.length, skipped: [] } : null };
       },
@@ -421,6 +421,7 @@ describe('BindingSection', () => {
     await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
     const request = api.calls('POST', EDITS)[0]?.body as EditRequest;
     expect(request.apply).toBe(false);
+    expect(request).not.toHaveProperty('allowCascade');
     const [table, column, ...rest] = request.items;
     expect(rest).toEqual([]);
     expect(table).toMatchObject({
@@ -482,6 +483,7 @@ describe('BindingSection', () => {
     await save();
 
     const items = await submittedItems(api);
+    expect(api.calls('POST', EDITS)[0]?.body).toHaveProperty('allowCascade', false);
     const deletions = [
       { op: 'delete', kind: 'type_binding', targetElementId: 'bd-heat', targetRevision: 3 },
       { op: 'delete', kind: 'property_binding', targetElementId: 'bd-weight', targetRevision: 5 },
@@ -526,6 +528,7 @@ describe('BindingSection', () => {
       { op: 'delete', kind: 'relation_binding', targetElementId: 'bd-first-heat', targetRevision: 9 },
       { op: 'delete', kind: 'type_binding', targetElementId: 'bd-heat', targetRevision: 3 },
     ]);
+    expect(api.calls('POST', EDITS)[0]?.body).toHaveProperty('allowCascade', false);
   });
 
   it('does not submit when unbinding is cancelled', async () => {
@@ -538,8 +541,7 @@ describe('BindingSection', () => {
   });
 
   it('closes the confirmation and shows the server problem in the editor when unbinding fails', async () => {
-    // Any rejected edit takes this path; the type mismatch is just a problem with a known message.
-    const { api, user, dialog } = await openEditor({ view: heatWithJoins, editError: 'binding.type_mismatch' });
+    const { api, user, dialog } = await openEditor({ view: heatWithJoins, editError: problemResponse(422, 'binding.type_mismatch') });
     await user.click(dialog.getByRole('button', { name: formText('unbind') }));
     const confirmation = within(await screen.findByRole('dialog', { name: formText('unbindConfirm.title') }));
     await user.click(confirmation.getByRole('button', { name: formText('unbind') }));
@@ -590,6 +592,28 @@ describe('BindingSection', () => {
     expect(await dialog.findByText(formText('dependenciesChanged'))).toBeVisible();
     expect(dialog.getByRole('checkbox', { name: 'archive_no' })).toBeChecked();
     expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('keeps the draft and refreshes the queries when the server detects an unlisted dependency', async () => {
+    const { api, user, dialog, save } = await openEditor({
+      tables: [currentHeatTable, archiveTable, castTable], editError: problemResponse(409, 'changeset.cascade_changed'),
+    });
+    await user.click(await dialog.findByRole('option', { name: /mes\.archived_heat/ }));
+    expect(await dialog.findByRole('checkbox', { name: 'archive_no' })).toBeChecked();
+    await save();
+
+    expect(await dialog.findByText(formText('dependenciesChanged'))).toBeVisible();
+    expect(dialog.getByRole('checkbox', { name: 'archive_no' })).toBeChecked();
+    expect(api.calls('POST', EDITS)).toHaveLength(1);
+    const posted = api.requests.findIndex(({ method, path }) => method === 'POST' && path === EDITS);
+    await waitFor(() => {
+      const refreshed = api.requests.slice(posted + 1).filter(({ method }) => method === 'GET');
+      expect(refreshed.map(({ path }) => path)).toEqual(expect.arrayContaining([
+        '/api/ontologies/onto-steel/bindings', '/api/data-sources',
+      ]));
+      const elements = refreshed.filter(({ path }) => path === '/api/ontologies/onto-steel/elements');
+      expect(elements.map(({ query }) => query.get('kind'))).toEqual(expect.arrayContaining(['property_binding', 'relation_binding']));
+    });
   });
 
   it.each([
@@ -1023,7 +1047,7 @@ describe('BindingSection', () => {
   });
 
   it('shows the localized type mismatch inside the edit dialog when the server rejects a property binding', async () => {
-    const { api, user, dialog, save } = await openEditor({ editError: 'binding.type_mismatch' });
+    const { api, user, dialog, save } = await openEditor({ editError: problemResponse(422, 'binding.type_mismatch') });
     const column = await dialog.findByRole('combobox', { name: '批次号' });
     await within(column).findByRole('option', { name: /heat_no/ });
     await user.selectOptions(column, 'heat_no');

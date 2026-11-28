@@ -87,7 +87,7 @@ type EditItem = {
   targetElementId?: string; targetRevision?: number;   // update / delete / restore 必填
   tempRef?: string; fields: ElementFields;
 };
-type EditRequest = { items: EditItem[]; apply: boolean };
+type EditRequest = { items: EditItem[]; apply: boolean; allowCascade?: boolean };
 type EditResult = { changeSetId: string; merged: boolean; merge: MergeResult | null };
 
 type ElementRef = { id: string; kind: Kind; label: string; iri: string | null };
@@ -103,6 +103,7 @@ type Impact = {
 // - create 不能带 iri（显式 IRI 只来自导入），否则 422 changeset.invalid_edit；
 // - 同一次保存里两项指向同一元素，或某项引用、修改的元素会被本次删除（含级联）一并删除，422 changeset.invalid_edit；
 // - 级联按本次修改之后的引用计算：用户在同一次保存里把引用改走的，不再清空或删除；
+// - allowCascade 默认 true。设为 false 时，级联若涉及请求未列出的元素，整次保存失败（409 changeset.cascade_changed）；级联只把字段合并进请求已列出的项时不算。
 // - 约束的规则被级联移除光后保留约束（空规则列表合法），不删除；
 // - 公理的 create、update、restore 都做三项校验；同一次保存里重复的公理按 422 axiom.invalid。
 
@@ -164,6 +165,7 @@ type AssistantRequest = {
 | `import.empty` | 422 | 文件里没有任何三元组 |
 | `import.axiom_too_large` | 422 | 某条公理超过平台能存的长度（200 万字符） |
 | `element.stale` | 409 | 元素在读取之后被修改过 |
+| `changeset.cascade_changed` | 409 | `allowCascade: false` 时，删除需要追加请求未列出的元素 |
 | `element.name_taken` | 409 | 局部名或 IRI 已被占用（包括已删除的元素） |
 | `element.not_found` | 404 | 沿用 M1 |
 | `axiom.invalid` | 422 | 公理片段无法解析、不是恰好一条公理，或本体（或同一次保存）里已有这条公理 |

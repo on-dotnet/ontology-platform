@@ -131,6 +131,7 @@ type TypeBindingView = {
 };
 // GET /api/ontologies/{id}/bindings?typeId=        → TypeBindingView[]（不带 typeId 时返回所有已绑定的类型）
 // 手工编辑绑定沿用 POST /api/ontologies/{id}/edits（002 第 6 节），items 的 kind 用绑定种类。
+// 绑定对话框换表或解绑时，列出类型绑定及其依赖的删除项，并传 allowCascade: false。
 
 // 影响分析（002 的 Impact）新增 bindings: ElementRef[]：直接引用该元素的在用绑定；
 // 绑定的 ElementRef.label 是生成的说明，如 "炉次 → mes.heat"。cascade 里照常包含绑定的删除项。

@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isForbidden } from '@/api/errors';
+import { isApiError, isForbidden } from '@/api/errors';
 import { InfoTip } from '@/components/feedback/hint-tip';
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { ErrorState } from '@/components/states/error-state';
@@ -63,6 +63,10 @@ export function BindingDialog({ open, onOpenChange, ontologyId, type, all, view 
   const ready = availableSources !== undefined && listed && boundViews !== undefined &&
     (!editing || (properties.data !== undefined && relations.data !== undefined));
   const refresh = () => Promise.all([bindingKeys.all, listKey].map((queryKey) => client.invalidateQueries({ queryKey })));
+  function showDependenciesChanged() {
+    setFailure({ changed: true });
+    return refresh();
+  }
   async function save(items: EditItem[], model: BindingModel) {
     if (saving.current) return;
     if (!items.length) {
@@ -73,8 +77,9 @@ export function BindingDialog({ open, onOpenChange, ontologyId, type, all, view 
     setBusy(true);
     setFailure(null);
     try {
-      if (items.some((item) => item.op === 'delete' && item.kind === 'type_binding')) {
-        // The server expands a cascade. Detect dependencies added since this dialog opened.
+      const deletesTypeBinding = items.some((item) => item.op === 'delete' && item.kind === 'type_binding');
+      if (deletesTypeBinding) {
+        // Catch changes since the dialog opened before asking the server to save.
         const [tables, columns, joins] = await Promise.all([
           views.refetch({ throwOnError: true }), properties.refetch({ throwOnError: true }), relations.refetch({ throwOnError: true }),
         ]);
@@ -82,16 +87,24 @@ export function BindingDialog({ open, onOpenChange, ontologyId, type, all, view 
         const current = latestViews.find((item) => item.typeId === type.id);
         const latest = current && bindingModel(type, all, current, latestViews, columns.data ?? [], joins.data ?? []);
         if (!latest || replacementChanged(model, latest, items)) {
-          setFailure({ changed: true });
-          await refresh();
+          await showDependenciesChanged();
           return;
         }
       }
-      await mutation.mutateAsync({ items, appliedTitle: t('bindings.form.saved') });
+      await mutation.mutateAsync({
+        items,
+        appliedTitle: t('bindings.form.saved'),
+        allowCascade: deletesTypeBinding ? false : undefined,
+      });
       await refresh();
       onOpenChange(false);
     } catch (error) {
-      setFailure({ error });
+      if (isApiError(error) && error.status === 409 && error.code === 'changeset.cascade_changed') {
+        // The dependency lists read before the POST are already stale.
+        await Promise.all([showDependenciesChanged(), properties.refetch(), relations.refetch()]);
+      } else {
+        setFailure({ error });
+      }
     } finally {
       saving.current = false;
       setBusy(false);
