@@ -32,7 +32,6 @@ scored against the same run: `--rescore` reads {"expected": "<toml text>", "elem
 import asyncio
 import base64
 import json
-import re
 import sys
 import time
 import tomllib
@@ -49,6 +48,7 @@ from pydantic import BaseModel
 from ontology_platform.modules.ai.candidates import THRESHOLD, Names, group_recall
 from ontology_platform.modules.ai.candidates import score as candidate_score
 from ontology_platform.modules.ai.extraction import (
+    TYPES_BATCH_TERMS,
     ChunkText,
     ExtractionModels,
     Extractor,
@@ -59,10 +59,17 @@ from ontology_platform.modules.ai.extraction import (
     Proposal,
     ProposedMatch,
     RunStats,
+    _aliases,
+    _as_uuid,
+    _unalias,
+    merge_types,
     normalize,
+    relations_catalog,
+    types_context,
 )
 from ontology_platform.modules.ai.gateway import AiError, InputFile, ModelGateway
 from ontology_platform.modules.ai.pipeline import to_item
+from ontology_platform.modules.ai.prompts import EntityTypeOut, TermsOut, TypesOut
 from ontology_platform.modules.ai.replay import (
     STAGE_COUNTS,
     MeteredGateway,
@@ -930,17 +937,16 @@ class OracleReviewer(FlagReviewer):
     ) -> tuple[list[Proposal], list[DecidedItem]]:
         accepted: list[Proposal] = []
         decided: list[DecidedItem] = []
-        by_ref = {p.temp_ref: p for p in proposals if p.temp_ref}
+        accepted_names: dict[str, str] = {}
         known = {str(e.id): e for e in version.elements} if version is not None else {}
 
         def name(ref: str | None) -> str | None:
             if not ref:
                 return None
-            item = by_ref.get(ref)
-            if item is not None:
-                return item.fields.get("labelZh") or item.fields.get("labelEn")
+            if ref in accepted_names:
+                return accepted_names[ref]
             element = known.get(ref)
-            return element.label_zh if element else None
+            return (element.label_zh or element.label_en or element.local_name) if element else None
 
         groups = self.expected["entity_types"]
         group_of = {
@@ -994,6 +1000,10 @@ class OracleReviewer(FlagReviewer):
                     decision = "rejected"
             if decision == "accepted":
                 accepted.append(final)
+                if final.temp_ref and final.kind == "entity_type":
+                    accepted_names[final.temp_ref] = (
+                        final.fields.get("labelZh") or final.fields.get("labelEn") or ""
+                    )
             match = proposal.match
             other_label = None
             if match is not None:
@@ -1002,8 +1012,8 @@ class OracleReviewer(FlagReviewer):
                     other_label = other.label_zh
                 elif match.item_id in self.items:
                     other_label = sorted(self.items[match.item_id])[0]
-                elif match.temp_ref in by_ref:
-                    other_label = by_ref[match.temp_ref].fields.get("labelZh")
+                elif match.temp_ref in accepted_names:
+                    other_label = accepted_names[match.temp_ref]
             decided.append(
                 DecidedItem(
                     item_id=item_id(label, seq),
@@ -1042,6 +1052,9 @@ class _CaptureGateway:
         self.gateway = gateway
         self.known = known
         self.outputs: list[Proposal] = []
+        self.term_batches: list[list[str]] = []
+        self.found_types: list[EntityTypeOut] = []
+        self.type_batch = 0
 
     async def structured[T: BaseModel](
         self,
@@ -1055,6 +1068,9 @@ class _CaptureGateway:
         document_id: Any = None,
         effort: str | None = None,
     ) -> T:
+        term_index = len(self.term_batches) if purpose == "extract.terms" else None
+        if term_index is not None:
+            self.term_batches.append([])
         result = await self.gateway.structured(
             purpose=purpose,
             model=model,
@@ -1065,24 +1081,42 @@ class _CaptureGateway:
             document_id=document_id,
             effort=effort,
         )
-        if purpose == "extract.types":
-            aliases = {
-                alias: element.id
-                for alias, label in re.findall(r"^- (E\d+) \| ([^|]+) \|", text, re.MULTILINE)
-                for element in self.known
-                if normalize(element.label_zh) == normalize(label)
-            }
-            for item in result.model_dump().get("entity_types", []):
+        if term_index is not None:
+            self.term_batches[term_index] = [term.name for term in cast(TermsOut, result).terms]
+        elif purpose == "extract.types":
+            unique_terms: dict[str, str] = {}
+            for term_batch in self.term_batches:
+                for name in term_batch:
+                    unique_terms.setdefault(normalize(name), name)
+            terms = list(unique_terms.values())
+            group = terms[
+                self.type_batch * TYPES_BATCH_TERMS : (self.type_batch + 1) * TYPES_BATCH_TERMS
+            ]
+            context = types_context(self.known, group)
+            aliases = _aliases(
+                [str(element.id) for element in context]
+                + [item.ref for item in self.found_types if _as_uuid(item.ref) is not None]
+            )
+            ids = {alias: value for value, alias in aliases.items()}
+            type_batch_items = [
+                item.model_copy(update={"ref": _unalias(item.ref, ids)})
+                for item in cast(TypesOut, result).entity_types
+            ]
+            self.found_types = merge_types(self.found_types, type_batch_items)
+            self.type_batch += 1
+            for item in type_batch_items:
                 self.outputs.append(
                     Proposal(
-                        op="update" if item["ref"] in aliases else "create",
+                        op="update" if _as_uuid(item.ref) is not None else "create",
                         kind="entity_type",
-                        temp_ref=item["ref"],
-                        target_element_id=aliases.get(item["ref"]),
-                        fields={"labelZh": item.get("label_zh"), "labelEn": item.get("label_en")},
+                        temp_ref=item.ref,
+                        target_element_id=_as_uuid(item.ref),
+                        fields={"labelZh": item.label_zh, "labelEn": item.label_en},
                     )
                 )
         elif purpose == "extract.relations":
+            _, aliases = relations_catalog(self.found_types, self.known)
+            ids = {alias: value for value, alias in aliases.items()}
             values = result.model_dump()
             for item in values.get("relations", []):
                 self.outputs.append(
@@ -1091,8 +1125,8 @@ class _CaptureGateway:
                         kind="relation_type",
                         fields={
                             "labelZh": item["label_zh"],
-                            "domainRef": item["domain"],
-                            "rangeRef": item["range"],
+                            "domainRef": _unalias(item["domain"], ids),
+                            "rangeRef": _unalias(item["range"], ids),
                         },
                     )
                 )
@@ -1101,7 +1135,10 @@ class _CaptureGateway:
                     Proposal(
                         op="create",
                         kind="property",
-                        fields={"labelZh": item["label_zh"], "domainRef": item["domain"]},
+                        fields={
+                            "labelZh": item["label_zh"],
+                            "domainRef": _unalias(item["domain"], ids),
+                        },
                     )
                 )
         return result
@@ -1469,10 +1506,51 @@ async def run_case(
             skipped += version.merge(accepted, label, decide)
             accepted_decisions = (d for d in decisions if d.decision == "accepted")
             completed: list[DecidedItem] = []
+            by_id = {str(element.id): element for element in version.elements}
+            applied_refs = {
+                proposal.temp_ref: version.recorded[item_id(label, seq)].merged_into
+                for seq, proposal in enumerate(accepted, start=1)
+                if proposal.kind == "entity_type" and proposal.temp_ref
+            }
+
+            def ref_name(
+                ref: str | None,
+                elements: Mapping[str, KnownElement],
+                refs: Mapping[str, UUID | None],
+            ) -> str | None:
+                if ref is None:
+                    return None
+                element = elements.get(str(refs.get(ref) or ref))
+                return (
+                    element.label_zh or element.label_en or element.local_name
+                    if element is not None
+                    else None
+                )
+
+            def endpoint_names(
+                proposal: Proposal,
+                merged: UUID | None,
+                elements: Mapping[str, KnownElement],
+                refs: Mapping[str, UUID | None],
+            ) -> tuple[str | None, str | None]:
+                target = elements.get(str(merged)) if merged is not None else None
+                domain = (
+                    str(target.domain_id)
+                    if target and target.domain_id
+                    else proposal.fields.get("domainRef")
+                )
+                range_ = (
+                    str(target.range_id)
+                    if target and target.range_id
+                    else proposal.fields.get("rangeRef")
+                )
+                return ref_name(domain, elements, refs), ref_name(range_, elements, refs)
+
             for seq, decided in enumerate(accepted_decisions, start=1):
                 record = version.recorded[item_id(label, seq)]
                 made = record.merged_into
                 proposal = accepted[seq - 1]
+                domain_label, range_label = endpoint_names(proposal, made, by_id, applied_refs)
                 match_decision = (
                     cast(Literal["same", "different"] | None, decide(proposal, proposal.match))
                     if proposal.match is not None
@@ -1483,10 +1561,23 @@ async def run_case(
                         decided,
                         item_id=item_id(label, seq),
                         created_element_id=made if made not in old_ids else None,
+                        domain_label=domain_label,
+                        range_label=range_label,
                         match_decision=match_decision,
                     )
                 )
-            completed.extend(d for d in decisions if d.decision == "rejected")
+            for proposal, decided in zip(proposals, decisions, strict=True):
+                if decided.decision != "rejected":
+                    continue
+                domain_label, range_label = endpoint_names(proposal, None, by_id, applied_refs)
+                if proposal.kind in ("relation_type", "property") and domain_label is None:
+                    continue
+                if proposal.kind == "relation_type" and range_label is None:
+                    continue
+                # Rejected and accepted item ids can coincide; collect uses them only as provenance.
+                completed.append(
+                    replace(decided, domain_label=domain_label, range_label=range_label)
+                )
             memory = apply_delta(
                 memory,
                 collect("ai_extraction", completed),
