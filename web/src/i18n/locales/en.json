@@ -499,6 +499,19 @@
     "mergeFailedTitle": "The change set was not merged",
     "resolutionChangedTitle": "Merging would no longer do what the page shows",
     "resolutionChangedDescription": "The ontology or this change set changed after you looked at it. What each item below will do when merged has been updated. Look it over, then merge again.",
+    "bindingImpacts": {
+      "title": "Existing bindings affected after merge: {{count}}",
+      "description": "These bindings are outside this change set. Publishing after the merge will fail until they are changed or removed.",
+      "reasons": {
+        "binding": {
+          "invalid": "Reference or structure is no longer valid",
+          "duplicate": "Duplicates another binding",
+          "type_mismatch": "Data types do not match",
+          "cross_source": "The relation spans data sources"
+        },
+        "other": "Binding validation fails"
+      }
+    },
     "resolution": {
       "into": "Will be merged into the existing “{{name}}”",
       "intoDescription": "Nothing new is created: only synonyms and content it lacks are added, and relations and properties referring to this item will refer to it.",

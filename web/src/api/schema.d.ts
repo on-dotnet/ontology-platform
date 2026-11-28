@@ -536,6 +536,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{ontologyId}/change-sets/{id}/binding-impacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Binding Impacts */
+        get: operations["get_binding_impacts_api_ontologies__ontologyId__change_sets__id__binding_impacts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/change-sets/{id}/items/{itemId}": {
         parameters: {
             query?: never;
@@ -1696,6 +1713,30 @@ export interface components {
             /** Message */
             message: string;
             context: components["schemas"]["AssistantContext"];
+        };
+        /** BindingImpact */
+        BindingImpact: {
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "type_binding" | "property_binding" | "relation_binding";
+            /** Label */
+            label: string;
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+        };
+        /** BindingImpacts */
+        BindingImpacts: {
+            /** Items */
+            items: components["schemas"]["BindingImpact"][];
         };
         /** BindingSuggestion */
         BindingSuggestion: {
@@ -6210,6 +6251,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChangeSetDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_binding_impacts_api_ontologies__ontologyId__change_sets__id__binding_impacts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontologyId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BindingImpacts"];
                 };
             };
             /** @description Unauthorized */

@@ -274,6 +274,30 @@ def change_set_nodes(elements: Iterable[Element], items: Iterable[Proposed]) -> 
     return nodes
 
 
+def binding_impacts(
+    elements: Sequence[Element], items: Sequence[Proposed], *, target_ids: set[UUID] | None = None
+) -> list[tuple[Element, Problem]]:
+    """Existing valid bindings made invalid by items aimed at other elements."""
+    before = {str(element.id): element_node(element) for element in elements}
+    after = change_set_nodes(elements, items)
+    targets = (
+        target_ids
+        if target_ids is not None
+        else {item.target_id for item in items if item.target_id is not None}
+    )
+    found: list[tuple[Element, Problem]] = []
+    for element in elements:
+        if element.status != "active" or element.kind not in BINDING_KINDS or element.id in targets:
+            continue
+        key = str(element.id)
+        if node_problems(before[key], before):
+            continue
+        problems = node_problems(after[key], after)
+        if problems:
+            found.append((element, problems[0]))
+    return found
+
+
 # ---------- checks against the other elements ----------
 
 

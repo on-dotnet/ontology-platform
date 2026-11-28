@@ -22,7 +22,7 @@ import { usePermissions } from '@/features/auth/permissions';
 import { usePublishAssistantSelection } from '@/features/assistant/assistant-selection';
 import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
 import { ELEMENT_KINDS, ontologyKeys, useElements, usePlatformSettings, type Element } from '@/features/ontologies/api';
-import { codeMessage, useErrorMessage } from '@/i18n/error-message';
+import { codeMessage, lookupText, useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
 import { usePagination } from '@/lib/pagination';
 import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
@@ -40,6 +40,7 @@ import {
   rejectChangeSet,
   replaceItemInCache,
   sameConceptPending,
+  useBindingImpacts,
   useChangeSet,
   type ChangeItem,
   type ChangeSetDetail,
@@ -133,7 +134,7 @@ interface ChangeSetReviewProps extends ElementsLoadedProps {
 }
 
 function ChangeSetReview({ changeSet, elements, language, own, selfReview }: ChangeSetReviewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const message = useErrorMessage();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -167,6 +168,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const selected = pageItems.find((item) => item.id === selectedId) ?? pageItems[0];
 
   const isOpen = changeSet.status === 'open';
+  const impacts = useBindingImpacts(changeSet.ontologyId, changeSet.id, isOpen);
   const canDecide = canReview && isOpen;
   // Submitters can take their open change set back in either review mode, reviewers too (spec 002, section 8).
   const canWithdraw = isOpen && own;
@@ -320,6 +322,23 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
           <ErrorState error={merge.error} title={t('review.mergeFailedTitle')} onRetry={canDecide ? () => merge.mutate() : undefined} />
         ) : null}
       </div>
+
+      {isOpen && impacts.isSuccess && impacts.data.items.length > 0 ? (
+        <div className="mt-4">
+          <InlineNotice tone="warning" title={t('review.bindingImpacts.title', { count: impacts.data.items.length })}>
+            <p>{t('review.bindingImpacts.description')}</p>
+            <ul className="mt-1.5 list-disc space-y-0.5 pl-5">
+              {impacts.data.items.map((impact) => (
+                <li key={impact.elementId}>
+                  <span className="font-medium">{impact.label}</span>
+                  {t('common.colon')}
+                  {lookupText(i18n, `review.bindingImpacts.reasons.${impact.code}`) ?? t('review.bindingImpacts.reasons.other')}
+                </li>
+              ))}
+            </ul>
+          </InlineNotice>
+        </div>
+      ) : null}
 
       {ordered.length === 0 ? (
         <Card className="mt-4">

@@ -106,6 +106,50 @@ def element_label(element: Element, by_id: Mapping[UUID, Element]) -> str:
     )
 
 
+async def get_binding_impacts(
+    db: AsyncSession, ontology_id: UUID, change_set_id: UUID
+) -> schemas.BindingImpacts:
+    change_set = await service._change_set_or_404(db, change_set_id)
+    if change_set.ontology_id != ontology_id:
+        raise service._change_set_not_found()
+    if change_set.status != "open":
+        return schemas.BindingImpacts(items=[])
+    all_items = await service._items(db, change_set)
+    items = [item for item in all_items if item.decision != "rejected"]
+    if not items:
+        return schemas.BindingImpacts(items=[])
+    elements = await service._elements(db, ontology_id, all_kinds=True)
+    proposed = [
+        binding_rules.Proposed(
+            op=item.op,
+            kind=item.kind,
+            target_id=item.target_element_id,
+            temp_ref=item.temp_ref,
+            fields=rules.effective_fields(item.proposed, item.edited),
+        )
+        for item in items
+    ]
+    by_id = {element.id: element for element in elements}
+    impacts = [
+        schemas.BindingImpact(
+            element_id=element.id,
+            kind=cast(
+                Literal["type_binding", "property_binding", "relation_binding"], element.kind
+            ),
+            label=element_label(element, by_id),
+            code=problem.code,
+            message=problem.message,
+        )
+        for element, problem in binding_rules.binding_impacts(
+            elements,
+            proposed,
+            target_ids={item.target_element_id for item in all_items if item.target_element_id},
+        )
+    ]
+    impacts.sort(key=lambda impact: (impact.label, str(impact.element_id)))
+    return schemas.BindingImpacts(items=impacts[:200])
+
+
 def row_label(row: Mapping[str, Any], rows: Mapping[str, Mapping[str, Any]]) -> str:
     """The label of a binding as a snapshot row (camelCase JSON) among `rows` (by id)."""
 

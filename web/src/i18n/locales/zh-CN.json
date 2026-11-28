@@ -499,6 +499,19 @@
     "mergeFailedTitle": "没有合并到本体",
     "resolutionChangedTitle": "合并结果已与页面上显示的不同",
     "resolutionChangedDescription": "本体或这个变更集在你看过之后有了变化，下面各项“合并时将……”的说明已按最新情况更新。请再看一遍，确认后再点“合并到本体”。",
+    "bindingImpacts": {
+      "title": "合并后有 {{count}} 条已有绑定会失效",
+      "description": "这些绑定不在本变更集里，合并后发布会报错，需要另外修改或解除。",
+      "reasons": {
+        "binding": {
+          "invalid": "引用或结构不再有效",
+          "duplicate": "会与其他绑定重复",
+          "type_mismatch": "数据类型不匹配",
+          "cross_source": "关系两端的数据源不同"
+        },
+        "other": "绑定校验不通过"
+      }
+    },
     "resolution": {
       "into": "合并时将并入已有的“{{name}}”",
       "intoDescription": "不再新建，只补上它还没有的同义词和内容；引用这一项的关系和属性改为指向它。",

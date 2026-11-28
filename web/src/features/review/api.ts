@@ -16,6 +16,7 @@ export type ItemMatch = NonNullable<ChangeItem['match']>;
 export type MatchDecision = ItemMatch['decision'];
 export type ItemPatch = components['schemas']['ItemDecisionPatch'];
 export type MergeResult = components['schemas']['MergeResult'];
+export type BindingImpact = components['schemas']['BindingImpact'];
 export type SkipCode = MergeResult['skipped'][number]['code'];
 
 export const changeSetKeys = {
@@ -35,6 +36,18 @@ export function useChangeSet(id: string) {
   return useQuery({
     queryKey: changeSetKeys.detail(id),
     queryFn: () => unwrap(api.GET('/api/change-sets/{id}', { params: { path: { id } } })),
+  });
+}
+
+export function useBindingImpacts(ontologyId: string, changeSetId: string, enabled: boolean) {
+  return useQuery({
+    // Keep impacts under detail so item decisions invalidate both queries together.
+    queryKey: [...changeSetKeys.detail(changeSetId), 'binding-impacts', ontologyId],
+    queryFn: () => unwrap(api.GET('/api/ontologies/{ontologyId}/change-sets/{id}/binding-impacts', {
+      params: { path: { ontologyId, id: changeSetId } },
+    })),
+    enabled,
+    retry: false,
   });
 }
 
