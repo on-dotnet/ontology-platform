@@ -532,10 +532,11 @@ def make_review_assistant(
                                     item_ids=unique,
                                 )
                             )
-                    groups = merged
+                    # A summary whose groups all cite unknown sources keeps the batches' groups.
+                    groups = merged or groups
                 except TimeoutError:
                     pass
-                except (AiError, ValueError, TypeError):
+                except (AiError, ValueError, TypeError, KeyError):
                     pass
             result = {
                 "summary": summary,

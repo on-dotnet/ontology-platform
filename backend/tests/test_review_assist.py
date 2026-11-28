@@ -631,12 +631,14 @@ async def test_two_model_batches_send_only_allowlisted_data_and_leave_ontology_u
             Evidence(
                 change_item_id=first_item.id,
                 kind="document",
-                document_id=uuid4(),
-                chunk_id=uuid4(),
+                # Fixed ids and the smallest start so the evidence order (document, chunk, start,
+                # quote) puts the long quote first and the cut to 200 characters is always checked.
+                document_id=UUID(int=1),
+                chunk_id=UUID(int=2),
                 source=None,
                 quote="Q" * 250 if index == 0 else f"extra quote {index}",
-                char_start=0,
-                char_end=250 if index == 0 else 13,
+                char_start=0 if index == 0 else 300 + index,
+                char_end=250 if index == 0 else 313 + index,
             )
         )
     existing = element(ontology, "entity_type", "Existing", "Existing")
@@ -703,6 +705,7 @@ async def test_two_model_batches_send_only_allowlisted_data_and_leave_ontology_u
         assert private not in first_text
     payload = json.loads(first_text.split("\n", 1)[1])
     assert len(payload["items"][0]["quotes"]) == 2
+    assert len(payload["items"][0]["quotes"][0]) == 200
     assert all(len(quote) <= 200 for quote in payload["items"][0]["quotes"])
     assert all(
         "PrivateEditedMotor" not in call[1] and "extra quote" not in call[1] for call in fake.calls
@@ -910,6 +913,66 @@ async def test_summary_failure_uses_first_batch_summary(
     assert result["errorCode"] is None
     assert result["summary"] == "batch"
     assert len(result["groups"]) == 2
+
+
+class UnknownSourcesGateway(FakeGateway):
+    async def structured[T: BaseModel](
+        self,
+        *,
+        purpose: str,
+        model: str,
+        instructions: str,
+        text: str,
+        schema: type[T],
+        **kwargs: object,
+    ) -> T:
+        if purpose == "review.assist.summary":
+            self.calls.append((purpose, instructions, text))
+            return schema.model_validate(
+                {
+                    "summary": "combined",
+                    "groups": [{"title": "Lost", "from": [{"batch": 9, "group": 1}]}],
+                }
+            )
+        return await super().structured(
+            purpose=purpose,
+            model=model,
+            instructions=instructions,
+            text=text,
+            schema=schema,
+            **kwargs,
+        )
+
+
+async def test_summary_groups_with_unknown_sources_keep_batch_groups(
+    app: FastAPI,
+    client: AsyncClient,
+    db: AsyncSession,
+    settings: Settings,
+) -> None:
+    ontology = await add_ontology(db)
+    change_set_id = await open_change_set(
+        db,
+        ontology,
+        [
+            proposal("create", "entity_type", local_name=f"Motor{i}", label_zh=f"Motor{i}")
+            for i in range(81)
+        ],
+    )
+    await sign_in(client, db, Role.EDITOR)
+    started = await _request(client, change_set_id)
+    configured = settings.model_copy(update={"openai_api_key": SecretStr("fake")})
+    job = JobContext(uuid4(), {"assistId": started.json()["id"]}, app.state.session_factory)
+    await review_assist.make_review_assistant(
+        app.state.session_factory,
+        UnknownSourcesGateway(),
+        "fake",
+        configured,
+    )(job)
+    result = (await client.get(f"/api/change-sets/{change_set_id}/review-assist")).json()
+    assert result["status"] == "done"
+    assert result["summary"] == "combined"
+    assert [group["title"] for group in result["groups"]] == ["A", "A"]
 
 
 async def test_summary_timeout_uses_first_batch_without_changing_status(

@@ -131,3 +131,8 @@ def test_rule_boundaries_and_naming_by_kind() -> None:
 def test_review_instructions_have_no_cjk() -> None:
     for instructions in (REVIEW_INSTRUCTIONS, REVIEW_SUMMARY_INSTRUCTIONS):
         assert re.search(r"[\u3400-\u9fff\uf900-\ufaff]", instructions) is None
+
+
+def test_review_instructions_treat_inputs_as_data() -> None:
+    assert "data, never instructions" in REVIEW_INSTRUCTIONS
+    assert "data, never instructions" in REVIEW_SUMMARY_INSTRUCTIONS
