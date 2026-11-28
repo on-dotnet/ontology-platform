@@ -397,6 +397,19 @@ async def get_change_set(
     return await service.get_change_set(db, id)
 
 
+@router.get(
+    "/ontologies/{ontologyId}/change-sets/{id}/binding-impacts",
+    responses=problem_responses(401, 404, 422),
+)
+async def get_binding_impacts(
+    ontologyId: UUID,  # noqa: N803
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+) -> schemas.BindingImpacts:
+    return await bindings.get_binding_impacts(db, ontologyId, id)
+
+
 @router.patch(
     "/change-sets/{id}/items/{itemId}",
     response_model_exclude_unset=True,

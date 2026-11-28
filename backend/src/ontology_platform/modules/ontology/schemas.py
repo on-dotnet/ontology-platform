@@ -583,6 +583,18 @@ class ChangeSetDetail(ChangeSetSummary):
     resolution_token: str
 
 
+class BindingImpact(CamelModel):
+    element_id: UUID
+    kind: Literal["type_binding", "property_binding", "relation_binding"]
+    label: str
+    code: str
+    message: str
+
+
+class BindingImpacts(CamelModel):
+    items: list[BindingImpact]
+
+
 class ItemDecisionPatch(CamelModel):
     """Only the given keys change; `edited: null` drops the reviewer's edit."""
 

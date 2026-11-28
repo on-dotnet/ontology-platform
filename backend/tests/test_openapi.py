@@ -33,6 +33,7 @@ M1_PATHS = {
     "/api/ontologies/{id}/releases",
     "/api/change-sets",
     "/api/change-sets/{id}",
+    "/api/ontologies/{ontologyId}/change-sets/{id}/binding-impacts",
     "/api/change-sets/{id}/items/{itemId}",
     "/api/change-sets/{id}/decisions",
     "/api/change-sets/{id}/merge",

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -6,7 +6,7 @@ import type { Join } from '@/features/bindings/api';
 import { changeSetFixture, elementFixture, itemFixture, ontologyFixture } from '@/test/fixtures';
 import { mockApi, renderApp, userWithRole } from '@/test/utils';
 
-import type { ChangeItem, ChangeSetDetail } from './api';
+import type { BindingImpact, ChangeItem, ChangeSetDetail } from './api';
 
 const heat = elementFixture({ id: 'el-heat', localName: 'Heat', labelZh: '炉次', labelEn: 'Heat' });
 const weight = elementFixture({ id: 'el-weight', kind: 'property', localName: 'weight', labelZh: '重量', domainId: 'el-heat', datatype: 'decimal' });
@@ -68,17 +68,86 @@ function bindingItems(): ChangeItem[] {
   ];
 }
 
-function server(changeSet: ChangeSetDetail) {
+function server(changeSet: ChangeSetDetail, impacts: { items: BindingImpact[] } | Response = { items: [] }, onDecision?: () => void) {
   return mockApi(
     {
       'GET /api/ontologies': () => [ontologyFixture({ openChangeSetCount: 1 })],
       'GET /api/change-sets': () => [changeSet],
       'GET /api/change-sets/:id': () => changeSet,
+      'GET /api/ontologies/:ontologyId/change-sets/:id/binding-impacts': () => impacts,
+      'PATCH /api/change-sets/:id/items/:itemId': ({ params }) => {
+        onDecision?.();
+        return { ...changeSet.items.find((item) => item.id === params.itemId), decision: 'rejected' };
+      },
       'GET /api/ontologies/:id/elements': () => [heat, weight, inCast],
     },
     { user: userWithRole('reviewer') },
   );
 }
+
+describe('existing binding impacts', () => {
+  const changeSet = changeSetFixture([], { id: 'cs-impacts', title: '修改本体', source: 'manual', documentId: null });
+
+  it('shows the count, names and reasons of affected bindings', async () => {
+    server(changeSet, { items: [
+      { elementId: 'binding-a', kind: 'property_binding', label: '重量 → mes.heat.weight_t', code: 'binding.invalid', message: 'invalid' },
+      { elementId: 'binding-b', kind: 'property_binding', label: '编号 → mes.heat.heat_no', code: 'binding.duplicate', message: 'duplicate' },
+    ] });
+    renderApp('/review/cs-impacts');
+    expect(await screen.findByText('合并后有 2 条已有绑定会失效')).toBeInTheDocument();
+    expect(screen.getByText('重量 → mes.heat.weight_t')).toBeInTheDocument();
+    expect(screen.getByText('编号 → mes.heat.heat_no')).toBeInTheDocument();
+    expect(screen.getByText((_, element) => element?.tagName === 'LI' && element.textContent?.includes('重量 → mes.heat.weight_t') === true)).toHaveTextContent('引用或结构不再有效');
+  });
+
+  it('falls back to a generic reason for an unknown code', async () => {
+    server(changeSet, { items: [
+      { elementId: 'binding-a', kind: 'property_binding', label: '重量 → mes.heat.weight_t', code: 'binding.new_problem', message: 'unknown' },
+    ] });
+    renderApp('/review/cs-impacts');
+    await screen.findByText('合并后有 1 条已有绑定会失效');
+    expect(screen.getByText((_, element) => element?.tagName === 'LI' && element.textContent?.includes('重量 → mes.heat.weight_t') === true)).toHaveTextContent('绑定校验不通过');
+  });
+
+  it('refreshes impacts after an item decision and removes the notice', async () => {
+    const user = userEvent.setup();
+    const impactResponse: { items: BindingImpact[] } = { items: [
+      { elementId: 'binding-a', kind: 'property_binding', label: '重量 → mes.heat.weight_t', code: 'binding.invalid', message: 'invalid' },
+    ] };
+    const detail = changeSetFixture([itemFixture({ id: 'item-domain', op: 'update', kind: 'property', targetElementId: weight.id, proposed: { domainRef: 'el-other' } })], {
+      id: 'cs-impacts', title: '修改本体', source: 'manual', documentId: null,
+    });
+    const api = server(detail, impactResponse, () => { impactResponse.items = []; });
+    renderApp('/review/cs-impacts');
+    expect(await screen.findByText('合并后有 1 条已有绑定会失效')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '拒绝' }));
+    await waitFor(() => expect(api.calls('GET', '/api/ontologies/onto-steel/change-sets/cs-impacts/binding-impacts')).toHaveLength(2));
+    await waitFor(() => expect(screen.queryByText(/已有绑定会失效/)).not.toBeInTheDocument());
+  });
+
+  it('hides the notice for an empty response', async () => {
+    const api = server(changeSet);
+    renderApp('/review/cs-impacts');
+    await screen.findByText('修改本体');
+    await waitFor(() => expect(api.calls('GET', '/api/ontologies/onto-steel/change-sets/cs-impacts/binding-impacts')).toHaveLength(1));
+    expect(screen.queryByText(/已有绑定会失效/)).not.toBeInTheDocument();
+  });
+
+  it('hides the notice when the API fails', async () => {
+    const api = server(changeSet, new Response(null, { status: 500 }));
+    renderApp('/review/cs-impacts');
+    await screen.findByText('修改本体');
+    await waitFor(() => expect(api.calls('GET', '/api/ontologies/onto-steel/change-sets/cs-impacts/binding-impacts')).toHaveLength(1));
+    expect(screen.queryByText(/已有绑定会失效/)).not.toBeInTheDocument();
+  });
+
+  it('does not request impacts for a closed change set', async () => {
+    const api = server({ ...changeSet, status: 'merged' });
+    renderApp('/review/cs-impacts');
+    await screen.findByText('修改本体');
+    expect(api.calls('GET', '/api/ontologies/onto-steel/change-sets/cs-impacts/binding-impacts')).toHaveLength(0);
+  });
+});
 
 describe('binding items in review', () => {
   it('says what each binding does in one sentence, with the AI label, the key notice and what a rejected table takes along', async () => {
