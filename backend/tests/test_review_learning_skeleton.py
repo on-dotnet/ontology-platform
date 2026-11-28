@@ -8,7 +8,6 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ontology_platform.modules.ai import review_assist
 from ontology_platform.modules.ai.candidates import main_name, normalize
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import service
@@ -171,8 +170,3 @@ def test_extraction_memory_guard_is_registered() -> None:
     from ontology_platform.modules.ai import extraction
 
     assert "memory" in inspect.signature(extraction.build_proposals).parameters
-
-
-@pytest.mark.xfail(strict=True, reason="Batch 6 implements review assistance")
-async def test_review_assist_request_is_available() -> None:
-    await review_assist.latest_assist(None, uuid4())  # type: ignore[arg-type]

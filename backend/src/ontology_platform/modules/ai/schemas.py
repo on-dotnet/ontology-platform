@@ -113,15 +113,44 @@ class AssistRequest(CamelModel):
     locale: Locale
 
 
+class ReviewAssistRiskOut(CamelModel):
+    code: str
+    reason: str
+    related: list[str] = Field(default_factory=list)
+
+
+class ReviewAssistGroupOut(CamelModel):
+    title: str
+    items: list[str]
+
+
+class ReviewAssistItemOut(CamelModel):
+    ref: str
+    risks: list[ReviewAssistRiskOut]
+    suggestion: str
+    reason: str
+    rename: AssistRename | None = None
+
+
 class ReviewAssistOut(CamelModel):
     summary: str
-    groups: list[dict[str, object]]
-    items: list[dict[str, object]]
+    groups: list[ReviewAssistGroupOut]
+    items: list[ReviewAssistItemOut]
+
+
+class ReviewAssistGroupSource(CamelModel):
+    batch: int
+    group: int
+
+
+class ReviewAssistSummaryGroupOut(CamelModel):
+    title: str
+    from_groups: list[ReviewAssistGroupSource] = Field(alias="from")
 
 
 class ReviewAssistSummaryOut(CamelModel):
     summary: str
-    groups: list[dict[str, object]]
+    groups: list[ReviewAssistSummaryGroupOut]
 
 
 # ---------- AI assistant (spec 002 §10) ----------

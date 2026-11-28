@@ -47,7 +47,7 @@ Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Rol
 @router.post(
     "/change-sets/{id}/review-assist",
     status_code=202,
-    responses=problem_responses(401, 403, 404, 409, 422, 429, 501),
+    responses=problem_responses(401, 403, 404, 409, 422, 429),
 )
 async def request_review_assist(
     id: UUID, body: schemas.AssistRequest, user: Creator, db: DbSession, settings: AppSettings
@@ -57,7 +57,7 @@ async def request_review_assist(
     )
 
 
-@router.get("/change-sets/{id}/review-assist", responses=problem_responses(401, 404, 422, 501))
+@router.get("/change-sets/{id}/review-assist", responses=problem_responses(401, 404, 422))
 async def get_review_assist(
     id: UUID, user: CurrentUser, db: DbSession
 ) -> schemas.ReviewAssist | None:
