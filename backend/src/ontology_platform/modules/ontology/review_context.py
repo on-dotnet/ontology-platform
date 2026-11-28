@@ -29,8 +29,7 @@ from ontology_platform.modules.ontology.models import (
     MatchKind,
     Ontology,
 )
-from ontology_platform.modules.ontology.review_memory import MemoryEntry
-from ontology_platform.modules.ontology.review_memory import _normalize as normalize
+from ontology_platform.modules.ontology.review_memory import MemoryEntry, normalize_key
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +98,7 @@ def item_fingerprint(
 
 def related_name(name: str, terms: Sequence[str]) -> bool:
     """The main-name part of the candidate score, kept in ontology to avoid an AI import."""
-    key = normalize(name)
+    key = normalize_key(name)
     return bool(key) and any(
         key == term
         or key in term
@@ -217,11 +216,13 @@ async def review_context(
         else {}
     )
     plan = (
-        await service._links(db, change_set, raw_items)
+        await service.change_links(db, change_set, raw_items)
         if change_set.source == "ai_extraction"
-        else service._NO_LINKS
+        else service.NO_LINKS
     )
-    resolutions = service._plan(change_set, ontology, all_elements, raw_items, plan).resolutions
+    resolutions = service.merge_plan(
+        change_set, ontology, all_elements, raw_items, plan
+    ).resolutions
     items: list[ReviewItem] = []
     for item in chosen:
         fields = rules.effective_fields(item.proposed, item.edited).model_dump(by_alias=True)
@@ -309,7 +310,7 @@ async def review_context(
         [e.turtle for e in active if e.kind == "axiom" and e.turtle], header.prefix_map(), names
     )
     terms = tuple(
-        normalize(name)
+        normalize_key(name)
         for item in items
         for name in (item.label_zh, item.label_en, item.domain, item.range)
         if name
@@ -347,7 +348,7 @@ async def review_context(
         and (
             related_name(e.label, terms) or related_name(e.label_en or "", terms)
             if e.element_kind == "entity_type"
-            else any(normalize(name) in terms for name in (e.domain, e.range) if name)
+            else any(normalize_key(name) in terms for name in (e.domain, e.range) if name)
         )
     ]
     rejected.sort(key=lambda e: e.last_hit_at or e.created_at, reverse=True)

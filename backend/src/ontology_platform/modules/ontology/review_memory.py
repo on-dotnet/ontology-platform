@@ -20,12 +20,13 @@ MemoryElementKind = Literal["entity_type", "relation_type", "property"]
 RejectReason = Literal["out_of_scope", "incorrect", "duplicate", "keep_open"]
 
 
-def _normalize(value: str) -> str:
+# review_context uses the same keys to match item labels against review memory.
+def normalize_key(value: str) -> str:
     return re.sub(r"\s+", "", unicodedata.normalize("NFKC", value)).lower()
 
 
 def _main_name(label_zh: str | None, label_en: str | None) -> str:
-    return _normalize(label_zh or "") or _normalize(label_en or "")
+    return normalize_key(label_zh or "") or normalize_key(label_en or "")
 
 
 def type_key(label_zh: str | None, label_en: str | None) -> str:

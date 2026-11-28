@@ -1530,7 +1530,7 @@ def _plan_elements(elements: Sequence[Element], base_iri: str) -> list[mergeplan
     ]
 
 
-def _plan_items(items: Sequence[ChangeItem], links: "_Links") -> list[mergeplan.PlanItem]:
+def _plan_items(items: Sequence[ChangeItem], links: "ChangeLinks") -> list[mergeplan.PlanItem]:
     return [
         mergeplan.PlanItem(
             id=item.id,
@@ -1552,7 +1552,7 @@ def _plan_items(items: Sequence[ChangeItem], links: "_Links") -> list[mergeplan.
 
 
 @dataclass(frozen=True, slots=True)
-class _Links:
+class ChangeLinks:
     """The alignment records around a change set's items (spec 004, 5.3 and 5.5).
 
     `others` are the items the records point at, with their change sets; `reverse` the items
@@ -1565,7 +1565,8 @@ class _Links:
     matched_by: Mapping[UUID, tuple[mergeplan.PlanMatchedBy, ...]]
 
 
-_NO_LINKS = _Links({}, {}, {}, {})
+# review_context skips alignment lookups for sources other than AI extraction.
+NO_LINKS = ChangeLinks({}, {}, {}, {})
 
 
 def _counts_for(other: ChangeItem, item: ChangeItem) -> bool:
@@ -1580,7 +1581,10 @@ def _merged_into(other: ChangeItem, change_set: ChangeSet) -> UUID | None:
     return other.applied_element_id
 
 
-async def _links(db: AsyncSession, change_set: ChangeSet, items: Sequence[ChangeItem]) -> _Links:
+# review_context uses these links to resolve matches across change sets.
+async def change_links(
+    db: AsyncSession, change_set: ChangeSet, items: Sequence[ChangeItem]
+) -> ChangeLinks:
     # A metric cannot be either side of an alignment record.
     items = [item for item in items if item.kind != "metric"]
     ids = [item.id for item in items]
@@ -1610,7 +1614,7 @@ async def _links(db: AsyncSession, change_set: ChangeSet, items: Sequence[Change
         {item_id: _recorded(other, owner) for item_id, (other, owner) in others.items()},
         [_recorded(other, owner) for entries in reverse.values() for other, owner in entries],
     )
-    return _Links(others, reverse, matches, matched_by)
+    return ChangeLinks(others, reverse, matches, matched_by)
 
 
 def _recorded(item: ChangeItem, change_set: ChangeSet) -> mergeplan.RecordedItem:
@@ -1642,12 +1646,13 @@ class _Plan:
 _NO_PLAN = _Plan({}, mergeplan.plan_token([], [], {}), needs_token=False)
 
 
-def _plan(
+# review_context uses the same merge resolutions to assess item risks.
+def merge_plan(
     change_set: ChangeSet,
     ontology: Ontology,
     elements: Sequence[Element],
     items: Sequence[ChangeItem],
-    links: _Links = _NO_LINKS,
+    links: ChangeLinks = NO_LINKS,
 ) -> _Plan:
     """Only what the extraction proposes is planned; other sources say exactly what they do."""
     if change_set.source != "ai_extraction":
@@ -1725,18 +1730,18 @@ async def _resolutions(
     db: AsyncSession,
     change_set: ChangeSet,
     items: Sequence[ChangeItem],
-) -> tuple[dict[UUID, schemas.ItemResolution], str, _Links]:
+) -> tuple[dict[UUID, schemas.ItemResolution], str, ChangeLinks]:
     """The resolution of each item for the API, the token of the plan (spec 004, 5.4), and the
     alignment records around the items."""
     if change_set.source != "ai_extraction" or change_set.status == "rejected":
-        return {}, _NO_PLAN.token, await _links(db, change_set, items)
+        return {}, _NO_PLAN.token, await change_links(db, change_set, items)
     ontology = await _ontology_or_404(db, change_set.ontology_id)
     elements = await _elements(db, ontology.id, all_kinds=True)
     by_id = {element.id: element for element in elements}
-    links = await _links(db, change_set, items)
+    links = await change_links(db, change_set, items)
     if change_set.status == "merged":
         return _applied_resolutions(change_set, items, by_id), _NO_PLAN.token, links
-    plan = _plan(change_set, ontology, elements, items, links)
+    plan = merge_plan(change_set, ontology, elements, items, links)
     by_item = {item.id: item for item in items}
     out: dict[UUID, schemas.ItemResolution] = {}
     for item_id, resolution in plan.resolutions.items():
@@ -1753,7 +1758,7 @@ async def _resolutions(
 
 
 async def _matches_out(
-    db: AsyncSession, items: Sequence[ChangeItem], links: _Links
+    db: AsyncSession, items: Sequence[ChangeItem], links: ChangeLinks
 ) -> dict[UUID, schemas.ItemMatch]:
     """Each item's own alignment record, or one made from a merged item that recorded it."""
     element_ids = {item.match_element_id for item in items if item.match_element_id}
@@ -1853,7 +1858,7 @@ async def _items_out(
     change_set: ChangeSet,
     items: Sequence[ChangeItem],
     resolutions: Mapping[UUID, schemas.ItemResolution],
-    links: _Links,
+    links: ChangeLinks,
     *,
     all_items: Sequence[ChangeItem] | None = None,
 ) -> list[schemas.ChangeItem]:
@@ -2009,6 +2014,21 @@ async def _detail(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetD
             "resolution_token": token,
         }
     )
+
+
+@dataclass(frozen=True, slots=True)
+class ChangeSetHeader:
+    status: ChangeSetStatus
+    ontology_id: UUID
+
+
+async def change_set_header(db: AsyncSession, change_set_id: UUID) -> ChangeSetHeader:
+    statement = select(ChangeSet.status, ChangeSet.ontology_id).where(ChangeSet.id == change_set_id)
+    row = (await db.execute(statement)).one_or_none()
+    if row is None:
+        raise _change_set_not_found()
+    status, ontology_id = row
+    return ChangeSetHeader(cast(ChangeSetStatus, status), ontology_id)
 
 
 async def get_change_set(db: AsyncSession, change_set_id: UUID) -> schemas.ChangeSetDetail:

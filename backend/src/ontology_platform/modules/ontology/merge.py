@@ -53,12 +53,12 @@ from ontology_platform.modules.ontology.service import (
     _ensure_open,
     _evict_review_memory,
     _items,
-    _links,
     _now,
     _ontology_or_404,
-    _plan,
+    change_links,
     header_of,
     iri_of,
+    merge_plan,
 )
 
 
@@ -942,7 +942,9 @@ async def _apply_change_set(
     now = _now()
     elements = await _elements(db, ontology.id, all_kinds=True)
     # Under the ontology lock: the plan made here is the one that is applied.
-    plan = _plan(change_set, ontology, elements, items, await _links(db, change_set, items))
+    plan = merge_plan(
+        change_set, ontology, elements, items, await change_links(db, change_set, items)
+    )
     seen = resolution_token == plan.token
     if not seen and (resolution_token is not None or plan.needs_token):
         raise AppError(
