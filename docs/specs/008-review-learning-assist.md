@@ -221,7 +221,7 @@ M1 只比较主名称键。同义词、近似名称不触发 M1，交给提示�
 ### 7.1 流程
 
 1. `POST /api/change-sets/{id}/review-assist`，请求体为 `{ locale }`。
-   - 校验：变更集为 `open`，否则 409 `changeset.closed`；调用者为 editor 以上；同一变更集没有 `queued` 或 `running` 的预审，否则 409 `review_assist.running`；不超过限流，否则 429 `review_assist.rate_limited`，带 `Retry-After`。
+   - 校验按这个顺序：调用者为 editor 以上，否则 403（权限先查，viewer 对任何状态的变更集都得到 403）；变更集为 `open`，否则 409 `changeset.closed`；同一变更集没有 `queued` 或 `running` 的预审，否则 409 `review_assist.running`；不超过限流，否则 429 `review_assist.rate_limited`，带 `Retry-After`。
    - "同时只有一次"由部分唯一索引保证（第 11 节）：并发插入撞到索引时，捕获冲突并返回 409 `review_assist.running`。
    - 失效的行：创建超过 `review_assist_timeout_seconds + 120` 秒仍是 `queued` 或 `running` 的行，在发起新预审时先改为 `failed`（`errorCode = review_assist.timeout`），再插入新行。这样 worker 崩溃后不会永远卡住。任务写结果前先核对这一行仍是 `running`，不是时放弃写入，避免把已判失效的行改回 `done`。
    - 新建 `ai.review_assists` 行（`queued`），排入任务 `review.assist`，返回 202 和这条预审。
@@ -244,13 +244,13 @@ M1 只比较主名称键。同义词、近似名称不触发 M1，交给提示�
 | | `stale_target` | 目标元素的 revision 已变（合并会报 `changeset.stale_target`） |
 | `naming` | `local_name_style` | 局部名不符合 `rules.LOCAL_NAME`，或类型不是大写开头、关系与属性不是小写开头 |
 | | `missing_label_en` | 新建项没有英文名 |
-| `memory` | `similar_to_rejected` | 主名称与某条 `rejected` 条目不是精确命中，但 `candidates.score ≥ THRESHOLD` |
+| `memory` | `similar_to_rejected` | 主名称与某条 `rejected` 条目不是精确命中，但 `candidates.score ≥ THRESHOLD`。逐条比较：对某条是精确命中的跳过这一条，继续比其他条目 |
 
-规则检查覆盖第 2 节范围内的所有项（类型、关系、属性），不限 400 项。
+规则检查覆盖第 2 节范围内的所有项（类型、关系、属性），不限 400 项。`similar_to_rejected` 用相关的全部有效 `rejected` 条目，不受 60 条限制；60 条只是发给模型的上限（第 7.3 节）。
 
 ### 7.3 模型检查（`source = 'ai'`）
 
-- 只查第 2 节范围内的项，按变更项 `seq` 顺序每批 `review_assist_batch = 80` 项，最多 `review_assist_items_max = 400` 项。超出的项只有规则检查，`result.truncated = true`。
+- 只查第 2 节范围内的项，按变更项 `seq` 顺序每批 `review_assist_batch = 80` 项，最多 `review_assist_items_max = 400` 项（先截到 400 项再分批）。AI 已配置且项数超出时，超出的项只有规则检查，`result.truncated = true`；AI 未配置时 `truncated` 为 `false`，因为所有项本来就只有规则检查。
 - 每批一次调用，purpose `review.assist`。批数大于 1 时，最后再调一次 `review.assist.summary`，用来合并摘要和分组。整个任务最长 `review_assist_timeout_seconds = 300` 秒。
 - `text` 的内容（D14）：
   - `language: zh-CN` 或 `en`（来自请求的 `locale`）；
@@ -261,10 +261,10 @@ M1 只比较主名称键。同义词、近似名称不触发 M1，交给提示�
 - 输出结构（`ReviewAssistOut`，见附录）：每项给 `risks[]`（code 为 `weak_evidence`、`conflict`、`duplicate`、`naming`，各带一句理由）、`suggestion`（`accept`、`reject`、`edit`、`unsure`）、`reason`、可选的 `rename`（`labelZh`、`labelEn`、`localName`）；本批的 `groups[]`（标题和成员短引用）与 `summary`。
 - 校验（确定性代码）：
   - 未知短引用、未知 code 丢弃并计入 `dropped`；
-  - `rename.localName` 不合 `rules.LOCAL_NAME` 时丢弃这个字段；`rename` 的字段全被丢弃时，`suggestion` 改为 `unsure`；
-  - 理由截到 300 字，摘要截到 600 字；最多 12 个组，组标题截到 40 字；一项只能属于一个组，重复出现时取第一次。
-- 汇总调用的输入只有各批的摘要和组（标题、成员数、批号），输出合并后的 `summary` 与组映射（新组标题 → 原组列表）。汇总失败时，摘要取第一批的，组按批拼接。
-- 某批失败（`ai.unavailable`、`ai.invalid_output`）或超时（`review_assist.timeout`）：已完成批次的结果保留，状态为 `partial`，`errorCode` 记第一个错误，未完成的项只有规则结果。全部批次都失败时，状态也是 `partial`，`aiUsed = false`。规则检查不受影响。
+  - `rename.localName` 不合 `rules.LOCAL_NAME` 时丢弃这个字段；`rename.labelZh`、`rename.labelEn` 各截到 200 字（与元素名称的上限相同）；`suggestion` 为 `edit` 却没有 `rename`，或 `rename` 的字段全被丢弃时，`suggestion` 改为 `unsure`；
+  - 理由截到 300 字，摘要截到 600 字；最多 12 个组，组标题截到 40 字；一项只能属于一个组，重复出现时取第一次；没有成员的组丢掉。
+- 汇总调用的输入只有各批的摘要和组（标题、成员数、批号），输出合并后的 `summary` 与组映射（新组标题 → 原组列表）。汇总失败或超时都算退化：摘要取第一批的，组按批拼接。汇总返回的组全部引用不存在的批或组时，摘要用汇总的，组仍按批拼接。退化不影响状态和 `errorCode`，它们只由各批决定，全部批次成功时仍是 `done`；汇总调用本身的错误记在它的 `ai.runs` 里。剩余时间已用完时不发起汇总调用，直接退化。
+- 某批失败（`ai.unavailable`、`ai.invalid_output`）或超时（`review_assist.timeout`）：已完成批次的结果保留，状态为 `partial`，`errorCode` 记第一个错误，未完成的项只有规则结果。剩余时间已用完时不再发起下一批调用，这一批及之后的批次记超时。全部批次都失败时，状态也是 `partial`，`aiUsed = false`。规则检查不受影响。
 - 每次调用都在 `ai.runs` 留记录，与现有做法一致。
 
 ### 7.4 提示词要点（`ai/review_prompts.py`，英文）

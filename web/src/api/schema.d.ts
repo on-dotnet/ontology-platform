@@ -7392,15 +7392,6 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ValidationProblem"];
                 };
             };
-            /** @description Not Implemented */
-            501: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
         };
     };
     request_review_assist_api_change_sets__id__review_assist_post: {
@@ -7474,15 +7465,6 @@ export interface operations {
             };
             /** @description Too Many Requests */
             429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
-            /** @description Not Implemented */
-            501: {
                 headers: {
                     [name: string]: unknown;
                 };
