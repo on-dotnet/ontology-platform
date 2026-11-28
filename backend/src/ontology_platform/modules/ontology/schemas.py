@@ -758,6 +758,9 @@ class EditRequest(CamelModel):
     items: list[EditItem] = Field(min_length=1, max_length=EDIT_ITEMS_MAX)
     # Merge at once when the user may review their own changes (spec 002, section 6).
     apply: bool = False
+    # Callers that list every dependency can reject the whole save if it affects another element.
+    # A factory keeps the flag optional in generated clients.
+    allow_cascade: bool = Field(default_factory=lambda: True)
 
 
 class EditResult(CamelModel):

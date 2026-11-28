@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { isApiError } from '@/api/errors';
 import { useToast } from '@/components/feedback/toast';
 import { usePermissions } from '@/features/auth/permissions';
-import { elementName, ontologyKeys, saveEdits, useAppliesEdits, type EditItem, type EditResult, type Element } from '@/features/ontologies/api';
+import { elementName, ontologyKeys, saveEdits, useAppliesEdits, type EditRequest, type EditResult, type Element } from '@/features/ontologies/api';
 import { changeSetKeys } from '@/features/review/api';
 import { useErrorMessage } from '@/i18n/error-message';
 
@@ -76,8 +76,7 @@ function useEditToast(): (result: EditResult, appliedTitle: string) => void {
   };
 }
 
-export interface SaveVariables {
-  items: EditItem[];
+export interface SaveVariables extends Pick<EditRequest, 'items' | 'allowCascade'> {
   /** Toast title when the change took effect, e.g. "Saved". */
   appliedTitle: string;
 }
@@ -91,7 +90,7 @@ export function useSaveEdits(ontologyId: string) {
   const refresh = useRefreshAfterEdit();
   const notify = useEditToast();
   const mutation = useMutation({
-    mutationFn: ({ items }: SaveVariables) => saveEdits(ontologyId, { items, apply }),
+    mutationFn: ({ items, allowCascade }: SaveVariables) => saveEdits(ontologyId, { items, apply, allowCascade }),
     onSuccess: async (result, { appliedTitle }) => {
       await refresh();
       notify(result, appliedTitle);

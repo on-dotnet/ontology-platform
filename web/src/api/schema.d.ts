@@ -2773,6 +2773,8 @@ export interface components {
              * @default false
              */
             apply: boolean;
+            /** Allowcascade */
+            allowCascade?: boolean;
         };
         /** EditResult */
         EditResult: {
