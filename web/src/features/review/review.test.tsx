@@ -1,4 +1,4 @@
-import { cleanup, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -6,7 +6,7 @@ import { changeSetFixture, documentFixture, elementFixture, elementRefFixture, i
 import type { UserInfo } from '@/features/auth/api';
 import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
-import { countDecisions, type ChangeItem, type ChangeSetDetail, type ItemPatch, type ItemResolution } from './api';
+import { changeSetKeys, countDecisions, type ChangeItem, type ChangeSetDetail, type ItemPatch, type ItemResolution } from './api';
 
 const CHUNK_TEXT = '第一章 总则\n钢包是盛装和运送钢水的容器，使用前应烘烤至规定温度。\n板坯由连铸机生产。';
 const QUOTE = '钢包是盛装和运送钢水的容器';
@@ -86,7 +86,7 @@ function reviewServer({ initial = changeSetFixture(items()), extra = {}, user }:
       const patch = body as ItemPatch;
       const next = state.items.map((item) =>
         item.id === params.itemId
-          ? { ...item, ...(patch.decision ? { decision: patch.decision } : {}), ...(patch.edited !== undefined ? { edited: patch.edited } : {}) }
+          ? { ...item, ...(patch.decision ? { decision: patch.decision } : {}), ...(patch.rejectReason ? { rejectReason: patch.rejectReason } : {}), ...(patch.edited !== undefined ? { edited: patch.edited } : {}) }
           : item,
       );
       update(next);
@@ -121,6 +121,119 @@ describe('change set list', () => {
 });
 
 describe('change set review', () => {
+  it.each([
+    ['out_of_scope', '超出范围'], ['incorrect', '不正确'], ['duplicate', '重复'], ['keep_open', '暂不决定'],
+  ] as const)('sends the %s rejection reason and shows it on the item', async (reason, label) => {
+    const user = userEvent.setup();
+    const api = reviewServer();
+    renderApp('/review/cs-converter');
+    const ladle = await screen.findByRole('article', { name: /钢包/ });
+    await user.click(within(ladle).getByRole('button', { name: '带理由拒绝钢包' }));
+    await user.click(await screen.findByRole('menuitem', { name: label }));
+    await waitFor(() => expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-ladle')[0]?.body)
+      .toEqual({ decision: 'rejected', rejectReason: reason }));
+    expect(within(ladle).getByText(label)).toBeInTheDocument();
+  });
+
+  it('bulk rejects pending items with a reason', async () => {
+    const user = userEvent.setup();
+    const api = reviewServer({ initial: changeSetFixture(items().map((item) => item.id === 'item-slab' ? { ...item, decision: 'accepted' } : item)) });
+    renderApp('/review/cs-converter');
+    await screen.findByRole('article', { name: /钢包/ });
+    const bulk = screen.getByRole('button', { name: '带理由拒绝' });
+    await user.click(bulk);
+    await user.click(await screen.findByRole('menuitem', { name: '超出范围' }));
+    const dialog = await screen.findByRole('dialog', { name: '拒绝全部待定项' });
+    expect(within(dialog).getByText(/3 项待定/)).toBeInTheDocument();
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(0);
+    await user.click(within(dialog).getByRole('button', { name: '取消' }));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(0);
+    await user.click(screen.getByRole('button', { name: '带理由拒绝' }));
+    await user.click(await screen.findByRole('menuitem', { name: '超出范围' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '拒绝全部待定项' })).getByRole('button', { name: '拒绝这 3 项' }));
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')[0]?.body)
+      .toEqual({ itemIds: ['item-ladle', 'item-holds', 'item-thickness'], decision: 'rejected', rejectReason: 'out_of_scope' });
+    expect(await screen.findByText('已拒绝 3 项待定')).toBeInTheDocument();
+  });
+  it('bulk rejects from the main button without a reason', async () => {
+    const api = reviewServer({ initial: changeSetFixture(items().map((item) => item.id === 'item-slab' ? { ...item, decision: 'accepted' } : item)) });
+    const user = userEvent.setup();
+    renderApp('/review/cs-converter');
+    await screen.findByRole('article', { name: /钢包/ });
+    await user.click(screen.getByRole('button', { name: '拒绝全部 3 项待定' }));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(0);
+    const dialog = await screen.findByRole('dialog', { name: '拒绝全部待定项' });
+    await user.click(within(dialog).getByRole('button', { name: '拒绝这 3 项' }));
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')[0]?.body)
+      .toEqual({ itemIds: ['item-ladle', 'item-holds', 'item-thickness'], decision: 'rejected' });
+    expect(await screen.findByText('已拒绝 3 项待定')).toBeInTheDocument();
+  });
+
+  it('disables bulk acceptance while bulk rejection is pending', async () => {
+    const api = reviewServer({ extra: { 'POST /api/change-sets/:id/decisions': () => new Promise(() => {}) } });
+    const user = userEvent.setup();
+    renderApp('/review/cs-converter');
+    await user.click(await screen.findByRole('button', { name: '拒绝全部 4 项待定' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '拒绝全部待定项' })).getByRole('button', { name: '拒绝这 4 项' }));
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(screen.getByText('接受全部高置信度项（2）').closest('button')).toBeDisabled();
+  });
+
+  it('disables bulk rejection while bulk acceptance is pending', async () => {
+    const api = reviewServer({ extra: { 'POST /api/change-sets/:id/decisions': () => new Promise(() => {}) } });
+    const user = userEvent.setup();
+    renderApp('/review/cs-converter');
+    await user.click(await screen.findByRole('button', { name: '接受全部高置信度项（2）' }));
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(screen.getByRole('button', { name: '拒绝全部 4 项待定' })).toBeDisabled();
+  });
+
+  it('clears the bulk rejection dialog when no pending items remain', async () => {
+    reviewServer();
+    const user = userEvent.setup();
+    const { queryClient } = renderApp('/review/cs-converter');
+    await user.click(await screen.findByRole('button', { name: '拒绝全部 4 项待定' }));
+    expect(screen.getByRole('dialog', { name: '拒绝全部待定项' })).toBeInTheDocument();
+    const key = changeSetKeys.detail('cs-converter');
+    await act(() => queryClient.setQueryData(key, changeSetFixture(items().map((item) => ({ ...item, decision: 'accepted' })))));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '拒绝全部待定项' })).not.toBeInTheDocument());
+    await act(() => new Promise<void>((resolve) => window.setTimeout(resolve, 10)));
+    await act(() => queryClient.setQueryData(key, changeSetFixture(items())));
+    expect(await screen.findByRole('button', { name: '拒绝全部 4 项待定' })).toBeEnabled();
+    expect(screen.queryByRole('dialog', { name: '拒绝全部待定项' })).not.toBeInTheDocument();
+  });
+
+  it('shows suppressed suggestions and their memory links', async () => {
+    reviewServer({ initial: changeSetFixture(items(), { suppressed: [
+      { kind: 'entity_type', labelZh: '炉渣颜色', labelEn: null, cause: 'memory', memoryEntryId: 'mem-1', dependsOn: null },
+      { kind: 'property', labelZh: '炉渣属性', labelEn: null, cause: 'depends_on_suppressed', memoryEntryId: 'mem-2', dependsOn: '炉渣' },
+    ], suppressedTotal: 4 }) });
+    const user = userEvent.setup();
+    renderApp('/review/cs-converter');
+    await user.click(await screen.findByRole('button', { name: '展开' }));
+    expect(screen.getByText('按审核记忆，有 4 项没有再提出')).toBeInTheDocument();
+    expect(screen.getByText(/依赖被挡的类型 炉渣/)).toBeInTheDocument();
+    expect(screen.getByText('另有 2 项未列出')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '炉渣颜色' })).toHaveAttribute('href', '/review/memory?ontology=onto-steel&q=%E7%82%89%E6%B8%A3%E9%A2%9C%E8%89%B2&entry=mem-1');
+    expect(screen.getByRole('link', { name: '炉渣属性' })).toHaveAttribute('href', '/review/memory?ontology=onto-steel&q=%E7%82%89%E6%B8%A3&entry=mem-2');
+  });
+  it('does not show a suppressed notice for an empty list', async () => {
+    reviewServer();
+    renderApp('/review/cs-converter');
+    await screen.findByRole('article', { name: /钢包/ });
+    expect(screen.queryByText(/按审核记忆/)).not.toBeInTheDocument();
+  });
+  it('omits the search term when a suppressed dependency has no name', async () => {
+    reviewServer({ initial: changeSetFixture(items(), { suppressed: [
+      { kind: 'property', labelZh: '炉渣属性', labelEn: null, cause: 'depends_on_suppressed', memoryEntryId: 'mem-2', dependsOn: null },
+    ], suppressedTotal: 1 }) });
+    const user = userEvent.setup();
+    renderApp('/review/cs-converter');
+    await user.click(await screen.findByRole('button', { name: '展开' }));
+    expect(screen.getByRole('link', { name: '炉渣属性' })).toHaveAttribute('href', '/review/memory?ontology=onto-steel&entry=mem-2');
+  });
   it('labels QA gap proposals in the list and reviews their items as AI suggestions', async () => {
     const user = userEvent.setup();
     const changeSet = changeSetFixture([itemFixture({ rationale: '问题中缺少钢包类型。' })], {

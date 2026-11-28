@@ -15,6 +15,7 @@ export type ItemResolution = NonNullable<ChangeItem['resolution']>;
 export type ItemMatch = NonNullable<ChangeItem['match']>;
 export type MatchDecision = ItemMatch['decision'];
 export type ItemPatch = components['schemas']['ItemDecisionPatch'];
+export type RejectReason = NonNullable<ItemPatch['rejectReason']>;
 export type MergeResult = components['schemas']['MergeResult'];
 export type BindingImpact = components['schemas']['BindingImpact'];
 export type SkipCode = MergeResult['skipped'][number]['code'];
@@ -74,11 +75,11 @@ export class PartialDecisionError extends Error {
 }
 
 /** Sends the decisions in batches, one after another, and stops at the first batch that fails. */
-export async function decideItems(changeSetId: string, itemIds: string[], decision: Decision): Promise<void> {
+export async function decideItems(changeSetId: string, itemIds: string[], decision: Decision, rejectReason?: RejectReason): Promise<void> {
   for (let start = 0; start < itemIds.length; start += DECISION_BATCH_SIZE) {
     const batch = itemIds.slice(start, start + DECISION_BATCH_SIZE);
     try {
-      await unwrap(api.POST('/api/change-sets/{id}/decisions', { params: { path: { id: changeSetId } }, body: { itemIds: batch, decision } }));
+      await unwrap(api.POST('/api/change-sets/{id}/decisions', { params: { path: { id: changeSetId } }, body: { itemIds: batch, decision, ...(rejectReason ? { rejectReason } : {}) } }));
     } catch (error) {
       if (start === 0) throw error;
       throw new PartialDecisionError(start, itemIds.length, error);

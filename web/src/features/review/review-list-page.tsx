@@ -35,7 +35,10 @@ export function ReviewListPage({ ontologyId, onOntologyChange }: ReviewListPageP
         title={t('nav.review')}
         info={t('pages.review.info')}
         actions={
-          selected && ontologies ? <OntologySelector ontologies={ontologies} value={selected.id} onValueChange={onOntologyChange} /> : null
+          selected && ontologies ? <div className="flex items-center gap-3">
+            <OntologySelector ontologies={ontologies} value={selected.id} onValueChange={onOntologyChange} />
+            <Link to="/review/memory" search={{ ontology: selected.id }} className={buttonVariants({ variant: 'secondary' })}>{t('review.memoryLink')}</Link>
+          </div> : null
         }
       />
       <QueryState query={query}>
