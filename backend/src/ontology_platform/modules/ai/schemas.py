@@ -235,6 +235,7 @@ class BindingSuggestion(CamelModel):
     change_set_id: UUID | None
     proposed: int
     dropped: int
+    dropped_reasons: dict[str, int] | None
     samples_sent: bool
     error_code: str | None
     created_at: datetime

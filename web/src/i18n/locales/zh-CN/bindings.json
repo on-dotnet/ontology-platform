@@ -33,6 +33,22 @@
     "proposed_other": "已生成 {{count}} 项绑定建议，等待审核",
     "dropped_one": "有 {{count}} 项无法采用，已忽略",
     "dropped_other": "有 {{count}} 项无法采用，已忽略",
+    "reasons": {
+      "suggestion": {
+        "unknown_element": "有 {{count}} 项引用了候选范围外的本体元素",
+        "not_in_catalog": "有 {{count}} 项引用了目录里没有的表或列",
+        "repeated": "有 {{count}} 项超出同一绑定的候选数量上限"
+      },
+      "binding": {
+        "invalid": "有 {{count}} 项不符合绑定规则",
+        "duplicate": "有 {{count}} 项与已有绑定或其他建议重复",
+        "type_mismatch": "有 {{count}} 项的属性类型与列类型不匹配",
+        "cross_source": "有 {{count}} 项的关系两端来自不同的数据源",
+        "column_in_use": "有 {{count}} 项引用的列在该对象类型下已有绑定",
+        "dependency_dropped": "有 {{count}} 项依赖了已被忽略的绑定建议"
+      },
+      "other": "其他原因（{{count}} 项）"
+    },
     "none": "没有找到可以采用的绑定建议",
     "failed": "AI 绑定建议暂不可用，已有的绑定不受影响",
     "manual": "改为手工绑定",

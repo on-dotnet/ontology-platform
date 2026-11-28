@@ -98,6 +98,7 @@ def _out(row: BindingSuggestion) -> schemas.BindingSuggestion:
         change_set_id=row.change_set_id,
         proposed=row.proposed,
         dropped=row.dropped,
+        dropped_reasons=row.dropped_reasons,
         samples_sent=row.samples_sent,
         error_code=row.error_code,
         created_at=row.created_at,
@@ -975,10 +976,12 @@ def make_handler(
                     title=f"AI 绑定建议：{source_name}",
                 )
                 reasons = draft.dropped + Counter(d.code for d in proposal.dropped)
+                dropped_reasons = dict(sorted(reasons.items()))
                 stored.status = "succeeded"
                 stored.change_set_id = proposal.change_set_id
                 stored.proposed = proposal.proposed
                 stored.dropped = reasons.total()
+                stored.dropped_reasons = dropped_reasons
                 stored.samples_sent = samples_sent
                 stored.finished_at = _now()
                 # What became of the suggestions and why the others were left out: counts only,
@@ -996,7 +999,7 @@ def make_handler(
                         ),
                         "proposed": proposal.proposed,
                         "dropped": reasons.total(),
-                        "reasons": dict(sorted(reasons.items())),
+                        "reasons": dropped_reasons,
                     },
                 )
         except AiError as exc:

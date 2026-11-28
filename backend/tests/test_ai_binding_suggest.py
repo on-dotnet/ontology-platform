@@ -320,6 +320,7 @@ async def test_a_suggestion_request_only_queues_work(client: AsyncClient, db: As
     assert response.status_code == 202
     assert response.json()["status"] == "queued"
     assert response.json()["changeSetId"] is None
+    assert response.json()["droppedReasons"] is None
     assert await db.scalar(select(func.count()).select_from(Element)) == elements_before
     assert await db.scalar(select(func.count()).select_from(ChangeSet)) == 0
     job = await db.scalar(select(Job).where(Job.kind == JOB_KIND))
@@ -433,6 +434,28 @@ async def test_suggestions_become_one_change_set_for_review_and_nothing_else(
     }
     assert sum(finished.detail["reasons"].values()) == finished.detail["dropped"]
     assert (finished.actor_id, finished.target_id) == (row.user_id, str(s.ontology.id))
+
+    response = await client.get(f"/api/binding-suggestions/{row.id}")
+    assert response.status_code == 200
+    result = response.json()
+    assert result["droppedReasons"] == finished.detail["reasons"]
+    assert sum(result["droppedReasons"].values()) == result["dropped"]
+
+
+async def test_suggestion_without_drops_returns_empty_reasons(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    s = await steel(db)
+    await ready(db, s)
+    await sign_in(client, db, Role.EDITOR)
+    body = await ask(client, s)
+    await answer(app, body["id"], CatalogGateway([table_match(s.heat, "heat")], {}))
+
+    response = await client.get(f"/api/binding-suggestions/{body['id']}")
+    assert response.status_code == 200
+    result = response.json()
+    assert (result["status"], result["proposed"], result["dropped"]) == ("succeeded", 1, 0)
+    assert result["droppedReasons"] == {}
 
 
 async def test_the_evidence_comes_from_the_catalog_and_matches_it(
@@ -818,6 +841,9 @@ async def test_a_model_failure_fails_the_request_and_proposes_nothing(
     assert row.finished_at is not None
     assert await db.scalar(select(func.count()).select_from(ChangeSet)) == 0
     assert await audit_events(db, "binding.suggestion_finished") == []
+    response = await client.get(f"/api/binding-suggestions/{row.id}")
+    assert response.status_code == 200
+    assert response.json()["droppedReasons"] is None
 
 
 # ---------- the steel sample end to end (spec 003, section 15: "AI 建议") ----------

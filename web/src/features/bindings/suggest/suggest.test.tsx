@@ -20,7 +20,7 @@ const allScope = { dataSourceId: source.id, schemas: ['steel', 'archive'] };
 
 function suggestion(overrides: Partial<Suggestion> = {}): Suggestion {
   return { id: 'req-1', ontologyId: onto.id, dataSourceId: source.id, status: 'queued', step: null,
-    proposed: 0, dropped: 0, changeSetId: null, samplesSent: false, errorCode: null,
+    proposed: 0, dropped: 0, droppedReasons: null, changeSetId: null, samplesSent: false, errorCode: null,
     createdAt: source.createdAt, finishedAt: null, ...overrides };
 }
 
@@ -43,6 +43,15 @@ async function openDialog(user: ReturnType<typeof userEvent.setup>) {
 async function openSource(user: ReturnType<typeof userEvent.setup>, search = '') {
   renderApp(`/data/${source.id}${search}`);
   return openDialog(user);
+}
+
+async function openDroppedResult(dropped: number, droppedReasons: Suggestion['droppedReasons']) {
+  server({ [`POST ${postPath}`]: () => jsonResponse(suggestion({ status: 'succeeded', dropped, droppedReasons }), 202) });
+  const user = userEvent.setup();
+  const dialog = await openSource(user);
+  await dialog.findByRole('checkbox', { name: 'steel' });
+  await user.click(dialog.getByRole('button', { name: submit }));
+  return dialog;
 }
 
 afterEach(() => { vi.useRealTimers(); });
@@ -192,14 +201,33 @@ describe('AI binding suggestions', () => {
     expect(api.calls('GET', pollPath)).toHaveLength(polls);
   });
 
-  it('shows the dropped count without a review link when nothing was adopted', async () => {
-    server({ [`POST ${postPath}`]: () => jsonResponse(suggestion({ status: 'succeeded', dropped: 1 }), 202) });
-    const user = userEvent.setup();
-    const dialog = await openSource(user);
-    await dialog.findByRole('checkbox', { name: 'steel' });
-    await user.click(dialog.getByRole('button', { name: submit }));
+  it('lists dropped reasons in descending order of count, ties by code', async () => {
+    const dialog = await openDroppedResult(4, {
+      'binding.type_mismatch': 1, 'suggestion.not_in_catalog': 2, 'binding.duplicate': 1,
+    });
+    expect(await dialog.findByText('有 4 项无法采用，已忽略')).toBeVisible();
+    expect(dialog.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+      '有 2 项引用了目录里没有的表或列', '有 1 项与已有绑定或其他建议重复', '有 1 项的属性类型与列类型不匹配',
+    ]);
+  });
+
+  it('groups unknown dropped reasons last without exposing their codes', async () => {
+    const dialog = await openDroppedResult(5, {
+      'suggestion.not_in_catalog': 2, 'binding.future_rule': 1, 'suggestion.future_check': 2,
+    });
+    expect(await dialog.findByText('有 5 项无法采用，已忽略')).toBeVisible();
+    expect(dialog.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+      '有 2 项引用了目录里没有的表或列', '其他原因（3 项）',
+    ]);
+    expect(dialog.getByRole('status')).not.toHaveTextContent(/binding\.future_rule|suggestion\.future_check/);
+  });
+
+  it.each([null, {}])('shows only the dropped total and no review link for reasons %j', async (reasons) => {
+    const dialog = await openDroppedResult(1, reasons);
     expect(await dialog.findByText('没有找到可以采用的绑定建议')).toBeVisible();
     expect(dialog.getByText('有 1 项无法采用，已忽略')).toBeVisible();
+    expect(dialog.getByRole('status')).toHaveTextContent(/^没有找到可以采用的绑定建议\s*有 1 项无法采用，已忽略$/);
+    expect(dialog.queryByRole('list')).toBeNull();
     expect(dialog.queryByRole('link', { name: '去审核' })).toBeNull();
   });
 

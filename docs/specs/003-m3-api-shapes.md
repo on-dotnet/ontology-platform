@@ -154,6 +154,9 @@ type BindingSuggestion = {
   step: 'catalog' | 'match' | 'columns' | 'changeset' | null;
   changeSetId: string | null;            // 没有可采用的建议时为 null
   proposed: number; dropped: number;     // 采用与丢弃的条数
+  // 与 binding.suggestion_finished 审计事件的 reasons 同源，按原因码计数。
+  // 成功且没有丢弃时为 {}。旧记录、排队中、运行中或失败的任务为 null。
+  droppedReasons: Record<string, number> | null;
   samplesSent: boolean; errorCode: string | null;
   createdAt: string; finishedAt: string | null;
 };
