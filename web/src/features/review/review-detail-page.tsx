@@ -5,7 +5,7 @@ import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { InfoTip } from '@/components/feedback/hint-tip';
-import { isApiError } from '@/api/errors';
+import { isApiError, isForbidden } from '@/api/errors';
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { useToast } from '@/components/feedback/toast';
 import { PageHeader } from '@/components/layout/page-header';
@@ -29,6 +29,7 @@ import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
 import {
   acceptsAll,
+  AssistRateLimitError,
   changeSetKeys,
   decideItems,
   highConfidencePending,
@@ -38,17 +39,22 @@ import {
   PartialDecisionError,
   patchItem,
   rejectChangeSet,
+  requestReviewAssist,
   replaceItemInCache,
   sameConceptPending,
   useBindingImpacts,
   useChangeSet,
+  useReviewAssist,
   type ChangeItem,
   type ChangeSetDetail,
   type ItemMatch,
   type ItemPatch,
   type MergeResult,
   type RejectReason,
+  type AssistRename,
 } from './api';
+import { AssistRequestButton, AssistSummary } from './assist-summary';
+import { AssistFilters, type AssistFilter } from './assist-filters';
 import { BINDING_KINDS, bindingSentence, CatalogEvidenceList, isBindingKind } from './binding-item';
 import { ChangeItemCard, RejectSplitButton } from './change-item-card';
 import { SuppressedNotice } from './suppressed-notice';
@@ -141,6 +147,29 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const toast = useToast();
   const queryClient = useQueryClient();
   const permissions = usePermissions();
+  const user = useCurrentUser();
+  const assistQuery = useReviewAssist(changeSet.id);
+  const assist = assistQuery.data ?? null;
+  const validAssist = assist?.status === 'done' || assist?.status === 'partial' ? assist : null;
+  const [filterResultId, setFilterResultId] = useState(assist?.id);
+  const [assistFilter, setAssistFilter] = useState<AssistFilter>(null);
+  const [assistGroup, setAssistGroup] = useState('');
+  const chosenGroup = assistGroup ? validAssist?.groups[Number(assistGroup)] : undefined;
+  if (filterResultId !== assist?.id) {
+    setFilterResultId(assist?.id);
+    setAssistFilter(null);
+    setAssistGroup('');
+  } else if (validAssist && assistGroup && !chosenGroup) {
+    setAssistGroup('');
+  }
+  const requestAssist = useMutation({
+    mutationFn: () => requestReviewAssist(changeSet.id, i18n.resolvedLanguage === 'en' ? 'en' : 'zh-CN'),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: changeSetKeys.assist(changeSet.id) }),
+    onError: (error) => {
+      if (error instanceof AssistRateLimitError) toast.error(t('reviewAssist.rateLimited', { seconds: error.retryAfter }));
+      else toast.error(t('reviewAssist.requestFailed'), message(error));
+    },
+  });
   // In separate review mode nobody reviews what they submitted (403 `changeset.self_review`).
   const blockedAsSubmitter = own && !selfReview;
   const canReview = permissions.canReview && !blockedAsSubmitter;
@@ -156,9 +185,18 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
     kind,
     items: changeSet.items.filter((item) => item.kind === kind).sort((a, b) => a.seq - b.seq),
   })).filter((group) => group.items.length > 0);
-  const ordered = groups.flatMap((group) => group.items);
+  const assistItems = new Map(validAssist?.items.map((item) => [item.itemId, item]) ?? []);
+  const matchesAssist = (item: ChangeItem) => {
+    if (!validAssist) return true;
+    const result = assistItems.get(item.id);
+    return (!chosenGroup || chosenGroup.itemIds.includes(item.id)) &&
+      (!assistFilter || (result !== undefined && !result.stale && (
+        assistFilter === 'risk' ? result.risks.length > 0 : result.suggestion === assistFilter
+      )));
+  };
+  const ordered = groups.flatMap((group) => group.items).filter(matchesAssist);
   // Items are paged in the order they are listed, across the kind groups.
-  const pager = usePagination(ordered.length, changeSet.id);
+  const pager = usePagination(ordered.length, `${changeSet.id}:${assistFilter ?? ''}:${assistGroup}`);
   const pageItems = ordered.slice(pager.start, pager.end);
   const onPage = new Set(pageItems);
   const pageGroups = groups.map((group) => ({ ...group, shown: group.items.filter((item) => onPage.has(item)) })).filter((group) => group.shown.length > 0);
@@ -166,11 +204,13 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<ChangeItem | null>(null);
+  const [suggestedRename, setSuggestedRename] = useState<AssistRename | null>(null);
   const [mergeResult, setMergeResult] = useState<MergeResult | null>(null);
   // The evidence beside the list follows the page: the first item of it until one is chosen there.
   const selected = pageItems.find((item) => item.id === selectedId) ?? pageItems[0];
 
   const isOpen = changeSet.status === 'open';
+  const canRequestAssist = !!user && user.role !== 'viewer' && isOpen;
   const impacts = useBindingImpacts(changeSet.ontologyId, changeSet.id, isOpen);
   const canDecide = canReview && isOpen;
   // Submitters can take their open change set back in either review mode, reviewers too (spec 002, section 8).
@@ -190,7 +230,9 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
     return () => window.clearTimeout(timeout);
   }, [pendingCount, rejectReason]);
   // AI proposals are bulk-accepted only when confident; imports and manual edits as a whole.
-  const bulkItems = acceptsAll(changeSet.source) ? pending : isAi ? highConfidencePending(changeSet.items) : [];
+  const unassistedBulk = isAi ? highConfidencePending(changeSet.items) : [];
+  const bulkItems = acceptsAll(changeSet.source) ? pending : isAi ? highConfidencePending(changeSet.items, validAssist) : [];
+  const excludedCount = validAssist && isAi ? unassistedBulk.length - bulkItems.length : 0;
   // Items recorded as concepts already there are accepted on their own, after a list (spec 004, 5.4).
   const sameConceptItems = changeSet.source === 'ai_extraction' ? sameConceptPending(changeSet.items) : [];
 
@@ -260,8 +302,10 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
       <PageHeader
         title={changeSet.title}
         info={t('review.detailInfo')}
-        actions={
-          canDecide ? (
+        actions={<>
+          <AssistRequestButton assist={assist} canRequest={canRequestAssist}
+            pending={assistQuery.isPending || requestAssist.isPending} onRequest={() => requestAssist.mutate()} />
+          {canDecide ? (
             <>
               {pendingCount > 0 ? (
                 <span id={pendingHintId} className="text-sm text-muted-foreground">
@@ -269,11 +313,15 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                 </span>
               ) : null}
               {bulkItems.length > 0 ? (
+                <>
                 <Button variant="secondary" loading={bulk.isPending} disabled={bulkReject.isPending} onClick={() => bulk.mutate(bulkItems.map((item) => item.id))}>
                   {bulk.isPending ? null : <CheckCheck aria-hidden />}
                   {t(isAi ? 'review.acceptHighConfidence' : 'review.acceptAll', { count: bulkItems.length })}
                 </Button>
+                {excludedCount > 0 ? <span className="text-sm text-muted-foreground">{t('reviewAssist.excluded', { count: excludedCount })}</span> : null}
+                </>
               ) : null}
+              {bulkItems.length === 0 && excludedCount > 0 ? <span className="text-sm text-muted-foreground">{t('reviewAssist.excluded', { count: excludedCount })}</span> : null}
               {pendingCount > 0 ? <RejectSplitButton count={pendingCount} disabled={bulkReject.isPending || bulk.isPending}
                 onReject={() => setRejectReason(null)} onReason={setRejectReason} /> : null}
               {sameConceptItems.length > 0 ? (
@@ -316,8 +364,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
               ) : null}
               {withdrawButton}
             </>
-          )
-        }
+          )}
+        </>}
       />
 
       <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -335,6 +383,11 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
       </div>
 
       <SuppressedNotice items={changeSet.suppressed} total={changeSet.suppressedTotal} ontologyId={changeSet.ontologyId} />
+      {assistQuery.isError && !isForbidden(assistQuery.error) ? (
+        <ErrorState error={assistQuery.error} title={t('reviewAssist.loadFailed')} className="mt-4" onRetry={() => { void assistQuery.refetch(); }} />
+      ) : null}
+      <AssistSummary assist={assist} forbidden={assistQuery.isError && isForbidden(assistQuery.error)}
+        canRetry={canRequestAssist} onRetry={() => requestAssist.mutate()} />
 
       <div className="space-y-4">
         {mergeResult ? <MergeResultNotice result={mergeResult} items={changeSet.items} context={context} /> : null}
@@ -364,10 +417,14 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
         </div>
       ) : null}
 
-      {ordered.length === 0 ? (
+      {validAssist ? <div className="mt-4"><AssistFilters assist={validAssist} filter={assistFilter} group={assistGroup} onFilter={setAssistFilter} onGroup={setAssistGroup} /></div> : null}
+
+      {changeSet.items.length === 0 ? (
         <Card className="mt-4">
           <CardContent className="text-sm text-muted-foreground">{t('review.noItems')}</CardContent>
         </Card>
+      ) : ordered.length === 0 ? (
+        <Card className="mt-4"><CardContent className="text-sm text-muted-foreground">{t('reviewAssist.noResults')}</CardContent></Card>
       ) : (
         // Columns follow `wide`, not a CSS breakpoint: rem breakpoints move with the browser font
         // size, and the evidence panel's placement must match the layout. Only AI proposals have
@@ -399,6 +456,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                       onDecide={(decision, rejectReason) => decide.mutate({ itemId: item.id, patch: { decision, ...(rejectReason ? { rejectReason } : {}) } })}
                       onDecideMatch={(matchDecision) => decide.mutate({ itemId: item.id, patch: { matchDecision } })}
                       onEdit={() => setEditing(item)}
+                      assist={assistItems.get(item.id)}
+                      onApplyRename={(rename) => { setSuggestedRename(rename); setEditing(item); }}
                       impactOntologyId={isOpen ? changeSet.ontologyId : undefined}
                     />
                     {/* Stacked layout: the evidence opens under the chosen item, not after the whole list. */}
@@ -436,12 +495,14 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
         <ChangeItemEditDialog
           changeSetId={changeSet.id}
           item={editing}
+          suggestedRename={suggestedRename}
           items={changeSet.items}
           context={context}
-          onClose={() => setEditing(null)}
+          onClose={() => { setEditing(null); setSuggestedRename(null); }}
           onSaved={(item) => {
             applyItem(item);
             setEditing(null);
+            setSuggestedRename(null);
             toast.success(t('review.edit.saved'));
           }}
         />

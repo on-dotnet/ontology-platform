@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { DATATYPES } from '@/features/ontologies/api';
 import { useErrorMessage } from '@/i18n/error-message';
 
-import { patchItem, type ChangeItem } from './api';
+import { patchItem, type AssistRename, type ChangeItem } from './api';
 import {
   editableFields,
   entityTypeOptions,
@@ -31,6 +31,7 @@ interface ChangeItemEditDialogProps {
   changeSetId: string;
   /** The item being edited; the dialog is closed when null. */
   item: ChangeItem | null;
+  suggestedRename?: AssistRename | null;
   items: readonly ChangeItem[];
   context: RefContext;
   onClose: () => void;
@@ -38,7 +39,7 @@ interface ChangeItemEditDialogProps {
 }
 
 /** Edits an AI proposal with the same fields as the element; merges use the edited values. */
-export function ChangeItemEditDialog({ changeSetId, item, items, context, onClose, onSaved }: ChangeItemEditDialogProps) {
+export function ChangeItemEditDialog({ changeSetId, item, suggestedRename, items, context, onClose, onSaved }: ChangeItemEditDialogProps) {
   const { t } = useTranslation();
   return (
     <Dialog
@@ -52,7 +53,7 @@ export function ChangeItemEditDialog({ changeSetId, item, items, context, onClos
           <>
             <DialogTitle>{t('review.edit.title', { name: itemLabel(item, context, t) })}</DialogTitle>
             <DialogDescription>{t(`review.edit.description.${item.kind}`)}</DialogDescription>
-            <EditItemForm key={item.id} changeSetId={changeSetId} item={item} items={items} context={context} onSaved={onSaved} />
+            <EditItemForm key={`${item.id}:${suggestedRename ? 'suggested' : 'normal'}`} changeSetId={changeSetId} item={item} suggestedRename={suggestedRename} items={items} context={context} onSaved={onSaved} />
           </>
         ) : null}
       </DialogContent>
@@ -63,19 +64,29 @@ export function ChangeItemEditDialog({ changeSetId, item, items, context, onClos
 interface EditItemFormProps {
   changeSetId: string;
   item: ChangeItem;
+  suggestedRename?: AssistRename | null;
   items: readonly ChangeItem[];
   context: RefContext;
   onSaved: (item: ChangeItem) => void;
 }
 
-function EditItemForm({ changeSetId, item, items, context, onSaved }: EditItemFormProps) {
+function EditItemForm({ changeSetId, item, suggestedRename, items, context, onSaved }: EditItemFormProps) {
   const { t } = useTranslation();
   const message = useErrorMessage();
   const baseId = useId();
   const separator = t('common.listSeparator');
   // An update shows the element's current values under the proposed ones; only differences are sent.
   const [unedited] = useState<EditForm>(() => toEditForm(shownFields({ ...item, edited: null }), separator));
-  const [form, setForm] = useState<EditForm>(() => toEditForm(shownFields(item), separator));
+  const [form, setForm] = useState<EditForm>(() => {
+    const original = toEditForm(shownFields(item), separator);
+    if (!suggestedRename) return original;
+    return {
+      ...original,
+      ...Object.fromEntries((['labelZh', 'labelEn', 'localName'] as const)
+        .filter((field) => suggestedRename[field] !== null && suggestedRename[field] !== undefined)
+        .map((field) => [field, suggestedRename[field]])),
+    };
+  });
   const [touched, setTouched] = useState<ReadonlySet<EditField>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const fields = new Set(editableFields(item.kind, item.op));

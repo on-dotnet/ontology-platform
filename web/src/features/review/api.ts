@@ -1,6 +1,7 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query';
 
 import { api, unwrap } from '@/api/client';
+import { problemToError } from '@/api/errors';
 import type { components } from '@/api/schema';
 
 export type ChangeSetSummary = components['schemas']['ChangeSetSummary'];
@@ -19,12 +20,50 @@ export type RejectReason = NonNullable<ItemPatch['rejectReason']>;
 export type MergeResult = components['schemas']['MergeResult'];
 export type BindingImpact = components['schemas']['BindingImpact'];
 export type SkipCode = MergeResult['skipped'][number]['code'];
+export type ReviewAssist = components['schemas']['ReviewAssist'];
+export type AssistItem = components['schemas']['AssistItem'];
+export type AssistRisk = components['schemas']['AssistRisk'];
+export type AssistGroup = components['schemas']['AssistGroup'];
+export type AssistCounts = components['schemas']['AssistCounts'];
+export type AssistRename = components['schemas']['AssistRename'];
+export type AssistRequest = components['schemas']['AssistRequest'];
 
 export const changeSetKeys = {
   all: ['change-sets'] as const,
   list: (ontologyId: string) => [...changeSetKeys.all, 'list', ontologyId] as const,
   detail: (id: string) => [...changeSetKeys.all, 'detail', id] as const,
+  assist: (id: string) => [...changeSetKeys.detail(id), 'review-assist'] as const,
 };
+
+export function useReviewAssist(changeSetId: string) {
+  return useQuery({
+    queryKey: changeSetKeys.assist(changeSetId),
+    queryFn: () => unwrap(api.GET('/api/change-sets/{id}/review-assist', { params: { path: { id: changeSetId } } })),
+    refetchInterval: (query) => query.state.data?.status === 'queued' || query.state.data?.status === 'running' ? 2000 : false,
+    retry: false,
+  });
+}
+
+export class AssistRateLimitError extends Error {
+  readonly retryAfter: number;
+  constructor(retryAfter: number) {
+    super('review_assist.rate_limited');
+    this.retryAfter = retryAfter;
+  }
+}
+
+export async function requestReviewAssist(changeSetId: string, locale: AssistRequest['locale']): Promise<ReviewAssist> {
+  const { data, error, response } = await api.POST('/api/change-sets/{id}/review-assist', {
+    params: { path: { id: changeSetId } }, body: { locale },
+  });
+  if (response.status === 429) {
+    const header = response.headers.get('Retry-After') ?? '';
+    const seconds = /^\d+$/.test(header) ? Number(header) : Math.max(0, Math.ceil((Date.parse(header) - Date.now()) / 1000));
+    throw new AssistRateLimitError(Number.isFinite(seconds) ? seconds : 60);
+  }
+  if (!response.ok || error !== undefined) throw problemToError(response.status, error);
+  return data;
+}
 
 export function useChangeSets(ontologyId: string) {
   return useQuery({
@@ -150,7 +189,12 @@ export function confidenceTier(confidence: number): ConfidenceTier {
  * proposed (into an existing element, renamed), items with an alignment record and restores are decided
  * one by one (spec 004, 5.4).
  */
-export function highConfidencePending(items: readonly ChangeItem[]): ChangeItem[] {
+export function highConfidencePending(items: readonly ChangeItem[], assist?: ReviewAssist | null): ChangeItem[] {
+  const blocked = new Set(
+    assist?.status === 'done' || assist?.status === 'partial'
+      ? assist.items.filter((item) => !item.stale && (item.risks.length > 0 || item.suggestion === 'reject' || item.suggestion === 'edit')).map((item) => item.itemId)
+      : [],
+  );
   return items.filter(
     (item) =>
       item.decision === 'pending' &&
@@ -159,7 +203,8 @@ export function highConfidencePending(items: readonly ChangeItem[]): ChangeItem[
       item.flags.length === 0 &&
       !mergesDifferently(item) &&
       item.match === null &&
-      item.op !== 'restore',
+      item.op !== 'restore' &&
+      !blocked.has(item.id),
   );
 }
 
