@@ -105,7 +105,7 @@ async def request_assist(
     locale: schemas.Locale,
     settings: Settings,
 ) -> schemas.ReviewAssist:
-    change_set = await ontology_service.get_change_set(db, change_set_id)
+    change_set = await ontology_service.change_set_header(db, change_set_id)
     if change_set.status != "open":
         raise AppError(409, "changeset.closed", "Change set is closed.")
     now = _now()
@@ -181,7 +181,7 @@ async def request_assist(
 
 
 async def latest_assist(db: AsyncSession, change_set_id: UUID) -> schemas.ReviewAssist | None:
-    change_set = await ontology_service.get_change_set(db, change_set_id)
+    change_set = await ontology_service.change_set_header(db, change_set_id)
     row = await db.scalar(
         select(ReviewAssistRow)
         .where(ReviewAssistRow.change_set_id == change_set_id)

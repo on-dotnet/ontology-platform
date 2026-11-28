@@ -7,6 +7,7 @@ from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from typing import Any
+from unittest.mock import AsyncMock
 from uuid import UUID, uuid4
 
 import pytest
@@ -22,6 +23,7 @@ from ontology_platform.modules.ai.gateway import AiUnavailableError
 from ontology_platform.modules.ai.models import AiRun, ReviewAssistRow
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.jobs.runner import JobContext
+from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.models import (
     ChangeItem,
     ChangeSet,
@@ -265,6 +267,49 @@ async def test_permissions_status_and_rule_only(
     assert (closed.status_code, closed.json()["code"]) == (409, "changeset.closed")
     await sign_in(client, db, Role.VIEWER)
     assert (await _request(client, change_set_id)).status_code == 403
+
+
+async def test_request_and_latest_assist_skip_change_set_detail(
+    client: AsyncClient, db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ontology = await add_ontology(db)
+    change_set_id = await open_change_set(
+        db, ontology, [proposal("create", "entity_type", local_name="Motor", label_zh="Motor")]
+    )
+    await sign_in(client, db, Role.EDITOR)
+    detail = AsyncMock(side_effect=AssertionError("Review assistance loaded the full change set"))
+    monkeypatch.setattr(ontology_service, "get_change_set", detail)
+
+    started = await _request(client, change_set_id)
+    assert started.status_code == 202
+    latest = await client.get(f"/api/change-sets/{change_set_id}/review-assist")
+    assert latest.status_code == 200
+    assert latest.json() == started.json()
+    detail.assert_not_called()
+
+
+@pytest.mark.parametrize("status", ["queued", "running"])
+async def test_polling_active_assist_skips_review_context(
+    client: AsyncClient, db: AsyncSession, monkeypatch: pytest.MonkeyPatch, status: str
+) -> None:
+    ontology = await add_ontology(db)
+    change_set_id = await open_change_set(
+        db, ontology, [proposal("create", "entity_type", local_name="Motor", label_zh="Motor")]
+    )
+    await sign_in(client, db, Role.EDITOR)
+    started = await _request(client, change_set_id)
+    assert started.status_code == 202
+    row = await db.get(ReviewAssistRow, UUID(started.json()["id"]))
+    assert row is not None
+    row.status = status
+    await db.commit()
+    context = AsyncMock(wraps=review_context)
+    monkeypatch.setattr(review_assist, "review_context", context)
+
+    polled = await client.get(f"/api/change-sets/{change_set_id}/review-assist")
+    assert polled.status_code == 200
+    assert (polled.json()["status"], polled.json()["items"]) == (status, [])
+    context.assert_not_called()
 
 
 async def test_context_edited_and_no_catalog_quote(db: AsyncSession) -> None:
@@ -750,6 +795,7 @@ async def test_open_get_recomputes_rule_risks_but_closed_get_uses_saved(
     client: AsyncClient,
     db: AsyncSession,
     settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     ontology = await add_ontology(db)
     change_set_id = await open_change_set(
@@ -764,13 +810,19 @@ async def test_open_get_recomputes_rule_risks_but_closed_get_uses_saved(
     item.flags = ["possible_duplicate"]
     await db.commit()
     url = f"/api/change-sets/{change_set_id}/review-assist"
+    context = AsyncMock(wraps=review_context)
+    monkeypatch.setattr(review_assist, "review_context", context)
     open_result = (await client.get(url)).json()
+    assert open_result["status"] == "done"
     assert "possible_duplicate" in [risk["detail"] for risk in open_result["items"][0]["risks"]]
+    context.assert_awaited_once()
     change_set = await db.get(ChangeSet, change_set_id)
     assert change_set is not None
     change_set.status = "rejected"
     await db.commit()
+    context.reset_mock()
     closed_result = (await client.get(url)).json()
+    context.assert_not_called()
     assert "possible_duplicate" not in [
         risk["detail"] for risk in closed_result["items"][0]["risks"]
     ]

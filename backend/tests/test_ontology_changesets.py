@@ -8,8 +8,9 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
-from sqlalchemy import func, select
+from sqlalchemy import Select, event, func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.orm import ORMExecuteState
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit.models import AuditEvent
@@ -517,6 +518,45 @@ async def test_bulk_decisions(client: AsyncClient, db: AsyncSession) -> None:
     assert detail["items"][0]["proposed"] == {"localName": "Slab", "labelZh": "板坯"}
     [still_pending] = await change_set_items(client, other_id)
     assert still_pending["decision"] == "pending"
+
+
+async def test_change_set_header_reads_only_status_and_ontology_id(db: AsyncSession) -> None:
+    ontology = await add_ontology(db)
+    change_set_id = await open_change_set(db, ontology, [slab()])
+    detail = await service.get_change_set(db, change_set_id)
+    reads: list[Select[Any]] = []
+
+    @event.listens_for(db.sync_session, "do_orm_execute")
+    def record_read(state: ORMExecuteState) -> None:
+        assert isinstance(state.statement, Select)
+        reads.append(state.statement)
+
+    header = await service.change_set_header(db, change_set_id)
+    assert (header.status, header.ontology_id) == (detail.status, detail.ontology_id)
+    [query] = reads
+    assert query.get_final_froms() == [ChangeSet.__table__]
+    assert set(query.selected_columns.keys()) == {"status", "ontology_id"}
+
+
+@pytest.mark.parametrize("delete_ontology", [False, True], ids=["unknown", "deleted-ontology"])
+async def test_change_set_header_matches_detail_when_missing(
+    db: AsyncSession, delete_ontology: bool
+) -> None:
+    if delete_ontology:
+        ontology = await add_ontology(db)
+        change_set_id = await open_change_set(db, ontology, [slab()])
+        await db.delete(ontology)
+        await db.commit()
+    else:
+        change_set_id = uuid4()
+
+    with pytest.raises(AppError) as detail:
+        await service.get_change_set(db, change_set_id)
+    with pytest.raises(AppError) as header:
+        await service.change_set_header(db, change_set_id)
+    expected = (404, "changeset.not_found", "Change set or item not found.")
+    assert (detail.value.status, detail.value.code, detail.value.detail) == expected
+    assert (header.value.status, header.value.code, header.value.detail) == expected
 
 
 async def test_list_change_sets_with_counts_and_filters(

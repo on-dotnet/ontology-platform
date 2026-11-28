@@ -15,9 +15,9 @@ from ontology_platform.modules.ontology.mergeplan import name_key
 from ontology_platform.modules.ontology.review_memory import (
     ReviewMemory,
     _main_name,
-    _normalize,
     apply_delta,
     collect,
+    normalize_key,
     pair_key,
     property_key,
     relation_key,
@@ -122,7 +122,7 @@ async def test_a_change_set_keeps_200_suppressed_proposals_and_counts_the_rest(
     ],
 )
 def test_review_keys_follow_candidate_normalization(zh: str | None, en: str | None) -> None:
-    assert _normalize(zh or "") == normalize(zh or "") == name_key(zh or "")
+    assert normalize_key(zh or "") == normalize(zh or "") == name_key(zh or "")
     assert _main_name(zh, en) == main_name(zh, en)
     assert type_key(zh, en) == "t:" + main_name(zh, en)
     assert relation_key("炉次", "产出", "钢卷") == "r:炉次|产出|钢卷"
